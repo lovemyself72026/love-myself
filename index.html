@@ -194,27 +194,150 @@
 <div class="section" id="schedule">
   <div class="subtitle">Plan your day</div>
   <h1>My schedule.</h1><br>
-  <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;" id="schedule-date"></div>
 
-  <!-- Add slot form -->
-  <div style="border:1px solid #c8c8c5;padding:2rem;margin-bottom:2rem;">
-    <div style="display:flex;gap:0.5rem;align-items:flex-end;margin-bottom:1rem;">
-      <input type="text" id="slot-time-text" placeholder="8:00" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;width:55px;flex-shrink:0;">
-      <select id="slot-ampm" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;cursor:pointer;width:55px;flex-shrink:0;">
-        <option value="AM">AM</option>
-        <option value="PM">PM</option>
-      </select>
-      <input type="text" id="slot-activity" placeholder="Activity..." onkeydown="if(event.key==='Enter')addSlot()" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;flex:1;min-width:0;">
+  <!-- Date navigation -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+    <button onclick="changeScheduleDay(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8249;</button>
+    <div style="text-align:center;">
+      <input type="date" id="schedule-date-picker" onchange="changeScheduleDate(this.value)" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;cursor:pointer;text-align:center;">
+      <div id="schedule-day-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-top:0.3rem;"></div>
     </div>
-    <input type="text" id="slot-note" placeholder="Notes (optional)..." onkeydown="if(event.key==='Enter')addSlot()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--gray);outline:none;padding:0.4rem 0;margin-bottom:1.2rem;display:block;">
-    <button class="btn fill" style="width:100%;text-align:center;" onclick="addSlot()">Add to schedule</button>
+    <button onclick="changeScheduleDay(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8250;</button>
   </div>
 
-  <div id="schedule-list"></div>
-  <div style="display:flex;justify-content:flex-end;margin-top:1rem;">
-    <button class="btn" onclick="resetSchedule()">Reset day</button>
+  <!-- Planner grid -->
+  <!-- Planner grid -->
+  <div id="planner-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;align-items:start;">
+
+    <!-- Goals + To Do side by side at top -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div class="planner-label">Goals</div>
+      <div id="goals-list" style="margin-top:0.5rem;"></div>
+      <input id="goals-input" placeholder="Add goal..." onkeydown="if(event.key==='Enter')addGoal()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.4rem;">
+    </div>
+
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div class="planner-label">To Do</div>
+      <div id="todo-list" style="margin-top:0.5rem;"></div>
+      <input id="todo-input" placeholder="Add task..." onkeydown="if(event.key==='Enter')addTodo()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
+    </div>
+
+    <!-- LEFT: Schedule, Notes -->
+    <div style="display:flex;flex-direction:column;gap:0.6rem;">
+
+      <!-- Schedule -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label">Schedule</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:0 0.4rem;margin-top:0.5rem;" id="schedule-time-rows"></div>
+      </div>
+
+      <!-- Notes -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label">Notes</div>
+        <textarea class="planner-textarea" id="planner-notes" placeholder="..." rows="1" style="width:100%;margin-top:0.4rem;max-height:40px;overflow-y:auto;"></textarea>
+        <button onclick="saveNote()" style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:var(--gray);padding:0.3rem 0.8rem;cursor:pointer;margin-top:0.6rem;width:100%;">Save note</button>
+        <div id="notes-list" style="margin-top:0.6rem;"></div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Mood, Sleep, Water, Exercise, Meals -->
+    <div style="display:flex;flex-direction:column;gap:0.6rem;">
+
+      <!-- Mood -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label">Mood</div>
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;">
+          <span class="mood-btn" onclick="toggleMood(this,'😊')">😊</span>
+          <span class="mood-btn" onclick="toggleMood(this,'😔')">😔</span>
+          <span class="mood-btn" onclick="toggleMood(this,'😰')">😰</span>
+          <span class="mood-btn" onclick="toggleMood(this,'😡')">😡</span>
+          <span class="mood-btn" onclick="toggleMood(this,'🥰')">🥰</span>
+          <span class="mood-btn" onclick="toggleMood(this,'😴')">😴</span>
+          <span class="mood-btn" onclick="toggleMood(this,'😐')">😐</span>
+          <span class="mood-btn" onclick="toggleMood(this,'🥺')">🥺</span>
+          <span class="mood-btn" onclick="toggleMood(this,'😤')">😤</span>
+          <span class="mood-btn" onclick="toggleMood(this,'😭')">😭</span>
+          <span class="mood-btn" onclick="toggleMood(this,'🤩')">🤩</span>
+          <span class="mood-btn" onclick="toggleMood(this,'😌')">😌</span>
+          <span class="mood-btn" onclick="toggleMood(this,'🤗')">🤗</span>
+          <span class="mood-btn" onclick="toggleMood(this,'😶')">😶</span>
+          <span class="mood-btn" onclick="toggleMood(this,'🥱')">🥱</span>
+          <span class="mood-btn" onclick="toggleMood(this,'😇')">😇</span>
+          <span class="mood-btn" onclick="toggleMood(this,'🤯')">🤯</span>
+          <span class="mood-btn" onclick="toggleMood(this,'💪')">💪</span>
+          <span class="mood-btn" onclick="toggleMood(this,'🔥')">🔥</span>
+          <span class="mood-btn" onclick="toggleMood(this,'😞')">😞</span>
+          <span class="mood-btn" onclick="toggleMood(this,'🥹')">🥹</span>
+        </div>
+      </div>
+
+      <!-- Sleep -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label">Sleep (hrs)</div>
+        <div style="display:flex;justify-content:space-between;margin-top:0.5rem;">
+          <span class="sleep-btn" onclick="setSleep(this,4)">4</span>
+          <span class="sleep-btn" onclick="setSleep(this,5)">5</span>
+          <span class="sleep-btn" onclick="setSleep(this,6)">6</span>
+          <span class="sleep-btn" onclick="setSleep(this,7)">7</span>
+          <span class="sleep-btn" onclick="setSleep(this,8)">8+</span>
+        </div>
+      </div>
+
+      <!-- Water -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label">Water</div>
+        <div style="display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:nowrap;justify-content:space-between;" id="water-cups">
+          <span class="water-cup" onclick="toggleWater(this)">💧</span>
+          <span class="water-cup" onclick="toggleWater(this)">💧</span>
+          <span class="water-cup" onclick="toggleWater(this)">💧</span>
+          <span class="water-cup" onclick="toggleWater(this)">💧</span>
+          <span class="water-cup" onclick="toggleWater(this)">💧</span>
+          <span class="water-cup" onclick="toggleWater(this)">💧</span>
+          <span class="water-cup" onclick="toggleWater(this)">💧</span>
+          <span class="water-cup" onclick="toggleWater(this)">💧</span>
+        </div>
+      </div>
+
+      <!-- Exercise -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label">Exercise</div>
+        <div style="display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap;">
+          <span class="exercise-btn" onclick="toggleExercise(this,'Cardio')">Cardio</span>
+          <span class="exercise-btn" onclick="toggleExercise(this,'Strength')">Strength</span>
+          <span class="exercise-btn" onclick="toggleExercise(this,'Yoga')">Yoga</span>
+          <span class="exercise-btn" onclick="toggleExercise(this,'Walk')">Walk</span>
+          <span class="exercise-btn" onclick="toggleExercise(this,'Rest')">Rest</span>
+        </div>
+      </div>
+
+      <!-- Meals -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label">Breakfast</div>
+        <textarea class="planner-textarea" id="meal-breakfast" placeholder="..." rows="2"></textarea>
+        <div class="planner-label" style="margin-top:0.6rem;">Lunch</div>
+        <textarea class="planner-textarea" id="meal-lunch" placeholder="..." rows="2"></textarea>
+        <div class="planner-label" style="margin-top:0.6rem;">Dinner</div>
+        <textarea class="planner-textarea" id="meal-dinner" placeholder="..." rows="2"></textarea>
+      </div>
+
+    </div>
+
   </div>
+
+  <div style="display:flex;justify-content:space-between;margin-top:1rem;flex-wrap:wrap;gap:0.5rem;">
+    <button class="btn" onclick="resetSchedule()">Clear day</button>
+    <button class="btn fill" onclick="savePlannerDay()">Save day</button>
+  </div>
+
 </div>
+
+
+  </div>
+
+</div>
+
+
 
 <div class="section" id="rituals">
   <div class="subtitle">My Daily care</div>
@@ -356,13 +479,13 @@ function newAffirmation(){
 }
 
 function saveAffirmation(){
-  if(!savedAffirmations.includes(currentAff)){savedAffirmations.push(currentAff);localStorage.setItem('saved_affirmations',JSON.stringify(savedAffirmations));renderSavedAffirmations();}
+  if(!savedAffirmations.find(a=>(a.text||a)===currentAff)){savedAffirmations.push({text:currentAff,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' · '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});localStorage.setItem('saved_affirmations',JSON.stringify(savedAffirmations));renderSavedAffirmations();}
 }
 
 function renderSavedAffirmations(){
   const el=document.getElementById('saved-affirmations');
   if(!savedAffirmations.length){el.innerHTML='<p style="color:var(--gray);font-size:0.95rem;">The ones that resonate will appear here.</p>';return;}
-  el.innerHTML=savedAffirmations.map((a,i)=>`<div class="journal-entry"><button onclick="removeSavedAff(${i})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.4rem;">remove</button><div class="journal-content">${a}</div></div>`).join('');
+  el.innerHTML=savedAffirmations.map((a,i)=>`<div class="journal-entry"><button onclick="removeSavedAff(${i})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.4rem;">remove</button><div class="journal-date">${a.date||''}</div><div class="journal-content">${a.text||a}</div></div>`).join('');
 }
 
 function removeSavedAff(i){savedAffirmations.splice(i,1);localStorage.setItem('saved_affirmations',JSON.stringify(savedAffirmations));renderSavedAffirmations();}
@@ -371,7 +494,7 @@ function addRitual(){
   const input = document.getElementById('ritual-input');
   const val = input.value.trim();
   if(!val) return;
-  userRituals.push({ id: Date.now(), label: val });
+  userRituals.push({ id: Date.now(), label: val, date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}) });
   localStorage.setItem('user_rituals', JSON.stringify(userRituals));
   input.value = '';
   renderRituals();
@@ -409,7 +532,7 @@ function renderRituals(){
       <div style="display:flex;align-items:center;gap:1rem;">
         <button onclick="event.stopPropagation();deleteRitual(${r.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;flex-shrink:0;">remove</button>
         <div style="flex:1;display:flex;align-items:center;justify-content:space-between;" onclick="toggleRitual(${r.id})">
-          <div class="ritual-label" style="flex:1;text-align:center;">${r.label}</div>
+          <div style="flex:1;text-align:center;"><div class="ritual-label">${r.label}</div>${r.date ? `<div style="font-family:'Nunito',sans-serif;font-size:0.6rem;color:var(--gray);letter-spacing:0.08em;margin-top:0.2rem;">${r.date}</div>` : ''}</div>
           <div class="ritual-check"></div>
         </div>
       </div>
@@ -444,7 +567,7 @@ function addWin() {
   const input = document.getElementById('win-input');
   const val = input.value.trim();
   if (!val) return;
-  wins.unshift({ id: Date.now(), text: val, date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) });
+  wins.unshift({ id: Date.now(), text: val, date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}) });
   localStorage.setItem('my_wins', JSON.stringify(wins));
   input.value = '';
   renderWins();
@@ -497,7 +620,7 @@ if (whoiHistory.length) {
 function saveWhoIAm() {
   const entry = {
     id: Date.now(),
-    date: new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}),
+    date: new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}),
     free: document.getElementById('whoi-free').value.trim()
   };
   whoiHistory.unshift(entry);
@@ -530,84 +653,298 @@ function renderWhoIHistory() {
 
 renderWhoIHistory();
 
-// Schedule styles
+// Schedule & Planner styles
 const scheduleStyle = document.createElement('style');
 scheduleStyle.textContent = `
-  .slot-item { display:flex; align-items:flex-start; gap:1rem; padding:1rem 0; border-bottom:1px solid #e8e8e5; }
-  .slot-item.done .slot-activity { text-decoration:line-through; color:var(--gray); }
-  .slot-check { width:20px; height:20px; border:1px solid #c8c8c5; flex-shrink:0; margin-top:3px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background 0.2s; }
-  .slot-item.done .slot-check { background:var(--black); border-color:var(--black); }
-  .slot-item.done .slot-check::after { content:''; width:8px; height:5px; border-left:1.5px solid var(--white); border-bottom:1.5px solid var(--white); transform:rotate(-45deg) translateY(-1px); }
-  .slot-time { font-family:'Nunito',sans-serif; font-size:0.72rem; letter-spacing:0.08em; color:var(--gray); margin-bottom:0.2rem; }
-  .slot-activity { font-family:'Nunito',sans-serif; font-size:1rem; font-weight:300; }
-  .slot-note { font-family:'Lora',serif; font-style:italic; font-size:0.85rem; color:var(--gray); margin-top:0.2rem; }
-  .slot-remove { font-family:'Nunito',sans-serif; font-size:0.6rem; letter-spacing:0.1em; color:var(--gray); border:none; background:none; cursor:pointer; text-transform:uppercase; margin-left:auto; flex-shrink:0; padding-top:0.2rem; }
+  .planner-label { font-family:'Nunito',sans-serif; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gray); }
+  .planner-textarea { width:100%; border:none; border-bottom:1px solid #e8e8e5; background:transparent; font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; color:var(--black); outline:none; resize:none; padding:0.3rem 0; line-height:1.5; }
+  .mood-btn { font-size:1.2rem; cursor:pointer; opacity:0.35; transition:opacity 0.15s; }
+  .mood-btn.selected { opacity:1; }
+  .sleep-btn { font-family:'Nunito',sans-serif; font-size:0.72rem; border:1px solid #c8c8c5; padding:0.2rem 0.45rem; cursor:pointer; color:var(--gray); background:none; transition:all 0.15s; }
+  .sleep-btn.selected { background:var(--black); color:var(--white); border-color:var(--black); }
+  .water-cup { font-size:1rem; cursor:pointer; opacity:0.25; transition:opacity 0.15s; }
+  .water-cup.filled { opacity:1; }
+  .exercise-btn { font-family:'Nunito',sans-serif; font-size:0.65rem; letter-spacing:0.06em; border:1px solid #c8c8c5; padding:0.2rem 0.5rem; cursor:pointer; color:var(--gray); background:none; transition:all 0.15s; }
+  .exercise-btn.selected { background:var(--black); color:var(--white); border-color:var(--black); }
+  .todo-item { display:flex; align-items:center; gap:0.4rem; margin-bottom:0.35rem; }
+  .todo-check { width:12px; height:12px; border:1px solid #c8c8c5; flex-shrink:0; cursor:pointer; transition:background 0.15s; }
+  .todo-check.done { background:var(--black); border-color:var(--black); }
+  .todo-text { font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; flex:1; }
+  .todo-text.done { text-decoration:line-through; color:var(--gray); }
+  .time-label { font-family:'Nunito',sans-serif; font-size:0.65rem; color:var(--gray); padding:0.4rem 0.3rem 0 0; white-space:nowrap; }
+  .time-input { border:none; border-bottom:1px solid #e8e8e5; background:transparent; font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; color:var(--black); outline:none; padding:0.35rem 0; width:100%; }
 `;
 document.head.appendChild(scheduleStyle);
 
-let scheduleSlots = JSON.parse(localStorage.getItem('schedule_slots') || '[]');
-let scheduleDone = JSON.parse(localStorage.getItem('schedule_done') || '{}');
+let allPlannerData = JSON.parse(localStorage.getItem('all_planner_data') || '{}');
+let currentScheduleDate = new Date().toISOString().split('T')[0];
 
-// Set schedule date
-document.getElementById('schedule-date').textContent = new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'});
+function getDateKey() { return currentScheduleDate; }
+function getPlannerDay() { return allPlannerData[getDateKey()] || {}; }
 
-function addSlot() {
-  const timeText = document.getElementById('slot-time-text').value.trim();
-  const ampm = document.getElementById('slot-ampm').value;
-  const time = timeText ? `${timeText} ${ampm}` : '';
-  const activity = document.getElementById('slot-activity').value.trim();
-  const note = document.getElementById('slot-note').value.trim();
-  if (!activity) return;
-  scheduleSlots.push({ id: Date.now(), time, activity, note });
-  scheduleSlots.sort((a, b) => a.time.localeCompare(b.time));
-  localStorage.setItem('schedule_slots', JSON.stringify(scheduleSlots));
-  document.getElementById('slot-time-text').value = '';
-  document.getElementById('slot-activity').value = '';
-  document.getElementById('slot-note').value = '';
-  renderSchedule();
+function initScheduleDatePicker() {
+  document.getElementById('schedule-date-picker').value = currentScheduleDate;
+  updateDayLabel();
 }
 
-function toggleSlot(id) {
-  scheduleDone[id] = !scheduleDone[id];
-  localStorage.setItem('schedule_done', JSON.stringify(scheduleDone));
-  renderSchedule();
+function updateDayLabel() {
+  const d = new Date(currentScheduleDate + 'T00:00:00');
+  const today = new Date().toISOString().split('T')[0];
+  let label = d.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+  if (currentScheduleDate === today) label += ' — Today';
+  document.getElementById('schedule-day-label').textContent = label;
+  document.getElementById('schedule-date-picker').value = currentScheduleDate;
 }
 
-function deleteSlot(id) {
-  scheduleSlots = scheduleSlots.filter(s => s.id !== id);
-  delete scheduleDone[id];
-  localStorage.setItem('schedule_slots', JSON.stringify(scheduleSlots));
-  localStorage.setItem('schedule_done', JSON.stringify(scheduleDone));
+function changeScheduleDate(val) {
+  savePlannerDay();
+  currentScheduleDate = val;
+  updateDayLabel();
+  loadPlannerDay();
+}
+
+function changeScheduleDay(dir) {
+  savePlannerDay();
+  const d = new Date(currentScheduleDate + 'T00:00:00');
+  d.setDate(d.getDate() + dir);
+  currentScheduleDate = d.toISOString().split('T')[0];
+  updateDayLabel();
+  loadPlannerDay();
+}
+
+// Schedule time rows
+function renderSchedule() {
+  const el = document.getElementById('schedule-time-rows');
+  if (!el) return;
+  const day = getPlannerDay();
+  const schedule = day.schedule || {};
+  const hours = [];
+  for (let h = 4; h <= 24; h++) {
+    const label = h < 12 ? `${h}am` : h === 12 ? '12pm' : h === 24 ? '12am' : `${h-12}pm`;
+    hours.push({h, label});
+  }
+  el.innerHTML = hours.map(({h, label}) => {
+    const entry = schedule[h] || {};
+    const val = typeof entry === 'string' ? entry : (entry.text || '');
+    const savedTime = typeof entry === 'object' && entry.time ? `<span style="font-family:'Nunito',sans-serif;font-size:0.58rem;color:var(--gray);margin-left:0.3rem;">${entry.time}</span>` : '';
+    return `<div class="time-label">${label}</div>
+    <div style="display:flex;align-items:center;gap:0.2rem;">
+      <input class="time-input" data-hour="${h}" value="${val}" placeholder="..." onblur="saveScheduleRow(${h}, this.value)" style="flex:1;">
+      <span id="st-${h}">${savedTime}</span>
+    </div>`;
+  }).join('');
+}
+
+function saveScheduleRow(h, val) {
+  const key = getDateKey();
+  if (!allPlannerData[key]) allPlannerData[key] = {};
+  if (!allPlannerData[key].schedule) allPlannerData[key].schedule = {};
+  if (val.trim()) {
+    const time = new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+    allPlannerData[key].schedule[h] = { text: val, time };
+    const span = document.getElementById(`st-${h}`);
+    if (span) span.innerHTML = `<span style="font-family:'Nunito',sans-serif;font-size:0.58rem;color:var(--gray);margin-left:0.3rem;">${time}</span>`;
+  } else {
+    allPlannerData[key].schedule[h] = '';
+    const span = document.getElementById(`st-${h}`);
+    if (span) span.innerHTML = '';
+  }
+  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData));
+}
+
+// Mood
+function toggleMood(el, emoji) {
+  el.classList.toggle('selected');
+  savePlannerDay();
+}
+
+// Sleep
+function setSleep(el, hrs) {
+  document.querySelectorAll('.sleep-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  savePlannerDay();
+}
+
+// Water
+function toggleWater(el) {
+  el.classList.toggle('filled');
+  savePlannerDay();
+}
+
+// Exercise
+function toggleExercise(el) {
+  el.classList.toggle('selected');
+  savePlannerDay();
+}
+
+// Todo
+let plannerTodos = [];
+function addTodo() {
+  const inp = document.getElementById('todo-input');
+  const text = inp.value.trim();
+  if (!text) return;
+  plannerTodos.push({id: Date.now(), text, done: false, time: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});
+  inp.value = '';
+  renderTodos();
+  savePlannerDay();
+}
+function toggleTodo(id) {
+  plannerTodos = plannerTodos.map(t => t.id===id ? {...t, done:!t.done} : t);
+  renderTodos();
+  savePlannerDay();
+}
+function renderTodos() {
+  const el = document.getElementById('todo-list');
+  el.innerHTML = plannerTodos.map(t => `
+    <div class="todo-item">
+      <div class="todo-check${t.done?' done':''}" onclick="toggleTodo(${t.id})"></div>
+      <div style="flex:1;"><div class="todo-text${t.done?' done':''}">${t.text}</div>${t.time?`<div style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);">${t.time}</div>`:''}</div>
+      <button onclick="removeTodo(${t.id})" style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.08em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;flex-shrink:0;">✕</button>
+    </div>`).join('');
+}
+
+function removeTodo(id) {
+  plannerTodos = plannerTodos.filter(t => t.id !== id);
+  renderTodos();
+  savePlannerDay();
+}
+
+// Notes
+let plannerNotes = [];
+function saveNote() {
+  const text = document.getElementById('planner-notes').value.trim();
+  if (!text) return;
+  plannerNotes.unshift({
+    id: Date.now(),
+    text,
+    time: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+  });
+  document.getElementById('planner-notes').value = '';
+  renderNotes();
+  savePlannerDay();
+}
+function removeNote(id) {
+  plannerNotes = plannerNotes.filter(n => n.id !== id);
+  renderNotes();
+  savePlannerDay();
+}
+function renderNotes() {
+  const el = document.getElementById('notes-list');
+  if (!el) return;
+  el.innerHTML = plannerNotes.map(n => `
+    <div style="border-bottom:1px solid #f0f0ee;padding:0.5rem 0;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);">${n.time}</div>
+        <button onclick="removeNote(${n.id})" style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;">✕</button>
+      </div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;margin-top:0.2rem;">${n.text}</div>
+    </div>`).join('');
+}
+
+// Goals
+let plannerGoals = [];
+function addGoal() {
+  const inp = document.getElementById('goals-input');
+  const text = inp.value.trim();
+  if (!text) return;
+  plannerGoals.push({id: Date.now(), text, done: false, time: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});
+  inp.value = '';
+  renderGoals();
+  savePlannerDay();
+}
+function toggleGoal(id) {
+  plannerGoals = plannerGoals.map(g => g.id===id ? {...g, done:!g.done} : g);
+  renderGoals();
+  savePlannerDay();
+}
+function renderGoals() {
+  const el = document.getElementById('goals-list');
+  el.innerHTML = plannerGoals.map(g => `
+    <div class="todo-item">
+      <div class="todo-check${g.done?' done':''}" onclick="toggleGoal(${g.id})"></div>
+      <div style="flex:1;"><div class="todo-text${g.done?' done':''}">${g.text}</div>${g.time?`<div style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);">${g.time}</div>`:''}</div>
+      <button onclick="removeGoal(${g.id})" style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.08em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;flex-shrink:0;">✕</button>
+    </div>`).join('');
+}
+
+function removeGoal(id) {
+  plannerGoals = plannerGoals.filter(g => g.id !== id);
+  renderGoals();
+  savePlannerDay();
+}
+
+function savePlannerDay() {
+  const key = getDateKey();
+  if (!allPlannerData[key]) allPlannerData[key] = {};
+  const d = allPlannerData[key];
+  // mood
+  d.mood = [...document.querySelectorAll('.mood-btn.selected')].map(e=>e.textContent);
+  // sleep
+  const sleepEl = document.querySelector('.sleep-btn.selected');
+  d.sleep = sleepEl ? sleepEl.textContent : '';
+  // water
+  d.water = [...document.querySelectorAll('.water-cup')].map(e=>e.classList.contains('filled'));
+  // exercise
+  d.exercise = [...document.querySelectorAll('.exercise-btn.selected')].map(e=>e.textContent);
+  // meals
+  d.breakfast = document.getElementById('meal-breakfast')?.value || '';
+  d.lunch = document.getElementById('meal-lunch')?.value || '';
+  d.dinner = document.getElementById('meal-dinner')?.value || '';
+  // notes & grateful
+  d.notes = document.getElementById('planner-notes')?.value || '';
+  d.notesList = plannerNotes;
+
+  // todos & goals
+  d.todos = plannerTodos;
+  d.goals = plannerGoals;
+  d.savedAt = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData));
+  const btn = document.querySelector('[onclick="savePlannerDay()"]');
+  if (btn) { btn.textContent = 'Saved ✓'; setTimeout(()=>btn.textContent='Save day',1500); }
+}
+
+function loadPlannerDay() {
+  const d = getPlannerDay();
+  // mood
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  if (d.mood) d.mood.forEach(m => {
+    document.querySelectorAll('.mood-btn').forEach(b => { if(b.textContent===m) b.classList.add('selected'); });
+  });
+  // sleep
+  document.querySelectorAll('.sleep-btn').forEach(b => { b.classList.toggle('selected', b.textContent==d.sleep); });
+  // water
+  if (d.water) document.querySelectorAll('.water-cup').forEach((c,i) => c.classList.toggle('filled', !!d.water[i]));
+  // exercise
+  document.querySelectorAll('.exercise-btn').forEach(b => b.classList.toggle('selected', d.exercise&&d.exercise.includes(b.textContent)));
+  // meals
+  if (document.getElementById('meal-breakfast')) document.getElementById('meal-breakfast').value = d.breakfast||'';
+  if (document.getElementById('meal-lunch')) document.getElementById('meal-lunch').value = d.lunch||'';
+  if (document.getElementById('meal-dinner')) document.getElementById('meal-dinner').value = d.dinner||'';
+  if (document.getElementById('planner-notes')) document.getElementById('planner-notes').value = d.notes||'';
+  plannerNotes = d.notesList || [];
+  renderNotes();
+
+  // todos & goals
+  plannerTodos = d.todos || [];
+  plannerGoals = d.goals || [];
+  renderTodos();
+  renderGoals();
   renderSchedule();
 }
 
 function resetSchedule() {
-  scheduleDone = {};
-  localStorage.setItem('schedule_done', JSON.stringify(scheduleDone));
-  renderSchedule();
+  if (!confirm('Clear everything for this day?')) return;
+  delete allPlannerData[getDateKey()];
+  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData));
+  loadPlannerDay();
 }
 
-function renderSchedule() {
-  const el = document.getElementById('schedule-list');
-  if (!scheduleSlots.length) {
-    el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;">Add your first time slot above and plan your beautiful day.</p>';
-    return;
-  }
-  el.innerHTML = scheduleSlots.map(s => `
-    <div class="slot-item ${scheduleDone[s.id] ? 'done' : ''}">
-      <div style="flex:1;">
-        <button class="slot-remove" onclick="deleteSlot(${s.id})">remove</button>
-        ${s.time ? `<div class="slot-time">${formatTime(s.time)}</div>` : ''}
-        <div class="slot-activity">${s.activity}</div>
-        ${s.note ? `<div class="slot-note">${s.note}</div>` : ''}
-      </div>
-      <div class="slot-check" onclick="toggleSlot(${s.id})" style="align-self:flex-start;margin-top:0;"></div>
-    </div>`).join('');
-}
+function addSlot() {}
+function deleteSlot() {}
+function formatTime(t) { return t||''; }
 
-function formatTime(t) { return t || ''; }
-
-renderSchedule();
+initScheduleDatePicker();
+loadPlannerDay();
 
 // Vision Board styles
 const visionStyle = document.createElement('style');
@@ -639,13 +976,13 @@ function addVisionItem() {
   if (currentVisionType === 'dream') {
     const text = document.getElementById('vision-dream-text').value.trim();
     if (!text) return;
-    visionItems.push({ id: Date.now(), type: 'dream', content: text });
+    visionItems.push({ id: Date.now(), type: 'dream', content: text, date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}) });
     document.getElementById('vision-dream-text').value = '';
     saveAndRenderVision();
   } else if (currentVisionType === 'word') {
     const text = document.getElementById('vision-word-text').value.trim();
     if (!text) return;
-    visionItems.push({ id: Date.now(), type: 'word', content: text });
+    visionItems.push({ id: Date.now(), type: 'word', content: text, date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}) });
     document.getElementById('vision-word-text').value = '';
     saveAndRenderVision();
   } else if (currentVisionType === 'image') {
@@ -653,7 +990,7 @@ function addVisionItem() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = function(e) {
-      visionItems.push({ id: Date.now(), type: 'image', content: e.target.result });
+      visionItems.push({ id: Date.now(), type: 'image', content: e.target.result, date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}) });
       document.getElementById('vision-image-file').value = '';
       saveAndRenderVision();
     };
@@ -685,9 +1022,9 @@ function renderVisionBoard() {
   board.innerHTML = visionItems.map(v => {
     let inner = '';
     if (v.type === 'dream') {
-      inner = `<div class="vision-card-type">Dream & Goal</div><div class="vision-card-content">${v.content}</div>`;
+      inner = `<div class="vision-card-type">Dream & Goal</div><div class="vision-card-content">${v.content}</div>${v.date ? `<div style="font-family:'Nunito',sans-serif;font-size:0.6rem;color:var(--gray);margin-top:0.5rem;">${v.date}</div>` : ''}`;
     } else if (v.type === 'word') {
-      inner = `<div class="vision-card-type">Word</div><div class="vision-card-word">${v.content}</div>`;
+      inner = `<div class="vision-card-type">Word</div><div class="vision-card-word">${v.content}</div>${v.date ? `<div style="font-family:'Nunito',sans-serif;font-size:0.6rem;color:var(--gray);margin-top:0.5rem;text-align:center;">${v.date}</div>` : ''}`;
     } else if (v.type === 'image') {
       inner = `<img src="${v.content}" alt="vision">`;
     }
@@ -704,7 +1041,7 @@ function saveVent() {
   if (!text) return;
   ventEntries.unshift({
     id: Date.now(),
-    date: new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}),
+    date: new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}),
     text
   });
   localStorage.setItem('vent_entries', JSON.stringify(ventEntries));
