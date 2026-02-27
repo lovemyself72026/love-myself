@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Love Myself</title>
+<meta name="application-name" content="Love Myself">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Love Myself">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f9f9f7">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400&family=Nunito:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --black: #0a0a0a; --white: #f9f9f7; --gray: #888; --light: #e8e8e5; }
+  body { background: var(--white); color: var(--black); font-family: 'Nunito', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+  nav { width: 100%; max-width: 680px; display: flex; flex-direction: column; align-items: flex-start; padding: 1.5rem 1.5rem 0; gap: 0.8rem; }
+  .logo { font-size: 1.5rem; letter-spacing: 0.12em; font-weight: 300; text-transform: lowercase; }
+  .nav-tabs { display: flex; gap: 0; flex-wrap: nowrap; overflow-x: hidden; justify-content: space-between; width: 100%; }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab { font-family: 'Nunito', sans-serif; font-size: 1rem; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; color: var(--gray); border: none; background: none; padding: 0.25rem 0; border-bottom: 1px solid transparent; transition: color 0.2s, border-color 0.2s; white-space: nowrap; }
+  .nav-tab.active, .nav-tab:hover { color: var(--black); border-bottom-color: var(--black); }
+  .section { display: none; width: 100%; max-width: 680px; padding: 3rem 1.5rem 4rem; animation: fadeIn 0.4s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 300;  line-height: 1.1; margin-bottom: 0.4rem; }
+  h2 { font-size: 1.5rem; font-weight: 300; margin-bottom: 1.5rem; }
+  .subtitle { font-family: 'Nunito', sans-serif; font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); margin-bottom: 2.5rem; }
+  hr { border: none; border-top: 1px solid var(--light); margin: 2rem 0; }
+  .affirmation-card { border: 1px solid #c8c8c5; padding: 3rem 2.5rem; text-align: center; margin-bottom: 1.5rem; position: relative; cursor: pointer; transition: background 0.2s; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .affirmation-card:hover { background: var(--light); }
+  .affirmation-text { font-size: clamp(1.3rem, 3.5vw, 1.8rem);  font-weight: 300; line-height: 1.4; transition: opacity 0.3s; }
+  .affirmation-hint { font-family: 'Nunito', sans-serif; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray); position: absolute; bottom: 1rem; right: 1.5rem; }
+  .btn { font-family: 'Nunito', sans-serif; font-size: 0.82rem; letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid #c8c8c5; background: none; color: var(--black); padding: 0.75rem 1.8rem; cursor: pointer; transition: background 0.2s, color 0.2s; }
+  .btn:hover { background: var(--black); color: var(--white); }
+  .btn.fill { background: var(--black); color: var(--white); }
+  .btn.fill:hover { background: var(--white); color: var(--black); }
+  .journal-entry { border-bottom: 1px solid var(--light); padding: 1.5rem 0; }
+  .journal-date { font-family: 'Nunito', sans-serif; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); margin-bottom: 0.5rem; }
+  .journal-content { font-size: 1.05rem; line-height: 1.7;  font-weight: 300; }
+  textarea { width: 100%; border: none; border-bottom: 1px solid #c8c8c5; background: transparent; font-family: 'Nunito', sans-serif; font-size: 1.15rem;  font-weight: 300; line-height: 1.7; color: var(--black); resize: none; outline: none; padding: 0.5rem 0; margin-bottom: 1rem; min-height: 120px; }
+  textarea::placeholder { color: var(--gray); }
+  .ritual-item { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--light); cursor: pointer; }
+  .ritual-item:last-child { border-bottom: none; }
+  .ritual-check { width: 20px; height: 20px; border: 1px solid #c8c8c5; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+  .ritual-item.done .ritual-check { background: var(--black); }
+  .ritual-item.done .ritual-check::after { content: ''; width: 8px; height: 5px; border-left: 1.5px solid var(--white); border-bottom: 1.5px solid var(--white); transform: rotate(-45deg) translateY(-1px); }
+  .ritual-label { font-size: 1.15rem; font-weight: 300; line-height: 1.4; transition: color 0.2s; }
+  .ritual-item.done .ritual-label { color: var(--gray); text-decoration: line-through; text-decoration-color: var(--light); }
+  .ritual-sub { font-family: 'Nunito', sans-serif; font-size: 0.65rem; color: var(--gray); letter-spacing: 0.08em; margin-top: 0.2rem; }
+  .mirror-section { border: 1px solid #c8c8c5; padding: 2.5rem; margin-bottom: 1.5rem; }
+  .mirror-prompt { font-size: 1.2rem; font-weight: 300;  margin-bottom: 1.2rem; line-height: 1.5; }
+  .mirror-input { width: 100%; border: none; border-bottom: 1px solid #c8c8c5; background: transparent; font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 300; color: var(--black); outline: none; padding: 0.4rem 0; margin-bottom: 0.5rem; }
+  .mirror-input::placeholder { color: var(--light); }
+  .counter-row { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; border-bottom: 1px solid var(--light); }
+  .counter-label { font-size: 1.05rem; font-weight: 300; }
+  .counter-controls { display: flex; align-items: center; gap: 1.2rem; }
+  .counter-btn { width: 30px; height: 30px; border: 1px solid #c8c8c5; background: none; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: background 0.15s, color 0.15s; font-family: 'Nunito', sans-serif; }
+  .counter-btn:hover { background: var(--black); color: var(--white); }
+  .counter-num { font-family: 'Nunito', sans-serif; font-size: 1rem; min-width: 24px; text-align: center; }
+  .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #c8c8c5; border: 1px solid #c8c8c5; margin-bottom: 2rem; }
+  .home-card { background: var(--white); padding: 1.5rem; cursor: pointer; transition: background 0.2s; min-height: 100px; display: flex; flex-direction: column; justify-content: center; }
+  .home-card:hover, .home-card:active { background: var(--light); }
+  .home-card-title { font-family: 'Nunito', sans-serif; font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.6rem; color: var(--gray); }
+  .home-card-text { font-size: 1.1rem; font-weight: 300; }
+  .save-note { font-family: 'Nunito', sans-serif; font-size: 0.65rem; color: var(--gray); letter-spacing: 0.08em; margin-top: 0.8rem; }
+  @media (max-width: 480px) { .home-grid { grid-template-columns: 1fr 1fr; } .nav-tabs { gap: 0; } .nav-tab { font-size: 0.88rem; letter-spacing: 0.04em; white-space: nowrap; } .home-card { min-height: 90px; padding: 1rem; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">love myself</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('home')">Home</button>
+    <button class="nav-tab" onclick="showSection('vision')">Vision</button>
+    <button class="nav-tab" onclick="showSection('rituals')">Habits</button>
+    <button class="nav-tab" onclick="showSection('schedule')">Schedule</button>
+    <button class="nav-tab" onclick="showSection('affirmations')">Affirm</button>
+    <button class="nav-tab" onclick="showSection('mirror')">Wins</button>
+    <button class="nav-tab" onclick="showSection('vent')">Vent</button>
+  </div>
+</nav>
+
+<div class="section active" id="home">
+  <br>
+  <div class="subtitle">My Daily practice</div>
+  <h1>Good to see you today.</h1><br>
+  <div class="home-grid">
+    <div class="home-card" onclick="showSection('affirmations')"><div class="home-card-title">Affirmations</div><div class="home-card-text">Words that hold you</div></div>
+    <div class="home-card" onclick="showSection('rituals')"><div class="home-card-title">Habits</div><div class="home-card-text">Build your daily care</div></div>
+    <div class="home-card" onclick="showSection('schedule')"><div class="home-card-title">Schedule</div><div class="home-card-text">Plan your day</div></div>
+    <div class="home-card" onclick="showSection('mirror')"><div class="home-card-title">My Wins</div><div class="home-card-text">Celebrate myself</div></div>
+    <div class="home-card" onclick="showSection('vent')"><div class="home-card-title">Vent</div><div class="home-card-text">Let it all out</div></div>
+    <div class="home-card" onclick="showSection('vision')"><div class="home-card-title">Vision Board</div><div class="home-card-text">Dream it, live it</div></div>
+  </div>
+</div>
+
+<div class="section" id="affirmations">
+  <div class="subtitle">My Daily affirmations</div>
+  <h1>I am.</h1><br>
+  <div class="affirmation-card" onclick="newAffirmation()">
+    <div class="affirmation-text" id="affirmation-text">I am worthy of love — especially my own.</div>
+    <div class="affirmation-hint">tap for a new one</div>
+  </div><br>
+  <div style="display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:320px;margin:0 auto;">
+    <button class="btn" style="width:100%;text-align:center;" onclick="newAffirmation()">Next affirmation</button>
+    <button class="btn" style="width:100%;text-align:center;" onclick="saveAffirmation()">Save this one</button>
+  </div>
+  <hr><h2>Saved affirmations</h2>
+  <div id="saved-affirmations"><p style="color:var(--gray);font-size:0.95rem;">The ones that resonate will appear here.</p></div>
+</div>
+
+<div class="section" id="vent">
+  <div class="subtitle">Let it all out</div>
+  <h1>I need to vent.</h1><br>
+  <div style="font-family:'Lora',serif;font-style:italic;font-size:1rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">This is your safe space. Write anything. No judgment, just you and your feelings.</div>
+
+  <textarea id="vent-input" placeholder="Let it all out here..." rows="10" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1.15rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.5rem 0;margin-bottom:1.5rem;min-height:200px;"></textarea>
+
+  <div style="display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:320px;margin:0 auto 2rem;">
+    <button class="btn fill" style="width:100%;text-align:center;" onclick="saveVent()">Save</button>
+    <button class="btn" style="width:100%;text-align:center;" onclick="clearVentInput()">Clear</button>
+  </div>
+
+  <div id="vent-entries"></div>
+</div>
+
+  </div>
+</div>
+
+<div class="section" id="vision">
+  <div class="subtitle">Dream it, live it</div>
+  <h1>My vision board.</h1><br>
+
+  <!-- Add item form -->
+  <div style="border:1px solid #c8c8c5;padding:2rem;margin-bottom:2rem;">
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:1.05rem;margin-bottom:1.2rem;">Add to your board</div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:0.5rem;margin-bottom:1.2rem;">
+      <button class="vision-type-btn active" data-type="dream" onclick="selectVisionType(this)">Dream</button>
+      <button class="vision-type-btn" data-type="word" onclick="selectVisionType(this)">Word</button>
+      <button class="vision-type-btn" data-type="image" onclick="selectVisionType(this)">Image</button>
+    </div>
+
+    <!-- Dream input -->
+    <div id="vision-dream-input">
+      <input id="vision-dream-text" placeholder="e.g. Travel the world, own my own home..." onkeydown="if(event.key==='Enter')addVisionItem()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1.2rem;">
+    </div>
+
+    <!-- Word input -->
+    <div id="vision-word-input" style="display:none;">
+      <input id="vision-word-text" placeholder="e.g. Abundance, Love, Peace..." onkeydown="if(event.key==='Enter')addVisionItem()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1.2rem;">
+    </div>
+
+    <!-- Image input -->
+    <div id="vision-image-input" style="display:none;">
+      <label style="font-family:'Nunito',sans-serif;font-size:0.78rem;color:var(--gray);display:block;margin-bottom:0.8rem;">Choose an image from your phone or computer</label>
+      <input type="file" id="vision-image-file" accept="image/*" style="font-family:'Nunito',sans-serif;font-size:0.82rem;color:var(--black);margin-bottom:1.2rem;width:100%;">
+    </div>
+
+    <button class="btn fill" style="width:100%;text-align:center;" onclick="addVisionItem()">Add to board</button>
+  </div>
+
+  <!-- Board -->
+  <div id="vision-board" style="columns:2;gap:0.75rem;"></div>
+  <p id="vision-empty" style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:'Lora',serif;">Your vision board is waiting. Start adding your dreams. 🤍</p>
+
+  <!-- Who I Am -->
+  <hr style="margin:2.5rem 0;">
+  <div class="subtitle" style="margin-bottom:0.5rem;">Who I am</div>
+  <h2 style="margin-bottom:0.5rem;">Track your growth.</h2>
+  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:2rem;line-height:1.6;">Write freely about yourself, then answer the prompts. Come back anytime to update and see how you've grown.</div>
+
+  <!-- Free write -->
+  <div style="border:1px solid #c8c8c5;padding:2rem;margin-bottom:1.5rem;">
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:1rem;">In my own words, I am...</div>
+    <textarea id="whoi-free" placeholder="Write freely about who you are right now — your values, your personality, how you see yourself today..." rows="5" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0;"></textarea>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:320px;margin:0 auto 1rem;">
+    <button class="btn fill" style="width:100%;text-align:center;" onclick="saveWhoIAm()">Save this version of me</button>
+  </div>
+  <div id="whoi-saved-note" style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);letter-spacing:0.1em;text-align:center;margin-bottom:2rem;"></div>
+
+  <!-- Past versions -->
+  <div id="whoi-history"></div>
+</div>
+
+<div class="section" id="schedule">
+  <div class="subtitle">Plan your day</div>
+  <h1>My schedule.</h1><br>
+  <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;" id="schedule-date"></div>
+
+  <!-- Add slot form -->
+  <div style="border:1px solid #c8c8c5;padding:2rem;margin-bottom:2rem;">
+    <div style="display:flex;gap:0.5rem;align-items:flex-end;margin-bottom:1rem;">
+      <input type="text" id="slot-time-text" placeholder="8:00" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;width:55px;flex-shrink:0;">
+      <select id="slot-ampm" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;cursor:pointer;width:55px;flex-shrink:0;">
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+      </select>
+      <input type="text" id="slot-activity" placeholder="Activity..." onkeydown="if(event.key==='Enter')addSlot()" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;flex:1;min-width:0;">
+    </div>
+    <input type="text" id="slot-note" placeholder="Notes (optional)..." onkeydown="if(event.key==='Enter')addSlot()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--gray);outline:none;padding:0.4rem 0;margin-bottom:1.2rem;display:block;">
+    <button class="btn fill" style="width:100%;text-align:center;" onclick="addSlot()">Add to schedule</button>
+  </div>
+
+  <div id="schedule-list"></div>
+  <div style="display:flex;justify-content:flex-end;margin-top:1rem;">
+    <button class="btn" onclick="resetSchedule()">Reset day</button>
+  </div>
+</div>
+
+<div class="section" id="rituals">
+  <div class="subtitle">My Daily care</div>
+  <h1>My habits.</h1><br>
+
+  <div style="border:1px solid #c8c8c5;padding:2rem;margin-bottom:2rem;">
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:1.05rem;margin-bottom:1rem;">Add your own ritual</div>
+    <input id="ritual-input" placeholder="e.g. Drink a glass of water" onkeydown="if(event.key==='Enter')addRitual()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1.2rem;">
+    <button class="btn fill" onclick="addRitual()">Add ritual</button>
+  </div>
+
+  <div id="ritual-list"></div><br>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
+    <span id="ritual-progress" style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;color:var(--gray);"></span>
+    <button class="btn" onclick="resetRituals()">Uncheck all</button>
+  </div>
+</div>
+
+<div class="section" id="mirror">
+  <div class="subtitle">Celebrate myself</div>
+  <h1>My wins.</h1><br>
+
+  <div style="border:1px solid #c8c8c5;padding:2rem;margin-bottom:2rem;">
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:1.05rem;margin-bottom:1rem;">Add a win — big or small, they all count</div>
+    <input id="win-input" placeholder="e.g. I got out of bed today" onkeydown="if(event.key==='Enter')addWin()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1.2rem;">
+    <button class="btn fill" onclick="addWin()">Add win</button>
+  </div>
+
+  <div id="wins-list"></div>
+</div>
+
+
+
+<script>
+const affirmations = [
+  // I love me
+  "I love me fully, deeply, and completely.",
+  "I love me on every kind of day.",
+  "I love me exactly as I am right now.",
+  "I love me and I am proud of who I am becoming.",
+  "I love me enough to choose what is good for me.",
+  "I love me. Every part of me belongs.",
+  "I love me and I deserve all the good that comes my way.",
+  "I love me and I speak to myself with kindness.",
+  "I love me and I trust myself completely.",
+  "I love me. My story is worth celebrating.",
+  "I love me and I make space for my own needs.",
+  "I love me through every season of my life.",
+  "I love me and I am allowed to rest.",
+  "I love me. My feelings are always valid.",
+  "I love me and I show up for myself every day.",
+  "I love me fiercely and softly.",
+  "I love me and I am more than enough.",
+  "I love me. I am my own safe place.",
+  "I love me and I choose joy for myself.",
+  "I love me and I am healing beautifully.",
+  "I love me. This love is mine forever.",
+  "I love me, always.",
+  // Accepting love from others
+  "I am open to receiving love freely and joyfully.",
+  "I allow others to love me the way I deserve to be loved.",
+  "I receive love with an open heart and open hands.",
+  "It is safe for me to let people in.",
+  "Love flows to me easily and abundantly.",
+  "I welcome love into my life with open arms.",
+  "Love finds me wherever I go.",
+  "I trust that the people who love me truly mean it.",
+  "I receive love as gracefully as I give it.",
+  "I deserve to be cherished, chosen, and seen.",
+  "It is safe to be loved. I welcome it fully.",
+  "I accept love with a full and grateful heart.",
+  "I allow myself to be held, supported, and adored.",
+  "Receiving love is a beautiful act of courage.",
+  "I welcome warmth, kindness, and connection into my life.",
+  // I am worthy
+  "I am worthy simply because I exist.",
+  "My worth is steady, solid, and sure.",
+  "I am worthy of every good thing life has to offer.",
+  "My worth speaks for itself.",
+  "I am worthy of kindness, patience, and grace.",
+  "I have always been worthy. I know this now.",
+  "I am worthy of success, love, and deep happiness.",
+  "I am worthy and I walk through life knowing it.",
+  "I am worthy of taking up space in this world.",
+  "My value is seen by those who matter.",
+  "I am worthy of rest, joy, and peace of mind.",
+  "I have always been worthy, and I believe it more each day.",
+  "I am worthy of dreams that feel big and beautiful.",
+  "I am worthy and my life reflects that truth.",
+  "I am worthy of being someone's first choice.",
+  "My worthiness is constant and ever-growing.",
+  "I am worthy of a life that feels beautiful and full.",
+  "I claim my worth today and every day."
+];
+
+let userRituals = JSON.parse(localStorage.getItem('user_rituals') || '[]');
+let habitTracker = JSON.parse(localStorage.getItem('habit_tracker') || '{}');
+
+
+const homeQuotes = [];
+
+
+
+let savedAffirmations = JSON.parse(localStorage.getItem('saved_affirmations')||'[]');
+let ritualState = JSON.parse(localStorage.getItem('ritual_state')||'{}');
+
+let lastVisit = localStorage.getItem('last_visit');
+
+(function init(){
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now()-86400000).toDateString();
+  if(lastVisit===today){}
+  localStorage.setItem('last_visit',today);
+  const now = new Date();
+  renderRituals(); renderSavedAffirmations();
+})();
+
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const map=['home','vision','rituals','schedule','affirmations','mirror','vent'];
+  document.querySelectorAll('.nav-tab')[map.indexOf(id)].classList.add('active');
+  window.scrollTo(0,0);
+}
+
+let shuffled = [...affirmations].sort(() => Math.random() - 0.5);
+let affIndex = 0;
+let currentAff = shuffled[0];
+function newAffirmation(){
+  const el=document.getElementById('affirmation-text');
+  el.style.opacity=0;
+  setTimeout(()=>{
+    affIndex = (affIndex + 1) % shuffled.length;
+    if (affIndex === 0) shuffled = [...affirmations].sort(() => Math.random() - 0.5);
+    currentAff = shuffled[affIndex];
+    el.textContent=currentAff;el.style.opacity=1;
+  },200);
+}
+
+function saveAffirmation(){
+  if(!savedAffirmations.includes(currentAff)){savedAffirmations.push(currentAff);localStorage.setItem('saved_affirmations',JSON.stringify(savedAffirmations));renderSavedAffirmations();}
+}
+
+function renderSavedAffirmations(){
+  const el=document.getElementById('saved-affirmations');
+  if(!savedAffirmations.length){el.innerHTML='<p style="color:var(--gray);font-size:0.95rem;">The ones that resonate will appear here.</p>';return;}
+  el.innerHTML=savedAffirmations.map((a,i)=>`<div class="journal-entry"><button onclick="removeSavedAff(${i})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.4rem;">remove</button><div class="journal-content">${a}</div></div>`).join('');
+}
+
+function removeSavedAff(i){savedAffirmations.splice(i,1);localStorage.setItem('saved_affirmations',JSON.stringify(savedAffirmations));renderSavedAffirmations();}
+
+function addRitual(){
+  const input = document.getElementById('ritual-input');
+  const val = input.value.trim();
+  if(!val) return;
+  userRituals.push({ id: Date.now(), label: val });
+  localStorage.setItem('user_rituals', JSON.stringify(userRituals));
+  input.value = '';
+  renderRituals();
+}
+
+function renderRituals(){
+  const el=document.getElementById('ritual-list');
+  if(!userRituals.length){
+    el.innerHTML='<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;">Add your first ritual above. Small acts of care go a long way.</p>';
+    document.getElementById('ritual-progress').textContent='';
+    return;
+  }
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
+  const monthLabel = today.toLocaleDateString('en-US', {month:'long', year:'numeric'});
+  const dayNames = ['M','T','W','T','F','S','S'];
+
+  el.innerHTML=userRituals.map((r)=>{
+    const calDays = dayNames.map(d=>`<div style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);text-align:center;">${d}</div>`).join('');
+    let calCells = '';
+    for(let i=0;i<firstDay;i++) calCells+=`<div></div>`;
+    for(let d=1;d<=daysInMonth;d++){
+      const dateStr=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const isToday = d===today.getDate();
+      const checked = (habitTracker[r.id]||[]).includes(dateStr);
+      const todayStyle = isToday ? 'border:1px solid var(--black);' : 'border:1px solid transparent;';
+      const checkedStyle = checked ? 'background:var(--black);color:var(--white);' : '';
+      calCells+=`<div onclick="event.stopPropagation();toggleHabitTracker(${r.id},'${dateStr}')" style="font-family:'Nunito',sans-serif;font-size:0.65rem;text-align:center;cursor:pointer;padding:0.15rem;${todayStyle}${checkedStyle}">${d}</div>`;
+    }
+    return `
+    <div class="ritual-item ${ritualState[r.id]?'done':''}" style="flex-direction:column;align-items:stretch;gap:0.8rem;">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <button onclick="event.stopPropagation();deleteRitual(${r.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;flex-shrink:0;">remove</button>
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-between;" onclick="toggleRitual(${r.id})">
+          <div class="ritual-label" style="flex:1;text-align:center;">${r.label}</div>
+          <div class="ritual-check"></div>
+        </div>
+      </div>
+      <div style="padding:0 0 0.5rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;">${monthLabel}</div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.15rem;">
+          ${calDays}${calCells}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  const done=Object.values(ritualState).filter(Boolean).length;
+  document.getElementById('ritual-progress').textContent=`${done} of ${userRituals.length} complete`;
+}
+
+function toggleHabitTracker(ritualId, dateStr){
+  if(!habitTracker[ritualId]) habitTracker[ritualId]=[];
+  const idx = habitTracker[ritualId].indexOf(dateStr);
+  if(idx>-1) habitTracker[ritualId].splice(idx,1);
+  else habitTracker[ritualId].push(dateStr);
+  localStorage.setItem('habit_tracker', JSON.stringify(habitTracker));
+  renderRituals();
+}
+
+function toggleRitual(id){ritualState[id]=!ritualState[id];localStorage.setItem('ritual_state',JSON.stringify(ritualState));renderRituals();}
+function deleteRitual(id){userRituals=userRituals.filter(r=>r.id!==id);delete ritualState[id];delete habitTracker[id];localStorage.setItem('user_rituals',JSON.stringify(userRituals));localStorage.setItem('ritual_state',JSON.stringify(ritualState));localStorage.setItem('habit_tracker',JSON.stringify(habitTracker));renderRituals();}
+function resetRituals(){ritualState={};localStorage.setItem('ritual_state',JSON.stringify(ritualState));renderRituals();}
+
+let wins = JSON.parse(localStorage.getItem('my_wins') || '[]');
+
+function addWin() {
+  const input = document.getElementById('win-input');
+  const val = input.value.trim();
+  if (!val) return;
+  wins.unshift({ id: Date.now(), text: val, date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) });
+  localStorage.setItem('my_wins', JSON.stringify(wins));
+  input.value = '';
+  renderWins();
+}
+
+function deleteWin(id) {
+  wins = wins.filter(w => w.id !== id);
+  localStorage.setItem('my_wins', JSON.stringify(wins));
+  renderWins();
+}
+
+function renderWins() {
+  const el = document.getElementById('wins-list');
+  if (!wins.length) {
+    el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;">Every step forward counts. Add your first win.</p>';
+    return;
+  }
+  el.innerHTML = wins.map(w => `
+    <div class="journal-entry">
+      <button onclick="deleteWin(${w.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.4rem;">remove</button>
+      <div class="journal-date">${w.date}</div>
+      <div class="journal-content">${w.text}</div>
+    </div>`).join('');
+}
+
+renderWins();
+
+function saveMirror(){}
+
+
+// Who I Am styles
+const whoiStyle = document.createElement('style');
+whoiStyle.textContent = `
+  .whoi-entry { border:1px solid #c8c8c5; padding:1.5rem; margin-bottom:1rem; }
+  .whoi-entry-date { font-family:'Nunito',sans-serif; font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gray); margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; }
+  .whoi-entry-section { margin-bottom:1rem; }
+  .whoi-entry-label { font-family:'Nunito',sans-serif; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray); margin-bottom:0.3rem; }
+  .whoi-entry-text { font-family:'Lora',serif; font-size:0.95rem; line-height:1.7; }
+`;
+document.head.appendChild(whoiStyle);
+
+let whoiHistory = JSON.parse(localStorage.getItem('whoi_history') || '[]');
+
+// Load latest saved version into fields
+if (whoiHistory.length) {
+  const latest = whoiHistory[0];
+  document.getElementById('whoi-free').value = latest.free || '';
+}
+
+function saveWhoIAm() {
+  const entry = {
+    id: Date.now(),
+    date: new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}),
+    free: document.getElementById('whoi-free').value.trim()
+  };
+  whoiHistory.unshift(entry);
+  localStorage.setItem('whoi_history', JSON.stringify(whoiHistory));
+  document.getElementById('whoi-free').value = '';
+  const note = document.getElementById('whoi-saved-note');
+  note.textContent = 'Saved — ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+  setTimeout(() => note.textContent = '', 3000);
+  renderWhoIHistory();
+}
+
+function deleteWhoIEntry(id) {
+  whoiHistory = whoiHistory.filter(e => e.id !== id);
+  localStorage.setItem('whoi_history', JSON.stringify(whoiHistory));
+  renderWhoIHistory();
+}
+
+
+function renderWhoIHistory() {
+  const el = document.getElementById('whoi-history');
+  if (!whoiHistory.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:1rem;">Past versions of me</div>` +
+  whoiHistory.map(e => `
+    <div class="whoi-entry">
+      <button onclick="deleteWhoIEntry(${e.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.3rem;">remove</button>
+      <div class="whoi-entry-date"><span>${e.date}</span></div>
+      ${e.free ? `<div class="whoi-entry-section"><div class="whoi-entry-label">In my own words</div><div class="whoi-entry-text">${e.free}</div></div>` : ''}
+    </div>`).join('');
+}
+
+renderWhoIHistory();
+
+// Schedule styles
+const scheduleStyle = document.createElement('style');
+scheduleStyle.textContent = `
+  .slot-item { display:flex; align-items:flex-start; gap:1rem; padding:1rem 0; border-bottom:1px solid #e8e8e5; }
+  .slot-item.done .slot-activity { text-decoration:line-through; color:var(--gray); }
+  .slot-check { width:20px; height:20px; border:1px solid #c8c8c5; flex-shrink:0; margin-top:3px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background 0.2s; }
+  .slot-item.done .slot-check { background:var(--black); border-color:var(--black); }
+  .slot-item.done .slot-check::after { content:''; width:8px; height:5px; border-left:1.5px solid var(--white); border-bottom:1.5px solid var(--white); transform:rotate(-45deg) translateY(-1px); }
+  .slot-time { font-family:'Nunito',sans-serif; font-size:0.72rem; letter-spacing:0.08em; color:var(--gray); margin-bottom:0.2rem; }
+  .slot-activity { font-family:'Nunito',sans-serif; font-size:1rem; font-weight:300; }
+  .slot-note { font-family:'Lora',serif; font-style:italic; font-size:0.85rem; color:var(--gray); margin-top:0.2rem; }
+  .slot-remove { font-family:'Nunito',sans-serif; font-size:0.6rem; letter-spacing:0.1em; color:var(--gray); border:none; background:none; cursor:pointer; text-transform:uppercase; margin-left:auto; flex-shrink:0; padding-top:0.2rem; }
+`;
+document.head.appendChild(scheduleStyle);
+
+let scheduleSlots = JSON.parse(localStorage.getItem('schedule_slots') || '[]');
+let scheduleDone = JSON.parse(localStorage.getItem('schedule_done') || '{}');
+
+// Set schedule date
+document.getElementById('schedule-date').textContent = new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'});
+
+function addSlot() {
+  const timeText = document.getElementById('slot-time-text').value.trim();
+  const ampm = document.getElementById('slot-ampm').value;
+  const time = timeText ? `${timeText} ${ampm}` : '';
+  const activity = document.getElementById('slot-activity').value.trim();
+  const note = document.getElementById('slot-note').value.trim();
+  if (!activity) return;
+  scheduleSlots.push({ id: Date.now(), time, activity, note });
+  scheduleSlots.sort((a, b) => a.time.localeCompare(b.time));
+  localStorage.setItem('schedule_slots', JSON.stringify(scheduleSlots));
+  document.getElementById('slot-time-text').value = '';
+  document.getElementById('slot-activity').value = '';
+  document.getElementById('slot-note').value = '';
+  renderSchedule();
+}
+
+function toggleSlot(id) {
+  scheduleDone[id] = !scheduleDone[id];
+  localStorage.setItem('schedule_done', JSON.stringify(scheduleDone));
+  renderSchedule();
+}
+
+function deleteSlot(id) {
+  scheduleSlots = scheduleSlots.filter(s => s.id !== id);
+  delete scheduleDone[id];
+  localStorage.setItem('schedule_slots', JSON.stringify(scheduleSlots));
+  localStorage.setItem('schedule_done', JSON.stringify(scheduleDone));
+  renderSchedule();
+}
+
+function resetSchedule() {
+  scheduleDone = {};
+  localStorage.setItem('schedule_done', JSON.stringify(scheduleDone));
+  renderSchedule();
+}
+
+function renderSchedule() {
+  const el = document.getElementById('schedule-list');
+  if (!scheduleSlots.length) {
+    el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;">Add your first time slot above and plan your beautiful day.</p>';
+    return;
+  }
+  el.innerHTML = scheduleSlots.map(s => `
+    <div class="slot-item ${scheduleDone[s.id] ? 'done' : ''}">
+      <div style="flex:1;">
+        <button class="slot-remove" onclick="deleteSlot(${s.id})">remove</button>
+        ${s.time ? `<div class="slot-time">${formatTime(s.time)}</div>` : ''}
+        <div class="slot-activity">${s.activity}</div>
+        ${s.note ? `<div class="slot-note">${s.note}</div>` : ''}
+      </div>
+      <div class="slot-check" onclick="toggleSlot(${s.id})" style="align-self:flex-start;margin-top:0;"></div>
+    </div>`).join('');
+}
+
+function formatTime(t) { return t || ''; }
+
+renderSchedule();
+
+// Vision Board styles
+const visionStyle = document.createElement('style');
+visionStyle.textContent = `
+  .vision-type-btn { font-family:'Nunito',sans-serif; font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; border:1px solid #c8c8c5; background:none; color:var(--gray); padding:0.45rem 1rem; cursor:pointer; transition:all 0.2s; }
+  .vision-type-btn.active { background:var(--black); color:var(--white); border-color:var(--black); }
+  .vision-card { break-inside:avoid; margin-bottom:0.75rem; border:1px solid #c8c8c5; padding:1.2rem; position:relative; }
+  .vision-card-type { font-family:'Nunito',sans-serif; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gray); margin-bottom:0.5rem; }
+  .vision-card-content { font-family:'Lora',serif; font-size:1rem; font-weight:400; line-height:1.5; word-break:break-word; }
+  .vision-card-word { font-family:'Lora',serif; font-size:1.4rem; font-style:italic; font-weight:400; text-align:center; padding:0.5rem 0; }
+  .vision-card img { width:100%; display:block; border-radius:0; }
+  .vision-remove { position:absolute; top:0.5rem; right:0.6rem; font-family:'Nunito',sans-serif; font-size:0.55rem; letter-spacing:0.1em; color:var(--gray); border:none; background:none; cursor:pointer; text-transform:uppercase; }
+`;
+document.head.appendChild(visionStyle);
+
+let visionItems = JSON.parse(localStorage.getItem('vision_items') || '[]');
+let currentVisionType = 'dream';
+
+function selectVisionType(btn) {
+  document.querySelectorAll('.vision-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentVisionType = btn.dataset.type;
+  document.getElementById('vision-dream-input').style.display = currentVisionType === 'dream' ? 'block' : 'none';
+  document.getElementById('vision-word-input').style.display = currentVisionType === 'word' ? 'block' : 'none';
+  document.getElementById('vision-image-input').style.display = currentVisionType === 'image' ? 'block' : 'none';
+}
+
+function addVisionItem() {
+  if (currentVisionType === 'dream') {
+    const text = document.getElementById('vision-dream-text').value.trim();
+    if (!text) return;
+    visionItems.push({ id: Date.now(), type: 'dream', content: text });
+    document.getElementById('vision-dream-text').value = '';
+    saveAndRenderVision();
+  } else if (currentVisionType === 'word') {
+    const text = document.getElementById('vision-word-text').value.trim();
+    if (!text) return;
+    visionItems.push({ id: Date.now(), type: 'word', content: text });
+    document.getElementById('vision-word-text').value = '';
+    saveAndRenderVision();
+  } else if (currentVisionType === 'image') {
+    const file = document.getElementById('vision-image-file').files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      visionItems.push({ id: Date.now(), type: 'image', content: e.target.result });
+      document.getElementById('vision-image-file').value = '';
+      saveAndRenderVision();
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function removeVisionItem(id) {
+  visionItems = visionItems.filter(v => v.id !== id);
+  saveAndRenderVision();
+}
+
+function saveAndRenderVision() {
+  // Save only non-image items to avoid localStorage size limits
+  const toSave = visionItems.map(v => v.type === 'image' ? { ...v, content: v.content.substring(0, 50) + '...' } : v);
+  try { localStorage.setItem('vision_items', JSON.stringify(visionItems)); } catch(e) {}
+  renderVisionBoard();
+}
+
+function renderVisionBoard() {
+  const board = document.getElementById('vision-board');
+  const empty = document.getElementById('vision-empty');
+  if (!visionItems.length) {
+    board.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  board.innerHTML = visionItems.map(v => {
+    let inner = '';
+    if (v.type === 'dream') {
+      inner = `<div class="vision-card-type">Dream & Goal</div><div class="vision-card-content">${v.content}</div>`;
+    } else if (v.type === 'word') {
+      inner = `<div class="vision-card-type">Word</div><div class="vision-card-word">${v.content}</div>`;
+    } else if (v.type === 'image') {
+      inner = `<img src="${v.content}" alt="vision">`;
+    }
+    return `<div class="vision-card"><button class="vision-remove" style="position:static;display:block;margin-bottom:0.5rem;font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;text-align:left;" onclick="removeVisionItem(${v.id})">remove</button>${inner}</div>`;
+  }).join('');
+}
+
+renderVisionBoard();
+
+let ventEntries = JSON.parse(localStorage.getItem('vent_entries') || '[]');
+
+function saveVent() {
+  const text = document.getElementById('vent-input').value.trim();
+  if (!text) return;
+  ventEntries.unshift({
+    id: Date.now(),
+    date: new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}),
+    text
+  });
+  localStorage.setItem('vent_entries', JSON.stringify(ventEntries));
+  document.getElementById('vent-input').value = '';
+  renderVentEntries();
+}
+
+function deleteVentEntry(id) {
+  ventEntries = ventEntries.filter(e => e.id !== id);
+  localStorage.setItem('vent_entries', JSON.stringify(ventEntries));
+  renderVentEntries();
+}
+
+function clearVentInput() {
+  document.getElementById('vent-input').value = '';
+}
+
+function renderVentEntries() {
+  const el = document.getElementById('vent-entries');
+  if (!ventEntries.length) { el.innerHTML = ''; return; }
+  el.innerHTML = ventEntries.map(e => `
+    <div class="journal-entry">
+      <button onclick="deleteVentEntry(${e.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.4rem;">remove</button>
+      <div class="journal-date">${e.date}</div>
+      <div class="journal-content">${e.text.replace(/\n/g,'<br>')}</div>
+    </div>`).join('');
+}
+
+renderVentEntries();
+
+// PWA: Register service worker
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'love-myself-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', './index.html'])));
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+    });
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+
+// PWA: Inject manifest dynamically
+const manifestData = {
+  name: "Love Myself",
+  short_name: "Love Myself",
+  description: "Your daily self-love companion",
+  start_url: "./",
+  display: "standalone",
+  background_color: "#f9f9f7",
+  theme_color: "#f9f9f7",
+  orientation: "portrait",
+  icons: [
+    { src: generateIcon(192), sizes: "192x192", type: "image/png" },
+    { src: generateIcon(512), sizes: "512x512", type: "image/png" }
+  ]
+};
+
+function generateIcon(size) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#f9f9f7';
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = '#0a0a0a';
+  ctx.font = `${size * 0.45}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🤍', size / 2, size / 2);
+  return canvas.toDataURL('image/png');
+}
+
+const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+const manifestUrl = URL.createObjectURL(manifestBlob);
+const manifestLink = document.createElement('link');
+manifestLink.rel = 'manifest';
+manifestLink.href = manifestUrl;
+document.head.appendChild(manifestLink);
+
+// Apple touch icon
+const appleIcon = document.createElement('link');
+appleIcon.rel = 'apple-touch-icon';
+appleIcon.href = generateIcon(180);
+document.head.appendChild(appleIcon);
+</script>
+</body>
+</html>
