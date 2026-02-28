@@ -367,6 +367,18 @@
 
   <div style="display:flex;justify-content:space-between;margin-top:1rem;flex-wrap:wrap;gap:0.5rem;">
     <button class="btn fill" onclick="savePlannerDay()">Save day</button>
+    <button class="btn" onclick="showCopySchedule()">Copy to another day</button>
+  </div>
+
+  <!-- Copy schedule picker -->
+  <div id="copy-schedule-box" style="display:none;border:1px solid #c8c8c5;padding:1rem;margin-top:0.6rem;">
+    <div class="planner-label" style="margin-bottom:0.6rem;">Copy this day's schedule to:</div>
+    <input type="date" id="copy-target-date" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;color:var(--black);outline:none;padding:0.3rem 0;width:100%;margin-bottom:0.8rem;">
+    <div style="display:flex;gap:0.5rem;">
+      <button class="btn fill" onclick="copyScheduleToDay()" style="flex:1;">Copy</button>
+      <button class="btn" onclick="document.getElementById('copy-schedule-box').style.display='none'" style="flex:1;">Cancel</button>
+    </div>
+    <div id="copy-msg" style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);margin-top:0.5rem;text-align:center;"></div>
   </div>
 
 </div>
@@ -1415,6 +1427,35 @@ localStorage.setItem = function(key, value) {
 };
 
 renderAnalytics();
+
+function showCopySchedule() {
+  const box = document.getElementById('copy-schedule-box');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  document.getElementById('copy-msg').textContent = '';
+}
+
+function copyScheduleToDay() {
+  const target = document.getElementById('copy-target-date').value;
+  if (!target) { document.getElementById('copy-msg').textContent = 'Please pick a date.'; return; }
+  const sourceKey = currentScheduleDate;
+  const source = allPlannerData[sourceKey] || {};
+  if (!allPlannerData[target]) allPlannerData[target] = {};
+  // Copy schedule, goals, todos, bible verse — but reset done states so they can be edited fresh
+  if (source.schedule) {
+    allPlannerData[target].schedule = {};
+    Object.entries(source.schedule).forEach(([k, v]) => {
+      allPlannerData[target].schedule[k] = typeof v === 'object' ? {...v, done: false} : v;
+    });
+  }
+  if (source.goals) allPlannerData[target].goals = source.goals.map(g => ({...g, done: false}));
+  if (source.todos) allPlannerData[target].todos = source.todos.map(t => ({...t, done: false}));
+  if (source.bibleVerse) allPlannerData[target].bibleVerse = source.bibleVerse;
+  if (source.bibleRef) allPlannerData[target].bibleRef = source.bibleRef;
+  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData));
+  const msg = document.getElementById('copy-msg');
+  msg.textContent = 'Copied! Navigate to that day to edit it 🤍';
+  setTimeout(() => { msg.textContent = ''; document.getElementById('copy-schedule-box').style.display = 'none'; }, 2500);
+}
 
 // Export / Import
 function exportData() {
