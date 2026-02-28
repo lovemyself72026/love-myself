@@ -30,9 +30,9 @@
   h2 { font-size: 1.5rem; font-weight: 300; margin-bottom: 1.5rem; }
   .subtitle { font-family: 'Nunito', sans-serif; font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); margin-bottom: 2.5rem; }
   hr { border: none; border-top: 1px solid var(--light); margin: 2rem 0; }
-  .affirmation-card { border: 1px solid #c8c8c5; padding: 3rem 2.5rem; text-align: center; margin-bottom: 1.5rem; position: relative; cursor: pointer; transition: background 0.2s; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .affirmation-card { border: 1px solid #c8c8c5; padding: 1.5rem 1.5rem; text-align: center; margin-bottom: 1.5rem; position: relative; cursor: pointer; transition: background 0.2s; min-height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .affirmation-card:hover { background: var(--light); }
-  .affirmation-text { font-size: clamp(1.3rem, 3.5vw, 1.8rem);  font-weight: 300; line-height: 1.4; transition: opacity 0.3s; }
+  .affirmation-text { font-size: clamp(1.3rem, 3.2vw, 1.8rem);  font-weight: 300; line-height: 1.4; transition: opacity 0.3s; }
   .affirmation-hint { font-family: 'Nunito', sans-serif; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray); position: absolute; bottom: 1rem; right: 1.5rem; }
   .btn { font-family: 'Nunito', sans-serif; font-size: 0.82rem; letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid #c8c8c5; background: none; color: var(--black); padding: 0.75rem 1.8rem; cursor: pointer; transition: background 0.2s, color 0.2s; }
   .btn:hover { background: var(--black); color: var(--white); }
@@ -78,7 +78,7 @@
     <button class="nav-tab active" onclick="showSection('home')">Home</button>
     <button class="nav-tab" onclick="showSection('vision')">Vision</button>
     <button class="nav-tab" onclick="showSection('schedule')">Schedule</button>
-    <button class="nav-tab" onclick="showSection('affirmations')">Affirm</button>
+    <button class="nav-tab" onclick="showSection('affirmations')">Wins</button>
   </div>
 </nav>
 
@@ -87,10 +87,10 @@
   <div class="subtitle">My Daily practice</div>
   <h1>Good to see you today.</h1><br>
   <div class="home-grid">
-    <div class="home-card" onclick="showSection('affirmations')"><div class="home-card-title">Affirmations</div><div class="home-card-text">Words that hold you</div></div>
+    <div class="home-card" onclick="showSection('vision')"><div class="home-card-title">Vision Board</div><div class="home-card-text">Dream it, live it</div></div>
+    <div class="home-card" onclick="showSection('affirmations');setTimeout(()=>document.getElementById('vent-section').scrollIntoView({behavior:'smooth'}),100)"><div class="home-card-title">Vent</div><div class="home-card-text">Let it out</div></div>
     <div class="home-card" onclick="showSection('schedule')"><div class="home-card-title">Schedule</div><div class="home-card-text">Plan your day</div></div>
     <div class="home-card" onclick="showSection('affirmations')"><div class="home-card-title">My Wins</div><div class="home-card-text">Celebrate myself</div></div>
-    <div class="home-card" onclick="showSection('vision')"><div class="home-card-title">Vision Board</div><div class="home-card-text">Dream it, live it</div></div>
   </div>
 
   <!-- Analytics -->
@@ -101,6 +101,33 @@
 </div>
 
 <div class="section" id="affirmations">
+
+  <!-- Celebration overlay -->
+  <div id="book-celebrate" style="display:none;position:fixed;inset:0;z-index:999;pointer-events:none;">
+    <canvas id="confetti-canvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+    <div id="book-toast" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--black);color:var(--white);padding:1.5rem 2rem;text-align:center;min-width:220px;opacity:0;transition:opacity 0.3s;">
+      <div style="font-size:1.8rem;margin-bottom:0.5rem;">🎉</div>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:1.1rem;margin-bottom:0.2rem;" id="toast-title"></div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#aaa;">Added to your reading list 🤍</div>
+    </div>
+  </div>
+
+  <!-- Books I've Read -->
+  <div style="margin-bottom:2rem;">
+    <div class="subtitle">My reading list</div>
+    <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:1rem;">
+      <h2 style="margin:0;">Books I've read.</h2>
+      <span id="books-count" style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
+    </div>
+    <div style="border:1px solid #c8c8c5;padding:1.5rem;margin-bottom:1rem;">
+      <input id="book-input" placeholder="Book title..." onkeydown="if(event.key==='Enter')addBook()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
+      <input id="book-author" placeholder="Author (optional)" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:1rem;">
+      <button class="btn fill" onclick="addBook()">Add book</button>
+    </div>
+    <div id="books-list"></div>
+  </div>
+  <hr style="margin-bottom:2rem;">
+
   <!-- My Wins -->
   <div style="margin-bottom:2rem;">
     <div class="subtitle">Celebrate myself</div>
@@ -126,7 +153,7 @@
   <hr><h2>Saved affirmations</h2>
   <div id="saved-affirmations"><p style="color:var(--gray);font-size:0.95rem;">The ones that resonate will appear here.</p></div>
   <hr style="margin:2rem 0;">
-  <div class="subtitle" style="margin-bottom:0.5rem;">Let it all out</div>
+  <div id="vent-section" class="subtitle" style="margin-bottom:0.5rem;">Let it all out</div>
   <h2 style="margin-bottom:1rem;">I need to vent.</h2>
   <div style="font-family:'Lora',serif;font-style:italic;font-size:1rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">This is your safe space. Write anything. No judgment, just you and your feelings.</div>
   <textarea id="vent-input" placeholder="Let it all out here..." rows="10" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1.15rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.5rem 0;margin-bottom:1.5rem;min-height:200px;"></textarea>
@@ -151,21 +178,29 @@
   <hr style="margin:2.5rem 0;">
   <div class="subtitle" style="margin-bottom:0.5rem;">Who I am</div>
   <h2 style="margin-bottom:0.5rem;">Track your growth.</h2>
-  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:2rem;line-height:1.6;">Write freely about yourself. Come back anytime to update and see how you've grown.</div>
+  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Add words, thoughts, and pictures that reflect who you are 🤍</div>
 
-  <!-- Free write -->
-  <div style="border:1px solid #c8c8c5;padding:2rem;margin-bottom:1.5rem;">
-    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:1rem;">In my own words, I am...</div>
-    <textarea id="whoi-free" placeholder="Write freely about who you are right now — your values, your personality, how you see yourself today..." rows="5" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0;"></textarea>
+  <!-- Type selector -->
+  <div style="display:flex;gap:0.4rem;margin-bottom:0.8rem;">
+    <button class="vision-type-btn active" id="whoi-btn-word" onclick="setWhoiType('word')">Word</button>
+    <button class="vision-type-btn" id="whoi-btn-thought" onclick="setWhoiType('thought')">Thought</button>
+    <button class="vision-type-btn" id="whoi-btn-image" onclick="setWhoiType('image')">Image</button>
   </div>
 
-  <div style="display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:320px;margin:0 auto 1rem;">
-    <button class="btn fill" style="width:100%;text-align:center;" onclick="saveWhoIAm()">Save this version of me</button>
+  <div id="whoi-input-word" style="display:flex;gap:0.5rem;align-items:center;">
+    <input id="whoi-text-word" placeholder="e.g. Resilient, Creative, Kind..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
+    <button onclick="addWhoiItem()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
   </div>
-  <div id="whoi-saved-note" style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);letter-spacing:0.1em;text-align:center;margin-bottom:2rem;"></div>
+  <div id="whoi-input-thought" style="display:none;gap:0.5rem;align-items:center;">
+    <input id="whoi-text-thought" placeholder="Something true about me..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
+    <button onclick="addWhoiItem()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
+  </div>
+  <div id="whoi-input-image" style="display:none;">
+    <input type="file" accept="image/*" onchange="addWhoiImage(this)" style="font-size:0.82rem;width:100%;">
+  </div>
 
-  <!-- Past versions -->
-  <div id="whoi-history"></div>
+  <div id="whoi-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:1rem;"></div>
+  <div id="whoi-saved-note" style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);letter-spacing:0.1em;text-align:center;margin-top:0.5rem;"></div>
 </div>
 
 <div class="section" id="schedule">
@@ -186,21 +221,14 @@
   <!-- Planner grid -->
   <div id="planner-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;align-items:start;">
 
-    <!-- Goals + To Do side by side at top -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-      <div class="planner-label">Goals</div>
-      <div id="goals-list" style="margin-top:0.5rem;"></div>
-      <input id="goals-input" placeholder="Add goal..." onkeydown="if(event.key==='Enter')addGoal()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.4rem;">
-    </div>
-
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-      <div class="planner-label">To Do</div>
-      <div id="todo-list" style="margin-top:0.5rem;"></div>
-      <input id="todo-input" placeholder="Add task..." onkeydown="if(event.key==='Enter')addTodo()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
-    </div>
-
-    <!-- LEFT: Schedule -->
+    <!-- LEFT: Goals + Schedule -->
     <div style="display:flex;flex-direction:column;gap:0.6rem;">
+
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label">Goals</div>
+        <div id="goals-list" style="margin-top:0.5rem;"></div>
+        <input id="goals-input" placeholder="Add goal..." onkeydown="if(event.key==='Enter')addGoal()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.4rem;">
+      </div>
 
       <!-- Schedule -->
       <div style="border:1px solid #c8c8c5;padding:0.8rem;">
@@ -210,8 +238,15 @@
 
     </div>
 
-    <!-- RIGHT: Mood, Sleep, Water, Exercise, Meals -->
+    <!-- RIGHT: To Do, Mood, Sleep, Water, Bible Verse, Exercise, Meals -->
     <div style="display:flex;flex-direction:column;gap:0.6rem;">
+
+      <!-- To Do -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label">To Do</div>
+        <div id="todo-list" style="margin-top:0.5rem;"></div>
+        <input id="todo-input" placeholder="Add task..." onkeydown="if(event.key==='Enter')addTodo()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
+      </div>
 
       <!-- Mood -->
       <div style="border:1px solid #c8c8c5;padding:0.8rem;">
@@ -266,6 +301,13 @@
           <span class="water-cup" onclick="toggleWater(this)">💧</span>
           <span class="water-cup" onclick="toggleWater(this)">💧</span>
         </div>
+      </div>
+
+      <!-- Bible Verse -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label" style="margin-bottom:0.4rem;">Bible Verse</div>
+        <textarea id="bible-verse" placeholder="Enter today's verse..." rows="2" onblur="savePlannerDay()" style="width:100%;border:none;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.2rem 0;"></textarea>
+        <input id="bible-ref" placeholder="e.g. John 3:16" onblur="savePlannerDay()" style="width:100%;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);outline:none;padding:0.2rem 0;margin-top:0.2rem;">
       </div>
 
       <!-- Exercise -->
@@ -324,7 +366,6 @@
   </div>
 
   <div style="display:flex;justify-content:space-between;margin-top:1rem;flex-wrap:wrap;gap:0.5rem;">
-    <button class="btn" onclick="resetSchedule()">Clear day</button>
     <button class="btn fill" onclick="savePlannerDay()">Save day</button>
   </div>
 
@@ -464,6 +505,102 @@ function toggleRitual(){}
 function deleteRitual(){}
 function resetRituals(){}
 
+// Books I've Read
+let books = JSON.parse(localStorage.getItem('my_books') || '[]');
+
+function addBook() {
+  const title = document.getElementById('book-input').value.trim();
+  if (!title) return;
+  const author = document.getElementById('book-author').value.trim();
+  books.unshift({
+    id: Date.now(),
+    title,
+    author,
+    date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'})
+  });
+  localStorage.setItem('my_books', JSON.stringify(books));
+  document.getElementById('book-input').value = '';
+  document.getElementById('book-author').value = '';
+  renderBooks();
+  celebrateBook(title);
+}
+
+function celebrateBook(title) {
+  const overlay = document.getElementById('book-celebrate');
+  const toast = document.getElementById('book-toast');
+  const canvas = document.getElementById('confetti-canvas');
+  document.getElementById('toast-title').textContent = title;
+  overlay.style.display = 'block';
+  overlay.style.pointerEvents = 'auto';
+  setTimeout(() => toast.style.opacity = '1', 50);
+
+  // Confetti
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const pieces = Array.from({length: 80}, () => ({
+    x: Math.random() * canvas.width,
+    y: -10 - Math.random() * 100,
+    r: 4 + Math.random() * 5,
+    color: ['#1a1a1a','#c8c8c5','#888','#444','#f5f5f0','#222'][Math.floor(Math.random()*6)],
+    vx: (Math.random() - 0.5) * 3,
+    vy: 2 + Math.random() * 3,
+    angle: Math.random() * Math.PI * 2,
+    spin: (Math.random() - 0.5) * 0.2
+  }));
+  let frame;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.r/2, -p.r/2, p.r, p.r * 1.6);
+      ctx.restore();
+      p.x += p.vx;
+      p.y += p.vy;
+      p.angle += p.spin;
+      p.vy += 0.05;
+    });
+    if (pieces.some(p => p.y < canvas.height)) frame = requestAnimationFrame(draw);
+  }
+  draw();
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      overlay.style.pointerEvents = 'none';
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      cancelAnimationFrame(frame);
+    }, 400);
+  }, 2200);
+}
+
+function deleteBook(id) {
+  books = books.filter(b => b.id !== id);
+  localStorage.setItem('my_books', JSON.stringify(books));
+  renderBooks();
+}
+
+function renderBooks() {
+  const el = document.getElementById('books-list');
+  if (!el) return;
+  const countEl = document.getElementById('books-count');
+  if (countEl) countEl.textContent = books.length ? `${books.length} book${books.length===1?'':'s'}` : '';
+  if (!books.length) { el.innerHTML = ''; return; }
+  el.innerHTML = books.map(b => `
+    <div class="journal-entry" style="position:relative;">
+      <button onclick="deleteBook(${b.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.3rem;">remove</button>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);letter-spacing:0.08em;margin-bottom:0.3rem;">${b.date}</div>
+      <div style="font-family:'Lora',serif;font-size:1rem;font-weight:400;">${b.title}</div>
+      ${b.author ? `<div style="font-family:'Nunito',sans-serif;font-size:0.78rem;color:var(--gray);margin-top:0.2rem;">by ${b.author}</div>` : ''}
+    </div>`).join('');
+}
+
+renderBooks();
+
 let wins = JSON.parse(localStorage.getItem('my_wins') || '[]');
 
 function addWin() {
@@ -503,14 +640,12 @@ function saveMirror(){}
 
 // Life Dimension Vision Boards
 const lifeDimensions = [
-  { key: 'physical',      label: 'Physical',      icon: '💪', desc: 'Exercise, sleep, nutrition, body care' },
-  { key: 'nutritional',   label: 'Nutritional',   icon: '🥗', desc: 'What you eat, hydration, nourishment' },
-  { key: 'emotional',     label: 'Emotional',     icon: '🤍', desc: 'Feelings, self-awareness, inner peace' },
-  { key: 'social',        label: 'Social',        icon: '🫂', desc: 'Relationships, community, connection' },
-  { key: 'spiritual',     label: 'Spiritual',     icon: '✨', desc: 'Purpose, faith, meaning, mindfulness' },
-  { key: 'intellectual',  label: 'Intellectual',  icon: '📚', desc: 'Learning, creativity, curiosity' },
-  { key: 'financial',     label: 'Financial',     icon: '💰', desc: 'Savings, spending, financial goals' },
-  { key: 'environmental', label: 'Environmental', icon: '🌿', desc: 'Your space, nature, surroundings' },
+  { key: 'spiritual',   label: 'Spiritual',   icon: '✨', desc: 'Purpose, faith, meaning, mindfulness' },
+  { key: 'social',      label: 'Social',      icon: '🫂', desc: 'Relationships, community, connection' },
+  { key: 'physical',    label: 'Physical',    icon: '💪', desc: 'Exercise, sleep, nutrition, body care' },
+  { key: 'nutritional', label: 'Nutritional', icon: '🥗', desc: 'What you eat, hydration, nourishment' },
+  { key: 'emotional',   label: 'Emotional',   icon: '🤍', desc: 'Feelings, self-awareness, inner peace' },
+  { key: 'financial',   label: 'Financial',   icon: '💰', desc: 'Savings, spending, financial goals' },
 ];
 
 let dimensionItems = JSON.parse(localStorage.getItem('dimension_items') || '{}');
@@ -624,49 +759,74 @@ whoiStyle.textContent = `
 `;
 document.head.appendChild(whoiStyle);
 
-let whoiHistory = JSON.parse(localStorage.getItem('whoi_history') || '[]');
+let whoiItems = JSON.parse(localStorage.getItem('whoi_history') || '[]');
+let whoiType = 'word';
 
-// Load latest saved version into fields
-if (whoiHistory.length) {
-  const latest = whoiHistory[0];
-  document.getElementById('whoi-free').value = latest.free || '';
+function setWhoiType(type) {
+  whoiType = type;
+  ['word','thought','image'].forEach(t => {
+    document.getElementById(`whoi-input-${t}`).style.display = t === type ? (t === 'image' ? 'block' : 'flex') : 'none';
+    document.getElementById(`whoi-btn-${t}`).classList.toggle('active', t === type);
+  });
 }
 
-function saveWhoIAm() {
-  const entry = {
+function addWhoiItem() {
+  const inp = document.getElementById(`whoi-text-${whoiType}`);
+  if (!inp || !inp.value.trim()) return;
+  whoiItems.unshift({
     id: Date.now(),
-    date: new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}),
-    free: document.getElementById('whoi-free').value.trim()
+    type: whoiType,
+    content: inp.value.trim(),
+    date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+  });
+  inp.value = '';
+  localStorage.setItem('whoi_history', JSON.stringify(whoiItems));
+  renderWhoiGrid();
+}
+
+function addWhoiImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    whoiItems.unshift({
+      id: Date.now(),
+      type: 'image',
+      content: e.target.result,
+      date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+    });
+    localStorage.setItem('whoi_history', JSON.stringify(whoiItems));
+    renderWhoiGrid();
   };
-  whoiHistory.unshift(entry);
-  localStorage.setItem('whoi_history', JSON.stringify(whoiHistory));
-  document.getElementById('whoi-free').value = '';
-  const note = document.getElementById('whoi-saved-note');
-  note.textContent = 'Saved — ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
-  setTimeout(() => note.textContent = '', 3000);
-  renderWhoIHistory();
+  reader.readAsDataURL(file);
 }
 
 function deleteWhoIEntry(id) {
-  whoiHistory = whoiHistory.filter(e => e.id !== id);
-  localStorage.setItem('whoi_history', JSON.stringify(whoiHistory));
-  renderWhoIHistory();
+  whoiItems = whoiItems.filter(e => e.id !== id);
+  localStorage.setItem('whoi_history', JSON.stringify(whoiItems));
+  renderWhoiGrid();
 }
 
-
-function renderWhoIHistory() {
-  const el = document.getElementById('whoi-history');
-  if (!whoiHistory.length) { el.innerHTML = ''; return; }
-  el.innerHTML = `<div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:1rem;">Past versions of me</div>` +
-  whoiHistory.map(e => `
-    <div class="whoi-entry">
-      <button onclick="deleteWhoIEntry(${e.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.3rem;">remove</button>
-      <div class="whoi-entry-date"><span>${e.date}</span></div>
-      ${e.free ? `<div class="whoi-entry-section"><div class="whoi-entry-label">In my own words</div><div class="whoi-entry-text">${e.free}</div></div>` : ''}
+function renderWhoiGrid() {
+  const el = document.getElementById('whoi-grid');
+  if (!el) return;
+  el.innerHTML = whoiItems.map(item => `
+    <div style="border:1px solid #e8e8e5;padding:0.6rem;position:relative;">
+      <button onclick="deleteWhoIEntry(${item.id})" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;position:absolute;top:0.3rem;right:0.3rem;line-height:1;">✕</button>
+      ${item.type === 'image'
+        ? `<img src="${item.content}" style="width:100%;display:block;">`
+        : item.type === 'word'
+        ? `<div style="font-family:'Lora',serif;font-style:italic;font-size:1rem;text-align:center;padding:0.4rem 0.5rem 0.2rem;">${item.content}</div>`
+        : `<div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;line-height:1.5;padding-right:0.8rem;">${item.content}</div>`
+      }
+      <div style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);margin-top:0.3rem;">${item.date||''}</div>
     </div>`).join('');
 }
 
-renderWhoIHistory();
+function renderWhoIHistory() { renderWhoiGrid(); }
+function saveWhoIAm() {}
+
+renderWhoiGrid();
 
 // Schedule & Planner styles
 const scheduleStyle = document.createElement('style');
@@ -842,8 +1002,9 @@ function toggleMood(el, emoji) {
 
 // Sleep
 function setSleep(el, hrs) {
+  const isSelected = el.classList.contains('selected');
   document.querySelectorAll('.sleep-btn').forEach(b => b.classList.remove('selected'));
-  el.classList.add('selected');
+  if (!isSelected) el.classList.add('selected');
   savePlannerDay();
 }
 
@@ -975,6 +1136,8 @@ function savePlannerDay() {
   if (!d.mealTimes) d.mealTimes = {};
   // notes & grateful
   d.notes = document.getElementById('planner-notes')?.value || '';
+  d.bibleVerse = document.getElementById('bible-verse')?.value || '';
+  d.bibleRef = document.getElementById('bible-ref')?.value || '';
   d.notesList = plannerNotes;
 
   // todos & goals
@@ -1009,6 +1172,8 @@ function loadPlannerDay() {
   });
   renderMeals();
   if (document.getElementById('planner-notes')) document.getElementById('planner-notes').value = d.notes||'';
+  if (document.getElementById('bible-verse')) document.getElementById('bible-verse').value = d.bibleVerse||'';
+  if (document.getElementById('bible-ref')) document.getElementById('bible-ref').value = d.bibleRef||'';
   plannerNotes = d.notesList || [];
   renderNotes();
 
@@ -1097,77 +1262,61 @@ function renderVentEntries() {
 renderVentEntries();
 
 // Analytics
+let analyticsDate = new Date();
+
+function analyticsDateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function changeAnalyticsDay(dir) {
+  analyticsDate.setDate(analyticsDate.getDate() + dir);
+  renderAnalytics();
+}
+
 function renderAnalytics() {
   const el = document.getElementById('home-analytics');
   if (!el) return;
 
   const allPlanner = JSON.parse(localStorage.getItem('all_planner_data') || '{}');
-  const allDays = Object.keys(allPlanner);
-  const totalDays = allDays.length;
+  const key = analyticsDateKey(analyticsDate);
+  const d = allPlanner[key] || {};
 
   const today = new Date();
-  const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-  const todayData = allPlanner[todayKey] || {};
+  const todayKey = analyticsDateKey(today);
+  const isToday = key === todayKey;
 
-  // External stores
-  const winsData      = JSON.parse(localStorage.getItem('my_wins') || '[]');
-  const affData       = JSON.parse(localStorage.getItem('saved_affirmations') || '[]');
-  const ventData      = JSON.parse(localStorage.getItem('vent_entries') || '[]');
-  const whoiData      = JSON.parse(localStorage.getItem('whoi_history') || '[]');
-  const dimData       = JSON.parse(localStorage.getItem('dimension_items') || '{}');
-  const totalVisionItems = Object.values(dimData).reduce((s, arr) => s + arr.length, 0);
+  const dateLabel = analyticsDate.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
 
-  // Streak
-  const streak = calcStreak(allDays);
+  // Schedule
+  const schedule = d.schedule || {};
+  const scheduleDone  = Object.values(schedule).filter(e => typeof e==='object' && e.done).length;
+  const scheduleTotal = Object.values(schedule).filter(e => (typeof e==='object' && e.text)||(typeof e==='string' && e)).length;
 
-  // Mood frequency
-  const moodCount = {};
-  allDays.forEach(d => { (allPlanner[d].mood || []).forEach(m => { moodCount[m] = (moodCount[m]||0)+1; }); });
-  const topMoods = Object.entries(moodCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  // Goals & todos
+  const goalsDone  = (d.goals||[]).filter(g=>g.done).length;
+  const goalsTotal = (d.goals||[]).length;
+  const todosDone  = (d.todos||[]).filter(t=>t.done).length;
+  const todosTotal = (d.todos||[]).length;
 
-  // Sleep average
-  const sleepMap = {'4':4,'5':5,'6':6,'7':7,'8+':8};
-  const sleepDays = allDays.filter(d => allPlanner[d].sleep);
-  const sleepAvg = sleepDays.length ? (sleepDays.reduce((s,d) => s+(sleepMap[allPlanner[d].sleep]||0),0)/sleepDays.length).toFixed(1) : null;
+  // Mood, sleep, water, exercise
+  const moods   = d.mood || [];
+  const sleep   = d.sleep || null;
+  const water   = (d.water||[]).filter(Boolean).length;
+  const exercise = d.exercise || [];
 
-  // Water average
-  const waterDays = allDays.filter(d => allPlanner[d].water);
-  const waterAvg = waterDays.length ? (waterDays.reduce((s,d) => s+(allPlanner[d].water||[]).filter(Boolean).length,0)/waterDays.length).toFixed(1) : null;
+  // Meals
+  const me = d.mealEntries || {};
+  const breakfastEntries = me.breakfast || [];
+  const lunchEntries     = me.lunch || [];
+  const dinnerEntries    = me.dinner || [];
+  const totalMeals = breakfastEntries.length + lunchEntries.length + dinnerEntries.length;
 
-  // Exercise
-  const exCount = {};
-  allDays.forEach(d => { (allPlanner[d].exercise||[]).forEach(e => { exCount[e]=(exCount[e]||0)+1; }); });
-  const topEx = Object.entries(exCount).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  // Notes
+  const notes = d.notesList || [];
 
-  // Meals logged across all days
-  let totalMeals = 0;
-  allDays.forEach(d => {
-    const me = allPlanner[d].mealEntries || {};
-    totalMeals += (me.breakfast||[]).length + (me.lunch||[]).length + (me.dinner||[]).length;
-    // also count legacy string meals
-    if (allPlanner[d].breakfast) totalMeals++;
-    if (allPlanner[d].lunch) totalMeals++;
-    if (allPlanner[d].dinner) totalMeals++;
-  });
-
-  // Notes saved across all days
-  let totalNotes = 0;
-  allDays.forEach(d => { totalNotes += (allPlanner[d].notesList||[]).length; });
-
-  // Today — schedule, goals, todos
-  const scheduleToday = todayData.schedule || {};
-  const scheduleDone  = Object.values(scheduleToday).filter(e => typeof e==='object' && e.done).length;
-  const scheduleTotal = Object.values(scheduleToday).filter(e => (typeof e==='object' && e.text)||(typeof e==='string' && e)).length;
-  const goalsDone  = (todayData.goals||[]).filter(g=>g.done).length;
-  const goalsTotal = (todayData.goals||[]).length;
-  const todosDone  = (todayData.todos||[]).filter(t=>t.done).length;
-  const todosTotal = (todayData.todos||[]).length;
-
-  // Today's water
-  const todayWater = (todayData.water||[]).filter(Boolean).length;
-  const todayMoods = (todayData.mood||[]);
-  const todaySleep = todayData.sleep || null;
-  const todayEx    = (todayData.exercise||[]);
+  // Goals & todos lists
+  const goalsList = d.goals || [];
+  const todosList = d.todos || [];
 
   function stat(label, value, sub='') {
     return `<div style="border:1px solid #c8c8c5;padding:0.9rem;text-align:center;">
@@ -1177,84 +1326,72 @@ function renderAnalytics() {
     </div>`;
   }
 
-  if (!totalDays && !winsData.length && !affData.length && !ventData.length && !totalVisionItems) {
-    el.innerHTML = `<p style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);text-align:center;padding:1rem 0;">Start using the app and your analytics will appear here 🤍</p>`;
-    return;
-  }
+  const hasData = scheduleTotal || goalsTotal || todosTotal || moods.length || sleep || water || exercise.length || totalMeals || notes.length;
 
   el.innerHTML = `
-    <!-- Overall counts -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;">
-      ${stat('Days planned', totalDays)}
-      ${stat('Day streak', streak + (streak===1?' day':' days'))}
-      ${stat('Wins logged', winsData.length)}
-      ${stat('Affirmations saved', affData.length)}
-      ${stat('Vent entries', ventData.length)}
-      ${stat('Who I Am entries', whoiData.length)}
-      ${stat('Vision items', totalVisionItems, Object.keys(dimData).filter(k=>(dimData[k]||[]).length>0).length + ' dimensions')}
-      ${stat('Meals logged', totalMeals)}
-      ${totalNotes ? stat('Notes saved', totalNotes) : ''}
+    <!-- Date nav -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
+      <button onclick="changeAnalyticsDay(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8249;</button>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--black);text-align:center;">${dateLabel}${isToday ? ' <span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">Today</span>' : ''}</div>
+      <button onclick="changeAnalyticsDay(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8250;</button>
     </div>
 
-    <!-- Today snapshot -->
-    ${(scheduleTotal || goalsTotal || todosTotal || todayWater || todaySleep || todayMoods.length || todayEx.length) ? `
-    <div style="border:1px solid #c8c8c5;padding:1rem;margin-bottom:0.5rem;">
-      <div class="planner-label" style="margin-bottom:0.8rem;">Today</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-bottom:${todayWater||todaySleep||todayMoods.length||todayEx.length?'0.5rem':'0'};">
-        ${scheduleTotal ? stat('Schedule', `${scheduleDone}/${scheduleTotal}`, 'tasks done') : ''}
-        ${goalsTotal ? stat('Goals', `${goalsDone}/${goalsTotal}`, 'done') : ''}
-        ${todosTotal ? stat('To Do', `${todosDone}/${todosTotal}`, 'done') : ''}
-      </div>
-      ${todayWater || todaySleep ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:${todayMoods.length||todayEx.length?'0.5rem':'0'};">
-        ${todaySleep ? stat('Sleep', todaySleep + ' hrs') : ''}
-        ${todayWater ? stat('Water', todayWater + '/8 💧') : ''}
-      </div>` : ''}
-      ${todayMoods.length ? `<div style="margin-top:0.3rem;"><div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Mood today</div><div style="display:flex;gap:0.3rem;flex-wrap:wrap;">${todayMoods.map(m=>`<span style="font-size:1rem;">${m}</span>`).join('')}</div></div>` : ''}
-      ${todayEx.length ? `<div style="margin-top:0.6rem;"><div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Exercise today</div><div style="display:flex;gap:0.4rem;flex-wrap:wrap;">${todayEx.map(e=>`<span style="border:1px solid #c8c8c5;font-family:'Nunito',sans-serif;font-size:0.68rem;padding:0.2rem 0.5rem;">${e}</span>`).join('')}</div></div>` : ''}
+    ${!hasData ? `<p style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);text-align:center;padding:0.5rem 0;">No data for this day 🤍</p>` : `
+
+    ${scheduleTotal || goalsTotal || todosTotal ? `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;">
+      ${scheduleTotal ? stat('Schedule', `${scheduleDone}/${scheduleTotal}`, 'tasks done') : stat('Schedule','—')}
+      ${goalsTotal    ? stat('Goals',    `${goalsDone}/${goalsTotal}`,       'done')       : stat('Goals','—')}
+      ${todosTotal    ? stat('To Do',    `${todosDone}/${todosTotal}`,       'done')       : stat('To Do','—')}
     </div>` : ''}
 
-    <!-- Sleep & Water averages -->
-    ${sleepAvg || waterAvg ? `
-    <div style="border:1px solid #c8c8c5;padding:1rem;margin-bottom:0.5rem;">
-      <div class="planner-label" style="margin-bottom:0.6rem;">Averages</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-        ${sleepAvg ? stat('Avg sleep', sleepAvg + ' hrs', sleepDays.length + ' days') : ''}
-        ${waterAvg ? stat('Avg water', waterAvg + ' 💧', 'per day') : ''}
-      </div>
+    ${sleep || water ? `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;">
+      ${sleep ? stat('Sleep', sleep + ' hrs') : ''}
+      ${water ? stat('Water', water + '/8 💧') : ''}
     </div>` : ''}
 
-    <!-- Top moods -->
-    ${topMoods.length ? `
-    <div style="border:1px solid #c8c8c5;padding:1rem;margin-bottom:0.5rem;">
-      <div class="planner-label" style="margin-bottom:0.6rem;">Most felt moods</div>
-      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
-        ${topMoods.map(([m,c])=>`<div style="border:1px solid #c8c8c5;padding:0.3rem 0.6rem;font-size:0.9rem;">${m} <span style="font-family:'Nunito',sans-serif;font-size:0.58rem;color:var(--gray);">×${c}</span></div>`).join('')}
-      </div>
+    ${moods.length ? `
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.5rem;">
+      <div class="planner-label" style="margin-bottom:0.5rem;">Mood</div>
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">${moods.map(m=>`<span style="font-size:1.1rem;">${m}</span>`).join('')}</div>
     </div>` : ''}
 
-    <!-- Top exercises -->
-    ${topEx.length ? `
-    <div style="border:1px solid #c8c8c5;padding:1rem;">
-      <div class="planner-label" style="margin-bottom:0.6rem;">Most done exercises</div>
-      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
-        ${topEx.map(([e,c])=>`<div style="border:1px solid #c8c8c5;padding:0.3rem 0.6rem;font-family:'Nunito',sans-serif;font-size:0.7rem;">${e} <span style="color:var(--gray);">×${c}</span></div>`).join('')}
-      </div>
+    ${exercise.length ? `
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.5rem;">
+      <div class="planner-label" style="margin-bottom:0.5rem;">Exercise</div>
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">${exercise.map(e=>`<span style="border:1px solid #c8c8c5;font-family:'Nunito',sans-serif;font-size:0.7rem;padding:0.2rem 0.5rem;">${e}</span>`).join('')}</div>
     </div>` : ''}
+
+    ${totalMeals ? `
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.5rem;">
+      <div class="planner-label" style="margin-bottom:0.5rem;">Meals</div>
+      ${breakfastEntries.length ? `<div style="margin-bottom:0.4rem;"><div style="font-family:'Nunito',sans-serif;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--gray);margin-bottom:0.2rem;">Breakfast</div>${breakfastEntries.map(e=>`<div style="font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:300;">${e.text} <span style="color:var(--gray);font-size:0.6rem;">${e.time}</span></div>`).join('')}</div>` : ''}
+      ${lunchEntries.length     ? `<div style="margin-bottom:0.4rem;"><div style="font-family:'Nunito',sans-serif;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--gray);margin-bottom:0.2rem;">Lunch</div>${lunchEntries.map(e=>`<div style="font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:300;">${e.text} <span style="color:var(--gray);font-size:0.6rem;">${e.time}</span></div>`).join('')}</div>` : ''}
+      ${dinnerEntries.length    ? `<div><div style="font-family:'Nunito',sans-serif;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--gray);margin-bottom:0.2rem;">Dinner</div>${dinnerEntries.map(e=>`<div style="font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:300;">${e.text} <span style="color:var(--gray);font-size:0.6rem;">${e.time}</span></div>`).join('')}</div>` : ''}
+    </div>` : ''}
+
+    ${goalsList.length ? `
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.5rem;">
+      <div class="planner-label" style="margin-bottom:0.5rem;">Goals</div>
+      ${goalsList.map(g=>`<div style="font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:300;padding:0.2rem 0;${g.done?'text-decoration:line-through;color:var(--gray);':''}">${g.done?'✓ ':'○ '}${g.text}</div>`).join('')}
+    </div>` : ''}
+
+    ${todosList.length ? `
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.5rem;">
+      <div class="planner-label" style="margin-bottom:0.5rem;">To Do</div>
+      ${todosList.map(t=>`<div style="font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:300;padding:0.2rem 0;${t.done?'text-decoration:line-through;color:var(--gray);':''}">${t.done?'✓ ':'○ '}${t.text}</div>`).join('')}
+    </div>` : ''}
+
+    ${notes.length ? `
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div class="planner-label" style="margin-bottom:0.5rem;">Notes</div>
+      ${notes.map(n=>`<div style="font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:300;padding:0.2rem 0;border-bottom:1px solid #f0f0ee;">${n.text} <span style="color:var(--gray);font-size:0.6rem;">${n.time}</span></div>`).join('')}
+    </div>` : ''}
+    `}
   `;
 }
 
-function calcStreak(days) {
-  if (!days.length) return 0;
-  const sorted = [...days].sort().reverse();
-  let streak = 0;
-  const check = new Date();
-  for (let i = 0; i < 365; i++) {
-    const k = `${check.getFullYear()}-${String(check.getMonth()+1).padStart(2,'0')}-${String(check.getDate()).padStart(2,'0')}`;
-    if (sorted.includes(k)) { streak++; check.setDate(check.getDate()-1); }
-    else break;
-  }
-  return streak;
-}
 
 // One-time data clear
 if (!localStorage.getItem('data_cleared_v1')) {
