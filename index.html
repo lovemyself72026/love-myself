@@ -98,6 +98,17 @@
   <div class="subtitle" style="margin-bottom:0.3rem;">My progress</div>
   <h2 style="margin-bottom:1.5rem;">Analytics.</h2>
   <div id="home-analytics"></div>
+
+  <!-- Export / Import -->
+  <hr style="margin:2rem 0;">
+  <div class="subtitle" style="margin-bottom:0.3rem;">My data</div>
+  <h2 style="margin-bottom:1rem;">Backup & restore.</h2>
+  <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+    <button class="btn fill" onclick="exportData()" style="flex:1;">Export data</button>
+    <button class="btn" onclick="document.getElementById('import-file').click()" style="flex:1;">Import data</button>
+    <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(this)">
+  </div>
+  <div id="import-msg" style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);letter-spacing:0.08em;margin-top:0.6rem;text-align:center;"></div>
 </div>
 
 <div class="section" id="affirmations">
@@ -1415,6 +1426,45 @@ localStorage.setItem = function(key, value) {
 };
 
 renderAnalytics();
+
+// Export / Import
+function exportData() {
+  const keys = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books','user_rituals','ritual_state','habit_tracker'];
+  const data = {};
+  keys.forEach(k => { const v = localStorage.getItem(k); if (v) data[k] = JSON.parse(v); });
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `self-love-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      Object.entries(data).forEach(([k, v]) => localStorage.setItem(k, JSON.stringify(v)));
+      const msg = document.getElementById('import-msg');
+      if (msg) { msg.textContent = 'Data restored successfully 🤍'; setTimeout(() => msg.textContent = '', 3000); }
+      wins = JSON.parse(localStorage.getItem('my_wins') || '[]');
+      savedAffirmations = JSON.parse(localStorage.getItem('saved_affirmations') || '[]');
+      ventEntries = JSON.parse(localStorage.getItem('vent_entries') || '[]');
+      dimensionItems = JSON.parse(localStorage.getItem('dimension_items') || '{}');
+      whoiItems = JSON.parse(localStorage.getItem('whoi_history') || '[]');
+      books = JSON.parse(localStorage.getItem('my_books') || '[]');
+      allPlannerData = JSON.parse(localStorage.getItem('all_planner_data') || '{}');
+      renderWins(); renderSavedAffirmations(); renderVentEntries(); renderDimensionBoards(); renderWhoiGrid(); renderBooks(); renderAnalytics(); loadPlannerDay();
+    } catch(err) {
+      const msg = document.getElementById('import-msg');
+      if (msg) msg.textContent = 'Invalid file — please use a valid backup.';
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
 
 // PWA: Register service worker
 if ('serviceWorker' in navigator) {
