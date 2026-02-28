@@ -98,17 +98,6 @@
   <div class="subtitle" style="margin-bottom:0.3rem;">My progress</div>
   <h2 style="margin-bottom:1.5rem;">Analytics.</h2>
   <div id="home-analytics"></div>
-
-  <!-- Export / Import -->
-  <hr style="margin:2rem 0;">
-  <div class="subtitle" style="margin-bottom:0.3rem;">My data</div>
-  <h2 style="margin-bottom:1rem;">Backup & restore.</h2>
-  <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
-    <button class="btn fill" onclick="exportData()" style="flex:1;">Export data</button>
-    <button class="btn" onclick="document.getElementById('import-file').click()" style="flex:1;">Import data</button>
-    <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(this)">
-  </div>
-  <div id="import-msg" style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);letter-spacing:0.08em;margin-top:0.6rem;text-align:center;"></div>
 </div>
 
 <div class="section" id="affirmations">
@@ -905,8 +894,8 @@ function renderSchedule() {
   const day = getPlannerDay();
   const schedule = day.schedule || {};
   const slots = [
-    '4:00 AM','4:05 AM','4:10 AM','4:20 AM','4:30 AM',
-    '5:00 AM','5:30 AM','6:00 AM','6:30 AM','7:00 AM',
+    '4:00 AM','4:05 AM','4:10 AM','4:20 AM','4:25 AM','4:30 AM',
+    '5:00 AM','5:15 AM','5:30 AM','6:00 AM','6:30 AM','7:00 AM',
     '7:30 AM','8:00 AM','8:30 AM','9:00 AM','9:30 AM',
     '10:00 AM','10:30 AM','11:00 AM','11:30 AM','12:00 PM',
     '12:30 PM','1:00 PM','1:30 PM','2:00 PM','2:30 PM',
