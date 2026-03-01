@@ -32,10 +32,12 @@
   const USER_ID = 'my-love-myself-data';
   const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books'];
 
-  // Push to Firebase whenever localStorage changes
+  // Expose syncToCloud globally
   window.syncToCloud = function(key, value) {
     if (!SYNC_KEYS.includes(key)) return;
-    set(ref(db, `${USER_ID}/${key}`), value).catch(e => console.warn('Sync failed:', e));
+    set(ref(db, `${USER_ID}/${key}`), value)
+      .then(() => console.log('Synced:', key))
+      .catch(e => console.warn('Sync failed:', e));
   };
 
   // Pull from Firebase on load — real-time sync
@@ -47,7 +49,10 @@
       if (data[k] !== undefined) {
         const current = localStorage.getItem(k);
         const incoming = JSON.stringify(data[k]);
-        if (current !== incoming) { localStorage.setItem(k, incoming); changed = true; }
+        if (current !== incoming) {
+          localStorage.setItem(k, incoming);
+          changed = true;
+        }
       }
     });
     if (changed && typeof reloadAllData === 'function') reloadAllData();
