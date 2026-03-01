@@ -812,7 +812,6 @@ async function addDimImage(key, input) {
   const date = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   if (!dimensionItems[key]) dimensionItems[key] = [];
 
-  // Show placeholder while uploading
   const tempId = Date.now();
   dimensionItems[key].push({ id: tempId, type: 'image', content: '', date, uploading: true });
   renderDimensionBoards();
@@ -821,8 +820,9 @@ async function addDimImage(key, input) {
     let url;
     if (typeof uploadImageToCloud === 'function') {
       url = await uploadImageToCloud(file);
+      alert('✅ Upload success! URL: ' + url.slice(0, 60) + '...');
     } else {
-      // fallback to base64
+      alert('❌ uploadImageToCloud not found - falling back to base64');
       url = await new Promise(res => { const r = new FileReader(); r.onload = e => res(e.target.result); r.readAsDataURL(file); });
     }
     const idx = dimensionItems[key].findIndex(i => i.id === tempId);
@@ -830,11 +830,10 @@ async function addDimImage(key, input) {
     localStorage.setItem('dimension_items', JSON.stringify(dimensionItems));
     renderDimensionBoards();
   } catch(e) {
-    console.warn('Image upload failed', e);
+    alert('❌ Upload failed: ' + e.message);
     const idx = dimensionItems[key].findIndex(i => i.id === tempId);
-    if (idx !== -1) { dimensionItems[key][idx].uploading = false; dimensionItems[key][idx].error = true; dimensionItems[key][idx].content = ''; }
+    if (idx !== -1) { dimensionItems[key].splice(idx, 1); }
     renderDimensionBoards();
-    alert('Image upload failed: ' + e.message + '\nCheck your Cloudinary preset name.');
   }
 }
 
