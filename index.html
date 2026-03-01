@@ -32,13 +32,18 @@
   const USER_ID = 'my-love-myself-data';
   const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books'];
 
-  // Expose syncToCloud globally
+  // Process any queued syncs
+  const queue = window._syncQueue || [];
+  window._syncQueue = null;
+
   window.syncToCloud = function(key, value) {
     if (!SYNC_KEYS.includes(key)) return;
     set(ref(db, `${USER_ID}/${key}`), value)
-      .then(() => console.log('Synced:', key))
       .catch(e => console.warn('Sync failed:', e));
   };
+
+  // Flush queue
+  queue.forEach(([k, v]) => window.syncToCloud(k, v));
 
   // Pull from Firebase on load — real-time sync
   onValue(ref(db, USER_ID), (snapshot) => {
@@ -1511,7 +1516,13 @@ if (!localStorage.getItem('data_cleared_v1')) {
 const _origSetItem = localStorage.setItem.bind(localStorage);
 localStorage.setItem = function(key, value) {
   _origSetItem(key, value);
-  if (typeof syncToCloud === 'function') syncToCloud(key, JSON.parse(value));
+  if (typeof syncToCloud === 'function') {
+    syncToCloud(key, JSON.parse(value));
+  } else {
+    // Queue until Firebase is ready
+    if (!window._syncQueue) window._syncQueue = [];
+    window._syncQueue.push([key, JSON.parse(value)]);
+  }
   const watched = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history'];
   if (watched.includes(key) && document.getElementById('home')?.classList.contains('active')) {
     renderAnalytics();
