@@ -68,6 +68,8 @@
   .home-card-text { font-size: 1.1rem; font-weight: 300; }
   .save-note { font-family: 'Nunito', sans-serif; font-size: 0.65rem; color: var(--gray); letter-spacing: 0.08em; margin-top: 0.8rem; }
   @media (max-width: 480px) { .home-grid { grid-template-columns: 1fr 1fr; } .nav-tabs { gap: 0; } .nav-tab { font-size: 0.88rem; letter-spacing: 0.04em; white-space: nowrap; } .home-card { min-height: 90px; padding: 1rem; } }
+  @media (max-width: 600px) { #planner-grid { grid-template-columns: 1fr !important; } .vision-items-grid { grid-template-columns: 1fr !important; } }
+  .vision-items-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:1rem; }
 </style>
 </head>
 <body>
@@ -207,7 +209,7 @@
     <input type="file" accept="image/*" onchange="addWhoiImage(this)" style="font-size:0.82rem;width:100%;">
   </div>
 
-  <div id="whoi-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:1rem;"></div>
+  <div id="whoi-grid" class="vision-items-grid" style="margin-top:1rem;"></div>
   <div id="whoi-saved-note" style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);letter-spacing:0.1em;text-align:center;margin-top:0.5rem;"></div>
 </div>
 
@@ -705,7 +707,7 @@ function renderDimensionBoards() {
         <input type="file" accept="image/*" onchange="addDimImage('${d.key}', this)" style="font-size:0.82rem;width:100%;">
       </div>
 
-      ${items.length ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:1rem;">
+      ${items.length ? `<div class="vision-items-grid">
         ${items.map(item => `
         <div style="border:1px solid #e8e8e5;padding:0.6rem;position:relative;">
           <button onclick="removeDimItem('${d.key}',${item.id})" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;position:absolute;top:0.3rem;right:0.3rem;line-height:1;">✕</button>
