@@ -29,28 +29,8 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
-  const storage = getStorage(app);
   const USER_ID = 'my-love-myself-data';
-
   const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books'];
-
-  // Upload image to Cloudinary, return download URL
-  window.uploadImageToCloud = async function(file) {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'love_myself_unsigned');
-    formData.append('cloud_name', 'dvo7yubho');
-    const res = await fetch('https://api.cloudinary.com/v1_1/dvo7yubho/image/upload', {
-      method: 'POST',
-      body: formData
-    });
-    const data = await res.json();
-    if (!data.secure_url) {
-      console.error('Cloudinary error:', JSON.stringify(data));
-      throw new Error(data.error?.message || 'Upload failed');
-    }
-    return data.secure_url;
-  };
 
   // Push to Firebase whenever localStorage changes
   window.syncToCloud = function(key, value) {
@@ -58,7 +38,7 @@
     set(ref(db, `${USER_ID}/${key}`), value).catch(e => console.warn('Sync failed:', e));
   };
 
-  // Pull from Firebase on load
+  // Pull from Firebase on load — real-time sync
   onValue(ref(db, USER_ID), (snapshot) => {
     const data = snapshot.val();
     if (!data) return;
@@ -72,6 +52,25 @@
     });
     if (changed && typeof reloadAllData === 'function') reloadAllData();
   });
+</script>
+
+<!-- Cloudinary image upload — outside module so it's globally accessible -->
+<script>
+  window.uploadImageToCloud = async function(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'love_myself_unsigned');
+    const res = await fetch('https://api.cloudinary.com/v1_1/dvo7yubho/image/upload', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (!data.secure_url) {
+      console.error('Cloudinary error:', JSON.stringify(data));
+      throw new Error(data.error?.message || 'Upload failed');
+    }
+    return data.secure_url;
+  };
 </script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
