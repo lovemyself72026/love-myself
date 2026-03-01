@@ -13,54 +13,53 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400&family=Nunito:wght@200;300;400&display=swap" rel="stylesheet">
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+  window.addEventListener('load', function() {
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJC8hnTJxUM2p3ZjcK56arCRDLJBOOcpE",
+      authDomain: "lovemyselfapp.firebaseapp.com",
+      databaseURL: "https://lovemyselfapp-default-rtdb.firebaseio.com",
+      projectId: "lovemyselfapp",
+      storageBucket: "lovemyselfapp.firebasestorage.app",
+      messagingSenderId: "530689960308",
+      appId: "1:530689960308:web:a775dcd62c8e1624b46421"
+    };
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAJC8hnTJxUM2p3ZjcK56arCRDLJBOOcpE",
-    authDomain: "lovemyselfapp.firebaseapp.com",
-    databaseURL: "https://lovemyselfapp-default-rtdb.firebaseio.com",
-    projectId: "lovemyselfapp",
-    storageBucket: "lovemyselfapp.firebasestorage.app",
-    messagingSenderId: "530689960308",
-    appId: "1:530689960308:web:a775dcd62c8e1624b46421"
-  };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const USER_ID = 'my-love-myself-data';
+    const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books'];
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const USER_ID = 'my-love-myself-data';
-  const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books'];
+    window.syncToCloud = function(key, value) {
+      if (!SYNC_KEYS.includes(key)) return;
+      db.ref(USER_ID + '/' + key).set(value).catch(e => console.warn('Sync failed:', e));
+    };
 
-  // Process any queued syncs
-  const queue = window._syncQueue || [];
-  window._syncQueue = null;
+    // Flush any queued syncs
+    if (window._syncQueue) {
+      window._syncQueue.forEach(function(item) { window.syncToCloud(item[0], item[1]); });
+      window._syncQueue = null;
+    }
 
-  window.syncToCloud = function(key, value) {
-    if (!SYNC_KEYS.includes(key)) return;
-    set(ref(db, `${USER_ID}/${key}`), value)
-      .catch(e => console.warn('Sync failed:', e));
-  };
-
-  // Flush queue
-  queue.forEach(([k, v]) => window.syncToCloud(k, v));
-
-  // Pull from Firebase on load — real-time sync
-  onValue(ref(db, USER_ID), (snapshot) => {
-    const data = snapshot.val();
-    if (!data) return;
-    let changed = false;
-    SYNC_KEYS.forEach(k => {
-      if (data[k] !== undefined) {
-        const current = localStorage.getItem(k);
-        const incoming = JSON.stringify(data[k]);
-        if (current !== incoming) {
-          localStorage.setItem(k, incoming);
-          changed = true;
+    // Pull from Firebase — real-time sync
+    db.ref(USER_ID).on('value', function(snapshot) {
+      const data = snapshot.val();
+      if (!data) return;
+      let changed = false;
+      SYNC_KEYS.forEach(function(k) {
+        if (data[k] !== undefined) {
+          const current = localStorage.getItem(k);
+          const incoming = JSON.stringify(data[k]);
+          if (current !== incoming) {
+            localStorage.setItem(k, incoming);
+            changed = true;
+          }
         }
-      }
+      });
+      if (changed && typeof reloadAllData === 'function') reloadAllData();
     });
-    if (changed && typeof reloadAllData === 'function') reloadAllData();
   });
 </script>
 
