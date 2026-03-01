@@ -16,6 +16,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAJC8hnTJxUM2p3ZjcK56arCRDLJBOOcpE",
@@ -29,9 +30,18 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
+  const storage = getStorage(app);
   const USER_ID = 'my-love-myself-data';
 
   const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books'];
+
+  // Upload image to Firebase Storage, return download URL
+  window.uploadImageToCloud = async function(file) {
+    const path = `images/${USER_ID}/${Date.now()}_${file.name}`;
+    const storageRef = sRef(storage, path);
+    await uploadBytes(storageRef, file);
+    return await getDownloadURL(storageRef);
+  };
 
   // Push to Firebase whenever localStorage changes
   window.syncToCloud = function(key, value) {
@@ -754,7 +764,9 @@ function renderDimensionBoards() {
         <div style="border:1px solid #e8e8e5;padding:0.6rem;position:relative;">
           <button onclick="removeDimItem('${d.key}',${item.id})" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;position:absolute;top:0.3rem;right:0.3rem;line-height:1;">✕</button>
           ${item.type==='image'
-            ? `<img src="${item.content}" style="width:100%;display:block;border-radius:0;">`
+            ? item.uploading
+              ? `<div style="font-family:'Nunito',sans-serif;font-size:0.7rem;color:var(--gray);text-align:center;padding:1rem 0;">Uploading...</div>`
+              : `<img src="${item.content}" style="width:100%;display:block;border-radius:0;">`
             : item.type==='word'
             ? `<div style="font-family:'Lora',serif;font-style:italic;font-size:1rem;text-align:center;padding:0.5rem 0.5rem 0.2rem;">${item.content}</div>`
             : `<div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;line-height:1.5;padding-right:0.8rem;">${item.content}</div>`
@@ -786,22 +798,32 @@ function addDimItem(key) {
   renderDimensionBoards();
 }
 
-function addDimImage(key, input) {
+async function addDimImage(key, input) {
   const file = input.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    if (!dimensionItems[key]) dimensionItems[key] = [];
-    dimensionItems[key].push({
-      id: Date.now(),
-      type: 'image',
-      content: e.target.result,
-      date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
-    });
+  const date = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  if (!dimensionItems[key]) dimensionItems[key] = [];
+
+  // Show placeholder while uploading
+  const tempId = Date.now();
+  dimensionItems[key].push({ id: tempId, type: 'image', content: '', date, uploading: true });
+  renderDimensionBoards();
+
+  try {
+    let url;
+    if (typeof uploadImageToCloud === 'function') {
+      url = await uploadImageToCloud(file);
+    } else {
+      // fallback to base64
+      url = await new Promise(res => { const r = new FileReader(); r.onload = e => res(e.target.result); r.readAsDataURL(file); });
+    }
+    const idx = dimensionItems[key].findIndex(i => i.id === tempId);
+    if (idx !== -1) { dimensionItems[key][idx].content = url; dimensionItems[key][idx].uploading = false; }
     localStorage.setItem('dimension_items', JSON.stringify(dimensionItems));
     renderDimensionBoards();
-  };
-  reader.readAsDataURL(file);
+  } catch(e) {
+    console.warn('Image upload failed', e);
+  }
 }
 
 function removeDimItem(key, id) {
@@ -848,21 +870,28 @@ function addWhoiItem() {
   renderWhoiGrid();
 }
 
-function addWhoiImage(input) {
+async function addWhoiImage(input) {
   const file = input.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    whoiItems.unshift({
-      id: Date.now(),
-      type: 'image',
-      content: e.target.result,
-      date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
-    });
+  const date = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const tempId = Date.now();
+  whoiItems.unshift({ id: tempId, type: 'image', content: '', date, uploading: true });
+  renderWhoiGrid();
+
+  try {
+    let url;
+    if (typeof uploadImageToCloud === 'function') {
+      url = await uploadImageToCloud(file);
+    } else {
+      url = await new Promise(res => { const r = new FileReader(); r.onload = e => res(e.target.result); r.readAsDataURL(file); });
+    }
+    const idx = whoiItems.findIndex(i => i.id === tempId);
+    if (idx !== -1) { whoiItems[idx].content = url; whoiItems[idx].uploading = false; }
     localStorage.setItem('whoi_history', JSON.stringify(whoiItems));
     renderWhoiGrid();
-  };
-  reader.readAsDataURL(file);
+  } catch(e) {
+    console.warn('Image upload failed', e);
+  }
 }
 
 function deleteWhoIEntry(id) {
@@ -878,7 +907,9 @@ function renderWhoiGrid() {
     <div style="border:1px solid #e8e8e5;padding:0.6rem;position:relative;">
       <button onclick="deleteWhoIEntry(${item.id})" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;position:absolute;top:0.3rem;right:0.3rem;line-height:1;">✕</button>
       ${item.type === 'image'
-        ? `<img src="${item.content}" style="width:100%;display:block;">`
+        ? item.uploading
+          ? `<div style="font-family:'Nunito',sans-serif;font-size:0.7rem;color:var(--gray);text-align:center;padding:1rem 0;">Uploading...</div>`
+          : `<img src="${item.content}" style="width:100%;display:block;">`
         : item.type === 'word'
         ? `<div style="font-family:'Lora',serif;font-style:italic;font-size:1rem;text-align:center;padding:0.4rem 0.5rem 0.2rem;">${item.content}</div>`
         : `<div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;line-height:1.5;padding-right:0.8rem;">${item.content}</div>`
