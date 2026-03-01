@@ -16,7 +16,6 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-  import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAJC8hnTJxUM2p3ZjcK56arCRDLJBOOcpE",
@@ -35,12 +34,18 @@
 
   const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books'];
 
-  // Upload image to Firebase Storage, return download URL
+  // Upload image to Cloudinary, return download URL
   window.uploadImageToCloud = async function(file) {
-    const path = `images/${USER_ID}/${Date.now()}_${file.name}`;
-    const storageRef = sRef(storage, path);
-    await uploadBytes(storageRef, file);
-    return await getDownloadURL(storageRef);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'love_myself_unsigned');
+    formData.append('cloud_name', 'dvo7yubho');
+    const res = await fetch('https://api.cloudinary.com/v1_1/dvo7yubho/image/upload', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    return data.secure_url;
   };
 
   // Push to Firebase whenever localStorage changes
