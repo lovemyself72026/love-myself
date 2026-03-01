@@ -98,6 +98,14 @@
   <div class="subtitle" style="margin-bottom:0.3rem;">My progress</div>
   <h2 style="margin-bottom:1.5rem;">Analytics.</h2>
   <div id="home-analytics"></div>
+
+  <hr style="margin:2rem 0;">
+  <div style="display:flex;gap:0.5rem;justify-content:center;">
+    <button onclick="exportData()" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;color:var(--gray);">Export</button>
+    <button onclick="document.getElementById('import-file').click()" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;color:var(--gray);">Import</button>
+    <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(this)">
+  </div>
+  <div id="import-msg" style="font-family:'Nunito',sans-serif;font-size:0.62rem;color:var(--gray);letter-spacing:0.08em;margin-top:0.4rem;text-align:center;"></div>
 </div>
 
 <div class="section" id="affirmations">
