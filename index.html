@@ -822,22 +822,16 @@ async function addDimImage(key, input) {
   renderDimensionBoards();
 
   try {
-    let url;
-    if (typeof uploadImageToCloud === 'function') {
-      url = await uploadImageToCloud(file);
-      alert('✅ Upload success! URL: ' + url.slice(0, 60) + '...');
-    } else {
-      alert('❌ uploadImageToCloud not found - falling back to base64');
-      url = await new Promise(res => { const r = new FileReader(); r.onload = e => res(e.target.result); r.readAsDataURL(file); });
-    }
+    const url = await uploadImageToCloud(file);
     const idx = dimensionItems[key].findIndex(i => i.id === tempId);
     if (idx !== -1) { dimensionItems[key][idx].content = url; dimensionItems[key][idx].uploading = false; }
     localStorage.setItem('dimension_items', JSON.stringify(dimensionItems));
+    if (typeof syncToCloud === 'function') syncToCloud('dimension_items', dimensionItems);
     renderDimensionBoards();
   } catch(e) {
     alert('❌ Upload failed: ' + e.message);
     const idx = dimensionItems[key].findIndex(i => i.id === tempId);
-    if (idx !== -1) { dimensionItems[key].splice(idx, 1); }
+    if (idx !== -1) dimensionItems[key].splice(idx, 1);
     renderDimensionBoards();
   }
 }
@@ -895,18 +889,16 @@ async function addWhoiImage(input) {
   renderWhoiGrid();
 
   try {
-    let url;
-    if (typeof uploadImageToCloud === 'function') {
-      url = await uploadImageToCloud(file);
-    } else {
-      url = await new Promise(res => { const r = new FileReader(); r.onload = e => res(e.target.result); r.readAsDataURL(file); });
-    }
+    const url = await uploadImageToCloud(file);
     const idx = whoiItems.findIndex(i => i.id === tempId);
     if (idx !== -1) { whoiItems[idx].content = url; whoiItems[idx].uploading = false; }
     localStorage.setItem('whoi_history', JSON.stringify(whoiItems));
+    if (typeof syncToCloud === 'function') syncToCloud('whoi_history', whoiItems);
     renderWhoiGrid();
   } catch(e) {
-    console.warn('Image upload failed', e);
+    const idx = whoiItems.findIndex(i => i.id === tempId);
+    if (idx !== -1) whoiItems.splice(idx, 1);
+    renderWhoiGrid();
   }
 }
 
