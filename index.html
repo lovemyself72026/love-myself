@@ -37,14 +37,17 @@
       if (!data) { if(showMsg) alert('No data found yet.'); return; }
       let changed = false;
       SYNC_KEYS.forEach(function(k) {
-        if (data[k] !== undefined) {
-          const incoming = JSON.stringify(data[k]);
-          const current = localStorage.getItem(k);
-          if (current !== incoming) {
-            // Use raw setItem to avoid triggering syncToCloud loop
-            window._rawLS(k, incoming);
-            changed = true;
-          }
+        if (data[k] === undefined) return;
+        // Handle both raw and wrapped {data, ts} format
+        let value = data[k];
+        if (value && typeof value === 'object' && value.data !== undefined && value.ts !== undefined) {
+          value = value.data;
+        }
+        const incoming = JSON.stringify(value);
+        const current = localStorage.getItem(k);
+        if (current !== incoming) {
+          window._rawLS(k, incoming);
+          changed = true;
         }
       });
       if (changed && typeof reloadAllData === 'function') reloadAllData();
@@ -537,6 +540,7 @@ const homeQuotes = [];
 
 
 let savedAffirmations = JSON.parse(localStorage.getItem('saved_affirmations')||'[]');
+if (!Array.isArray(savedAffirmations)) savedAffirmations = [];
 let ritualState = JSON.parse(localStorage.getItem('ritual_state')||'{}');
 
 let lastVisit = localStorage.getItem('last_visit');
@@ -595,6 +599,7 @@ function resetRituals(){}
 
 // Books I've Read
 let books = JSON.parse(localStorage.getItem('my_books') || '[]');
+if (!Array.isArray(books)) books = [];
 
 function addBook() {
   const title = document.getElementById('book-input').value.trim();
@@ -690,6 +695,7 @@ function renderBooks() {
 renderBooks();
 
 let wins = JSON.parse(localStorage.getItem('my_wins') || '[]');
+if (!Array.isArray(wins)) wins = [];
 
 function addWin() {
   const input = document.getElementById('win-input');
@@ -856,6 +862,7 @@ whoiStyle.textContent = `
 document.head.appendChild(whoiStyle);
 
 let whoiItems = JSON.parse(localStorage.getItem('whoi_history') || '[]');
+if (!Array.isArray(whoiItems)) whoiItems = [];
 let whoiType = 'word';
 
 function setWhoiType(type) {
@@ -1326,6 +1333,7 @@ function saveAndRenderVision() {}
 function renderVisionBoard() {}
 
 let ventEntries = JSON.parse(localStorage.getItem('vent_entries') || '[]');
+if (!Array.isArray(ventEntries)) ventEntries = [];
 
 function saveVent() {
   const text = document.getElementById('vent-input').value.trim();
@@ -1508,13 +1516,13 @@ if (!localStorage.getItem('data_cleared_v1')) {
 
 
 function reloadAllData() {
-  wins = JSON.parse(localStorage.getItem('my_wins') || '[]');
-  savedAffirmations = JSON.parse(localStorage.getItem('saved_affirmations') || '[]');
-  ventEntries = JSON.parse(localStorage.getItem('vent_entries') || '[]');
-  dimensionItems = JSON.parse(localStorage.getItem('dimension_items') || '{}');
-  whoiItems = JSON.parse(localStorage.getItem('whoi_history') || '[]');
-  books = JSON.parse(localStorage.getItem('my_books') || '[]');
-  allPlannerData = JSON.parse(localStorage.getItem('all_planner_data') || '{}');
+  const w = JSON.parse(localStorage.getItem('my_wins') || '[]'); wins = Array.isArray(w) ? w : [];
+  const sa = JSON.parse(localStorage.getItem('saved_affirmations') || '[]'); savedAffirmations = Array.isArray(sa) ? sa : [];
+  const ve = JSON.parse(localStorage.getItem('vent_entries') || '[]'); ventEntries = Array.isArray(ve) ? ve : [];
+  const di = JSON.parse(localStorage.getItem('dimension_items') || '{}'); dimensionItems = (di && typeof di === 'object' && !Array.isArray(di)) ? di : {};
+  const wi = JSON.parse(localStorage.getItem('whoi_history') || '[]'); whoiItems = Array.isArray(wi) ? wi : [];
+  const b = JSON.parse(localStorage.getItem('my_books') || '[]'); books = Array.isArray(b) ? b : [];
+  const ap = JSON.parse(localStorage.getItem('all_planner_data') || '{}'); allPlannerData = (ap && typeof ap === 'object' && !Array.isArray(ap)) ? ap : {};
   renderWins(); renderSavedAffirmations(); renderVentEntries(); renderDimensionBoards(); renderWhoiGrid(); renderBooks(); renderAnalytics(); loadPlannerDay();
 }
 
