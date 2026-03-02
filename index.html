@@ -579,7 +579,7 @@ function newAffirmation(){
 }
 
 function saveAffirmation(){
-  if(!savedAffirmations.find(a=>(a.text||a)===currentAff)){savedAffirmations.push({text:currentAff,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' · '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});localStorage.setItem('saved_affirmations',JSON.stringify(savedAffirmations));renderSavedAffirmations();}
+  if(!savedAffirmations.find(a=>(a.text||a)===currentAff)){savedAffirmations.push({text:currentAff,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' · '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});saveAndSync('saved_affirmations',savedAffirmations);renderSavedAffirmations();}
 }
 
 function renderSavedAffirmations(){
@@ -588,7 +588,7 @@ function renderSavedAffirmations(){
   el.innerHTML=savedAffirmations.map((a,i)=>`<div class="journal-entry"><button onclick="removeSavedAff(${i})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.4rem;">remove</button><div class="journal-date">${a.date||''}</div><div class="journal-content">${a.text||a}</div></div>`).join('');
 }
 
-function removeSavedAff(i){savedAffirmations.splice(i,1);localStorage.setItem('saved_affirmations',JSON.stringify(savedAffirmations));renderSavedAffirmations();}
+function removeSavedAff(i){savedAffirmations.splice(i,1);saveAndSync('saved_affirmations',savedAffirmations);renderSavedAffirmations();}
 
 function addRitual(){}
 function renderRituals(){}
@@ -610,7 +610,7 @@ function addBook() {
     author,
     date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'})
   });
-  localStorage.setItem('my_books', JSON.stringify(books));
+  saveAndSync('my_books', books);
   document.getElementById('book-input').value = '';
   document.getElementById('book-author').value = '';
   renderBooks();
@@ -672,7 +672,7 @@ function celebrateBook(title) {
 
 function deleteBook(id) {
   books = books.filter(b => b.id !== id);
-  localStorage.setItem('my_books', JSON.stringify(books));
+  saveAndSync('my_books', books);
   renderBooks();
 }
 
@@ -700,16 +700,14 @@ function addWin() {
   const val = input.value.trim();
   if (!val) return;
   wins.unshift({ id: Date.now(), text: val, date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}) });
-  localStorage.setItem('my_wins', JSON.stringify(wins));
-  console.log('syncToCloud type:', typeof syncToCloud);
-  if (typeof syncToCloud === 'function') syncToCloud('my_wins', wins);
+  saveAndSync('my_wins', wins);
   input.value = '';
   renderWins();
 }
 
 function deleteWin(id) {
   wins = wins.filter(w => w.id !== id);
-  localStorage.setItem('my_wins', JSON.stringify(wins));
+  saveAndSync('my_wins', wins);
   renderWins();
 }
 
@@ -814,7 +812,7 @@ function addDimItem(key) {
     content: inp.value.trim(),
     date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
   });
-  localStorage.setItem('dimension_items', JSON.stringify(dimensionItems));
+  saveAndSync('dimension_items', dimensionItems);
   renderDimensionBoards();
 }
 
@@ -832,7 +830,7 @@ async function addDimImage(key, input) {
     const url = await uploadImageToCloud(file);
     const idx = dimensionItems[key].findIndex(i => i.id === tempId);
     if (idx !== -1) { dimensionItems[key][idx].content = url; dimensionItems[key][idx].uploading = false; }
-    localStorage.setItem('dimension_items', JSON.stringify(dimensionItems));
+    saveAndSync('dimension_items', dimensionItems);
     if (typeof syncToCloud === 'function') syncToCloud('dimension_items', dimensionItems);
     renderDimensionBoards();
   } catch(e) {
@@ -845,7 +843,7 @@ async function addDimImage(key, input) {
 
 function removeDimItem(key, id) {
   dimensionItems[key] = (dimensionItems[key]||[]).filter(i => i.id !== id);
-  localStorage.setItem('dimension_items', JSON.stringify(dimensionItems));
+  saveAndSync('dimension_items', dimensionItems);
   renderDimensionBoards();
 }
 
@@ -883,7 +881,7 @@ function addWhoiItem() {
     date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
   });
   inp.value = '';
-  localStorage.setItem('whoi_history', JSON.stringify(whoiItems));
+  saveAndSync('whoi_history', whoiItems);
   renderWhoiGrid();
 }
 
@@ -899,7 +897,7 @@ async function addWhoiImage(input) {
     const url = await uploadImageToCloud(file);
     const idx = whoiItems.findIndex(i => i.id === tempId);
     if (idx !== -1) { whoiItems[idx].content = url; whoiItems[idx].uploading = false; }
-    localStorage.setItem('whoi_history', JSON.stringify(whoiItems));
+    saveAndSync('whoi_history', whoiItems);
     if (typeof syncToCloud === 'function') syncToCloud('whoi_history', whoiItems);
     renderWhoiGrid();
   } catch(e) {
@@ -911,7 +909,7 @@ async function addWhoiImage(input) {
 
 function deleteWhoIEntry(id) {
   whoiItems = whoiItems.filter(e => e.id !== id);
-  localStorage.setItem('whoi_history', JSON.stringify(whoiItems));
+  saveAndSync('whoi_history', whoiItems);
   renderWhoiGrid();
 }
 
@@ -1038,7 +1036,7 @@ function toggleScheduleDone(key) {
   if (typeof entry === 'string') return;
   entry.done = !entry.done;
   allPlannerData[dayKey].schedule[key] = entry;
-  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData));
+  saveAndSync('all_planner_data', allPlannerData);
   renderSchedule();
 }
 
@@ -1057,7 +1055,7 @@ function saveScheduleRow(key, val) {
     const span = document.getElementById(`st-${key}`);
     if (span) span.innerHTML = '';
   }
-  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData));
+  saveAndSync('all_planner_data', allPlannerData);
   renderSchedule();
 }
 
@@ -1073,7 +1071,7 @@ function saveMeal(meal) {
   document.getElementById(`meal-${meal}`).value = '';
   const span = document.getElementById(`meal-time-${meal}`);
   if (span) { span.textContent = 'Saved ✓'; setTimeout(() => span.textContent = '', 1500); }
-  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData));
+  saveAndSync('all_planner_data', allPlannerData);
   renderMeals();
 }
 
@@ -1081,7 +1079,7 @@ function removeMealEntry(meal, id) {
   const key = getDateKey();
   if (!allPlannerData[key]?.mealEntries?.[meal]) return;
   allPlannerData[key].mealEntries[meal] = allPlannerData[key].mealEntries[meal].filter(e => e.id !== id);
-  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData));
+  saveAndSync('all_planner_data', allPlannerData);
   renderMeals();
 }
 
@@ -1254,7 +1252,7 @@ function savePlannerDay() {
   d.todos = plannerTodos;
   d.goals = plannerGoals;
   d.savedAt = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData));
+  saveAndSync('all_planner_data', allPlannerData);
   const btn = document.querySelector('[onclick="savePlannerDay()"]');
   if (btn) { btn.textContent = 'Saved ✓'; setTimeout(()=>btn.textContent='Save day',1500); }
 }
@@ -1299,7 +1297,7 @@ function loadPlannerDay() {
 function resetSchedule() {
   if (!confirm('Clear everything for this day?')) return;
   delete allPlannerData[getDateKey()];
-  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData));
+  saveAndSync('all_planner_data', allPlannerData);
   loadPlannerDay();
 }
 
@@ -1343,14 +1341,14 @@ function saveVent() {
     date: new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}),
     text
   });
-  localStorage.setItem('vent_entries', JSON.stringify(ventEntries));
+  saveAndSync('vent_entries', ventEntries);
   document.getElementById('vent-input').value = '';
   renderVentEntries();
 }
 
 function deleteVentEntry(id) {
   ventEntries = ventEntries.filter(e => e.id !== id);
-  localStorage.setItem('vent_entries', JSON.stringify(ventEntries));
+  saveAndSync('vent_entries', ventEntries);
   renderVentEntries();
 }
 
@@ -1519,14 +1517,28 @@ window._rawSetItem = localStorage.setItem.bind(localStorage);
 window._rawGetItem = localStorage.getItem.bind(localStorage);
 const _origSetItem = window._rawSetItem;
 window._syncQueue = window._syncQueue || [];
+
+// Helper: save to localStorage AND sync to cloud
+window.saveAndSync = function(key, value) {
+  const str = JSON.stringify(value);
+  _origSetItem(key, str);
+  if (typeof syncToCloud === 'function') {
+    syncToCloud(key, value);
+  } else {
+    window._syncQueue.push([key, value]);
+  }
+};
+
 localStorage.setItem = function(key, value) {
   _origSetItem(key, value);
-  const parsed = JSON.parse(value);
-  if (typeof syncToCloud === 'function') {
-    syncToCloud(key, parsed);
-  } else {
-    window._syncQueue.push([key, parsed]);
-  }
+  try {
+    const parsed = JSON.parse(value);
+    if (typeof syncToCloud === 'function') {
+      syncToCloud(key, parsed);
+    } else {
+      window._syncQueue.push([key, parsed]);
+    }
+  } catch(e) {}
   const watched = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history'];
   if (watched.includes(key) && document.getElementById('home')?.classList.contains('active')) {
     renderAnalytics();
@@ -1579,7 +1591,7 @@ function copyScheduleToDay() {
   if (source.todos) allPlannerData[target].todos = source.todos.map(t => ({...t, done: false}));
   if (source.bibleVerse) allPlannerData[target].bibleVerse = source.bibleVerse;
   if (source.bibleRef) allPlannerData[target].bibleRef = source.bibleRef;
-  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData));
+  saveAndSync('all_planner_data', allPlannerData);
   const msg = document.getElementById('copy-msg');
   msg.textContent = 'Copied! Navigate to that day to edit it 🤍';
   setTimeout(() => { msg.textContent = ''; document.getElementById('copy-schedule-box').style.display = 'none'; }, 2500);
