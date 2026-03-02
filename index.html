@@ -136,6 +136,7 @@
   .home-card-text { font-size: 1.1rem; font-weight: 300; }
   .save-note { font-family: 'Nunito', sans-serif; font-size: 0.65rem; color: var(--gray); letter-spacing: 0.08em; margin-top: 0.8rem; }
   @media (max-width: 480px) { .home-grid { grid-template-columns: 1fr 1fr; } .nav-tabs { gap: 0; } .nav-tab { font-size: 0.88rem; letter-spacing: 0.04em; white-space: nowrap; } .home-card { min-height: 90px; padding: 1rem; } }
+  @media (max-width: 600px) { .books-vent-grid { grid-template-columns: 1fr !important; } }
   @media (max-width: 600px) { #planner-grid { grid-template-columns: 1fr !important; } .vision-items-grid { grid-template-columns: 1fr !important; } }
   .vision-items-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:1rem; }
 </style>
@@ -191,26 +192,67 @@
     </div>
   </div>
 
-  <!-- Books I've Read -->
-  <div style="margin-bottom:2rem;">
-    <div class="subtitle">My reading list</div>
-    <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:1rem;">
-      <h2 style="margin:0;">Books I've read.</h2>
-      <span id="books-count" style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
-    </div>
-    <div style="border:1px solid #c8c8c5;padding:1.5rem;margin-bottom:1rem;">
-      <input id="book-input" placeholder="Book title..." onkeydown="if(event.key==='Enter')addBook()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
-      <input id="book-author" placeholder="Author (optional)" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:1rem;">
-      <button class="btn fill" onclick="addBook()">Add book</button>
-    </div>
-    <div id="books-list"></div>
+  <!-- Affirmations -->
+  <div class="subtitle">My Daily affirmations</div>
+  <h1>I am.</h1><br>
+  <div class="affirmation-card" onclick="newAffirmation()">
+    <div class="affirmation-text" id="affirmation-text">I am worthy of love — especially my own.</div>
+    <div class="affirmation-hint">tap for a new one</div>
   </div>
-  <hr style="margin-bottom:2rem;">
+
+  <hr style="margin:2rem 0;">
+
+  <!-- Books + Vent stacked -->
+  <div style="display:flex;flex-direction:column;gap:2rem;">
+
+    <!-- Books I've Read -->
+    <div>
+      <div class="subtitle">My reading list</div>
+      <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:1rem;">
+        <h2 style="margin:0;">Books I've read.</h2>
+        <span id="books-count" style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
+      </div>
+      <div style="border:1px solid #c8c8c5;padding:1.5rem;margin-bottom:1rem;">
+        <input id="book-input" placeholder="Book title..." onkeydown="if(event.key==='Enter')addBook()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
+        <input id="book-author" placeholder="Author (optional)" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:1rem;">
+        <button class="btn fill" onclick="addBook()">Add book</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <button onclick="changeBooksMonth(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
+        <span id="books-month-label" style="font-family:'Nunito',sans-serif;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
+        <button onclick="changeBooksMonth(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
+      </div>
+      <div id="books-list"></div>
+    </div>
+
+    <!-- I need to vent -->
+    <div>
+      <div id="vent-section" class="subtitle" style="margin-bottom:0.5rem;">Let it all out</div>
+      <h2 style="margin-bottom:1rem;">I need to vent.</h2>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Your safe space. No judgment 🤍</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <button onclick="changeVentDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
+        <input type="date" id="vent-date-picker" onchange="loadVentDay()" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;color:var(--black);outline:none;padding:0.2rem 0.3rem;text-align:center;width:100%;max-width:130px;">
+        <button onclick="changeVentDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
+      </div>
+      <textarea id="vent-input" placeholder="Let it all out here..." rows="8" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.5rem 0;margin-bottom:1rem;min-height:150px;"></textarea>
+      <button class="btn fill" style="width:100%;text-align:center;" onclick="saveVent()">Save</button>
+      <div id="vent-entries" style="margin-top:1rem;"></div>
+    </div>
+
+  </div>
+
+  <hr style="margin:2rem 0;">
 
   <!-- My Wins -->
   <div style="margin-bottom:2rem;">
     <div class="subtitle">Celebrate myself</div>
     <h2 style="margin-bottom:1rem;">My wins.</h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+      <button onclick="changeWinsDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
+      <input type="date" id="wins-date-picker" onchange="loadWinsDay()" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.85rem;color:var(--black);outline:none;padding:0.2rem 0.4rem;text-align:center;">
+      <button onclick="changeWinsDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
+    </div>
     <div style="border:1px solid #c8c8c5;padding:2rem;margin-bottom:1.5rem;">
       <div style="font-family:'Lora',serif;font-style:italic;font-size:1.05rem;margin-bottom:1rem;">Add a win — big or small, they all count</div>
       <input id="win-input" placeholder="e.g. I got out of bed today" onkeydown="if(event.key==='Enter')addWin()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1.2rem;">
@@ -218,34 +260,8 @@
     </div>
     <div id="wins-list"></div>
   </div>
-  <hr style="margin-bottom:2rem;">
 
-  <div class="subtitle">My Daily affirmations</div>
-  <h1>I am.</h1><br>
-  <div class="affirmation-card" onclick="newAffirmation()">
-    <div class="affirmation-text" id="affirmation-text">I am worthy of love — especially my own.</div>
-    <div class="affirmation-hint">tap for a new one</div>
-  </div><br>
-  <div style="display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:320px;margin:0 auto;">
-    <button class="btn" style="width:100%;text-align:center;" onclick="saveAffirmation()">Save this one</button>
-  </div>
-  <hr><h2>Saved affirmations</h2>
-  <div id="saved-affirmations"><p style="color:var(--gray);font-size:0.95rem;">The ones that resonate will appear here.</p></div>
-  <hr style="margin:2rem 0;">
-  <div id="vent-section" class="subtitle" style="margin-bottom:0.5rem;">Let it all out</div>
-  <h2 style="margin-bottom:1rem;">I need to vent.</h2>
-  <div style="font-family:'Lora',serif;font-style:italic;font-size:1rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">This is your safe space. Write anything. No judgment, just you and your feelings.</div>
-  <textarea id="vent-input" placeholder="Let it all out here..." rows="10" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1.15rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.5rem 0;margin-bottom:1.5rem;min-height:200px;"></textarea>
-  <div style="display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:320px;margin:0 auto 2rem;">
-    <button class="btn fill" style="width:100%;text-align:center;" onclick="saveVent()">Save</button>
-    <button class="btn" style="width:100%;text-align:center;" onclick="clearVentInput()">Clear</button>
-  </div>
-  <div id="vent-entries"></div>
 </div>
-
-  </div>
-</div>
-
 
 <div class="section" id="vision">
   <div class="subtitle">Dream it, live it</div>
@@ -566,7 +582,7 @@ function showSection(id){
 }
 
 let shuffled = [...affirmations].sort(() => Math.random() - 0.5);
-let affIndex = 0;
+var affIndex = 0;
 let currentAff = shuffled[0];
 function newAffirmation(){
   const el=document.getElementById('affirmation-text');
@@ -585,7 +601,8 @@ function saveAffirmation(){
 
 function renderSavedAffirmations(){
   const el=document.getElementById('saved-affirmations');
-  if(!savedAffirmations.length){el.innerHTML='<p style="color:var(--gray);font-size:0.95rem;">The ones that resonate will appear here.</p>';return;}
+  if(!el) return;
+  if(!savedAffirmations.length){el.innerHTML='';return;}
   el.innerHTML=savedAffirmations.map((a,i)=>`<div class="journal-entry"><button onclick="removeSavedAff(${i})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.4rem;">remove</button><div class="journal-date">${a.date||''}</div><div class="journal-content">${a.text||a}</div></div>`).join('');
 }
 
@@ -602,14 +619,33 @@ function resetRituals(){}
 let books = JSON.parse(localStorage.getItem('my_books') || '[]');
 if (!Array.isArray(books)) books = [];
 
+let booksMonth = new Date();
+
+function getBooksMonthKey() {
+  return booksMonth.getFullYear() + '-' + String(booksMonth.getMonth() + 1).padStart(2, '0');
+}
+
+function updateBooksMonthLabel() {
+  const el = document.getElementById('books-month-label');
+  if (el) el.textContent = booksMonth.toLocaleDateString('en-US', {month:'long', year:'numeric'});
+}
+
+function changeBooksMonth(dir) {
+  booksMonth = new Date(booksMonth.getFullYear(), booksMonth.getMonth() + dir, 1);
+  updateBooksMonthLabel();
+  renderBooks();
+}
+
 function addBook() {
   const title = document.getElementById('book-input').value.trim();
   if (!title) return;
   const author = document.getElementById('book-author').value.trim();
+  const monthKey = getBooksMonthKey();
   books.unshift({
     id: Date.now(),
     title,
     author,
+    monthKey,
     date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'})
   });
   localStorage.setItem('my_books', JSON.stringify(books)); if(typeof syncToCloud==='function')syncToCloud('my_books',books);
@@ -681,15 +717,30 @@ function deleteBook(id) {
 function renderBooks() {
   const el = document.getElementById('books-list');
   if (!el) return;
+  updateBooksMonthLabel();
+  const monthKey = getBooksMonthKey();
+  const monthBooks = books.filter(b => {
+    if (b.monthKey) return b.monthKey === monthKey;
+    if (b.date) {
+      try {
+        const d = new Date(b.date.split(' · ')[0]);
+        return (d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0')) === monthKey;
+      } catch(e) { return false; }
+    }
+    return false;
+  });
   const countEl = document.getElementById('books-count');
-  if (countEl) countEl.textContent = books.length ? `${books.length} book${books.length===1?'':'s'}` : '';
-  if (!books.length) { el.innerHTML = ''; return; }
-  el.innerHTML = books.map(b => `
+  if (countEl) countEl.textContent = books.length ? `${books.length} total` : '';
+  if (!monthBooks.length) {
+    el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;">No books this month 🤍</p>';
+    return;
+  }
+  el.innerHTML = monthBooks.map(b => `
     <div class="journal-entry" style="position:relative;">
       <button onclick="deleteBook(${b.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.3rem;">remove</button>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);letter-spacing:0.08em;margin-bottom:0.3rem;">${b.date}</div>
       <div style="font-family:'Lora',serif;font-size:1rem;font-weight:400;">${b.title}</div>
       ${b.author ? `<div style="font-family:'Nunito',sans-serif;font-size:0.78rem;color:var(--gray);margin-top:0.2rem;">by ${b.author}</div>` : ''}
+      <div style="font-family:'Nunito',sans-serif;font-size:0.62rem;color:var(--gray);margin-top:0.3rem;">${b.date.split(' · ')[0]}</div>
     </div>`).join('');
 }
 
@@ -698,11 +749,38 @@ renderBooks();
 let wins = JSON.parse(localStorage.getItem('my_wins') || '[]');
 if (!Array.isArray(wins)) wins = [];
 
+function getWinsDateKey() {
+  const dp = document.getElementById('wins-date-picker');
+  if (dp && dp.value) return dp.value;
+  return new Date().toISOString().split('T')[0];
+}
+
+function initWinsDate() {
+  const dp = document.getElementById('wins-date-picker');
+  if (dp) dp.value = new Date().toISOString().split('T')[0];
+}
+
+function changeWinsDate(dir) {
+  const dp = document.getElementById('wins-date-picker');
+  if (!dp) return;
+  const d = new Date(dp.value || new Date().toISOString().split('T')[0]);
+  d.setDate(d.getDate() + dir);
+  dp.value = d.toISOString().split('T')[0];
+  loadWinsDay();
+}
+
+function loadWinsDay() {
+  renderWins();
+}
+
 function addWin() {
   const input = document.getElementById('win-input');
   const val = input.value.trim();
   if (!val) return;
-  wins.unshift({ id: Date.now(), text: val, date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}) });
+  const dateKey = getWinsDateKey();
+  const displayDate = new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  const time = new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+  wins.unshift({ id: Date.now(), text: val, dateKey, date: displayDate + ' · ' + time });
   localStorage.setItem('my_wins', JSON.stringify(wins)); if(typeof syncToCloud==='function')syncToCloud('my_wins',wins);
   input.value = '';
   renderWins();
@@ -716,19 +794,22 @@ function deleteWin(id) {
 
 function renderWins() {
   const el = document.getElementById('wins-list');
-  if (!wins.length) {
-    el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;">Every step forward counts. Add your first win.</p>';
+  if (!el) return;
+  const dateKey = getWinsDateKey();
+  const dayWins = wins.filter(w => w.dateKey === dateKey || (!w.dateKey && w.date && w.date.includes(new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}))));
+
+  if (!dayWins.length) {
+    el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;">No wins for this day yet 🤍</p>';
     return;
   }
-  el.innerHTML = wins.map(w => `
+  el.innerHTML = dayWins.map(w => `
     <div class="journal-entry">
-      <button onclick="deleteWin(${w.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.4rem;">remove</button>
-      <div class="journal-date">${w.date}</div>
+      <button onclick="deleteWin(${w.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.3rem;">remove</button>
       <div class="journal-content">${w.text}</div>
     </div>`).join('');
 }
 
-renderWins();
+window.addEventListener('DOMContentLoaded', function(){ initWinsDate(); renderWins(); });
 
 function saveMirror(){}
 
@@ -1261,17 +1342,21 @@ function savePlannerDay() {
 
 function loadPlannerDay() {
   const d = getPlannerDay();
-  // mood
+
+  // Always clear everything first
   document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-  if (d.mood) d.mood.forEach(m => {
+  document.querySelectorAll('.sleep-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.water-cup').forEach(c => c.classList.remove('filled'));
+  document.querySelectorAll('.exercise-btn').forEach(b => b.classList.remove('selected'));
+
+  // Only restore if explicitly saved
+  if (d.mood && d.mood.length) d.mood.forEach(m => {
     document.querySelectorAll('.mood-btn').forEach(b => { if(b.textContent===m) b.classList.add('selected'); });
   });
-  // sleep
-  document.querySelectorAll('.sleep-btn').forEach(b => { b.classList.toggle('selected', b.textContent==d.sleep); });
-  // water
-  if (d.water) document.querySelectorAll('.water-cup').forEach((c,i) => c.classList.toggle('filled', !!d.water[i]));
-  // exercise
-  document.querySelectorAll('.exercise-btn').forEach(b => b.classList.toggle('selected', d.exercise&&d.exercise.includes(b.textContent)));
+  if (d.sleep) document.querySelectorAll('.sleep-btn').forEach(b => { if(b.textContent==d.sleep) b.classList.add('selected'); });
+  if (d.water) document.querySelectorAll('.water-cup').forEach((c,i) => { if(d.water[i]) c.classList.add('filled'); });
+  if (d.exercise && d.exercise.length) document.querySelectorAll('.exercise-btn').forEach(b => { if(d.exercise.includes(b.textContent)) b.classList.add('selected'); });
+
   // meals
   if (document.getElementById('meal-breakfast')) document.getElementById('meal-breakfast').value = '';
   if (document.getElementById('meal-lunch')) document.getElementById('meal-lunch').value = '';
@@ -1336,12 +1421,38 @@ function renderVisionBoard() {}
 let ventEntries = JSON.parse(localStorage.getItem('vent_entries') || '[]');
 if (!Array.isArray(ventEntries)) ventEntries = [];
 
+function getVentDateKey() {
+  const dp = document.getElementById('vent-date-picker');
+  if (dp && dp.value) return dp.value;
+  return new Date().toISOString().split('T')[0];
+}
+
+function initVentDate() {
+  const dp = document.getElementById('vent-date-picker');
+  if (dp) dp.value = new Date().toISOString().split('T')[0];
+}
+
+function changeVentDate(dir) {
+  const dp = document.getElementById('vent-date-picker');
+  if (!dp) return;
+  const d = new Date(dp.value || new Date().toISOString().split('T')[0]);
+  d.setDate(d.getDate() + dir);
+  dp.value = d.toISOString().split('T')[0];
+  loadVentDay();
+}
+
+function loadVentDay() {
+  renderVentEntries();
+}
+
 function saveVent() {
   const text = document.getElementById('vent-input').value.trim();
   if (!text) return;
+  const dateKey = getVentDateKey();
   ventEntries.unshift({
     id: Date.now(),
-    date: new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}),
+    dateKey,
+    date: new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}),
     text
   });
   localStorage.setItem('vent_entries', JSON.stringify(ventEntries)); if(typeof syncToCloud==='function')syncToCloud('vent_entries',ventEntries);
@@ -1361,15 +1472,18 @@ function clearVentInput() {
 
 function renderVentEntries() {
   const el = document.getElementById('vent-entries');
-  if (!ventEntries.length) { el.innerHTML = ''; return; }
-  el.innerHTML = ventEntries.map(e => `
+  if (!el) return;
+  const dateKey = getVentDateKey();
+  const dayEntries = ventEntries.filter(e => e.dateKey === dateKey || (!e.dateKey && e.date && e.date.includes(new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}))));
+  if (!dayEntries.length) { el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;">Nothing here for this day 🤍</p>'; return; }
+  el.innerHTML = dayEntries.map(e => `
     <div class="journal-entry">
       <button onclick="deleteVentEntry(${e.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.4rem;">remove</button>
-      <div class="journal-date">${e.date}</div>
       <div class="journal-content">${e.text.replace(/\n/g,'<br>')}</div>
     </div>`).join('');
 }
 
+window.addEventListener('DOMContentLoaded', function(){ initVentDate(); renderVentEntries(); });
 renderVentEntries();
 
 // Analytics
