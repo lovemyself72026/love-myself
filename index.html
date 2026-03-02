@@ -20,18 +20,22 @@
   window.syncToCloud = async function(key, value) {
     if (!SYNC_KEYS.includes(key)) return;
     try {
-      await fetch(`${DB_URL}/${key}.json`, {
+      const res = await fetch(`${DB_URL}/${key}.json?print=silent`, {
         method: 'PUT',
-        mode: 'cors',
         body: JSON.stringify(value),
-        headers: {'Content-Type': 'application/json'}
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
       });
-    } catch(e) { console.warn('Sync failed:', e); }
+      console.log('Synced', key, res.status);
+    } catch(e) { console.warn('Sync failed:', key, e.message); }
   };
 
   window.pullFromCloud = async function(showMsg) {
     try {
-      const res = await fetch(`${DB_URL}.json`, { mode: 'cors' });
+      const res = await fetch(`${DB_URL}.json?shallow=false`, {
+        method: 'GET',
+        headers: {'Accept': 'application/json'}
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       if (!data) { if(showMsg) alert('No data found in cloud yet.'); return; }
       let changed = false;
@@ -46,15 +50,15 @@
         }
       });
       if (changed && typeof reloadAllData === 'function') reloadAllData();
-      if (showMsg) alert('✅ Synced! Your data is up to date 🤍');
+      if (showMsg) alert('✅ Synced! 🤍');
     } catch(e) {
-      console.warn('Pull failed:', e);
-      if (showMsg) alert('❌ Could not connect. Check your internet connection.');
+      console.warn('Pull failed:', e.message);
+      if (showMsg) alert('❌ Sync failed: ' + e.message);
     }
   };
 
   window.addEventListener('load', function() {
-    window.pullFromCloud(false);
+    setTimeout(function(){ window.pullFromCloud(false); }, 2000);
     setInterval(function(){ window.pullFromCloud(false); }, 15000);
   });
 </script>
