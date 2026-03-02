@@ -21,12 +21,11 @@
     if (!SYNC_KEYS.includes(key)) return;
     const payload = { data: value, ts: Date.now() };
     try {
-      const res = await fetch(`${DB_URL}/${key}.json`, {
+      await fetch(`${DB_URL}/${key}.json`, {
         method: 'PUT',
         body: JSON.stringify(payload),
         headers: {'Content-Type': 'application/json'}
       });
-      console.log('✅ Synced:', key, res.status);
     } catch(e) { console.warn('Sync failed:', key, e.message); }
   };
 
@@ -44,7 +43,6 @@
         if (!data[k]) return;
         const cloudTs = data[k].ts || 0;
         const localTs = parseInt(window._rawGetItem(k + '_ts') || '0');
-        // Only update if cloud is newer
         if (cloudTs > localTs) {
           window._rawSetItem(k, JSON.stringify(data[k].data));
           window._rawSetItem(k + '_ts', String(cloudTs));
@@ -54,14 +52,15 @@
       if (changed && typeof reloadAllData === 'function') reloadAllData();
       if (showMsg) alert('✅ Synced! 🤍');
     } catch(e) {
-      console.warn('Pull failed:', e.message);
       if (showMsg) alert('❌ Sync failed: ' + e.message);
     }
   };
 
   window.addEventListener('load', function() {
-    setTimeout(function(){ window.pullFromCloud(false); }, 2000);
-    setInterval(function(){ window.pullFromCloud(false); }, 15000);
+    // Pull immediately on load
+    setTimeout(function(){ window.pullFromCloud(false); }, 1500);
+    // Then pull every 5 seconds automatically
+    setInterval(function(){ window.pullFromCloud(false); }, 5000);
   });
 </script>
 
@@ -173,7 +172,6 @@
 
   <hr style="margin:2rem 0;">
   <div style="display:flex;gap:0.5rem;justify-content:center;align-items:center;">
-    <button onclick="pullFromCloud(true)" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;color:var(--gray);">↻ Sync</button>
     <button onclick="exportData()" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;color:var(--gray);">Export</button>
     <button onclick="document.getElementById('import-file').click()" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;color:var(--gray);">Import</button>
     <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(this)">
