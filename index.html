@@ -137,6 +137,8 @@
   .save-note { font-family: 'Nunito', sans-serif; font-size: 0.65rem; color: var(--gray); letter-spacing: 0.08em; margin-top: 0.8rem; }
   @media (max-width: 480px) { .home-grid { grid-template-columns: 1fr 1fr; } .nav-tabs { gap: 0; } .nav-tab { font-size: 0.88rem; letter-spacing: 0.04em; white-space: nowrap; } .home-card { min-height: 90px; padding: 1rem; } }
   @media (max-width: 600px) { .books-vent-grid { grid-template-columns: 1fr !important; } }
+  .journal-tab { font-family:'Nunito',sans-serif; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; color:var(--gray); border:none; background:none; padding:0.5rem 1rem 0.6rem; border-bottom:2px solid transparent; transition:color 0.2s,border-color 0.2s; white-space:nowrap; flex:1; text-align:center; }
+  .journal-tab.active, .journal-tab:hover { color:var(--black); border-bottom-color:var(--black); }
   @media (max-width: 600px) { #planner-grid { grid-template-columns: 1fr !important; } .vision-items-grid { grid-template-columns: 1fr !important; } }
   .vision-items-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:1rem; }
 </style>
@@ -149,7 +151,7 @@
     <button class="nav-tab active" onclick="showSection('home')">Home</button>
     <button class="nav-tab" onclick="showSection('vision')">Vision</button>
     <button class="nav-tab" onclick="showSection('schedule')">Schedule</button>
-    <button class="nav-tab" onclick="showSection('affirmations')">Wins</button>
+    <button class="nav-tab" onclick="showSection('affirmations')">Journal</button>
   </div>
 </nav>
 
@@ -159,9 +161,9 @@
   <h1>Good to see you today.</h1><br>
   <div class="home-grid">
     <div class="home-card" onclick="showSection('vision')"><div class="home-card-title">Vision Board</div><div class="home-card-text">Dream it, live it</div></div>
-    <div class="home-card" onclick="showSection('affirmations');setTimeout(()=>document.getElementById('vent-section').scrollIntoView({behavior:'smooth'}),100)"><div class="home-card-title">Vent</div><div class="home-card-text">Let it out</div></div>
+    <div class="home-card" onclick="showSection('affirmations');setTimeout(()=>showJournalTab('vent'),100)"><div class="home-card-title">Vent</div><div class="home-card-text">Let it out</div></div>
     <div class="home-card" onclick="showSection('schedule')"><div class="home-card-title">Schedule</div><div class="home-card-text">Plan your day</div></div>
-    <div class="home-card" onclick="showSection('affirmations')"><div class="home-card-title">My Wins</div><div class="home-card-text">Celebrate myself</div></div>
+    <div class="home-card" onclick="showSection('affirmations');setTimeout(()=>showJournalTab('wins'),100)"><div class="home-card-title">My Wins</div><div class="home-card-text">Celebrate myself</div></div>
   </div>
 
   <!-- Analytics -->
@@ -192,19 +194,16 @@
     </div>
   </div>
 
-  <!-- Affirmations -->
-  <div class="subtitle">My Daily affirmations</div>
-  <h1>I am.</h1><br>
-  <div class="affirmation-card" onclick="newAffirmation()">
-    <div class="affirmation-text" id="affirmation-text">I am worthy of love — especially my own.</div>
-    <div class="affirmation-hint">tap for a new one</div>
+  <!-- Journal sub-tabs -->
+  <div id="journal-tabs" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+    <button class="journal-tab active" onclick="showJournalTab('belief')" id="jtab-belief">Belief</button>
+    <button class="journal-tab" onclick="showJournalTab('vent')" id="jtab-vent">Vent</button>
+    <button class="journal-tab" onclick="showJournalTab('books')" id="jtab-books">Books</button>
+    <button class="journal-tab" onclick="showJournalTab('wins')" id="jtab-wins">Wins</button>
   </div>
 
-  <hr style="margin:2rem 0;">
-
-  <!-- Books + Vent stacked -->
-  <div style="display:flex;flex-direction:column;gap:2rem;">
-
+  <!-- Books sub-section -->
+  <div id="jsub-books" style="display:none;">
     <!-- Books I've Read -->
     <div>
       <div class="subtitle">My reading list</div>
@@ -224,7 +223,55 @@
       </div>
       <div id="books-list"></div>
     </div>
+  </div>
 
+  <!-- Belief sub-section -->
+  <div id="jsub-belief">
+    <!-- Belief Change (below books) -->
+    <div>
+      <div class="subtitle">Rewire your mind</div>
+      <h2 style="margin-bottom:0.3rem;">Change your belief.</h2>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1.2rem;line-height:1.6;">Simple. Daily. It works over time.</div>
+
+      <!-- Date nav -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
+        <button onclick="changeBeliefDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
+        <span id="belief-date-picker-label" onclick="document.getElementById('belief-date-picker').showPicker?document.getElementById('belief-date-picker').showPicker():document.getElementById('belief-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="belief-date-picker" onchange="loadBeliefDay()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
+        <button onclick="changeBeliefDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
+      </div>
+
+      <div style="margin-bottom:1.5rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">I used to believe</div>
+        <input type="text" id="belief-old" placeholder="write it here..." oninput="syncBelief()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--black);outline:none;padding:0.5rem 0;margin-bottom:1rem;">
+        <div id="belief-arrow" style="text-align:center;font-size:1rem;color:var(--gray);margin:-0.3rem 0 0.8rem;opacity:0;transition:opacity 0.3s;">↓</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Now I'm choosing to believe</div>
+        <input type="text" id="belief-new" placeholder="write the new one..." oninput="syncBelief()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--black);outline:none;padding:0.5rem 0;">
+      </div>
+
+      <div style="margin-bottom:1.5rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Do this today</div>
+        <div id="belief-checks"></div>
+      </div>
+
+      <div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Reflect</div>
+        <div id="belief-qcard" style="border:1px solid #c8c8c5;padding:1.5rem;">
+          <div id="belief-qtext" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;line-height:1.6;margin-bottom:1rem;"></div>
+          <textarea id="belief-qans" placeholder="your answer..." oninput="saveBeliefAns()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);resize:none;outline:none;padding:0.4rem 0;min-height:60px;line-height:1.6;"></textarea>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1rem;">
+            <div id="belief-dots" style="display:flex;gap:5px;"></div>
+            <div style="display:flex;gap:0.4rem;">
+              <button id="belief-prev" onclick="beliefGo(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;color:var(--gray);">←</button>
+              <button id="belief-next" onclick="beliefGo(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;color:var(--gray);">→</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vent sub-section -->
+  <div id="jsub-vent" style="display:none;">
     <!-- I need to vent -->
     <div>
       <div id="vent-section" class="subtitle" style="margin-bottom:0.5rem;">Let it all out</div>
@@ -232,7 +279,7 @@
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Your safe space. No judgment 🤍</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <button onclick="changeVentDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
-        <input type="date" id="vent-date-picker" onchange="loadVentDay()" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;color:var(--black);outline:none;padding:0.2rem 0.3rem;text-align:center;width:100%;max-width:130px;">
+        <span id="vent-date-picker-label" onclick="document.getElementById('vent-date-picker').showPicker?document.getElementById('vent-date-picker').showPicker():document.getElementById('vent-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="vent-date-picker" onchange="loadVentDay()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
         <button onclick="changeVentDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
       </div>
       <textarea id="vent-input" placeholder="Let it all out here..." rows="8" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.5rem 0;margin-bottom:1rem;min-height:150px;"></textarea>
@@ -242,15 +289,15 @@
 
   </div>
 
-  <hr style="margin:2rem 0;">
-
-  <!-- My Wins -->
+  <!-- Wins sub-section -->
+  <div id="jsub-wins" style="display:none;">
+    <!-- My Wins -->
   <div style="margin-bottom:2rem;">
     <div class="subtitle">Celebrate myself</div>
     <h2 style="margin-bottom:1rem;">My wins.</h2>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
       <button onclick="changeWinsDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
-      <input type="date" id="wins-date-picker" onchange="loadWinsDay()" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.85rem;color:var(--black);outline:none;padding:0.2rem 0.4rem;text-align:center;">
+      <span id="wins-date-picker-label" onclick="document.getElementById('wins-date-picker').showPicker?document.getElementById('wins-date-picker').showPicker():document.getElementById('wins-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="wins-date-picker" onchange="loadWinsDay()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
       <button onclick="changeWinsDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
     </div>
     <div style="border:1px solid #c8c8c5;padding:2rem;margin-bottom:1.5rem;">
@@ -261,7 +308,9 @@
     <div id="wins-list"></div>
   </div>
 
-</div>
+  </div><!-- end jsub-wins -->
+
+</div><!-- end #affirmations -->
 
 <div class="section" id="vision">
   <div class="subtitle">Dream it, live it</div>
@@ -274,6 +323,13 @@
   <div class="subtitle" style="margin-bottom:0.5rem;">Who I am</div>
   <h2 style="margin-bottom:0.5rem;">Track your growth.</h2>
   <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Add words, thoughts, and pictures that reflect who you are 🤍</div>
+
+  <!-- Date navigation -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+    <button onclick="changeWhoiDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
+    <span id="whoi-date-picker-label" onclick="document.getElementById('whoi-date-picker').showPicker?document.getElementById('whoi-date-picker').showPicker():document.getElementById('whoi-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="whoi-date-picker" onchange="renderWhoiGrid()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
+    <button onclick="changeWhoiDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
+  </div>
 
   <!-- Type selector -->
   <div style="display:flex;gap:0.4rem;margin-bottom:0.8rem;">
@@ -581,6 +637,14 @@ function showSection(id){
   if (id === 'home') renderAnalytics();
 }
 
+function showJournalTab(tab) {
+  ['books','belief','vent','wins'].forEach(t => {
+    document.getElementById('jsub-' + t).style.display = t === tab ? 'block' : 'none';
+    document.getElementById('jtab-' + t).classList.toggle('active', t === tab);
+  });
+  window.scrollTo(0,0);
+}
+
 let shuffled = [...affirmations].sort(() => Math.random() - 0.5);
 var affIndex = 0;
 let currentAff = shuffled[0];
@@ -646,7 +710,7 @@ function addBook() {
     title,
     author,
     monthKey,
-    date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'})
+    date: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
   });
   localStorage.setItem('my_books', JSON.stringify(books)); if(typeof syncToCloud==='function')syncToCloud('my_books',books);
   document.getElementById('book-input').value = '';
@@ -740,7 +804,7 @@ function renderBooks() {
       <button onclick="deleteBook(${b.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.3rem;">remove</button>
       <div style="font-family:'Lora',serif;font-size:1rem;font-weight:400;">${b.title}</div>
       ${b.author ? `<div style="font-family:'Nunito',sans-serif;font-size:0.78rem;color:var(--gray);margin-top:0.2rem;">by ${b.author}</div>` : ''}
-      <div style="font-family:'Nunito',sans-serif;font-size:0.62rem;color:var(--gray);margin-top:0.3rem;">${b.date.split(' · ')[0]}</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.62rem;color:var(--gray);margin-top:0.3rem;">${b.date || ''}</div>
     </div>`).join('');
 }
 
@@ -766,10 +830,12 @@ function changeWinsDate(dir) {
   const d = new Date(dp.value || new Date().toISOString().split('T')[0]);
   d.setDate(d.getDate() + dir);
   dp.value = d.toISOString().split('T')[0];
+  updateDateLabel('wins-date-picker');
   loadWinsDay();
 }
 
 function loadWinsDay() {
+  updateDateLabel('wins-date-picker');
   renderWins();
 }
 
@@ -778,7 +844,7 @@ function addWin() {
   const val = input.value.trim();
   if (!val) return;
   const dateKey = getWinsDateKey();
-  const displayDate = new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  const displayDate = new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
   const time = new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
   wins.unshift({ id: Date.now(), text: val, dateKey, date: displayDate + ' · ' + time });
   localStorage.setItem('my_wins', JSON.stringify(wins)); if(typeof syncToCloud==='function')syncToCloud('my_wins',wins);
@@ -805,6 +871,7 @@ function renderWins() {
   el.innerHTML = dayWins.map(w => `
     <div class="journal-entry">
       <button onclick="deleteWin(${w.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.3rem;">remove</button>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);margin-bottom:0.3rem;">${w.date ? w.date.split(' · ').slice(1).join(' · ') : ''}</div>
       <div class="journal-content">${w.text}</div>
     </div>`).join('');
 }
@@ -894,7 +961,7 @@ function addDimItem(key) {
     id: Date.now(),
     type,
     content: inp.value.trim(),
-    date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+    date: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
   });
   localStorage.setItem('dimension_items', JSON.stringify(dimensionItems)); if(typeof syncToCloud==='function')syncToCloud('dimension_items',dimensionItems);
   renderDimensionBoards();
@@ -903,7 +970,7 @@ function addDimItem(key) {
 async function addDimImage(key, input) {
   const file = input.files[0];
   if (!file) return;
-  const date = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   if (!dimensionItems[key]) dimensionItems[key] = [];
 
   const tempId = Date.now();
@@ -947,6 +1014,22 @@ let whoiItems = JSON.parse(localStorage.getItem('whoi_history') || '[]');
 if (!Array.isArray(whoiItems)) whoiItems = [];
 let whoiType = 'word';
 
+function getWhoiDateKey() {
+  const dp = document.getElementById('whoi-date-picker');
+  if (dp && dp.value) return dp.value;
+  return new Date().toISOString().split('T')[0];
+}
+
+function changeWhoiDate(dir) {
+  const dp = document.getElementById('whoi-date-picker');
+  if (!dp) return;
+  const d = new Date(dp.value || new Date().toISOString().split('T')[0]);
+  d.setDate(d.getDate() + dir);
+  dp.value = d.toISOString().split('T')[0];
+  updateDateLabel('whoi-date-picker');
+  renderWhoiGrid();
+}
+
 function setWhoiType(type) {
   whoiType = type;
   ['word','thought','image'].forEach(t => {
@@ -958,11 +1041,13 @@ function setWhoiType(type) {
 function addWhoiItem() {
   const inp = document.getElementById(`whoi-text-${whoiType}`);
   if (!inp || !inp.value.trim()) return;
+  const dateKey = getWhoiDateKey();
   whoiItems.unshift({
     id: Date.now(),
     type: whoiType,
     content: inp.value.trim(),
-    date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+    dateKey,
+    date: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
   });
   inp.value = '';
   localStorage.setItem('whoi_history', JSON.stringify(whoiItems)); if(typeof syncToCloud==='function')syncToCloud('whoi_history',whoiItems);
@@ -972,7 +1057,7 @@ function addWhoiItem() {
 async function addWhoiImage(input) {
   const file = input.files[0];
   if (!file) return;
-  const date = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   const tempId = Date.now();
   whoiItems.unshift({ id: tempId, type: 'image', content: '', date, uploading: true });
   renderWhoiGrid();
@@ -999,7 +1084,16 @@ function deleteWhoIEntry(id) {
 function renderWhoiGrid() {
   const el = document.getElementById('whoi-grid');
   if (!el) return;
-  el.innerHTML = whoiItems.map(item => `
+  // Init date picker
+  const dp = document.getElementById('whoi-date-picker');
+  if (dp && !dp.value) dp.value = new Date().toISOString().split('T')[0];
+  const dateKey = getWhoiDateKey();
+  const dayItems = whoiItems.filter(item => item.dateKey === dateKey || (!item.dateKey && item.date && item.date.includes(new Date(dateKey+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}))));
+  if (!dayItems.length) {
+    el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;margin-top:0.5rem;">Nothing here for this day 🤍</p>';
+    return;
+  }
+  el.innerHTML = dayItems.map(item => `
     <div style="border:1px solid #e8e8e5;padding:0.6rem;position:relative;">
       <button onclick="deleteWhoIEntry(${item.id})" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;position:absolute;top:0.3rem;right:0.3rem;line-height:1;">✕</button>
       ${item.type === 'image'
@@ -1217,7 +1311,7 @@ function addTodo() {
   const inp = document.getElementById('todo-input');
   const text = inp.value.trim();
   if (!text) return;
-  plannerTodos.push({id: Date.now(), text, done: false, time: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});
+  plannerTodos.push({id: Date.now(), text, done: false, time: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});
   inp.value = '';
   renderTodos();
   savePlannerDay();
@@ -1251,7 +1345,7 @@ function saveNote() {
   plannerNotes.unshift({
     id: Date.now(),
     text,
-    time: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+    time: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
   });
   document.getElementById('planner-notes').value = '';
   renderNotes();
@@ -1281,7 +1375,7 @@ function addGoal() {
   const inp = document.getElementById('goals-input');
   const text = inp.value.trim();
   if (!text) return;
-  plannerGoals.push({id: Date.now(), text, done: false, time: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});
+  plannerGoals.push({id: Date.now(), text, done: false, time: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});
   inp.value = '';
   renderGoals();
   savePlannerDay();
@@ -1334,7 +1428,7 @@ function savePlannerDay() {
   // todos & goals
   d.todos = plannerTodos;
   d.goals = plannerGoals;
-  d.savedAt = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  d.savedAt = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
   const btn = document.querySelector('[onclick="savePlannerDay()"]');
   if (btn) { btn.textContent = 'Saved ✓'; setTimeout(()=>btn.textContent='Save day',1500); }
@@ -1438,10 +1532,12 @@ function changeVentDate(dir) {
   const d = new Date(dp.value || new Date().toISOString().split('T')[0]);
   d.setDate(d.getDate() + dir);
   dp.value = d.toISOString().split('T')[0];
+  updateDateLabel('vent-date-picker');
   loadVentDay();
 }
 
 function loadVentDay() {
+  updateDateLabel('vent-date-picker');
   renderVentEntries();
 }
 
@@ -1479,6 +1575,7 @@ function renderVentEntries() {
   el.innerHTML = dayEntries.map(e => `
     <div class="journal-entry">
       <button onclick="deleteVentEntry(${e.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.4rem;">remove</button>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);margin-bottom:0.3rem;">${e.date ? e.date.split(' · ').pop() : ''}</div>
       <div class="journal-content">${e.text.replace(/\n/g,'<br>')}</div>
     </div>`).join('');
 }
@@ -1769,6 +1866,152 @@ const appleIcon = document.createElement('link');
 appleIcon.rel = 'apple-touch-icon';
 appleIcon.href = generateIcon(180);
 document.head.appendChild(appleIcon);
+
+// ── Pretty date labels ────────────────────────────────────────
+function updateDateLabel(pickerId) {
+  const dp = document.getElementById(pickerId);
+  const label = document.getElementById(pickerId + '-label');
+  if (!dp || !label) return;
+  if (!dp.value) return;
+  const d = new Date(dp.value + 'T12:00:00');
+  label.textContent = d.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+}
+
+function setDatePickerValue(pickerId, isoVal) {
+  const dp = document.getElementById(pickerId);
+  if (dp) { dp.value = isoVal; updateDateLabel(pickerId); }
+}
+// ─────────────────────────────────────────────────────────────
+let beliefData = JSON.parse(localStorage.getItem('belief_data') || '{"j":{},"c":{},"o":"","n":""}');
+let beliefQi = +localStorage.getItem('belief_qi') || 0;
+function saveBeliefData() { localStorage.setItem('belief_data', JSON.stringify(beliefData)); if(typeof syncToCloud==='function')syncToCloud('belief_data', beliefData); }
+
+function getBeliefDateKey() {
+  const dp = document.getElementById('belief-date-picker');
+  if (dp && dp.value) return dp.value;
+  return new Date().toISOString().split('T')[0];
+}
+
+function changeBeliefDate(dir) {
+  const dp = document.getElementById('belief-date-picker');
+  if (!dp) return;
+  const d = new Date(dp.value || new Date().toISOString().split('T')[0]);
+  d.setDate(d.getDate() + dir);
+  dp.value = d.toISOString().split('T')[0];
+  updateDateLabel('belief-date-picker');
+  loadBeliefDay();
+}
+
+function loadBeliefDay() {
+  updateDateLabel('belief-date-picker');
+  renderBeliefChecks();
+  renderBeliefQ();
+}
+
+const beliefItems = [
+  'Say the new belief out loud',
+  'Notice when the old belief shows up, just observe it',
+  'Do one thing the new belief would do',
+  'Write one piece of evidence that supports the new belief'
+];
+const beliefQs = [
+  'Write the belief in one sentence. When did you first feel this way?',
+  'Where did it come from? A person, an experience, a moment?',
+  'What would you lose if this belief were gone?',
+  'What evidence exists that contradicts this belief?',
+  'If a friend believed this about themselves, what would you tell them?',
+  'What would life look like if the new belief were completely true?',
+  'What triggered the old belief recently? What did you feel?',
+  'What small action today proves the new belief is real?'
+];
+
+function syncBelief() {
+  beliefData.o = document.getElementById('belief-old').value;
+  beliefData.n = document.getElementById('belief-new').value;
+  document.getElementById('belief-arrow').style.opacity = (beliefData.o && beliefData.n) ? '1' : '0';
+  saveBeliefData();
+}
+
+function renderBeliefChecks() {
+  const dateKey = getBeliefDateKey();
+  const tc = (beliefData.c && beliefData.c[dateKey]) || {};
+  const el = document.getElementById('belief-checks');
+  if (!el) return;
+  el.innerHTML = beliefItems.map((t, i) => `
+    <div onclick="toggleBeliefCheck(${i})" style="display:flex;align-items:center;gap:0.8rem;padding:0.6rem 0;border-bottom:1px solid var(--light);cursor:pointer;">
+      <div style="width:16px;height:16px;border:1px solid #c8c8c5;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;background:${tc[i]?'var(--black)':'none'};border-color:${tc[i]?'var(--black)':'#c8c8c5'};color:${tc[i]?'var(--white)':'transparent'};">✓</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:300;${tc[i]?'color:var(--gray);text-decoration:line-through;':''}">${t}</div>
+    </div>`).join('');
+}
+
+function toggleBeliefCheck(i) {
+  const dateKey = getBeliefDateKey();
+  if (!beliefData.c) beliefData.c = {};
+  if (!beliefData.c[dateKey]) beliefData.c[dateKey] = {};
+  beliefData.c[dateKey][i] = !beliefData.c[dateKey][i];
+  saveBeliefData(); renderBeliefChecks();
+}
+
+function renderBeliefQ() {
+  const dateKey = getBeliefDateKey();
+  const dayJ = (beliefData.j && beliefData.j[dateKey]) || {};
+  const qtEl = document.getElementById('belief-qtext');
+  const qaEl = document.getElementById('belief-qans');
+  const dotsEl = document.getElementById('belief-dots');
+  if (!qtEl) return;
+  qtEl.textContent = beliefQs[beliefQi];
+  qaEl.value = dayJ[beliefQi] || '';
+  document.getElementById('belief-prev').disabled = beliefQi === 0;
+  document.getElementById('belief-next').disabled = beliefQi === beliefQs.length - 1;
+  dotsEl.innerHTML = beliefQs.map((_,i) => `
+    <div onclick="beliefJump(${i})" style="width:6px;height:6px;border-radius:50%;background:${dayJ[i]?'var(--black)':i===beliefQi?'var(--gray)':'#e8e8e5'};cursor:pointer;transition:background 0.2s;"></div>`).join('');
+}
+
+function saveBeliefAns() {
+  const dateKey = getBeliefDateKey();
+  if (!beliefData.j) beliefData.j = {};
+  if (!beliefData.j[dateKey]) beliefData.j[dateKey] = {};
+  beliefData.j[dateKey][beliefQi] = document.getElementById('belief-qans').value;
+  saveBeliefData(); renderBeliefQ();
+}
+
+function beliefGo(dir) {
+  beliefQi = Math.max(0, Math.min(beliefQs.length - 1, beliefQi + dir));
+  localStorage.setItem('belief_qi', beliefQi);
+  renderBeliefQ();
+}
+
+function beliefJump(i) {
+  beliefQi = i;
+  localStorage.setItem('belief_qi', beliefQi);
+  renderBeliefQ();
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  const oldEl = document.getElementById('belief-old');
+  const newEl = document.getElementById('belief-new');
+  if (oldEl) oldEl.value = beliefData.o || '';
+  if (newEl) newEl.value = beliefData.n || '';
+  if (beliefData.o && beliefData.n) {
+    const arrow = document.getElementById('belief-arrow');
+    if (arrow) arrow.style.opacity = '1';
+  }
+  // Init date pickers
+  const today = new Date().toISOString().split('T')[0];
+  const bdp = document.getElementById('belief-date-picker');
+  if (bdp && !bdp.value) bdp.value = today;
+  const whoiDp = document.getElementById('whoi-date-picker');
+  if (whoiDp && !whoiDp.value) whoiDp.value = today;
+  // init wins + vent labels
+  const winsDp = document.getElementById('wins-date-picker');
+  if (winsDp && !winsDp.value) winsDp.value = today;
+  const ventDp = document.getElementById('vent-date-picker');
+  if (ventDp && !ventDp.value) ventDp.value = today;
+  ['wins-date-picker','vent-date-picker','belief-date-picker','whoi-date-picker'].forEach(updateDateLabel);
+
+  renderBeliefChecks();
+  renderBeliefQ();
+});
 </script>
 </body>
 </html>
