@@ -29,7 +29,7 @@
     } catch(e) { console.warn('Sync failed:', key, e.message); }
   };
 
-  window.pullFromCloud = async function(showMsg) {
+  window.pullFromCloud = async function(showMsg, force) {
     try {
       const res = await fetch(`${DB_URL}.json`, {
         method: 'GET',
@@ -43,7 +43,8 @@
         if (!data[k]) return;
         const cloudTs = data[k].ts || 0;
         const localTs = parseInt(window._rawGetItem(k + '_ts') || '0');
-        if (cloudTs > localTs) {
+        // force=true on first load, or if cloud is newer
+        if (force || cloudTs > localTs) {
           window._rawSetItem(k, JSON.stringify(data[k].data));
           window._rawSetItem(k + '_ts', String(cloudTs));
           changed = true;
@@ -57,10 +58,10 @@
   };
 
   window.addEventListener('load', function() {
-    // Pull immediately on load
-    setTimeout(function(){ window.pullFromCloud(false); }, 1500);
+    // Pull immediately on load — force update all keys
+    setTimeout(function(){ window.pullFromCloud(false, true); }, 1500);
     // Then pull every 5 seconds automatically
-    setInterval(function(){ window.pullFromCloud(false); }, 5000);
+    setInterval(function(){ window.pullFromCloud(false, false); }, 5000);
   });
 </script>
 
@@ -469,6 +470,46 @@
 </div>
 
 
+
+<script>
+// Sync setup — must be first
+window._rawSetItem = localStorage.setItem.bind(localStorage);
+window._rawGetItem = localStorage.getItem.bind(localStorage);
+window._syncQueue = [];
+
+window.saveAndSync = function(key, value) {
+  const ts = Date.now();
+  window._rawSetItem(key, JSON.stringify(value));
+  window._rawSetItem(key + '_ts', String(ts));
+  if (typeof syncToCloud === 'function') {
+    syncToCloud(key, value);
+  } else {
+    window._syncQueue.push([key, value]);
+  }
+};
+
+localStorage.setItem = function(key, value) {
+  window._rawSetItem(key, value);
+  try {
+    const parsed = JSON.parse(value);
+    if (typeof syncToCloud === 'function') {
+      syncToCloud(key, parsed);
+    } else {
+      window._syncQueue.push([key, parsed]);
+    }
+  } catch(e) {}
+};
+
+// Flush queue once syncToCloud is ready
+function flushSyncQueue() {
+  if (typeof syncToCloud !== 'function') { setTimeout(flushSyncQueue, 300); return; }
+  if (window._syncQueue.length > 0) {
+    window._syncQueue.forEach(function(item) { syncToCloud(item[0], item[1]); });
+    window._syncQueue = [];
+  }
+}
+setTimeout(flushSyncQueue, 500);
+</script>
 
 <script>
 const affirmations = [
@@ -1512,49 +1553,6 @@ if (!localStorage.getItem('data_cleared_v1')) {
   renderWins(); renderSavedAffirmations(); renderVentEntries(); renderDimensionBoards();
 }
 
-// Auto-sync analytics whenever relevant data is saved
-window._rawSetItem = localStorage.setItem.bind(localStorage);
-window._rawGetItem = localStorage.getItem.bind(localStorage);
-const _origSetItem = window._rawSetItem;
-window._syncQueue = window._syncQueue || [];
-
-// Helper: save to localStorage AND sync to cloud
-window.saveAndSync = function(key, value) {
-  const ts = Date.now();
-  _origSetItem(key, JSON.stringify(value));
-  _origSetItem(key + '_ts', String(ts));
-  if (typeof syncToCloud === 'function') {
-    syncToCloud(key, value);
-  } else {
-    window._syncQueue.push([key, value]);
-  }
-};
-
-localStorage.setItem = function(key, value) {
-  _origSetItem(key, value);
-  try {
-    const parsed = JSON.parse(value);
-    if (typeof syncToCloud === 'function') {
-      syncToCloud(key, parsed);
-    } else {
-      window._syncQueue.push([key, parsed]);
-    }
-  } catch(e) {}
-  const watched = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history'];
-  if (watched.includes(key) && document.getElementById('home')?.classList.contains('active')) {
-    renderAnalytics();
-  }
-};
-
-// Flush queue as soon as syncToCloud is ready
-function flushSyncQueue() {
-  if (typeof syncToCloud !== 'function') { setTimeout(flushSyncQueue, 500); return; }
-  if (window._syncQueue && window._syncQueue.length > 0) {
-    window._syncQueue.forEach(function(item) { syncToCloud(item[0], item[1]); });
-    window._syncQueue = [];
-  }
-}
-setTimeout(flushSyncQueue, 1000);
 
 function reloadAllData() {
   wins = JSON.parse(localStorage.getItem('my_wins') || '[]');
