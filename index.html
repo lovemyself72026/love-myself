@@ -137,6 +137,32 @@
   .save-note { font-family: 'Nunito', sans-serif; font-size: 0.65rem; color: var(--gray); letter-spacing: 0.08em; margin-top: 0.8rem; }
   @media (max-width: 480px) { .home-grid { grid-template-columns: 1fr 1fr; } .nav-tabs { gap: 0; } .nav-tab { font-size: 0.88rem; letter-spacing: 0.04em; white-space: nowrap; } .home-card { min-height: 90px; padding: 1rem; } }
   @media (max-width: 600px) { .books-vent-grid { grid-template-columns: 1fr !important; } }
+
+  /* Balance & Relationships */
+  .q-check-card { background: white; border: 1px solid #e8e8e5; padding: 1.2rem; margin-bottom: 0.75rem; transition: opacity 0.2s; }
+  .q-check-card.answered { opacity: 0.45; }
+  .q-check-text { font-family: 'Lora', serif; font-style: italic; font-size: 0.93rem; color: var(--black); line-height: 1.55; margin-bottom: 0.9rem; }
+  .q-check-category { font-family: 'Nunito', sans-serif; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); margin-bottom: 0.5rem; }
+  .yn-btns { display: flex; gap: 8px; }
+  .yn-btn { flex: 1; padding: 0.5rem; border: 1px solid #e0d8cc; background: transparent; font-family: 'Nunito', sans-serif; font-size: 0.8rem; font-weight: 300; color: var(--gray); cursor: pointer; transition: all 0.18s; }
+  .yn-btn.yes { border-color: #5a8a5a; color: #5a8a5a; }
+  .yn-btn.yes.selected { background: #5a8a5a; color: white; }
+  .yn-btn.no  { border-color: #c88a7a; color: #c88a7a; }
+  .yn-btn.no.selected  { background: #c88a7a; color: white; }
+  .status-card { padding: 1.5rem; text-align: center; margin-bottom: 0.5rem; transition: background 0.4s; border: 1px solid #e8e8e5; }
+  .status-card.balanced   { background: #f0f5f0; }
+  .status-card.giving-more { background: #fdf5ee; }
+  .status-card.self-more  { background: #f0f4f8; }
+  .status-card.critical   { background: #fdeeed; }
+  .status-icon { font-size: 2rem; margin-bottom: 0.6rem; }
+  .status-msg  { font-family: 'Lora', serif; font-size: 1rem; color: var(--black); font-style: italic; margin-bottom: 0.4rem; line-height: 1.4; }
+  .status-sub  { font-size: 0.78rem; color: var(--gray); font-weight: 300; line-height: 1.5; }
+  .scale-wrap  { border: 1px solid #e8e8e5; padding: 1.2rem; margin-bottom: 1.5rem; }
+  .scale-note  { font-size: 0.75rem; color: var(--gray); margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid #e8e8e5; font-style: italic; text-align: center; }
+  .balance-sub-tabs { display: flex; border-bottom: 1px solid #e8e8e5; margin-bottom: 1.5rem; }
+  .balance-sub-tab { font-family: 'Nunito', sans-serif; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; color: var(--gray); border: none; background: none; padding: 0.5rem 1rem 0.6rem; border-bottom: 2px solid transparent; transition: color 0.2s, border-color 0.2s; flex: 1; text-align: center; }
+  .balance-sub-tab.active { color: var(--black); border-bottom-color: var(--black); }
+
   .journal-tab { font-family:'Nunito',sans-serif; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; color:var(--gray); border:none; background:none; padding:0.5rem 1rem 0.6rem; border-bottom:2px solid transparent; transition:color 0.2s,border-color 0.2s; white-space:nowrap; flex:1; text-align:center; }
   .journal-tab.active, .journal-tab:hover { color:var(--black); border-bottom-color:var(--black); }
   @media (max-width: 600px) { #planner-grid { grid-template-columns: 1fr !important; } .vision-items-grid { grid-template-columns: 1fr !important; } }
@@ -152,6 +178,7 @@
     <button class="nav-tab" onclick="showSection('vision')">Vision</button>
     <button class="nav-tab" onclick="showSection('schedule')">Schedule</button>
     <button class="nav-tab" onclick="showSection('affirmations')">Journal</button>
+    <button class="nav-tab" onclick="showSection('balance')">Balance</button>
   </div>
 </nav>
 
@@ -627,14 +654,21 @@ let lastVisit = localStorage.getItem('last_visit');
   renderRituals(); renderSavedAffirmations();
 })();
 
+var _balanceInited = false;
 function showSection(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  const map=['home','vision','schedule','affirmations'];
+  const map=['home','vision','schedule','affirmations','balance'];
   document.querySelectorAll('.nav-tab')[map.indexOf(id)].classList.add('active');
   window.scrollTo(0,0);
   if (id === 'home') renderAnalytics();
+  if (id === 'balance') {
+    if (!_balanceInited) { _balanceInited = true; }
+    updateBalanceSelectedLabel();
+    renderBalanceQuestions();
+    renderTracker();
+  }
 }
 
 function showJournalTab(tab) {
@@ -1861,6 +1895,290 @@ manifestLink.rel = 'manifest';
 manifestLink.href = manifestUrl;
 document.head.appendChild(manifestLink);
 
+// ── Balance & Relationships ────────────────────────────────
+
+  var storage = { getItem: function(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }, setItem: function(k,v) { try { localStorage.setItem(k,v); } catch(e) {} } };
+
+  var currentBalanceDate = new Date().toISOString().split('T')[0];
+
+  function getBalanceDateStr() {
+    return new Date(currentBalanceDate + 'T00:00:00').toDateString();
+  }
+
+  function initBalanceDatePicker() {
+    var dp = document.getElementById('balance-date-picker');
+    if (dp) dp.value = currentBalanceDate;
+    updateBalanceDayLabel();
+  }
+
+  function updateBalanceDayLabel() {
+    var dp = document.getElementById('balance-date-picker');
+    if (dp) dp.value = currentBalanceDate;
+    var d = new Date(currentBalanceDate + 'T00:00:00');
+    var today = new Date().toISOString().split('T')[0];
+    var label = d.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+    if (currentBalanceDate === today) label += ' \u2014 Today';
+    var el = document.getElementById('balance-day-label');
+    if (el) el.textContent = label;
+  }
+
+  function onBalanceDatePicked(val) {
+    currentBalanceDate = val;
+    updateBalanceDayLabel();
+    reloadBalanceDay();
+  }
+
+  function changeBalanceDay(dir) {
+    var d = new Date(currentBalanceDate + 'T00:00:00');
+    d.setDate(d.getDate() + dir);
+    currentBalanceDate = d.toISOString().split('T')[0];
+    updateBalanceDayLabel();
+    reloadBalanceDay();
+  }
+
+  function reloadBalanceDay() {
+    var sc = document.getElementById('statusCard');
+    var sc2 = document.getElementById('statusCard2');
+    if (sc) sc.style.display = 'none';
+    if (sc2) sc2.style.display = 'none';
+    var rel = document.getElementById('bspanel-relationships');
+    var activePanel = rel && rel.style.display === 'none' ? 'balance' : 'relationships';
+    if (activePanel === 'balance') renderBalanceQuestions();
+    else renderRelationshipQuestions();
+  }
+
+  function showBalanceTab(tab) {
+    ['balance','relationships'].forEach(function(t) {
+      var panel = document.getElementById('bspanel-' + t);
+      var tabEl = document.getElementById('bstab-' + t);
+      if (panel) panel.style.display = t === tab ? 'block' : 'none';
+      if (tabEl) tabEl.classList.toggle('active', t === tab);
+    });
+    var sc = document.getElementById('statusCard');
+    var sc2 = document.getElementById('statusCard2');
+    if (sc) sc.style.display = 'none';
+    if (sc2) sc2.style.display = 'none';
+    setTimeout(function() {
+      if (tab === 'balance') renderBalanceQuestions();
+      else renderRelationshipQuestions();
+    }, 0);
+  }
+
+  // ===== APP 1: HEALTHY BALANCE =====
+  var B = JSON.parse(storage.getItem('hlb') || '{}');
+  if (!B.history) B.history = {};
+  if (!B.answers) B.answers = {};
+  function saveB() { storage.setItem('hlb', JSON.stringify(B)); }
+
+  var balanceQs = [
+    { text: 'Did you help someone today: with a task, a problem, or just by listening?', type: 'give', yes: true },
+    { text: 'Did you check in on someone or reach out first today?', type: 'give', yes: true },
+    { text: 'Did you give someone your time or energy even when you were tired?', type: 'give', yes: true },
+    { text: 'Did you say yes to someone today when part of you wanted to say no?', type: 'give', yes: true },
+    { text: 'Did you put someone else\'s needs ahead of your own today?', type: 'give', yes: true },
+    { text: 'Did you spend time or energy on someone without them asking?', type: 'give', yes: true },
+    { text: 'Did you feel responsible for how someone else was feeling today?', type: 'give', yes: true },
+    { text: 'Did you work on something that was just for you today?', type: 'self', yes: true },
+    { text: 'Did you eat, sleep, or rest properly today?', type: 'self', yes: true },
+    { text: 'Did you have time today that was yours: no obligations, no one needing anything from you?', type: 'self', yes: true },
+    { text: 'Did you do at least one thing today that made you feel like yourself?', type: 'self', yes: true },
+    { text: 'Did you move your body or do something physical for yourself today?', type: 'self', yes: true },
+    { text: 'Did you say no to something today to protect your own time or energy?', type: 'self', yes: true },
+    { text: 'Did you feel okay at the end of today, not drained or invisible?', type: 'self', yes: true },
+    { text: 'Did you do something today purely because it made you happy, with no other reason?', type: 'self', yes: true }
+  ];
+
+  function renderBalanceQuestions() {
+    var today = getBalanceDateStr();
+    var ans = B.answers[today] || {};
+    var allAnswered = Object.keys(ans).length === balanceQs.length;
+    var qEl = document.getElementById('balanceQuestions');
+    var scEl = document.getElementById('statusCard');
+    if (!qEl) return;
+    if (allAnswered) {
+      qEl.style.display = 'none';
+      showBalanceResult(ans);
+      return;
+    }
+    if (scEl) scEl.style.display = 'none';
+    qEl.style.display = 'block';
+    qEl.innerHTML = balanceQs.map(function(q, i) {
+      var a = ans[i];
+      var answered = a !== undefined;
+      return '<div class="q-check-card' + (answered ? ' answered' : '') + '" id="qcard-' + i + '">'
+        + '<div class="q-check-category">' + (q.type === 'give' ? 'Giving' : 'Self') + '</div>'
+        + '<div class="q-check-text">' + q.text + '</div>'
+        + '<div class="yn-btns">'
+        + '<button class="yn-btn yes' + (a === true ? ' selected' : '') + '" onclick="answerQ(' + i + ', true)">Yes</button>'
+        + '<button class="yn-btn no' + (a === false ? ' selected' : '') + '" onclick="answerQ(' + i + ', false)">No</button>'
+        + '</div></div>';
+    }).join('');
+  }
+
+  function answerQ(i, val) {
+    var today = getBalanceDateStr();
+    if (!B.answers[today]) B.answers[today] = {};
+    B.answers[today][i] = val;
+    saveB();
+    var card = document.getElementById('qcard-' + i);
+    if (card) {
+      card.querySelectorAll('.yn-btn').forEach(function(b) { b.classList.remove('selected'); });
+      var btn = card.querySelector(val ? '.yn-btn.yes' : '.yn-btn.no');
+      if (btn) btn.classList.add('selected');
+      setTimeout(function() { card.classList.add('answered'); }, 200);
+    }
+    if (Object.keys(B.answers[today]).length === balanceQs.length) {
+      setTimeout(function() {
+        var qEl = document.getElementById('balanceQuestions');
+        if (qEl) qEl.style.display = 'none';
+        showBalanceResult(B.answers[today]);
+      }, 400);
+    }
+  }
+
+  function showBalanceResult(ans) {
+    var giveScore = 0, selfScore = 0;
+    balanceQs.forEach(function(q, i) {
+      if (q.type === 'give' && ans[i] === q.yes) giveScore++;
+      if (q.type === 'self' && ans[i] === q.yes) selfScore++;
+    });
+    var giveMax = balanceQs.filter(function(q){ return q.type === 'give'; }).length;
+    var selfMax = balanceQs.filter(function(q){ return q.type === 'self'; }).length;
+    var g = Math.round((giveScore / giveMax) * 10);
+    var s = Math.round((selfScore / selfMax) * 10);
+    var gEl = document.getElementById('giveScore');
+    var sEl = document.getElementById('selfScore');
+    if (gEl) gEl.textContent = g + '/10';
+    if (sEl) sEl.textContent = s + '/10';
+    var diff = g - s;
+    var card = document.getElementById('statusCard');
+    var icon = document.getElementById('statusIcon');
+    var msg  = document.getElementById('statusMsg');
+    var sub  = document.getElementById('statusSub');
+    if (!card) return;
+    card.className = 'status-card';
+    if (diff >= 4)      { card.classList.add('critical');     if(icon) icon.textContent = '🔴'; if(msg) msg.textContent = "You're giving a lot more than you're keeping."; if(sub) sub.textContent = "Something needs to come back to you. This level isn't sustainable."; }
+    else if (diff >= 2) { card.classList.add('giving-more'); if(icon) icon.textContent = '🟠'; if(msg) msg.textContent = "You're giving more than you're keeping right now."; if(sub) sub.textContent = "Keep an eye on this. Make sure you're not running on empty."; }
+    else if (diff <= -4){ card.classList.add('self-more');   if(icon) icon.textContent = '🔵'; if(msg) msg.textContent = "You're keeping more than you're giving right now."; if(sub) sub.textContent = "That's okay sometimes: just stay connected to the people around you."; }
+    else if (diff <= -2){ card.classList.add('self-more');   if(icon) icon.textContent = '🔵'; if(msg) msg.textContent = "Keeping a bit more than you're giving today."; if(sub) sub.textContent = "Check in with the people in your life when you can."; }
+    else                { card.classList.add('balanced');    if(icon) icon.textContent = '🟢'; if(msg) msg.textContent = "You're balanced today."; if(sub) sub.textContent = "Giving and keeping are roughly equal. That's healthy."; }
+    card.style.display = 'block';
+    B.history[getBalanceDateStr()] = { give: g, self: s };
+    saveB();
+  }
+
+  function resetBalance() {
+    var today = getBalanceDateStr();
+    delete B.answers[today];
+    saveB();
+    var sc = document.getElementById('statusCard');
+    if (sc) sc.style.display = 'none';
+    renderBalanceQuestions();
+  }
+
+  // ===== APP 2: HEALTHY RELATIONSHIPS =====
+  var R = JSON.parse(storage.getItem('hlr') || '{}');
+  if (!R.history) R.history = {};
+  if (!R.answers) R.answers = {};
+  function saveR() { storage.setItem('hlr', JSON.stringify(R)); }
+
+  var relationshipQs = [
+    { text: 'Did you talk to someone you care about today, not just because you had to?', yes: true },
+    { text: 'Did you reach out to someone first today?', yes: true },
+    { text: 'Did you actually listen to someone today without rushing to respond?', yes: true },
+    { text: 'Did any conversation today leave you feeling closer to that person?', yes: true },
+    { text: 'Did you do something small for someone just to show you were thinking of them?', yes: true },
+    { text: 'Did you ask someone how they were really doing and actually wait for the answer?', yes: true },
+    { text: 'Did you show up for someone today even when it was not convenient?', yes: true },
+    { text: 'Is there something you have been wanting to say to someone but still have not?', yes: false },
+    { text: 'Did you say something true today that you normally would have held back?', yes: true },
+    { text: 'Did you feel like you could be yourself with the people around you today?', yes: true },
+    { text: 'Did any relationship feel one-sided today, like you were doing all the work?', yes: false },
+    { text: 'Did you repair or acknowledge something that felt a little off with someone?', yes: true },
+    { text: 'Did you give someone your full attention today, no phone, no distractions?', yes: true },
+    { text: 'Did you say something kind or encouraging to someone today?', yes: true },
+    { text: 'Did you feel appreciated or valued by someone in your life today?', yes: true }
+  ];
+
+  function renderRelationshipQuestions() {
+    var today = getBalanceDateStr();
+    var ans = R.answers[today] || {};
+    var allAnswered = Object.keys(ans).length === relationshipQs.length;
+    var qEl = document.getElementById('relationshipQuestions');
+    var sc2 = document.getElementById('statusCard2');
+    if (!qEl) return;
+    if (allAnswered) {
+      qEl.style.display = 'none';
+      showRelationshipResult(ans);
+      return;
+    }
+    if (sc2) sc2.style.display = 'none';
+    qEl.style.display = 'block';
+    qEl.innerHTML = relationshipQs.map(function(q, i) {
+      var a = ans[i];
+      var answered = a !== undefined;
+      return '<div class="q-check-card' + (answered ? ' answered' : '') + '" id="rcard-' + i + '">'
+        + '<div class="q-check-text">' + q.text + '</div>'
+        + '<div class="yn-btns">'
+        + '<button class="yn-btn yes' + (a === true ? ' selected' : '') + '" onclick="answerRQ(' + i + ', true)">Yes</button>'
+        + '<button class="yn-btn no' + (a === false ? ' selected' : '') + '" onclick="answerRQ(' + i + ', false)">No</button>'
+        + '</div></div>';
+    }).join('');
+  }
+
+  function answerRQ(i, val) {
+    var today = getBalanceDateStr();
+    if (!R.answers[today]) R.answers[today] = {};
+    R.answers[today][i] = val;
+    saveR();
+    var card = document.getElementById('rcard-' + i);
+    if (card) {
+      card.querySelectorAll('.yn-btn').forEach(function(b) { b.classList.remove('selected'); });
+      var btn = card.querySelector(val ? '.yn-btn.yes' : '.yn-btn.no');
+      if (btn) btn.classList.add('selected');
+      setTimeout(function() { card.classList.add('answered'); }, 200);
+    }
+    if (Object.keys(R.answers[today]).length === relationshipQs.length) {
+      setTimeout(function() {
+        var qEl = document.getElementById('relationshipQuestions');
+        if (qEl) qEl.style.display = 'none';
+        showRelationshipResult(R.answers[today]);
+      }, 400);
+    }
+  }
+
+  function showRelationshipResult(ans) {
+    var score = 0;
+    relationshipQs.forEach(function(q, i) { if (ans[i] === q.yes) score++; });
+    var card = document.getElementById('statusCard2');
+    var icon = document.getElementById('statusIcon2');
+    var msg  = document.getElementById('statusMsg2');
+    var sub  = document.getElementById('statusSub2');
+    var cs   = document.getElementById('connectScore');
+    var hs   = document.getElementById('honestScore');
+    if (!card) return;
+    card.className = 'status-card';
+    if (cs) cs.textContent = score + '/15';
+    if (hs) hs.textContent = score >= 12 ? 'Healthy' : score >= 8 ? 'Okay' : 'Needs work';
+    if (score >= 12)     { card.classList.add('balanced');    if(icon) icon.textContent = '🟢'; if(msg) msg.textContent = 'Your relationships are healthy today.'; if(sub) sub.textContent = 'You are connecting, being honest, and showing up. Keep it going.'; }
+    else if (score >= 8) { card.classList.add('giving-more'); if(icon) icon.textContent = '🟡'; if(msg) msg.textContent = 'Your relationships are okay but something is a little off.'; if(sub) sub.textContent = 'You are mostly showing up but something is going unsaid or feeling uneven.'; }
+    else if (score >= 5) { card.classList.add('self-more');   if(icon) icon.textContent = '🟠'; if(msg) msg.textContent = 'Your relationships need some attention today.'; if(sub) sub.textContent = 'You are a bit disconnected or holding back. One honest conversation can shift this.'; }
+    else                 { card.classList.add('critical');    if(icon) icon.textContent = '🔴'; if(msg) msg.textContent = 'Your relationships are struggling today.'; if(sub) sub.textContent = 'Low connection and things going unsaid. Even one small reach out can start to change that.'; }
+    card.style.display = 'block';
+    R.history[getBalanceDateStr()] = { score: score };
+    saveR();
+  }
+
+  function resetRelationships() {
+    var today = getBalanceDateStr();
+    delete R.answers[today];
+    saveR();
+    var sc2 = document.getElementById('statusCard2');
+    if (sc2) sc2.style.display = 'none';
+    renderRelationshipQuestions();
+  }
+
+  // balance renders triggered on tab open
 // Apple touch icon
 const appleIcon = document.createElement('link');
 appleIcon.rel = 'apple-touch-icon';
@@ -2013,5 +2331,70 @@ window.addEventListener('DOMContentLoaded', function() {
   renderBeliefQ();
 });
 </script>
+
+<div class="section" id="balance">
+  <div class="subtitle">Check in with yourself</div>
+  <h1>Balance.</h1>
+  <div style="font-family:Lora,serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0.5rem 0 1.5rem;line-height:1.6;">Answer honestly. It figures out the rest.</div>
+
+  <!-- Balance sub-tabs -->
+  <div class="balance-sub-tabs">
+    <button class="balance-sub-tab active" id="bstab-balance" onclick="showBalanceTab('balance')">Healthy Balance</button>
+    <button class="balance-sub-tab" id="bstab-relationships" onclick="showBalanceTab('relationships')">Relationships</button>
+  </div>
+
+  <!-- Date navigation (same as Schedule) -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+    <button onclick="changeBalanceDay(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8249;</button>
+    <div style="text-align:center;">
+      <input type="date" id="balance-date-picker" onchange="onBalanceDatePicked(this.value)" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;cursor:pointer;text-align:center;">
+      <div id="balance-day-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-top:0.3rem;"></div>
+    </div>
+    <button onclick="changeBalanceDay(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8250;</button>
+  </div>
+
+  <div>
+
+    <!-- Healthy Balance panel -->
+    <div id="bspanel-balance">
+      <div id="balanceQuestions"></div>
+      <div class="status-card" id="statusCard" style="display:none;">
+        <div class="status-icon" id="statusIcon">⚖️</div>
+        <div class="status-msg" id="statusMsg"></div>
+        <div class="status-sub" id="statusSub"></div>
+        <div style="margin-top:1.2rem;display:flex;gap:20px;justify-content:center;">
+          <div style="text-align:center;">
+            <div style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#b88a5a;margin-bottom:4px;">Giving</div>
+            <div id="giveScore" style="font-size:1.4rem;font-weight:300;color:#b88a5a;font-family:Lora,serif;"></div>
+          </div>
+          <div style="width:1px;background:#e8e8e5;"></div>
+          <div style="text-align:center;">
+            <div style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#5a8a5a;margin-bottom:4px;">Self</div>
+            <div id="selfScore" style="font-size:1.4rem;font-weight:300;color:#5a8a5a;font-family:Lora,serif;"></div>
+          </div>
+        </div>
+        <button onclick="resetBalance()" style="margin-top:1rem;background:none;border:1px solid #e0d8cc;padding:0.35rem 1rem;font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.08em;color:var(--gray);cursor:pointer;">Redo this day</button>
+      </div>
+    </div>
+
+    <!-- Relationships panel -->
+    <div id="bspanel-relationships" style="display:none;">
+      <div id="relationshipQuestions"></div>
+      <div class="status-card" id="statusCard2" style="display:none;">
+        <div class="status-icon" id="statusIcon2">⚖️</div>
+        <div class="status-msg" id="statusMsg2"></div>
+        <div class="status-sub" id="statusSub2"></div>
+        <div style="margin-top:1.2rem;text-align:center;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:4px;">Today's score</div>
+          <div id="connectScore" style="font-size:1.6rem;font-weight:300;color:var(--black);font-family:Lora,serif;"></div>
+          <div id="honestScore" style="font-family:'Nunito',sans-serif;font-size:0.78rem;color:var(--gray);margin-top:2px;"></div>
+        </div>
+        <button onclick="resetRelationships()" style="margin-top:1rem;background:none;border:1px solid #e0d8cc;padding:0.35rem 1rem;font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.08em;color:var(--gray);cursor:pointer;">Redo this day</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
 </body>
 </html>
