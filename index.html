@@ -59,6 +59,7 @@
 
   window.addEventListener('load', function() {
     setTimeout(function(){ window.pullFromCloud(false); }, 1500);
+    setInterval(function(){ window.pullFromCloud(false); }, 5000);
   });
 </script>
 
