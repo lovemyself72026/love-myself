@@ -701,6 +701,8 @@ function addWin() {
   if (!val) return;
   wins.unshift({ id: Date.now(), text: val, date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}) });
   localStorage.setItem('my_wins', JSON.stringify(wins));
+  console.log('syncToCloud type:', typeof syncToCloud);
+  if (typeof syncToCloud === 'function') syncToCloud('my_wins', wins);
   input.value = '';
   renderWins();
 }
