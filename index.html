@@ -498,6 +498,10 @@ localStorage.setItem = function(key, value) {
       window._syncQueue.push([key, parsed]);
     }
   } catch(e) {}
+  const watched = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history'];
+  if (watched.includes(key) && document.getElementById('home')?.classList.contains('active')) {
+    if (typeof renderAnalytics === 'function') renderAnalytics();
+  }
 };
 
 // Flush queue once syncToCloud is ready
