@@ -19,11 +19,12 @@
 
   window.syncToCloud = async function(key, value) {
     if (!SYNC_KEYS.includes(key)) return;
+    const payload = { data: value, ts: Date.now() };
     try {
-      const res = await fetch(`${DB_URL}/${key}.json?print=silent`, {
+      const res = await fetch(`${DB_URL}/${key}.json`, {
         method: 'PUT',
-        body: JSON.stringify(value),
-        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
+        body: JSON.stringify(payload),
+        headers: {'Content-Type': 'application/json'}
       });
       console.log('✅ Synced:', key, res.status);
     } catch(e) { console.warn('Sync failed:', key, e.message); }
@@ -31,22 +32,23 @@
 
   window.pullFromCloud = async function(showMsg) {
     try {
-      const res = await fetch(`${DB_URL}.json?shallow=false`, {
+      const res = await fetch(`${DB_URL}.json`, {
         method: 'GET',
         headers: {'Accept': 'application/json'}
       });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      if (!data) { if(showMsg) alert('No data found in cloud yet.'); return; }
+      if (!data) { if(showMsg) alert('No data found yet.'); return; }
       let changed = false;
       SYNC_KEYS.forEach(function(k) {
-        if (data[k] !== undefined) {
-          const incoming = JSON.stringify(data[k]);
-          const current = window._rawGetItem(k);
-          if (current !== incoming) {
-            window._rawSetItem(k, incoming);
-            changed = true;
-          }
+        if (!data[k]) return;
+        const cloudTs = data[k].ts || 0;
+        const localTs = parseInt(window._rawGetItem(k + '_ts') || '0');
+        // Only update if cloud is newer
+        if (cloudTs > localTs) {
+          window._rawSetItem(k, JSON.stringify(data[k].data));
+          window._rawSetItem(k + '_ts', String(cloudTs));
+          changed = true;
         }
       });
       if (changed && typeof reloadAllData === 'function') reloadAllData();
@@ -1520,8 +1522,9 @@ window._syncQueue = window._syncQueue || [];
 
 // Helper: save to localStorage AND sync to cloud
 window.saveAndSync = function(key, value) {
-  const str = JSON.stringify(value);
-  _origSetItem(key, str);
+  const ts = Date.now();
+  _origSetItem(key, JSON.stringify(value));
+  _origSetItem(key + '_ts', String(ts));
   if (typeof syncToCloud === 'function') {
     syncToCloud(key, value);
   } else {
