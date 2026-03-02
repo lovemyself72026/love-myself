@@ -25,7 +25,7 @@
         body: JSON.stringify(value),
         headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
       });
-      console.log('Synced', key, res.status);
+      console.log('✅ Synced:', key, res.status);
     } catch(e) { console.warn('Sync failed:', key, e.message); }
   };
 
@@ -1516,19 +1516,30 @@ if (!localStorage.getItem('data_cleared_v1')) {
 window._rawSetItem = localStorage.setItem.bind(localStorage);
 window._rawGetItem = localStorage.getItem.bind(localStorage);
 const _origSetItem = window._rawSetItem;
+window._syncQueue = window._syncQueue || [];
 localStorage.setItem = function(key, value) {
   _origSetItem(key, value);
+  const parsed = JSON.parse(value);
   if (typeof syncToCloud === 'function') {
-    syncToCloud(key, JSON.parse(value));
+    syncToCloud(key, parsed);
   } else {
-    if (!window._syncQueue) window._syncQueue = [];
-    window._syncQueue.push([key, JSON.parse(value)]);
+    window._syncQueue.push([key, parsed]);
   }
   const watched = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history'];
   if (watched.includes(key) && document.getElementById('home')?.classList.contains('active')) {
     renderAnalytics();
   }
 };
+
+// Flush queue as soon as syncToCloud is ready
+function flushSyncQueue() {
+  if (typeof syncToCloud !== 'function') { setTimeout(flushSyncQueue, 500); return; }
+  if (window._syncQueue && window._syncQueue.length > 0) {
+    window._syncQueue.forEach(function(item) { syncToCloud(item[0], item[1]); });
+    window._syncQueue = [];
+  }
+}
+setTimeout(flushSyncQueue, 1000);
 
 function reloadAllData() {
   wins = JSON.parse(localStorage.getItem('my_wins') || '[]');
