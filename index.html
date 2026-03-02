@@ -19,35 +19,30 @@
 
   window.syncToCloud = async function(key, value) {
     if (!SYNC_KEYS.includes(key)) return;
-    const payload = { data: value, ts: Date.now() };
     try {
       await fetch(`${DB_URL}/${key}.json`, {
         method: 'PUT',
-        body: JSON.stringify(payload),
+        body: JSON.stringify(value),
         headers: {'Content-Type': 'application/json'}
       });
-    } catch(e) { console.warn('Sync failed:', key, e.message); }
+    } catch(e) {}
   };
 
-  window.pullFromCloud = async function(showMsg, force) {
+  window.pullFromCloud = async function(showMsg) {
     try {
-      const res = await fetch(`${DB_URL}.json`, {
-        method: 'GET',
-        headers: {'Accept': 'application/json'}
-      });
+      const res = await fetch(`${DB_URL}.json`);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       if (!data) { if(showMsg) alert('No data found yet.'); return; }
       let changed = false;
       SYNC_KEYS.forEach(function(k) {
-        if (!data[k]) return;
-        const cloudTs = data[k].ts || 0;
-        const localTs = parseInt(window._rawGetItem(k + '_ts') || '0');
-        // force=true on first load, or if cloud is newer
-        if (force || cloudTs > localTs) {
-          window._rawSetItem(k, JSON.stringify(data[k].data));
-          window._rawSetItem(k + '_ts', String(cloudTs));
-          changed = true;
+        if (data[k] !== undefined) {
+          const incoming = JSON.stringify(data[k]);
+          const current = localStorage.getItem(k);
+          if (current !== incoming) {
+            localStorage.setItem(k, incoming);
+            changed = true;
+          }
         }
       });
       if (changed && typeof reloadAllData === 'function') reloadAllData();
@@ -58,10 +53,7 @@
   };
 
   window.addEventListener('load', function() {
-    // Pull immediately on load — force update all keys
-    setTimeout(function(){ window.pullFromCloud(false, true); }, 1500);
-    // Then pull every 5 seconds automatically
-    setInterval(function(){ window.pullFromCloud(false, false); }, 5000);
+    setTimeout(function(){ window.pullFromCloud(false); }, 1500);
   });
 </script>
 
@@ -173,6 +165,7 @@
 
   <hr style="margin:2rem 0;">
   <div style="display:flex;gap:0.5rem;justify-content:center;align-items:center;">
+    <button onclick="pullFromCloud(true)" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;color:var(--gray);">↻ Sync</button>
     <button onclick="exportData()" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;color:var(--gray);">Export</button>
     <button onclick="document.getElementById('import-file').click()" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;color:var(--gray);">Import</button>
     <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(this)">
@@ -472,50 +465,6 @@
 
 
 <script>
-// Sync setup — must be first
-window._rawSetItem = localStorage.setItem.bind(localStorage);
-window._rawGetItem = localStorage.getItem.bind(localStorage);
-window._syncQueue = [];
-
-window.saveAndSync = function(key, value) {
-  const ts = Date.now();
-  window._rawSetItem(key, JSON.stringify(value));
-  window._rawSetItem(key + '_ts', String(ts));
-  if (typeof syncToCloud === 'function') {
-    syncToCloud(key, value);
-  } else {
-    window._syncQueue.push([key, value]);
-  }
-};
-
-localStorage.setItem = function(key, value) {
-  window._rawSetItem(key, value);
-  try {
-    const parsed = JSON.parse(value);
-    if (typeof syncToCloud === 'function') {
-      syncToCloud(key, parsed);
-    } else {
-      window._syncQueue.push([key, parsed]);
-    }
-  } catch(e) {}
-  const watched = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history'];
-  if (watched.includes(key) && document.getElementById('home')?.classList.contains('active')) {
-    if (typeof renderAnalytics === 'function') renderAnalytics();
-  }
-};
-
-// Flush queue once syncToCloud is ready
-function flushSyncQueue() {
-  if (typeof syncToCloud !== 'function') { setTimeout(flushSyncQueue, 300); return; }
-  if (window._syncQueue.length > 0) {
-    window._syncQueue.forEach(function(item) { syncToCloud(item[0], item[1]); });
-    window._syncQueue = [];
-  }
-}
-setTimeout(flushSyncQueue, 500);
-</script>
-
-<script>
 const affirmations = [
   // I love me
   "I love me fully, deeply, and completely.",
@@ -624,7 +573,7 @@ function newAffirmation(){
 }
 
 function saveAffirmation(){
-  if(!savedAffirmations.find(a=>(a.text||a)===currentAff)){savedAffirmations.push({text:currentAff,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' · '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});saveAndSync('saved_affirmations',savedAffirmations);renderSavedAffirmations();}
+  if(!savedAffirmations.find(a=>(a.text||a)===currentAff)){savedAffirmations.push({text:currentAff,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' · '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});localStorage.setItem('saved_affirmations',JSON.stringify(savedAffirmations));if(typeof syncToCloud==='function')syncToCloud('saved_affirmations',savedAffirmations);renderSavedAffirmations();}
 }
 
 function renderSavedAffirmations(){
@@ -633,7 +582,7 @@ function renderSavedAffirmations(){
   el.innerHTML=savedAffirmations.map((a,i)=>`<div class="journal-entry"><button onclick="removeSavedAff(${i})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.4rem;">remove</button><div class="journal-date">${a.date||''}</div><div class="journal-content">${a.text||a}</div></div>`).join('');
 }
 
-function removeSavedAff(i){savedAffirmations.splice(i,1);saveAndSync('saved_affirmations',savedAffirmations);renderSavedAffirmations();}
+function removeSavedAff(i){savedAffirmations.splice(i,1);localStorage.setItem('saved_affirmations',JSON.stringify(savedAffirmations));if(typeof syncToCloud==='function')syncToCloud('saved_affirmations',savedAffirmations);renderSavedAffirmations();}
 
 function addRitual(){}
 function renderRituals(){}
@@ -655,7 +604,7 @@ function addBook() {
     author,
     date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'})
   });
-  saveAndSync('my_books', books);
+  localStorage.setItem('my_books', JSON.stringify(books)); if(typeof syncToCloud==='function')syncToCloud('my_books',books);
   document.getElementById('book-input').value = '';
   document.getElementById('book-author').value = '';
   renderBooks();
@@ -717,7 +666,7 @@ function celebrateBook(title) {
 
 function deleteBook(id) {
   books = books.filter(b => b.id !== id);
-  saveAndSync('my_books', books);
+  localStorage.setItem('my_books', JSON.stringify(books)); if(typeof syncToCloud==='function')syncToCloud('my_books',books);
   renderBooks();
 }
 
@@ -745,14 +694,14 @@ function addWin() {
   const val = input.value.trim();
   if (!val) return;
   wins.unshift({ id: Date.now(), text: val, date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}) });
-  saveAndSync('my_wins', wins);
+  localStorage.setItem('my_wins', JSON.stringify(wins)); if(typeof syncToCloud==='function')syncToCloud('my_wins',wins);
   input.value = '';
   renderWins();
 }
 
 function deleteWin(id) {
   wins = wins.filter(w => w.id !== id);
-  saveAndSync('my_wins', wins);
+  localStorage.setItem('my_wins', JSON.stringify(wins)); if(typeof syncToCloud==='function')syncToCloud('my_wins',wins);
   renderWins();
 }
 
@@ -857,7 +806,7 @@ function addDimItem(key) {
     content: inp.value.trim(),
     date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
   });
-  saveAndSync('dimension_items', dimensionItems);
+  localStorage.setItem('dimension_items', JSON.stringify(dimensionItems)); if(typeof syncToCloud==='function')syncToCloud('dimension_items',dimensionItems);
   renderDimensionBoards();
 }
 
@@ -875,7 +824,7 @@ async function addDimImage(key, input) {
     const url = await uploadImageToCloud(file);
     const idx = dimensionItems[key].findIndex(i => i.id === tempId);
     if (idx !== -1) { dimensionItems[key][idx].content = url; dimensionItems[key][idx].uploading = false; }
-    saveAndSync('dimension_items', dimensionItems);
+    localStorage.setItem('dimension_items', JSON.stringify(dimensionItems)); if(typeof syncToCloud==='function')syncToCloud('dimension_items',dimensionItems);
     if (typeof syncToCloud === 'function') syncToCloud('dimension_items', dimensionItems);
     renderDimensionBoards();
   } catch(e) {
@@ -888,7 +837,7 @@ async function addDimImage(key, input) {
 
 function removeDimItem(key, id) {
   dimensionItems[key] = (dimensionItems[key]||[]).filter(i => i.id !== id);
-  saveAndSync('dimension_items', dimensionItems);
+  localStorage.setItem('dimension_items', JSON.stringify(dimensionItems)); if(typeof syncToCloud==='function')syncToCloud('dimension_items',dimensionItems);
   renderDimensionBoards();
 }
 
@@ -926,7 +875,7 @@ function addWhoiItem() {
     date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
   });
   inp.value = '';
-  saveAndSync('whoi_history', whoiItems);
+  localStorage.setItem('whoi_history', JSON.stringify(whoiItems)); if(typeof syncToCloud==='function')syncToCloud('whoi_history',whoiItems);
   renderWhoiGrid();
 }
 
@@ -942,7 +891,7 @@ async function addWhoiImage(input) {
     const url = await uploadImageToCloud(file);
     const idx = whoiItems.findIndex(i => i.id === tempId);
     if (idx !== -1) { whoiItems[idx].content = url; whoiItems[idx].uploading = false; }
-    saveAndSync('whoi_history', whoiItems);
+    localStorage.setItem('whoi_history', JSON.stringify(whoiItems)); if(typeof syncToCloud==='function')syncToCloud('whoi_history',whoiItems);
     if (typeof syncToCloud === 'function') syncToCloud('whoi_history', whoiItems);
     renderWhoiGrid();
   } catch(e) {
@@ -954,7 +903,7 @@ async function addWhoiImage(input) {
 
 function deleteWhoIEntry(id) {
   whoiItems = whoiItems.filter(e => e.id !== id);
-  saveAndSync('whoi_history', whoiItems);
+  localStorage.setItem('whoi_history', JSON.stringify(whoiItems)); if(typeof syncToCloud==='function')syncToCloud('whoi_history',whoiItems);
   renderWhoiGrid();
 }
 
@@ -1081,7 +1030,7 @@ function toggleScheduleDone(key) {
   if (typeof entry === 'string') return;
   entry.done = !entry.done;
   allPlannerData[dayKey].schedule[key] = entry;
-  saveAndSync('all_planner_data', allPlannerData);
+  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
   renderSchedule();
 }
 
@@ -1100,7 +1049,7 @@ function saveScheduleRow(key, val) {
     const span = document.getElementById(`st-${key}`);
     if (span) span.innerHTML = '';
   }
-  saveAndSync('all_planner_data', allPlannerData);
+  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
   renderSchedule();
 }
 
@@ -1116,7 +1065,7 @@ function saveMeal(meal) {
   document.getElementById(`meal-${meal}`).value = '';
   const span = document.getElementById(`meal-time-${meal}`);
   if (span) { span.textContent = 'Saved ✓'; setTimeout(() => span.textContent = '', 1500); }
-  saveAndSync('all_planner_data', allPlannerData);
+  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
   renderMeals();
 }
 
@@ -1124,7 +1073,7 @@ function removeMealEntry(meal, id) {
   const key = getDateKey();
   if (!allPlannerData[key]?.mealEntries?.[meal]) return;
   allPlannerData[key].mealEntries[meal] = allPlannerData[key].mealEntries[meal].filter(e => e.id !== id);
-  saveAndSync('all_planner_data', allPlannerData);
+  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
   renderMeals();
 }
 
@@ -1297,7 +1246,7 @@ function savePlannerDay() {
   d.todos = plannerTodos;
   d.goals = plannerGoals;
   d.savedAt = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  saveAndSync('all_planner_data', allPlannerData);
+  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
   const btn = document.querySelector('[onclick="savePlannerDay()"]');
   if (btn) { btn.textContent = 'Saved ✓'; setTimeout(()=>btn.textContent='Save day',1500); }
 }
@@ -1342,7 +1291,7 @@ function loadPlannerDay() {
 function resetSchedule() {
   if (!confirm('Clear everything for this day?')) return;
   delete allPlannerData[getDateKey()];
-  saveAndSync('all_planner_data', allPlannerData);
+  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
   loadPlannerDay();
 }
 
@@ -1386,14 +1335,14 @@ function saveVent() {
     date: new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}),
     text
   });
-  saveAndSync('vent_entries', ventEntries);
+  localStorage.setItem('vent_entries', JSON.stringify(ventEntries)); if(typeof syncToCloud==='function')syncToCloud('vent_entries',ventEntries);
   document.getElementById('vent-input').value = '';
   renderVentEntries();
 }
 
 function deleteVentEntry(id) {
   ventEntries = ventEntries.filter(e => e.id !== id);
-  saveAndSync('vent_entries', ventEntries);
+  localStorage.setItem('vent_entries', JSON.stringify(ventEntries)); if(typeof syncToCloud==='function')syncToCloud('vent_entries',ventEntries);
   renderVentEntries();
 }
 
@@ -1594,7 +1543,7 @@ function copyScheduleToDay() {
   if (source.todos) allPlannerData[target].todos = source.todos.map(t => ({...t, done: false}));
   if (source.bibleVerse) allPlannerData[target].bibleVerse = source.bibleVerse;
   if (source.bibleRef) allPlannerData[target].bibleRef = source.bibleRef;
-  saveAndSync('all_planner_data', allPlannerData);
+  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
   const msg = document.getElementById('copy-msg');
   msg.textContent = 'Copied! Navigate to that day to edit it 🤍';
   setTimeout(() => { msg.textContent = ''; document.getElementById('copy-schedule-box').style.display = 'none'; }, 2500);
