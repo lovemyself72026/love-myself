@@ -13,53 +13,49 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400&family=Nunito:wght@200;300;400&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script>
-  window.addEventListener('load', function() {
-    const firebaseConfig = {
-      apiKey: "AIzaSyAJC8hnTJxUM2p3ZjcK56arCRDLJBOOcpE",
-      authDomain: "lovemyselfapp.firebaseapp.com",
-      databaseURL: "https://lovemyselfapp-default-rtdb.firebaseio.com",
-      projectId: "lovemyselfapp",
-      storageBucket: "lovemyselfapp.firebasestorage.app",
-      messagingSenderId: "530689960308",
-      appId: "1:530689960308:web:a775dcd62c8e1624b46421"
-    };
+  const DB_URL = 'https://lovemyselfapp-default-rtdb.firebaseio.com/my-love-myself-data';
+  const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books'];
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const USER_ID = 'my-love-myself-data';
-    const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books'];
+  window.syncToCloud = async function(key, value) {
+    if (!SYNC_KEYS.includes(key)) return;
+    try {
+      await fetch(`${DB_URL}/${key}.json`, {
+        method: 'PUT',
+        mode: 'cors',
+        body: JSON.stringify(value),
+        headers: {'Content-Type': 'application/json'}
+      });
+    } catch(e) { console.warn('Sync failed:', e); }
+  };
 
-    window.syncToCloud = function(key, value) {
-      if (!SYNC_KEYS.includes(key)) return;
-      db.ref(USER_ID + '/' + key).set(value).catch(e => console.warn('Sync failed:', e));
-    };
-
-    // Flush any queued syncs
-    if (window._syncQueue) {
-      window._syncQueue.forEach(function(item) { window.syncToCloud(item[0], item[1]); });
-      window._syncQueue = null;
-    }
-
-    // Pull from Firebase — real-time sync
-    db.ref(USER_ID).on('value', function(snapshot) {
-      const data = snapshot.val();
-      if (!data) return;
+  window.pullFromCloud = async function(showMsg) {
+    try {
+      const res = await fetch(`${DB_URL}.json`, { mode: 'cors' });
+      const data = await res.json();
+      if (!data) { if(showMsg) alert('No data found in cloud yet.'); return; }
       let changed = false;
       SYNC_KEYS.forEach(function(k) {
         if (data[k] !== undefined) {
-          const current = localStorage.getItem(k);
           const incoming = JSON.stringify(data[k]);
+          const current = window._rawGetItem(k);
           if (current !== incoming) {
-            localStorage.setItem(k, incoming);
+            window._rawSetItem(k, incoming);
             changed = true;
           }
         }
       });
       if (changed && typeof reloadAllData === 'function') reloadAllData();
-    });
+      if (showMsg) alert('✅ Synced! Your data is up to date 🤍');
+    } catch(e) {
+      console.warn('Pull failed:', e);
+      if (showMsg) alert('❌ Could not connect. Check your internet connection.');
+    }
+  };
+
+  window.addEventListener('load', function() {
+    window.pullFromCloud(false);
+    setInterval(function(){ window.pullFromCloud(false); }, 15000);
   });
 </script>
 
@@ -170,7 +166,8 @@
   <div id="home-analytics"></div>
 
   <hr style="margin:2rem 0;">
-  <div style="display:flex;gap:0.5rem;justify-content:center;">
+  <div style="display:flex;gap:0.5rem;justify-content:center;align-items:center;">
+    <button onclick="pullFromCloud(true)" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;color:var(--gray);">↻ Sync</button>
     <button onclick="exportData()" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;color:var(--gray);">Export</button>
     <button onclick="document.getElementById('import-file').click()" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;color:var(--gray);">Import</button>
     <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(this)">
@@ -1512,13 +1509,14 @@ if (!localStorage.getItem('data_cleared_v1')) {
 }
 
 // Auto-sync analytics whenever relevant data is saved
-const _origSetItem = localStorage.setItem.bind(localStorage);
+window._rawSetItem = localStorage.setItem.bind(localStorage);
+window._rawGetItem = localStorage.getItem.bind(localStorage);
+const _origSetItem = window._rawSetItem;
 localStorage.setItem = function(key, value) {
   _origSetItem(key, value);
   if (typeof syncToCloud === 'function') {
     syncToCloud(key, JSON.parse(value));
   } else {
-    // Queue until Firebase is ready
     if (!window._syncQueue) window._syncQueue = [];
     window._syncQueue.push([key, JSON.parse(value)]);
   }
