@@ -14,6 +14,7 @@
 <link rel="apple-touch-icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400&family=Nunito:wght@200;300;400&display=swap" rel="stylesheet">
 <script>
+  window._rawLS = localStorage.setItem.bind(localStorage);
   const DB_URL = 'https://lovemyselfapp-default-rtdb.firebaseio.com/my-love-myself-data';
   const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books'];
 
@@ -40,7 +41,8 @@
           const incoming = JSON.stringify(data[k]);
           const current = localStorage.getItem(k);
           if (current !== incoming) {
-            localStorage.setItem(k, incoming);
+            // Use raw setItem to avoid triggering syncToCloud loop
+            window._rawLS(k, incoming);
             changed = true;
           }
         }
@@ -825,7 +827,6 @@ async function addDimImage(key, input) {
     const idx = dimensionItems[key].findIndex(i => i.id === tempId);
     if (idx !== -1) { dimensionItems[key][idx].content = url; dimensionItems[key][idx].uploading = false; }
     localStorage.setItem('dimension_items', JSON.stringify(dimensionItems)); if(typeof syncToCloud==='function')syncToCloud('dimension_items',dimensionItems);
-    if (typeof syncToCloud === 'function') syncToCloud('dimension_items', dimensionItems);
     renderDimensionBoards();
   } catch(e) {
     alert('❌ Upload failed: ' + e.message);
@@ -892,7 +893,6 @@ async function addWhoiImage(input) {
     const idx = whoiItems.findIndex(i => i.id === tempId);
     if (idx !== -1) { whoiItems[idx].content = url; whoiItems[idx].uploading = false; }
     localStorage.setItem('whoi_history', JSON.stringify(whoiItems)); if(typeof syncToCloud==='function')syncToCloud('whoi_history',whoiItems);
-    if (typeof syncToCloud === 'function') syncToCloud('whoi_history', whoiItems);
     renderWhoiGrid();
   } catch(e) {
     const idx = whoiItems.findIndex(i => i.id === tempId);
