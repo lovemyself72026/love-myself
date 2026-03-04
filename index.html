@@ -168,7 +168,7 @@
   @media (max-width: 600px) { #planner-grid { grid-template-columns: 1fr !important; } .vision-items-grid { grid-template-columns: 1fr !important; } }
   .vision-items-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:1rem; }
   /* ── Who I Am ── */
-  .wia-tabs { display:flex; gap:0; background:transparent; border:1px solid #c8c8c5; padding:0; margin-bottom:1.5rem; }
+  .wia-tabs { display:flex; gap:0; background:transparent; border:1px solid #c8c8c5; padding:0; margin-top:0.5rem; margin-bottom:1.5rem; }
   .wia-tab { flex:1; text-align:center; padding:7px 6px; border-radius:0; border:none; border-right:1px solid #c8c8c5; background:transparent; font-family:'Nunito',sans-serif; font-size:0.6rem; font-weight:300; color:var(--gray); cursor:pointer; transition:all 0.2s; text-transform:uppercase; letter-spacing:0.12em; }
   .wia-tab:last-child { border-right:none; }
   .wia-tab.active { background:var(--black); color:var(--white); }
@@ -2002,7 +2002,7 @@ document.head.appendChild(manifestLink);
   }
 
 function showMeTab(tab) {
-  ['balance','whiam'].forEach(function(t) {
+  ['balance','whiam','rightforme'].forEach(function(t) {
     document.getElementById('mesub-' + t).style.display = t === tab ? 'block' : 'none';
     document.getElementById('metab-' + t).classList.toggle('active', t === tab);
   });
@@ -2012,10 +2012,11 @@ function showMeTab(tab) {
     renderRelationshipQuestions();
   }
   if (tab === 'whiam') initWhiAm();
+  if (tab === 'rightforme') rfmRender();
 }
 
 function initMeSection() {
-  showMeTab('balance');
+  showMeTab('whiam');
 }
 
 function showBalanceTab(tab) { /* tabs removed, both panels always visible */ }
@@ -2380,19 +2381,18 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<div class="section" id="me">
-  <div class="subtitle">Check in with yourself</div>
-  <h1>Me.</h1>
+<div class="section" id="me" style="padding-top:1.5rem;">
 
   <!-- Journal-style sub-tabs -->
-  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-    <button class="journal-tab active" onclick="showMeTab('balance')" id="metab-balance">Balance</button>
-    <button class="journal-tab" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
+  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;">
+    <button class="journal-tab active" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
+    <button class="journal-tab" onclick="showMeTab('balance')" id="metab-balance">Balance</button>
+    <button class="journal-tab" onclick="showMeTab('rightforme')" id="metab-rightforme">Right For Me</button>
   </div>
 
   <!-- BALANCE sub-section -->
-  <div id="mesub-balance">
-    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0 0 1.5rem;line-height:1.6;">Answer honestly. It figures out the rest.</div>
+  <div id="mesub-balance" style="display:none;">
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">Answer honestly. It figures out the rest.</div>
 
     <!-- Date navigation -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
@@ -2446,8 +2446,8 @@ window.addEventListener('DOMContentLoaded', function() {
   </div>
 
   <!-- WHO I AM sub-section -->
-  <div id="mesub-whiam" style="display:none;">
-    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0 0 1.5rem;line-height:1.6;">You performed from every angle. Now you build from within.</div>
+  <div id="mesub-whiam">
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">You performed from every angle. Now you build from within.</div>
 
     <div class="wia-tabs">
       <button class="wia-tab active" onclick="wiaTab('identity')">Identity</button>
@@ -2532,6 +2532,156 @@ window.addEventListener('DOMContentLoaded', function() {
       </div>
     </div>
   </div>
+
+
+
+<style>
+  /* ── Right For Me ── */
+  .rfm-inner-tab { font-family:'Nunito',sans-serif; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; color:var(--gray); border:none; background:none; padding:0.5rem 1rem 0.6rem; border-bottom:2px solid transparent; transition:color 0.2s,border-color 0.2s; white-space:nowrap; flex:1; text-align:center; font-weight:300; }
+  .rfm-inner-tab.active, .rfm-inner-tab:hover { color:var(--black); border-bottom-color:var(--black); }
+  .rfm-value-row { display:flex; align-items:center; justify-content:space-between; padding:1.2rem 0; border-bottom:1px solid var(--light); gap:1rem; }
+  .rfm-value-name { font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; flex:1; min-width:0; }
+  .rfm-value-must { font-family:'Nunito',sans-serif; font-size:0.58rem; letter-spacing:0.08em; text-transform:uppercase; padding:0.25rem 0.6rem; border:1px solid #c8c8c5; background:none; cursor:pointer; color:var(--gray); transition:all 0.2s; white-space:nowrap; flex-shrink:0; font-weight:300; }
+  .rfm-value-must.on { background:var(--black); color:var(--white); border-color:var(--black); }
+  .rfm-value-del { background:none; border:none; color:#ccc; font-size:1.2rem; cursor:pointer; padding:0 0.2rem; line-height:1; flex-shrink:0; }
+  .rfm-value-del:hover { color:#999; }
+  .rfm-person-card { border:1px solid #e8e8e5; padding:1.3rem 1.4rem; margin-bottom:0.8rem; cursor:pointer; transition:background 0.2s; }
+  .rfm-person-card:hover { background:var(--light); }
+  .rfm-person-name { font-family:'Lora',serif; font-size:1rem; font-weight:300; margin-bottom:0.3rem; }
+  .rfm-person-score { font-family:'Nunito',sans-serif; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray); font-weight:300; }
+  .rfm-score-bar { height:3px; background:var(--light); margin-top:0.9rem; margin-bottom:0.3rem; }
+  .rfm-score-fill { height:3px; background:var(--black); transition:width 0.4s; }
+  .rfm-verdict { font-family:'Lora',serif; font-style:italic; font-size:0.88rem; line-height:1.6; color:var(--black); margin-top:1.8rem; padding:1.2rem 1.2rem; border-left:1px solid #c8c8c5; }
+  .rfm-rate-row { display:flex; align-items:center; justify-content:space-between; padding:1.2rem 0; border-bottom:1px solid var(--light); gap:1rem; }
+  .rfm-rate-label { font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; flex:1; line-height:1.4; min-width:0; }
+  .rfm-must-badge { font-family:'Nunito',sans-serif; font-size:0.5rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--white); background:var(--black); padding:0.1rem 0.35rem; margin-left:0.4rem; vertical-align:middle; font-weight:300; }
+  .rfm-stars { display:flex; gap:0.35rem; flex-shrink:0; }
+  .rfm-star { font-size:1.1rem; cursor:pointer; color:#ddd; transition:color 0.15s; line-height:1; }
+  .rfm-star.on { color:var(--black); }
+  .rfm-back { background:none; border:none; font-family:'Nunito',sans-serif; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gray); cursor:pointer; padding:0; margin-bottom:1.5rem; display:block; font-weight:300; }
+  .rfm-back:hover { color:var(--black); }
+  .rfm-compare-row { display:flex; align-items:center; gap:1rem; padding:1.1rem 0; border-bottom:1px solid var(--light); }
+  .rfm-compare-name { font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; flex:1; min-width:0; }
+  .rfm-compare-bar-wrap { width:80px; height:3px; background:var(--light); flex-shrink:0; }
+  .rfm-compare-bar-fill { height:3px; background:var(--black); }
+  .rfm-compare-pct { font-family:'Nunito',sans-serif; font-size:0.72rem; color:var(--gray); width:36px; text-align:right; flex-shrink:0; }
+  .op-coin-row { margin-bottom:1.2rem; }
+  .op-coin-label { font-family:'Nunito',sans-serif; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--black); margin-bottom:0.2rem; font-weight:400; }
+  .op-coin-desc { font-family:'Nunito',sans-serif; font-size:0.72rem; font-weight:300; color:var(--gray); margin-bottom:0.5rem; line-height:1.4; }
+  .op-coin-btns { display:flex; gap:0.4rem; flex-wrap:wrap; }
+  .op-btn { font-family:'Nunito',sans-serif; font-size:0.72rem; font-weight:300; letter-spacing:0.06em; border:1px solid #c8c8c5; background:none; color:var(--black); padding:0.4rem 0.9rem; cursor:pointer; transition:all 0.2s; }
+  .op-btn.selected { background:var(--black); color:var(--white); border-color:var(--black); }
+</style>
+
+<!-- RIGHT FOR ME sub-section -->
+<div id="mesub-rightforme" style="display:none;">
+  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">Clarity before connection. Know what you need, then see who shows up.</div>
+
+  <!-- Inner tabs -->
+  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;" id="rfm-tab-bar">
+    <button class="rfm-inner-tab active" onclick="rfmInnerTab('values')" id="rfmtab-values">My Values</button>
+    <button class="rfm-inner-tab" onclick="rfmInnerTab('people')" id="rfmtab-people">People</button>
+    <button class="rfm-inner-tab" onclick="rfmInnerTab('compare')" id="rfmtab-compare">Compare</button>
+  </div>
+
+  <!-- VALUES panel -->
+  <div id="rfm-panel-values">
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:1rem;">What matters most to you in a person</div>
+    <div id="rfm-values-list"></div>
+    <div style="display:flex;gap:0.8rem;margin-top:1.2rem;align-items:center;">
+      <input id="rfm-new-val" type="text" placeholder="Add your own value…" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;" onkeydown="if(event.key==='Enter')rfmAddValue()">
+      <button class="btn" onclick="rfmAddValue()" style="padding:0.5rem 1.2rem;">Add</button>
+    </div>
+    <div style="margin-top:2rem;border-top:1px solid var(--light);padding-top:1.2rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:1rem;">Qualities by OP type tap to add</div>
+      <div id="rfm-suggestions" style="display:flex;flex-direction:column;gap:0;"></div>
+    </div>
+
+    <!-- Personality Types -->
+    <div style="margin-top:2rem;border-top:1px solid var(--light);padding-top:1.2rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.3rem;">Objective Personality Type</div>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--gray);margin-bottom:1.4rem;line-height:1.5;">Select the coins to identify a type, then add their qualities as values.</div>
+
+      <!-- Coin 1: Observer or Decider -->
+      <div class="op-coin-row">
+        <div class="op-coin-label">Are they Observer or Decider?</div>
+        <div class="op-coin-desc">Do they gather info first (Observer) or act/decide first (Decider)?</div>
+        <div class="op-coin-btns">
+          <button class="op-btn" onclick="opSelect('od','O',this)">Observer</button>
+          <button class="op-btn" onclick="opSelect('od','D',this)">Decider</button>
+        </div>
+      </div>
+
+      <!-- Coin 2: Sensing or iNtuition -->
+      <div class="op-coin-row">
+        <div class="op-coin-label">Sensory or iNtuitive?</div>
+        <div class="op-coin-desc">Do they focus on concrete reality (S) or patterns and possibilities (N)?</div>
+        <div class="op-coin-btns">
+          <button class="op-btn" onclick="opSelect('sn','S',this)">Sensory</button>
+          <button class="op-btn" onclick="opSelect('sn','N',this)">iNtuitive</button>
+        </div>
+      </div>
+
+      <!-- Coin 3: Feeling or Thinking -->
+      <div class="op-coin-row">
+        <div class="op-coin-label">Feeling or Thinking?</div>
+        <div class="op-coin-desc">Do they decide based on people/values (F) or logic/systems (T)?</div>
+        <div class="op-coin-btns">
+          <button class="op-btn" onclick="opSelect('ft','F',this)">Feeling</button>
+          <button class="op-btn" onclick="opSelect('ft','T',this)">Thinking</button>
+        </div>
+      </div>
+
+      <!-- Coin 4: Primary Animal -->
+      <div class="op-coin-row">
+        <div class="op-coin-label">Primary Animal</div>
+        <div class="op-coin-desc">Their most dominant energy. What do you notice first about them?</div>
+        <div class="op-coin-btns">
+          <button class="op-btn" onclick="opSelect('a1','P',this)" title="Extroverted — working, doing, expending energy">Play</button>
+          <button class="op-btn" onclick="opSelect('a1','B',this)" title="Teaching, sharing, starting things">Blast</button>
+          <button class="op-btn" onclick="opSelect('a1','C',this)" title="Learning, taking in, researching">Consume</button>
+          <button class="op-btn" onclick="opSelect('a1','S',this)" title="Introverted — processing, preserving, introspecting">Sleep</button>
+        </div>
+      </div>
+
+      <!-- Coin 5: Secondary Animal -->
+      <div class="op-coin-row" id="op-a2-row" style="opacity:0.4;">
+        <div class="op-coin-label">Secondary Animal</div>
+        <div class="op-coin-desc">Their second strongest animal. Note: opposites cannot be paired (Play↔Sleep, Blast↔Consume).</div>
+        <div class="op-coin-btns" id="op-a2-btns"></div>
+      </div>
+
+      <!-- Result -->
+      <div id="rfm-type-result" style="display:none;border:1px solid #c8c8c5;padding:1rem 1.2rem;margin-top:1.2rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Type</div>
+        <div id="rfm-type-code" style="font-family:'Lora',serif;font-size:1.1rem;margin-bottom:0.3rem;"></div>
+        <div id="rfm-type-desc" style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.5;margin-bottom:1rem;"></div>
+        <div id="rfm-type-qualities" style="margin-bottom:0.8rem;"></div>
+        <button onclick="rfmAddPersonalityType()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add type as value</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PEOPLE panel -->
+  <div id="rfm-panel-people" style="display:none;">
+    <div id="rfm-people-list"></div>
+    <div style="display:flex;gap:0.8rem;margin-top:1rem;align-items:center;">
+      <input id="rfm-new-person" type="text" placeholder="Add a person (name or nickname)…" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;" onkeydown="if(event.key==='Enter')rfmAddPerson()">
+      <button class="btn" onclick="rfmAddPerson()" style="padding:0.5rem 1.2rem;">Add</button>
+    </div>
+  </div>
+
+  <!-- COMPARE panel -->
+  <div id="rfm-panel-compare" style="display:none;">
+    <div id="rfm-compare-content"></div>
+  </div>
+
+  <!-- PERSON DETAIL view (overlays panels) -->
+  <div id="rfm-person-detail" style="display:none;">
+    <button class="rfm-back" onclick="rfmCloseDetail()">← Back</button>
+    <div id="rfm-detail-content"></div>
+  </div>
+</div>
 
 </div>
 
@@ -2775,6 +2925,542 @@ function wiaGoW(dir) {
   localStorage.setItem('wia2wq', wiaWqi); wiaRenderWQ();
 }
 function wiaJumpW(i) { wiaWqi = i; localStorage.setItem('wia2wq', wiaWqi); wiaRenderWQ(); }
+</script>
+
+
+<script>
+// ── RIGHT FOR ME ──────────────────────────────────────────────
+var RFM_KEY = 'rfm_data';
+var rfmData = { values: [], people: [] };
+
+var rfmSuggestions = [
+  {
+    group: 'Observer', desc: 'Takes in the world before acting',
+    items: [
+      { name: 'Notices things others miss', must: false },
+      { name: 'Reads the room well', must: false },
+      { name: 'Takes in info before reacting', must: false },
+      { name: 'Quietly attentive to your needs', must: false }
+    ]
+  },
+  {
+    group: 'Decider', desc: 'Acts on the world before observing',
+    items: [
+      { name: 'Takes initiative and acts', must: false },
+      { name: 'Makes decisions with confidence', must: false },
+      { name: 'Moves things forward', must: false },
+      { name: 'Fixes problems instead of sitting with them', must: false }
+    ]
+  },
+  {
+    group: 'Sensory', desc: 'Grounded in concrete, present reality',
+    items: [
+      { name: 'Present and grounded', must: false },
+      { name: 'Reliable and consistent', must: false },
+      { name: 'Shows up in practical, tangible ways', must: false },
+      { name: 'Values what is real over theoretical', must: false }
+    ]
+  },
+  {
+    group: 'iNtuitive', desc: 'Focused on patterns and possibilities',
+    items: [
+      { name: 'Sees patterns and future possibilities', must: false },
+      { name: 'Thinks in big pictures and meaning', must: false },
+      { name: 'Connects dots across ideas', must: false },
+      { name: 'Drawn to depth and abstract thinking', must: false }
+    ]
+  },
+  {
+    group: 'Feeling', desc: 'Decides with people and harmony in mind',
+    items: [
+      { name: 'Leads with empathy and compassion', must: false },
+      { name: 'Prioritises harmony in relationships', must: false },
+      { name: 'Attuned to your emotional state', must: false },
+      { name: 'Makes decisions with the heart', must: false }
+    ]
+  },
+  {
+    group: 'Thinking', desc: 'Decides with logic and consistency',
+    items: [
+      { name: 'Logically consistent and fair', must: false },
+      { name: 'Gives honest feedback without softening', must: false },
+      { name: 'Treats everyone by the same standard', must: false },
+      { name: 'Thinks through problems systematically', must: false }
+    ]
+  },
+  {
+    group: 'Blast', desc: 'Extroverted iNtuition — ideas and energy outward',
+    items: [
+      { name: 'Energising and idea-generating', must: false },
+      { name: 'Brings excitement and possibility to life', must: false },
+      { name: 'Expressive and spontaneously creative', must: false },
+      { name: 'Makes you feel alive in conversation', must: false }
+    ]
+  },
+  {
+    group: 'Play', desc: 'Extroverted Sensing — action and presence outward',
+    items: [
+      { name: 'Spontaneous and lives in the moment', must: false },
+      { name: 'Fun and action-oriented', must: false },
+      { name: 'Adventurous and hands-on', must: false },
+      { name: 'Brings lightness and play to the relationship', must: false }
+    ]
+  },
+  {
+    group: 'Sleep', desc: 'Introverted Feeling — deep inner emotional world',
+    items: [
+      { name: 'Deeply emotionally aware', must: false },
+      { name: 'Has a strong inner moral compass', must: false },
+      { name: 'Values authenticity over performance', must: false },
+      { name: 'Needs space and gives space', must: false }
+    ]
+  },
+  {
+    group: 'Consume', desc: 'Introverted Thinking — deep inner knowledge world',
+    items: [
+      { name: 'Curious and always learning', must: false },
+      { name: 'Builds knowledge deeply before sharing', must: false },
+      { name: 'Independent thinker who forms own views', must: false },
+      { name: 'Quiet but precise in what they say', must: false }
+    ]
+  }
+];
+
+function rfmLoad() {
+  try { var d = localStorage.getItem(RFM_KEY); if (d) rfmData = JSON.parse(d); } catch(e) {}
+  if (!rfmData.values) rfmData.values = [];
+  if (!rfmData.people) rfmData.people = [];
+}
+
+function rfmSave() {
+  localStorage.setItem(RFM_KEY, JSON.stringify(rfmData));
+  if (window.syncToCloud) window.syncToCloud(RFM_KEY, rfmData);
+}
+
+function rfmRender() {
+  rfmLoad();
+  rfmRenderValues();
+  rfmRenderSuggestions();
+  rfmRenderPeople();
+  rfmRenderCompare();
+  rfmInitTypeSelectors();
+}
+
+// ── VALUES ──
+function rfmRenderValues() {
+  var list = document.getElementById('rfm-values-list');
+  if (!list) return;
+  if (!rfmData.values.length) {
+    list.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.9rem;color:var(--gray);padding:1rem 0;">No values added yet. Use suggestions below or add your own.</div>';
+    return;
+  }
+  list.innerHTML = rfmData.values.map(function(v, i) {
+    return '<div class="rfm-value-row">' +
+      '<div class="rfm-value-name">' + v.name + '</div>' +
+      '<button class="rfm-value-must' + (v.must ? ' on' : '') + '" onclick="rfmTogMust(' + i + ')">' + (v.must ? 'Must Have' : 'Nice to Have') + '</button>' +
+      '<button class="rfm-value-del" onclick="rfmDelValue(' + i + ')">×</button>' +
+    '</div>';
+  }).join('');
+}
+
+function rfmRenderSuggestions() {
+  var el = document.getElementById('rfm-suggestions');
+  if (!el) return;
+  var added = rfmData.values.map(function(v){ return v.name.toLowerCase(); });
+  var html = '';
+  rfmSuggestions.forEach(function(group) {
+    var remaining = group.items.filter(function(s){ return added.indexOf(s.name.toLowerCase()) === -1; });
+    var groupId = 'rfmg-' + group.group.replace(/\s/g,'');
+    html += '<div style="margin-bottom:1rem;">' +
+      '<div onclick="rfmToggleGroup(\'' + groupId + '\')" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:0.5rem 0;border-bottom:1px solid var(--light);">' +
+        '<div>' +
+          '<span style="font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:400;letter-spacing:0.08em;text-transform:uppercase;color:var(--black);">' + group.group + '</span>' +
+          '<span style="font-family:\'Lora\',serif;font-style:italic;font-size:0.75rem;color:var(--gray);margin-left:0.5rem;">' + group.desc + '</span>' +
+        '</div>' +
+        '<span id="' + groupId + '-arrow" style="font-size:0.7rem;color:var(--gray);">▸</span>' +
+      '</div>' +
+      '<div id="' + groupId + '" style="display:none;padding-top:0.6rem;">';
+    if (!remaining.length) {
+      html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.72rem;color:var(--gray);font-style:italic;padding:0.3rem 0;">All added ✓</div>';
+    } else {
+      html += '<div style="display:flex;flex-direction:column;gap:0.35rem;">' +
+        remaining.map(function(s) {
+          return '<button onclick="rfmAddSuggestion(\'' + s.name.replace(/'/g, "\\'") + '\',' + s.must + ')" ' +
+            'style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;border:1px solid #c8c8c5;background:none;color:var(--black);padding:0.45rem 0.8rem;cursor:pointer;text-align:left;transition:background 0.15s;" ' +
+            'onmouseover="this.style.background=\'var(--light)\'" onmouseout="this.style.background=\'none\'">' +
+            s.name +
+          '</button>';
+        }).join('') +
+      '</div>';
+    }
+    html += '</div></div>';
+  });
+  el.innerHTML = html;
+}
+
+function rfmToggleGroup(id) {
+  var el = document.getElementById(id);
+  var arrow = document.getElementById(id + '-arrow');
+  if (!el) return;
+  var open = el.style.display === 'none';
+  el.style.display = open ? 'block' : 'none';
+  if (arrow) arrow.textContent = open ? '▾' : '▸';
+}
+
+function rfmAddSuggestion(name, must) {
+  rfmData.values.push({ name: name, must: must });
+  rfmSave(); rfmRenderValues(); rfmRenderSuggestions();
+}
+
+function rfmAddValue() {
+  var inp = document.getElementById('rfm-new-val');
+  var name = inp.value.trim();
+  if (!name) return;
+  rfmData.values.push({ name: name, must: false });
+  inp.value = '';
+  rfmSave(); rfmRenderValues(); rfmRenderSuggestions();
+}
+
+function rfmTogMust(i) {
+  rfmData.values[i].must = !rfmData.values[i].must;
+  rfmSave(); rfmRenderValues();
+}
+
+function rfmDelValue(i) {
+  rfmData.values.splice(i, 1);
+  rfmSave(); rfmRenderValues(); rfmRenderSuggestions();
+}
+
+// ── PEOPLE ──
+function rfmRenderPeople() {
+  var list = document.getElementById('rfm-people-list');
+  if (!list) return;
+  if (!rfmData.people.length) {
+    list.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.9rem;color:var(--gray);padding:1rem 0 1.5rem;">No one added yet. Add a name to start rating them.</div>';
+    return;
+  }
+  if (!rfmData.values.length) {
+    list.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.9rem;color:var(--gray);padding:1rem 0 1.5rem;">Add your values first, then come back to rate people.</div>';
+    return;
+  }
+  list.innerHTML = rfmData.people.map(function(p, i) {
+    var result = rfmScore(p);
+    return '<div class="rfm-person-card" style="position:relative;">' +
+      '<div onclick="rfmOpenDetail(' + i + ')" style="cursor:pointer;">' +
+        '<div class="rfm-person-name">' + p.name + '</div>' +
+        '<div class="rfm-score-bar"><div class="rfm-score-fill" style="width:' + result.pct + '%;"></div></div>' +
+        '<div style="display:flex;justify-content:space-between;margin-top:0.5rem;align-items:center;">' +
+          '<div class="rfm-person-score">' + result.label + '</div>' +
+          '<div style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;color:var(--gray);">' + result.pct + '% match · tap to rate</div>' +
+        '</div>' +
+      '</div>' +
+      '<button onclick="event.stopPropagation();rfmDeletePerson(' + i + ')" style="position:absolute;top:0.6rem;right:0.6rem;background:none;border:none;color:#ccc;font-size:1.1rem;cursor:pointer;line-height:1;padding:0 0.2rem;" title="Remove">×</button>' +
+    '</div>';
+  }).join('');
+}
+
+function rfmAddPerson() {
+  var inp = document.getElementById('rfm-new-person');
+  var name = inp.value.trim();
+  if (!name) return;
+  rfmData.people.push({ name: name, ratings: {} });
+  inp.value = '';
+  rfmSave(); rfmRenderPeople();
+}
+
+function rfmScore(person) {
+  var vals = rfmData.values;
+  if (!vals.length) return { pct: 0, label: 'No values set', mustFail: false };
+  var total = 0, score = 0, mustFail = false;
+  vals.forEach(function(v, i) {
+    var r = person.ratings[i] || 0;
+    var weight = v.must ? 2 : 1;
+    total += 5 * weight;
+    score += r * weight;
+    if (v.must && r <= 1 && r > 0) mustFail = true;
+    if (v.must && r === 0) {} // unrated = neutral
+  });
+  var rated = vals.filter(function(v, i){ return (person.ratings[i] || 0) > 0; }).length;
+  if (rated === 0) return { pct: 0, label: 'Not rated yet', mustFail: false };
+  var pct = Math.round((score / total) * 100);
+  var label = mustFail ? 'Missing a must-have' :
+    pct >= 85 ? 'Strongly aligned' :
+    pct >= 70 ? 'Good match' :
+    pct >= 55 ? 'Some alignment' :
+    pct >= 40 ? 'Needs reflection' : 'Not a match';
+  return { pct: pct, label: label, mustFail: mustFail };
+}
+
+function rfmOpenDetail(i) {
+  var person = rfmData.people[i];
+  var result = rfmScore(person);
+  var html = '<div style="font-family:\'Lora\',serif;font-size:1.4rem;margin-bottom:0.3rem;">' + person.name + '</div>';
+  html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;">' + result.pct + '% match</div>';
+  html += '<div class="rfm-score-bar" style="margin-bottom:1.5rem;"><div class="rfm-score-fill" style="width:' + result.pct + '%;"></div></div>';
+
+  if (!rfmData.values.length) {
+    html += '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.9rem;color:var(--gray);">Go to My Values tab first and add what matters to you.</div>';
+  } else {
+    html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Rate how much this person shows each value (1 = rarely · 5 = always)</div>';
+    html += rfmData.values.map(function(v, j) {
+      var r = person.ratings[j] || 0;
+      var stars = '';
+      for (var s = 1; s <= 5; s++) {
+        stars += '<span class="rfm-star' + (s <= r ? ' on' : '') + '" onclick="rfmRate(' + i + ',' + j + ',' + s + ')" data-pi="' + i + '" data-vi="' + j + '" data-s="' + s + '">★</span>';
+      }
+      return '<div class="rfm-rate-row">' +
+        '<div class="rfm-rate-label">' + v.name + (v.must ? '<span class="rfm-must-badge">must</span>' : '') + '</div>' +
+        '<div class="rfm-stars" id="rfm-stars-' + i + '-' + j + '">' + stars + '</div>' +
+      '</div>';
+    }).join('');
+
+    // Verdict
+    var verdict = '';
+    if (result.pct === 0) {
+      verdict = 'Start rating to get your clarity reading.';
+    } else if (result.mustFail) {
+      verdict = person.name + ' is missing something non-negotiable for you. That matters. Your must-haves exist for a reason — they protect your peace.';
+    } else if (result.pct >= 85) {
+      verdict = person.name + ' strongly aligns with what you need. That doesn\'t mean perfect — it means they show up in the ways that matter most to you.';
+    } else if (result.pct >= 70) {
+      verdict = 'There\'s real compatibility here. Notice which gaps feel workable and which feel like you\'d be shrinking yourself to accommodate.';
+    } else if (result.pct >= 55) {
+      verdict = 'Some alignment, some distance. Ask yourself: are you hoping they\'ll change, or accepting who they actually are right now?';
+    } else if (result.pct >= 40) {
+      verdict = 'This connection needs honest reflection. The pull you feel may be real — but is it who they are, or who you want them to be?';
+    } else {
+      verdict = 'The numbers are reflecting something your heart may already know. You deserve someone who meets you where you are.';
+    }
+    html += '<div class="rfm-verdict">' + verdict + '</div>';
+
+    html += '<div style="margin-top:1.5rem;border-top:1px solid var(--light);padding-top:1.2rem;">' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Add a value to compare</div>' +
+      '<div style="display:flex;gap:0.6rem;align-items:center;">' +
+        '<input id="rfm-inline-val" type="text" placeholder="e.g. patience, presence…" onkeydown="if(event.key===\'Enter\')rfmAddInlineValue(' + i + ')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">' +
+        '<button onclick="rfmAddInlineValue(' + i + ')" style="background:var(--black);border:none;color:var(--white);font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 0.8rem;cursor:pointer;white-space:nowrap;">Add</button>' +
+      '</div>' +
+    '</div>';
+
+    html += '<div style="display:flex;justify-content:flex-end;margin-top:1.5rem;">' +
+      '<button class="btn" style="color:#c00;border-color:#ddd;font-size:0.68rem;" onclick="rfmDeletePerson(' + i + ')">Remove ' + person.name + '</button>' +
+    '</div>';
+  }
+
+  document.getElementById('rfm-detail-content').innerHTML = html;
+  document.getElementById('rfm-panel-values').style.display = 'none';
+  document.getElementById('rfm-panel-people').style.display = 'none';
+  document.getElementById('rfm-panel-compare').style.display = 'none';
+  document.getElementById('rfm-tab-bar').style.display = 'none';
+  document.getElementById('rfm-person-detail').style.display = 'block';
+}
+
+function rfmAddInlineValue(personIdx) {
+  var inp = document.getElementById('rfm-inline-val');
+  if (!inp) return;
+  var name = inp.value.trim();
+  if (!name) return;
+  rfmData.values.push({ name: name, must: false });
+  rfmSave();
+  rfmOpenDetail(personIdx);
+}
+
+function rfmRate(personIdx, valueIdx, stars) {
+  rfmData.people[personIdx].ratings[valueIdx] = stars;
+  rfmSave();
+  // Update stars UI only
+  var container = document.getElementById('rfm-stars-' + personIdx + '-' + valueIdx);
+  if (container) {
+    container.querySelectorAll('.rfm-star').forEach(function(star, idx) {
+      star.classList.toggle('on', idx < stars);
+    });
+  }
+  // Update verdict + score bar
+  rfmOpenDetail(personIdx);
+}
+
+function rfmDeletePerson(i) {
+  rfmData.people.splice(i, 1);
+  rfmSave();
+  var detail = document.getElementById('rfm-person-detail');
+  if (detail && detail.style.display !== 'none') rfmCloseDetail();
+  rfmRenderPeople();
+}
+
+function rfmCloseDetail() {
+  document.getElementById('rfm-person-detail').style.display = 'none';
+  document.getElementById('rfm-tab-bar').style.display = 'flex';
+  rfmInnerTab(rfmCurrentInner || 'people');
+}
+
+var rfmCurrentInner = 'values';
+function rfmInnerTab(tab) {
+  rfmCurrentInner = tab;
+  ['values','people','compare'].forEach(function(t) {
+    document.getElementById('rfm-panel-' + t).style.display = t === tab ? 'block' : 'none';
+    document.getElementById('rfmtab-' + t).classList.toggle('active', t === tab);
+  });
+  document.getElementById('rfm-person-detail').style.display = 'none';
+  document.getElementById('rfm-tab-bar').style.display = 'flex';
+  if (tab === 'compare') rfmRenderCompare();
+}
+
+// ── PERSONALITY TYPES (MBTI) ──
+// ── OBJECTIVE PERSONALITY TYPE SYSTEM ──
+var opCoins = { od: null, sn: null, ft: null, a1: null, a2: null };
+var opAnimalOpposites = { P:'S', S:'P', B:'C', C:'B' };
+
+var opAnimalDesc = {
+  P: 'Play — extroverted decider + extroverted observer. Expending energy, doing, working, showing up for the tribe.',
+  B: 'Blast — extroverted decider + introverted observer. Teaching, sharing, starting, spreading ideas outward.',
+  C: 'Consume — introverted decider + extroverted observer. Learning, researching, taking in, filling themselves.',
+  S: 'Sleep — introverted decider + introverted observer. Preserving energy, processing, introspecting, going inward.'
+};
+
+var opQualities = {
+  O:  ['Observant — takes in before acting', 'Reads the room deeply', 'Gathers info before reacting', 'Quietly attentive and perceptive'],
+  D:  ['Decisive and action-first', 'Moves things forward confidently', 'Takes initiative without waiting', 'Acts on the world before absorbing it'],
+  S:  ['Grounded in concrete, present reality', 'Reliable and consistent', 'Shows up in practical tangible ways', 'Values what is real over theoretical'],
+  N:  ['Sees patterns and future possibilities', 'Thinks in big pictures and meaning', 'Connects dots across ideas', 'Drawn to depth and abstract thinking'],
+  F:  ['Leads with empathy and compassion', 'Prioritises harmony and people', 'Attuned to your emotional state', 'Makes decisions with the heart'],
+  T:  ['Logically consistent and fair', 'Gives honest feedback without softening', 'Treats everyone by the same standard', 'Thinks through problems systematically'],
+  P:  ['Spontaneous and present-focused', 'Fun and action-oriented', 'Adventurous and hands-on', 'Expends energy freely for the tribe'],
+  B:  ['Energising and idea-spreading', 'Teaches and shares naturally', 'Brings excitement and momentum', 'Makes you feel alive in conversation'],
+  C:  ['Curious and always learning', 'Researches deeply before acting', 'Independent thinker who forms own views', 'Quiet but precise in what they say'],
+  Si: ['Deeply emotionally aware', 'Has a strong inner moral compass', 'Needs space and gives space', 'Values authenticity over performance']
+};
+
+function opSelect(coin, val, btn) {
+  // Deselect siblings
+  btn.parentElement.querySelectorAll('.op-btn').forEach(function(b){ b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  opCoins[coin] = val;
+
+  // If primary animal selected, rebuild secondary options
+  if (coin === 'a1') {
+    opCoins.a2 = null;
+    var a2Row = document.getElementById('op-a2-row');
+    var a2Btns = document.getElementById('op-a2-btns');
+    var opposite = opAnimalOpposites[val];
+    var allowed = ['P','B','C','S'].filter(function(a){ return a !== val && a !== opposite; });
+    a2Btns.innerHTML = allowed.map(function(a) {
+      var labels = { P:'Play', B:'Blast', C:'Consume', S:'Sleep' };
+      return '<button class="op-btn" onclick="opSelect(\'a2\',\'' + a + '\',this)">' + labels[a] + '</button>';
+    }).join('');
+    a2Row.style.opacity = '1';
+  }
+  opUpdateResult();
+}
+
+function opUpdateResult() {
+  var c = opCoins;
+  var resultEl = document.getElementById('rfm-type-result');
+  if (!c.od || !c.sn || !c.ft || !c.a1 || !c.a2) { resultEl.style.display = 'none'; return; }
+
+  var animalLabels = { P:'Play', B:'Blast', C:'Consume', S:'Sleep' };
+  var typeCode = c.od + c.sn + '/' + c.ft + '/' + c.a1 + c.a2;
+
+  // Build description
+  var odDesc = c.od === 'O'
+    ? 'Observer — gathers information before deciding or acting.'
+    : 'Decider — acts and decides before fully observing.';
+  var snDesc = c.sn === 'S'
+    ? 'Sensory — anchored in concrete, present, tangible reality.'
+    : 'iNtuitive — drawn to patterns, meaning, and future possibilities.';
+  var ftDesc = c.ft === 'F'
+    ? 'Feeling — decides based on people, values, and harmony.'
+    : 'Thinking — decides based on logic, fairness, and systems.';
+  var animalDesc = animalLabels[c.a1] + ' / ' + animalLabels[c.a2] + '. ' + opAnimalDesc[c.a1];
+
+  document.getElementById('rfm-type-code').textContent = typeCode;
+  document.getElementById('rfm-type-desc').textContent = odDesc + ' ' + snDesc + ' ' + ftDesc + ' Animal stack: ' + animalDesc;
+
+  // Qualities from all coins
+  var sleepKey = c.a1 === 'S' || c.a2 === 'S' ? 'Si' : null;
+  var allQualities = []
+    .concat(opQualities[c.od] || [])
+    .concat(opQualities[c.ft] || [])
+    .concat(opQualities[c.a1] || [])
+    .concat(sleepKey ? opQualities[sleepKey] : []);
+  // Dedupe
+  var seen = {};
+  allQualities = allQualities.filter(function(q){ if(seen[q]) return false; seen[q]=true; return true; });
+
+  var ql = document.getElementById('rfm-type-qualities');
+  ql.innerHTML = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Qualities tap to add</div>' +
+    '<div style="display:flex;flex-direction:column;gap:0.3rem;">' +
+    allQualities.map(function(q) {
+      return '<button onclick="rfmAddQuality(\'' + q.replace(/'/g, "\\'") + '\')" ' +
+        'style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;border:1px solid #c8c8c5;background:none;color:var(--black);padding:0.4rem 0.8rem;cursor:pointer;text-align:left;transition:background 0.15s;" ' +
+        'onmouseover="this.style.background=\'var(--light)\'" onmouseout="this.style.background=\'none\'">' +
+        q + '</button>';
+    }).join('') + '</div>';
+
+  resultEl.style.display = 'block';
+}
+
+function rfmAddQuality(name) {
+  if (rfmData.values.find(function(v){ return v.name.toLowerCase() === name.toLowerCase(); })) return;
+  rfmData.values.push({ name: name, must: false });
+  rfmSave(); rfmRenderValues(); rfmRenderSuggestions();
+}
+
+function rfmAddPersonalityType() {
+  var code = document.getElementById('rfm-type-code').textContent;
+  if (!code) return;
+  rfmData.values.push({ name: code, must: false });
+  rfmSave(); rfmRenderValues(); rfmRenderSuggestions();
+}
+
+function rfmInitTypeSelectors() {
+  // Reset coins
+  opCoins = { od: null, sn: null, ft: null, a1: null, a2: null };
+  document.querySelectorAll('.op-btn').forEach(function(b){ b.classList.remove('selected'); });
+  var a2Row = document.getElementById('op-a2-row');
+  if (a2Row) a2Row.style.opacity = '0.4';
+  var resultEl = document.getElementById('rfm-type-result');
+  if (resultEl) resultEl.style.display = 'none';
+}
+
+
+
+function rfmRenderCompare() {
+  var el = document.getElementById('rfm-compare-content');
+  if (!el) return;
+  if (!rfmData.people.length) {
+    el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.9rem;color:var(--gray);padding:1rem 0;">Add people in the People tab to compare them here.</div>';
+    return;
+  }
+  var scored = rfmData.people.map(function(p, i) {
+    var r = rfmScore(p);
+    return { name: p.name, pct: r.pct, label: r.label, mustFail: r.mustFail, idx: i };
+  }).sort(function(a, b){ return b.pct - a.pct; });
+
+  var html = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:1rem;">Ranked by compatibility with your values</div>';
+  html += scored.map(function(p, rank) {
+    var badge = p.mustFail ? '⚠' : rank === 0 && p.pct > 0 ? '✦' : '';
+    return '<div class="rfm-compare-row">' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.7rem;color:var(--gray);width:16px;">' + (rank + 1) + '</div>' +
+      '<div class="rfm-compare-name">' + p.name + (badge ? ' <span style="font-size:0.8rem;">' + badge + '</span>' : '') + '</div>' +
+      '<div class="rfm-compare-bar-wrap"><div class="rfm-compare-bar-fill" style="width:' + p.pct + '%;"></div></div>' +
+      '<div class="rfm-compare-pct">' + p.pct + '%</div>' +
+    '</div>';
+  }).join('');
+
+  // Summary note
+  var top = scored[0];
+  var note = '';
+  if (top && top.pct >= 70 && !top.mustFail) {
+    note = top.name + ' aligns most with what you\'ve said you need. Let that be data, not a decision — only you know the full picture.';
+  } else if (top && top.mustFail) {
+    note = 'Everyone here is missing at least one must-have. It may be worth asking if these are the right options, or if your standards need space to be honored.';
+  } else if (top && top.pct > 0) {
+    note = 'No strong match yet. That\'s okay. Keep rating and keep being honest with yourself.';
+  } else {
+    note = 'Rate people in the People tab to see your comparison.';
+  }
+  html += '<div class="rfm-verdict" style="margin-top:1.5rem;">' + note + '</div>';
+  el.innerHTML = html;
+}
 </script>
 
 </body>
