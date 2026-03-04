@@ -516,7 +516,10 @@
 
       <!-- Sleep -->
       <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div class="planner-label">Sleep (hrs)</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="planner-label">Sleep (hrs)</div>
+          <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">9:00 PM</span>
+        </div>
         <div style="display:flex;justify-content:space-between;margin-top:0.5rem;">
           <span class="sleep-btn" onclick="setSleep(this,4)">4</span>
           <span class="sleep-btn" onclick="setSleep(this,5)">5</span>
@@ -529,28 +532,58 @@
       <!-- Water -->
       <div style="border:1px solid #c8c8c5;padding:0.8rem;">
         <div class="planner-label">Water</div>
-        <div style="display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:nowrap;justify-content:space-between;" id="water-cups">
-          <span class="water-cup" onclick="toggleWater(this)">💧</span>
-          <span class="water-cup" onclick="toggleWater(this)">💧</span>
-          <span class="water-cup" onclick="toggleWater(this)">💧</span>
-          <span class="water-cup" onclick="toggleWater(this)">💧</span>
-          <span class="water-cup" onclick="toggleWater(this)">💧</span>
-          <span class="water-cup" onclick="toggleWater(this)">💧</span>
-          <span class="water-cup" onclick="toggleWater(this)">💧</span>
-          <span class="water-cup" onclick="toggleWater(this)">💧</span>
+        <div style="display:flex;gap:0.2rem;margin-top:0.5rem;justify-content:space-between;" id="water-cups">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
+            <span class="water-cup" onclick="toggleWater(this)">💧</span>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">7:00 AM</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
+            <span class="water-cup" onclick="toggleWater(this)">💧</span>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">8:00 AM</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
+            <span class="water-cup" onclick="toggleWater(this)">💧</span>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">9:00 AM</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
+            <span class="water-cup" onclick="toggleWater(this)">💧</span>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">11:00 AM</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
+            <span class="water-cup" onclick="toggleWater(this)">💧</span>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">1:00 PM</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
+            <span class="water-cup" onclick="toggleWater(this)">💧</span>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">3:00 PM</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
+            <span class="water-cup" onclick="toggleWater(this)">💧</span>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">5:00 PM</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
+            <span class="water-cup" onclick="toggleWater(this)">💧</span>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">7:00 PM</span>
+          </div>
         </div>
       </div>
 
       <!-- Bible Verse -->
       <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div class="planner-label" style="margin-bottom:0.4rem;">Bible Verse</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">
+          <div class="planner-label">Bible Verse</div>
+          <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">5:30 AM</span>
+        </div>
         <textarea id="bible-verse" placeholder="Enter today's verse..." rows="2" onblur="savePlannerDay()" style="width:100%;border:none;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.2rem 0;"></textarea>
         <input id="bible-ref" placeholder="e.g. John 3:16" onblur="savePlannerDay()" style="width:100%;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);outline:none;padding:0.2rem 0;margin-top:0.2rem;">
       </div>
 
       <!-- Exercise -->
       <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div class="planner-label">Calisthenics</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="planner-label">Calisthenics</div>
+          <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">4:30 AM</span>
+        </div>
         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">
           <span class="exercise-btn" onclick="toggleExercise(this,'Push-ups')">Push-ups</span>
           <span class="exercise-btn" onclick="toggleExercise(this,'Bodyweight squats')">Bodyweight squats</span>
@@ -565,38 +598,37 @@
       <!-- Meals -->
       <div style="border:1px solid #c8c8c5;padding:0.8rem;">
 
-        <div class="planner-label">Breakfast</div>
-        <textarea class="planner-textarea" id="meal-breakfast" placeholder="..." rows="2" style="width:100%;margin-top:0.3rem;"></textarea>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.4rem;">
-          <span id="meal-time-breakfast" style="font-family:'Nunito',sans-serif;font-size:0.58rem;color:var(--gray);"></span>
-          <button onclick="saveMeal('breakfast')" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:var(--gray);padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="planner-label">Breakfast</div>
+          <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">6:30 AM</span>
         </div>
-        <div id="meal-saved-breakfast" style="margin-top:0.4rem;"></div>
+        <textarea class="planner-textarea" id="meal-breakfast" placeholder="" rows="1" style="width:100%;margin-top:0.3rem;min-height:28px;max-height:60px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();saveMeal('breakfast')}"></textarea>
+        <span id="meal-time-breakfast" style="font-family:'Nunito',sans-serif;font-size:0.58rem;color:var(--gray);"></span>
+        <div id="meal-saved-breakfast" style="margin-top:0.3rem;"></div>
 
-        <div class="planner-label" style="margin-top:0.8rem;">Lunch</div>
-        <textarea class="planner-textarea" id="meal-lunch" placeholder="..." rows="2" style="width:100%;margin-top:0.3rem;"></textarea>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.4rem;">
-          <span id="meal-time-lunch" style="font-family:'Nunito',sans-serif;font-size:0.58rem;color:var(--gray);"></span>
-          <button onclick="saveMeal('lunch')" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:var(--gray);padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.8rem;">
+          <div class="planner-label">Lunch</div>
+          <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">12:30 PM</span>
         </div>
-        <div id="meal-saved-lunch" style="margin-top:0.4rem;"></div>
+        <textarea class="planner-textarea" id="meal-lunch" placeholder="" rows="1" style="width:100%;margin-top:0.3rem;min-height:28px;max-height:60px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();saveMeal('lunch')}"></textarea>
+        <span id="meal-time-lunch" style="font-family:'Nunito',sans-serif;font-size:0.58rem;color:var(--gray);"></span>
+        <div id="meal-saved-lunch" style="margin-top:0.3rem;"></div>
 
-        <div class="planner-label" style="margin-top:0.8rem;">Dinner</div>
-        <textarea class="planner-textarea" id="meal-dinner" placeholder="..." rows="2" style="width:100%;margin-top:0.3rem;"></textarea>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.4rem;">
-          <span id="meal-time-dinner" style="font-family:'Nunito',sans-serif;font-size:0.58rem;color:var(--gray);"></span>
-          <button onclick="saveMeal('dinner')" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:var(--gray);padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.8rem;">
+          <div class="planner-label">Dinner</div>
+          <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">7:00 PM</span>
         </div>
-        <div id="meal-saved-dinner" style="margin-top:0.4rem;"></div>
+        <textarea class="planner-textarea" id="meal-dinner" placeholder="" rows="1" style="width:100%;margin-top:0.3rem;min-height:28px;max-height:60px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();saveMeal('dinner')}"></textarea>
+        <span id="meal-time-dinner" style="font-family:'Nunito',sans-serif;font-size:0.58rem;color:var(--gray);"></span>
+        <div id="meal-saved-dinner" style="margin-top:0.3rem;"></div>
 
       </div>
 
       <!-- Notes -->
       <div style="border:1px solid #c8c8c5;padding:0.8rem;">
         <div class="planner-label">Notes</div>
-        <textarea class="planner-textarea" id="planner-notes" placeholder="..." rows="1" style="width:100%;margin-top:0.4rem;max-height:40px;overflow-y:auto;"></textarea>
-        <button onclick="saveNote()" style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:var(--gray);padding:0.3rem 0.8rem;cursor:pointer;margin-top:0.6rem;width:100%;">Save note</button>
-        <div id="notes-list" style="margin-top:0.6rem;"></div>
+        <textarea class="planner-textarea" id="planner-notes" placeholder="" rows="1" style="width:100%;margin-top:0.3rem;min-height:28px;max-height:60px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();saveNote()}"></textarea>
+        <div id="notes-list" style="margin-top:0.3rem;"></div>
       </div>
 
     </div>
@@ -1276,53 +1308,86 @@ function renderSchedule() {
     '12:30 PM','1:00 PM','1:30 PM','2:00 PM','2:30 PM',
     '3:00 PM','3:30 PM','4:00 PM','4:30 PM','5:00 PM',
     '5:30 PM','6:00 PM','6:30 PM','7:00 PM','7:30 PM',
-    '8:00 PM','8:30 PM','9:00 PM','9:30 PM','10:00 PM',
-    '10:30 PM','11:00 PM','11:30 PM','12:00 AM'
+    '8:00 PM','8:30 PM','9:00 PM','9:30 PM'
   ];
   el.innerHTML = slots.map(slot => {
     const key = slot.replace(/\s/g,'_');
     const entry = schedule[key] || {};
-    const val = typeof entry === 'string' ? entry : (entry.text || '');
-    const done = typeof entry === 'object' && entry.done;
-    const savedTime = typeof entry === 'object' && entry.time ? `<span style="font-family:'Nunito',sans-serif;font-size:0.58rem;color:var(--gray);margin-left:0.3rem;">${entry.time}</span>` : '';
-    const checkboxHtml = val ? `<div onclick="toggleScheduleDone('${key}')" style="width:14px;height:14px;border:1px solid ${done?'var(--black)':'#c8c8c5'};background:${done?'var(--black)':'transparent'};flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">${done?'<svg width="8" height="6" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="white" stroke-width="1.5"/></svg>':''}</div>` : `<div style="width:14px;flex-shrink:0;"></div>`;
-    return `<div class="time-label" style="${done?'color:var(--gray);text-decoration:line-through;':''}">${slot}</div>
-    <div style="display:flex;align-items:center;gap:0.3rem;">
-      ${checkboxHtml}
-      <input class="time-input" data-key="${key}" value="${val}" placeholder="..." onblur="saveScheduleRow('${key}', this.value)" style="flex:1;${done?'color:var(--gray);text-decoration:line-through;':''}">
-      <span id="st-${key}">${savedTime}</span>
-    </div>`;
+    // Support both old single-string format and new multi-entry array format
+    let items = [];
+    if (Array.isArray(entry.items)) items = entry.items;
+    else if (typeof entry === 'string' && entry) items = [{id: key+'_0', text: entry, done: false}];
+    else if (entry.text) items = [{id: key+'_0', text: entry.text, done: entry.done||false}];
+
+    const itemsHtml = items.map((item, i) =>
+      '<div style="display:flex;align-items:center;gap:0.3rem;padding:0.1rem 0;">' +
+        '<div onclick="toggleScheduleItem(\'' + key + '\',' + i + ')" style="width:12px;height:12px;border:1px solid ' + (item.done?'var(--black)':'#c8c8c5') + ';background:' + (item.done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">' +
+          (item.done?'<svg width="7" height="5" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="white" stroke-width="1.5"/></svg>':'') +
+        '</div>' +
+        '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;' + (item.done?'color:var(--gray);text-decoration:line-through;':'') + '">' + item.text + '</span>' +
+        '<button onclick="removeScheduleItem(\'' + key + '\',' + i + ')" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;flex-shrink:0;padding:0;">✕</button>' +
+      '</div>'
+    ).join('');
+
+    return '<div class="time-label" style="padding-top:0.35rem;">' + slot + '</div>' +
+      '<div style="padding:0.1rem 0 0.3rem;" onclick="var i=this.querySelector(\'.time-input\');if(i){i.style.display=\'block\';i.focus();}">' +
+        itemsHtml +
+        '<input class="time-input" data-key="' + key + '" placeholder="" ' +
+          'onkeydown="if(event.key===\'Enter\'){event.preventDefault();addScheduleItem(\'' + key + '\',this);}" ' +
+          'onblur="if(!this.value)this.style.display=\'none\';" ' +
+          'style="width:100%;margin-top:' + (items.length?'0.2rem':'0') + ';display:' + (items.length?'none':'block') + ';">' +
+      '</div>';
   }).join('');
 }
 
-function toggleScheduleDone(key) {
+var _scheduleSaveTimer = null;
+function saveScheduleFast() {
+  clearTimeout(_scheduleSaveTimer);
+  _scheduleSaveTimer = setTimeout(function() {
+    localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData));
+    if (typeof syncToCloud === 'function') syncToCloud('all_planner_data', allPlannerData);
+  }, 500);
+}
+
+function addScheduleItem(key, input) {
+  const val = input.value.trim();
+  if (!val) return;
   const dayKey = getDateKey();
   if (!allPlannerData[dayKey]) allPlannerData[dayKey] = {};
   if (!allPlannerData[dayKey].schedule) allPlannerData[dayKey].schedule = {};
   const entry = allPlannerData[dayKey].schedule[key] || {};
-  if (typeof entry === 'string') return;
-  entry.done = !entry.done;
-  allPlannerData[dayKey].schedule[key] = entry;
-  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
+  let items = Array.isArray(entry.items) ? entry.items : (entry.text ? [{id: Date.now(), text: entry.text, done: false}] : []);
+  const id = Date.now();
+  items.push({id, text: val, done: false});
+  allPlannerData[dayKey].schedule[key] = { items };
+  input.value = '';
+  input.style.display = 'none';
+  // Insert new item before the input instantly
+  const row = input.parentElement;
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;align-items:center;gap:0.3rem;padding:0.1rem 0;';
+  div.innerHTML =
+    '<div onclick="toggleScheduleItem(\'' + key + '\',' + (items.length-1) + ')" style="width:12px;height:12px;border:1px solid #c8c8c5;background:transparent;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;"></div>' +
+    '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;">' + val + '</span>' +
+    '<button onclick="removeScheduleItem(\'' + key + '\',' + (items.length-1) + ')" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;flex-shrink:0;padding:0;">✕</button>';
+  row.insertBefore(div, input);
+  saveScheduleFast();
+}
+
+function toggleScheduleItem(key, idx) {
+  const dayKey = getDateKey();
+  if (!allPlannerData[dayKey]?.schedule?.[key]?.items) return;
+  const item = allPlannerData[dayKey].schedule[key].items[idx];
+  item.done = !item.done;
+  saveScheduleFast();
   renderSchedule();
 }
 
-function saveScheduleRow(key, val) {
+function removeScheduleItem(key, idx) {
   const dayKey = getDateKey();
-  if (!allPlannerData[dayKey]) allPlannerData[dayKey] = {};
-  if (!allPlannerData[dayKey].schedule) allPlannerData[dayKey].schedule = {};
-  const existing = allPlannerData[dayKey].schedule[key] || {};
-  if (val.trim()) {
-    const time = new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
-    allPlannerData[dayKey].schedule[key] = { text: val, time, done: existing.done || false };
-    const span = document.getElementById(`st-${key}`);
-    if (span) span.innerHTML = `<span style="font-family:'Nunito',sans-serif;font-size:0.58rem;color:var(--gray);margin-left:0.3rem;">${time}</span>`;
-  } else {
-    allPlannerData[dayKey].schedule[key] = '';
-    const span = document.getElementById(`st-${key}`);
-    if (span) span.innerHTML = '';
-  }
-  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
+  if (!allPlannerData[dayKey]?.schedule?.[key]?.items) return;
+  allPlannerData[dayKey].schedule[key].items.splice(idx, 1);
+  saveScheduleFast();
   renderSchedule();
 }
 
@@ -1356,14 +1421,16 @@ function renderMeals() {
     if (!el) return;
     const key = getDateKey();
     const entries = allPlannerData[key]?.mealEntries?.[meal] || [];
-    el.innerHTML = entries.map(e => `
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.4rem;padding:0.3rem 0;border-bottom:1px solid #f0f0ee;">
-        <div>
-          <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;">${e.text}</div>
-          <div style="font-family:'Nunito',sans-serif;font-size:0.58rem;color:var(--gray);">${e.time}</div>
-        </div>
-        <button onclick="removeMealEntry('${meal}',${e.id})" style="font-size:0.6rem;color:var(--gray);border:none;background:none;cursor:pointer;flex-shrink:0;">✕</button>
-      </div>`).join('');
+    if (!entries.length) { el.innerHTML = ''; return; }
+    el.innerHTML = entries.map(e =>
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid #f0f0ee;">' +
+        '<div style="display:flex;align-items:center;gap:0.5rem;">' +
+          '<span style="width:5px;height:5px;border-radius:50%;background:var(--black);display:inline-block;flex-shrink:0;"></span>' +
+          '<span style="font-family:\'Nunito\',sans-serif;font-size:0.88rem;font-weight:300;">' + e.text + '</span>' +
+        '</div>' +
+        '<button onclick="removeMealEntry(\'' + meal + '\',' + e.id + ')" style="font-size:0.6rem;color:var(--gray);border:none;background:none;cursor:pointer;flex-shrink:0;">✕</button>' +
+      '</div>'
+    ).join('');
   });
 }
 
@@ -1449,14 +1516,13 @@ function removeNote(id) {
 function renderNotes() {
   const el = document.getElementById('notes-list');
   if (!el) return;
-  el.innerHTML = plannerNotes.map(n => `
-    <div style="border-bottom:1px solid #f0f0ee;padding:0.5rem 0;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);">${n.time}</div>
-        <button onclick="removeNote(${n.id})" style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;">✕</button>
-      </div>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;margin-top:0.2rem;">${n.text}</div>
-    </div>`).join('');
+  if (!plannerNotes.length) { el.innerHTML = ''; return; }
+  el.innerHTML = plannerNotes.map(n =>
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid #f0f0ee;">' +
+      '<span style="font-family:\'Nunito\',sans-serif;font-size:0.88rem;font-weight:300;">' + n.text + '</span>' +
+      '<button onclick="removeNote(' + n.id + ')" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;flex-shrink:0;">✕</button>' +
+    '</div>'
+  ).join('');
 }
 
 // Goals
@@ -1509,6 +1575,10 @@ function savePlannerDay() {
   d.lunch = document.getElementById('meal-lunch')?.value || '';
   d.dinner = document.getElementById('meal-dinner')?.value || '';
   if (!d.mealTimes) d.mealTimes = {};
+  d.timeWater = document.getElementById('time-water')?.value || '';
+  d.timeBreakfast = document.getElementById('time-breakfast')?.value || '';
+  d.timeLunch = document.getElementById('time-lunch')?.value || '';
+  d.timeDinner = document.getElementById('time-dinner')?.value || '';
   // notes & grateful
   d.notes = document.getElementById('planner-notes')?.value || '';
   d.bibleVerse = document.getElementById('bible-verse')?.value || '';
@@ -1553,6 +1623,10 @@ function loadPlannerDay() {
   if (document.getElementById('planner-notes')) document.getElementById('planner-notes').value = d.notes||'';
   if (document.getElementById('bible-verse')) document.getElementById('bible-verse').value = d.bibleVerse||'';
   if (document.getElementById('bible-ref')) document.getElementById('bible-ref').value = d.bibleRef||'';
+  if (document.getElementById('time-water')) document.getElementById('time-water').value = d.timeWater||'';
+  if (document.getElementById('time-breakfast')) document.getElementById('time-breakfast').value = d.timeBreakfast||'';
+  if (document.getElementById('time-lunch')) document.getElementById('time-lunch').value = d.timeLunch||'';
+  if (document.getElementById('time-dinner')) document.getElementById('time-dinner').value = d.timeDinner||'';
   plannerNotes = d.notesList || [];
   renderNotes();
 
