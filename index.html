@@ -139,24 +139,24 @@
   @media (max-width: 600px) { .books-vent-grid { grid-template-columns: 1fr !important; } }
 
   /* Balance & Relationships */
-  .q-check-card { background: white; border: 1px solid #e8e8e5; padding: 1.2rem; margin-bottom: 0.75rem; transition: opacity 0.2s; }
-  .q-check-card.answered { opacity: 0.45; }
-  .q-check-text { font-family: 'Lora', serif; font-style: italic; font-size: 0.93rem; color: var(--black); line-height: 1.55; margin-bottom: 0.9rem; }
-  .q-check-category { font-family: 'Nunito', sans-serif; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); margin-bottom: 0.5rem; }
-  .yn-btns { display: flex; gap: 8px; }
-  .yn-btn { flex: 1; padding: 0.5rem; border: 1px solid #e0d8cc; background: transparent; font-family: 'Nunito', sans-serif; font-size: 0.8rem; font-weight: 300; color: var(--gray); cursor: pointer; transition: all 0.18s; }
-  .yn-btn.yes { border-color: #5a8a5a; color: #5a8a5a; }
-  .yn-btn.yes.selected { background: #5a8a5a; color: white; }
-  .yn-btn.no  { border-color: #c88a7a; color: #c88a7a; }
-  .yn-btn.no.selected  { background: #c88a7a; color: white; }
-  .status-card { padding: 1.5rem; text-align: center; margin-bottom: 0.5rem; transition: background 0.4s; border: 1px solid #e8e8e5; }
-  .status-card.balanced   { background: #f0f5f0; }
-  .status-card.giving-more { background: #fdf5ee; }
-  .status-card.self-more  { background: #f0f4f8; }
-  .status-card.critical   { background: #fdeeed; }
-  .status-icon { font-size: 2rem; margin-bottom: 0.6rem; }
-  .status-msg  { font-family: 'Lora', serif; font-size: 1rem; color: var(--black); font-style: italic; margin-bottom: 0.4rem; line-height: 1.4; }
-  .status-sub  { font-size: 0.78rem; color: var(--gray); font-weight: 300; line-height: 1.5; }
+  .q-check-card { background: white; border: 1px solid #e8e8e5; padding: 0.75rem; margin-bottom: 0.5rem; transition: opacity 0.2s; }
+  .q-check-card.answered { opacity: 0.4; }
+  .q-check-text { font-family: 'Lora', serif; font-style: italic; font-size: 0.78rem; color: var(--black); line-height: 1.5; margin-bottom: 0.6rem; }
+  .q-check-category { font-family: 'Nunito', sans-serif; font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); margin-bottom: 0.4rem; }
+  .yn-btns { display: flex; gap: 5px; }
+  .yn-btn { flex: 1; padding: 0.3rem 0.4rem; border: 1px solid #e0d8cc; background: transparent; font-family: 'Nunito', sans-serif; font-size: 0.7rem; font-weight: 300; color: var(--gray); cursor: pointer; transition: all 0.18s; }
+  .yn-btn.yes { border-color: var(--black); color: var(--black); }
+  .yn-btn.yes.selected { background: var(--black); color: var(--white); }
+  .yn-btn.no  { border-color: var(--black); color: var(--black); }
+  .yn-btn.no.selected  { background: var(--black); color: var(--white); }
+  .status-card { padding: 1rem; text-align: center; margin-bottom: 0.5rem; transition: background 0.4s; border: 1px solid #e8e8e5; }
+  .status-card.balanced   { background: #fff; }
+  .status-card.giving-more { background: #fff; }
+  .status-card.self-more  { background: #fff; }
+  .status-card.critical   { background: #fff; }
+  .status-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+  .status-msg  { font-family: 'Lora', serif; font-size: 0.88rem; color: var(--black); font-style: italic; margin-bottom: 0.3rem; line-height: 1.4; }
+  .status-sub  { font-size: 0.72rem; color: var(--gray); font-weight: 300; line-height: 1.5; }
   .scale-wrap  { border: 1px solid #e8e8e5; padding: 1.2rem; margin-bottom: 1.5rem; }
   .scale-note  { font-size: 0.75rem; color: var(--gray); margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid #e8e8e5; font-style: italic; text-align: center; }
   .balance-sub-tabs { display: flex; border-bottom: 1px solid #e8e8e5; margin-bottom: 1.5rem; }
@@ -167,6 +167,65 @@
   .journal-tab.active, .journal-tab:hover { color:var(--black); border-bottom-color:var(--black); }
   @media (max-width: 600px) { #planner-grid { grid-template-columns: 1fr !important; } .vision-items-grid { grid-template-columns: 1fr !important; } }
   .vision-items-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:1rem; }
+  /* ── Who I Am ── */
+  .wia-tabs { display:flex; gap:0; background:transparent; border:1px solid #c8c8c5; padding:0; margin-bottom:1.5rem; }
+  .wia-tab { flex:1; text-align:center; padding:7px 6px; border-radius:0; border:none; border-right:1px solid #c8c8c5; background:transparent; font-family:'Nunito',sans-serif; font-size:0.6rem; font-weight:300; color:var(--gray); cursor:pointer; transition:all 0.2s; text-transform:uppercase; letter-spacing:0.12em; }
+  .wia-tab:last-child { border-right:none; }
+  .wia-tab.active { background:var(--black); color:var(--white); }
+  .wia-panel { display:none; }
+  .wia-panel.active { display:block; }
+  .wia-identity-card { background:var(--black); padding:1rem; margin-bottom:0.8rem; position:relative; overflow:hidden; }
+  .wia-identity-card::after { content:'I'; position:absolute; right:12px; bottom:-20px; font-family:'Lora',serif; font-size:6rem; color:rgba(255,255,255,0.04); pointer-events:none; }
+  .wia-id-label { font-family:'Nunito',sans-serif; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:300; color:rgba(255,255,255,0.5); margin-bottom:6px; }
+  .wia-id-name { font-family:'Lora',serif; font-size:1.2rem; font-weight:300; color:var(--white); margin-bottom:1rem; font-style:italic; min-height:28px; }
+  .wia-id-traits { display:flex; flex-wrap:wrap; gap:5px; }
+  .wia-trait-tag { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.15); padding:3px 10px; font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; color:rgba(255,255,255,0.7); }
+  .wia-trait-tag.empty { border-style:dashed; color:rgba(255,255,255,0.2); font-style:italic; }
+  .wia-goals-box { margin-bottom:1.2rem; padding:1rem; border:1px solid #c8c8c5; }
+  .wia-goal-item { font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; color:var(--gray); display:flex; gap:8px; margin-bottom:5px; line-height:1.5; }
+  .wia-goal-item:last-child { margin-bottom:0; }
+  .wia-goal-dot { color:var(--black); flex-shrink:0; }
+  .wia-tag-row { display:flex; gap:8px; margin-bottom:8px; }
+  .wia-tag-row input { flex:1; }
+  .wia-tags-list { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:1.2rem; }
+  .wia-tag { background:#f0f0ec; border:1px solid #c8c8c5; padding:3px 10px 3px 12px; font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; color:var(--black); display:flex; align-items:center; gap:5px; }
+  .wia-tag button { background:none; border:none; color:var(--gray); cursor:pointer; font-size:0.9rem; line-height:1; padding:0; }
+  .wia-q-card { border:1px solid #c8c8c5; padding:1.2rem 1.2rem 0.9rem; margin-bottom:4px; }
+  .wia-q-text { font-family:'Lora',serif; font-style:italic; font-size:0.9rem; font-weight:300; color:var(--black); line-height:1.6; margin-bottom:0.7rem; }
+  .wia-q-footer { display:flex; align-items:center; justify-content:space-between; margin-top:0.7rem; }
+  .wia-q-dots { display:flex; gap:5px; }
+  .wia-dot { width:6px; height:6px; border-radius:0; background:#c8c8c5; cursor:pointer; transition:background 0.2s; }
+  .wia-dot.done { background:var(--black); }
+  .wia-dot.current { background:var(--black); opacity:0.4; }
+  .wia-q-btns { display:flex; gap:6px; }
+  .wia-q-btn { background:none; border:1px solid #c8c8c5; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:300; color:var(--gray); cursor:pointer; transition:all 0.2s; }
+  .wia-q-btn:hover { border-color:var(--black); color:var(--black); }
+  .wia-q-btn:disabled { opacity:0.3; cursor:default; }
+  .wia-check-wrap { border-bottom:1px solid #e8e8e5; }
+  .wia-check-wrap:last-child { border-bottom:none; }
+  .wia-check { display:flex; align-items:center; gap:10px; padding:9px 0; cursor:pointer; user-select:none; }
+  .wia-box { width:12px; height:12px; border:1px solid #c8c8c5; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.55rem; color:transparent; transition:all 0.2s; }
+  .wia-check.done .wia-box { background:var(--black); border-color:var(--black); color:white; }
+  .wia-check.done .wia-check-text { color:var(--gray); text-decoration:line-through; }
+  .wia-check-text { font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; color:var(--black); line-height:1.5; }
+  .wia-aff-box { border:1px solid #c8c8c5; padding:1.2rem; margin-bottom:1.2rem; text-align:center; }
+  .wia-aff-text { font-family:'Lora',serif; font-style:italic; font-size:0.9rem; font-weight:300; color:var(--black); line-height:1.6; margin-bottom:0.4rem; transition:opacity 0.18s; }
+  .wia-streak-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:1.2rem; }
+  .wia-streak-card { border:1px solid #c8c8c5; padding:0.9rem; text-align:center; }
+  .wia-streak-num { font-family:'Lora',serif; font-size:1.6rem; font-weight:300; color:var(--black); line-height:1; }
+  .wia-streak-label { font-family:'Nunito',sans-serif; font-size:0.6rem; font-weight:300; color:var(--gray); margin-top:3px; text-transform:uppercase; letter-spacing:0.12em; }
+  .wia-calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+  .wia-cal-label { grid-column:1/-1; display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:2px; }
+  .wia-cal-day-label { text-align:center; font-family:'Nunito',sans-serif; font-size:0.58rem; color:var(--gray); }
+  .wia-cal-day { aspect-ratio:1; background:#e8e8e5; }
+  .wia-cal-day.d1 { background:#c8c8c5; } .wia-cal-day.d2 { background:#a0a09e; } .wia-cal-day.d3 { background:#707070; } .wia-cal-day.dfull { background:var(--black); }
+  .wia-cal-day.today { outline:2px solid var(--black); outline-offset:1px; }
+  .wia-practice-row { display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid #e8e8e5; }
+  .wia-practice-row:last-child { border-bottom:none; }
+  .wia-practice-name { font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; color:var(--black); flex:1; }
+  .wia-bar-wrap { width:70px; height:5px; background:#e8e8e5; overflow:hidden; flex-shrink:0; }
+  .wia-bar { height:100%; background:var(--black); transition:width 0.4s; }
+  .wia-practice-count { font-family:'Nunito',sans-serif; font-size:0.65rem; font-weight:300; color:var(--gray); flex-shrink:0; width:26px; text-align:right; }
 </style>
 </head>
 <body>
@@ -178,7 +237,7 @@
     <button class="nav-tab" onclick="showSection('vision')">Vision</button>
     <button class="nav-tab" onclick="showSection('schedule')">Schedule</button>
     <button class="nav-tab" onclick="showSection('affirmations')">Journal</button>
-    <button class="nav-tab" onclick="showSection('balance')">Balance</button>
+    <button class="nav-tab" onclick="showSection('me')">Me</button>
   </div>
 </nav>
 
@@ -188,7 +247,7 @@
   <h1>Good to see you today.</h1><br>
   <div class="home-grid">
     <div class="home-card" onclick="showSection('vision')"><div class="home-card-title">Vision Board</div><div class="home-card-text">Dream it, live it</div></div>
-    <div class="home-card" onclick="showSection('affirmations');setTimeout(()=>showJournalTab('vent'),100)"><div class="home-card-title">Vent</div><div class="home-card-text">Let it out</div></div>
+    <div class="home-card" onclick="showSection('affirmations');setTimeout(()=>showJournalTab('vent'),100)"><div class="home-card-title">Journal</div><div class="home-card-text">Let it out</div></div>
     <div class="home-card" onclick="showSection('schedule')"><div class="home-card-title">Schedule</div><div class="home-card-text">Plan your day</div></div>
     <div class="home-card" onclick="showSection('affirmations');setTimeout(()=>showJournalTab('wins'),100)"><div class="home-card-title">My Wins</div><div class="home-card-text">Celebrate myself</div></div>
   </div>
@@ -224,7 +283,7 @@
   <!-- Journal sub-tabs -->
   <div id="journal-tabs" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
     <button class="journal-tab active" onclick="showJournalTab('belief')" id="jtab-belief">Belief</button>
-    <button class="journal-tab" onclick="showJournalTab('vent')" id="jtab-vent">Vent</button>
+    <button class="journal-tab" onclick="showJournalTab('vent')" id="jtab-vent">Journal</button>
     <button class="journal-tab" onclick="showJournalTab('books')" id="jtab-books">Books</button>
     <button class="journal-tab" onclick="showJournalTab('wins')" id="jtab-wins">Wins</button>
   </div>
@@ -302,7 +361,7 @@
     <!-- I need to vent -->
     <div>
       <div id="vent-section" class="subtitle" style="margin-bottom:0.5rem;">Let it all out</div>
-      <h2 style="margin-bottom:1rem;">I need to vent.</h2>
+      <h2 style="margin-bottom:1rem;">Journal.</h2>
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Your safe space. No judgment 🤍</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <button onclick="changeVentDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
@@ -659,15 +718,12 @@ function showSection(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  const map=['home','vision','schedule','affirmations','balance'];
+  const map=['home','vision','schedule','affirmations','me'];
   document.querySelectorAll('.nav-tab')[map.indexOf(id)].classList.add('active');
   window.scrollTo(0,0);
   if (id === 'home') renderAnalytics();
-  if (id === 'balance') {
-    if (!_balanceInited) { _balanceInited = true; }
-    updateBalanceSelectedLabel();
-    renderBalanceQuestions();
-    renderTracker();
+  if (id === 'me') {
+    initMeSection();
   }
 }
 
@@ -1941,28 +1997,28 @@ document.head.appendChild(manifestLink);
     var sc2 = document.getElementById('statusCard2');
     if (sc) sc.style.display = 'none';
     if (sc2) sc2.style.display = 'none';
-    var rel = document.getElementById('bspanel-relationships');
-    var activePanel = rel && rel.style.display === 'none' ? 'balance' : 'relationships';
-    if (activePanel === 'balance') renderBalanceQuestions();
-    else renderRelationshipQuestions();
+    renderBalanceQuestions();
+    renderRelationshipQuestions();
   }
 
-  function showBalanceTab(tab) {
-    ['balance','relationships'].forEach(function(t) {
-      var panel = document.getElementById('bspanel-' + t);
-      var tabEl = document.getElementById('bstab-' + t);
-      if (panel) panel.style.display = t === tab ? 'block' : 'none';
-      if (tabEl) tabEl.classList.toggle('active', t === tab);
-    });
-    var sc = document.getElementById('statusCard');
-    var sc2 = document.getElementById('statusCard2');
-    if (sc) sc.style.display = 'none';
-    if (sc2) sc2.style.display = 'none';
-    setTimeout(function() {
-      if (tab === 'balance') renderBalanceQuestions();
-      else renderRelationshipQuestions();
-    }, 0);
+function showMeTab(tab) {
+  ['balance','whiam'].forEach(function(t) {
+    document.getElementById('mesub-' + t).style.display = t === tab ? 'block' : 'none';
+    document.getElementById('metab-' + t).classList.toggle('active', t === tab);
+  });
+  if (tab === 'balance') {
+    initBalanceDatePicker();
+    renderBalanceQuestions();
+    renderRelationshipQuestions();
   }
+  if (tab === 'whiam') initWhiAm();
+}
+
+function initMeSection() {
+  showMeTab('balance');
+}
+
+function showBalanceTab(tab) { /* tabs removed, both panels always visible */ }
 
   // ===== APP 1: HEALTHY BALANCE =====
   var B = JSON.parse(storage.getItem('hlb') || '{}');
@@ -1971,27 +2027,23 @@ document.head.appendChild(manifestLink);
   function saveB() { storage.setItem('hlb', JSON.stringify(B)); }
 
   var balanceQs = [
-    { text: 'Did you help someone today: with a task, a problem, or just by listening?', type: 'give', yes: true },
+    { text: 'Did you help someone today with a task, a problem, or just by listening?', type: 'give', yes: true },
     { text: 'Did you check in on someone or reach out first today?', type: 'give', yes: true },
     { text: 'Did you give someone your time or energy even when you were tired?', type: 'give', yes: true },
-    { text: 'Did you say yes to someone today when part of you wanted to say no?', type: 'give', yes: true },
-    { text: 'Did you put someone else\'s needs ahead of your own today?', type: 'give', yes: true },
-    { text: 'Did you spend time or energy on someone without them asking?', type: 'give', yes: true },
+    { text: 'Did you say yes to someone when part of you wanted to say no?', type: 'give', yes: true },
     { text: 'Did you feel responsible for how someone else was feeling today?', type: 'give', yes: true },
     { text: 'Did you work on something that was just for you today?', type: 'self', yes: true },
     { text: 'Did you eat, sleep, or rest properly today?', type: 'self', yes: true },
-    { text: 'Did you have time today that was yours: no obligations, no one needing anything from you?', type: 'self', yes: true },
     { text: 'Did you do at least one thing today that made you feel like yourself?', type: 'self', yes: true },
-    { text: 'Did you move your body or do something physical for yourself today?', type: 'self', yes: true },
-    { text: 'Did you say no to something today to protect your own time or energy?', type: 'self', yes: true },
-    { text: 'Did you feel okay at the end of today, not drained or invisible?', type: 'self', yes: true },
-    { text: 'Did you do something today purely because it made you happy, with no other reason?', type: 'self', yes: true }
+    { text: 'Did you say no to something to protect your own time or energy?', type: 'self', yes: true },
+    { text: 'Did you feel okay at the end of today, not drained or invisible?', type: 'self', yes: true }
   ];
 
   function renderBalanceQuestions() {
     var today = getBalanceDateStr();
     var ans = B.answers[today] || {};
-    var allAnswered = Object.keys(ans).length === balanceQs.length;
+    var answeredCount = Object.keys(ans).filter(function(k){ return parseInt(k) < balanceQs.length; }).length;
+    var allAnswered = answeredCount === balanceQs.length;
     var qEl = document.getElementById('balanceQuestions');
     var scEl = document.getElementById('statusCard');
     if (!qEl) return;
@@ -2027,7 +2079,7 @@ document.head.appendChild(manifestLink);
       if (btn) btn.classList.add('selected');
       setTimeout(function() { card.classList.add('answered'); }, 200);
     }
-    if (Object.keys(B.answers[today]).length === balanceQs.length) {
+    if (Object.keys(B.answers[today]).filter(function(k){ return parseInt(k) < balanceQs.length; }).length === balanceQs.length) {
       setTimeout(function() {
         var qEl = document.getElementById('balanceQuestions');
         if (qEl) qEl.style.display = 'none';
@@ -2057,11 +2109,11 @@ document.head.appendChild(manifestLink);
     var sub  = document.getElementById('statusSub');
     if (!card) return;
     card.className = 'status-card';
-    if (diff >= 4)      { card.classList.add('critical');     if(icon) icon.textContent = '🔴'; if(msg) msg.textContent = "You're giving a lot more than you're keeping."; if(sub) sub.textContent = "Something needs to come back to you. This level isn't sustainable."; }
-    else if (diff >= 2) { card.classList.add('giving-more'); if(icon) icon.textContent = '🟠'; if(msg) msg.textContent = "You're giving more than you're keeping right now."; if(sub) sub.textContent = "Keep an eye on this. Make sure you're not running on empty."; }
-    else if (diff <= -4){ card.classList.add('self-more');   if(icon) icon.textContent = '🔵'; if(msg) msg.textContent = "You're keeping more than you're giving right now."; if(sub) sub.textContent = "That's okay sometimes: just stay connected to the people around you."; }
-    else if (diff <= -2){ card.classList.add('self-more');   if(icon) icon.textContent = '🔵'; if(msg) msg.textContent = "Keeping a bit more than you're giving today."; if(sub) sub.textContent = "Check in with the people in your life when you can."; }
-    else                { card.classList.add('balanced');    if(icon) icon.textContent = '🟢'; if(msg) msg.textContent = "You're balanced today."; if(sub) sub.textContent = "Giving and keeping are roughly equal. That's healthy."; }
+    if (diff >= 4)      { card.classList.add('critical');     if(icon) icon.textContent = '⚖'; if(msg) msg.textContent = "You're giving a lot more than you're keeping."; if(sub) sub.textContent = "Something needs to come back to you. This level isn't sustainable."; }
+    else if (diff >= 2) { card.classList.add('giving-more'); if(icon) icon.textContent = '⚖'; if(msg) msg.textContent = "You're giving more than you're keeping right now."; if(sub) sub.textContent = "Keep an eye on this. Make sure you're not running on empty."; }
+    else if (diff <= -4){ card.classList.add('self-more');   if(icon) icon.textContent = '⚖'; if(msg) msg.textContent = "You're keeping more than you're giving right now."; if(sub) sub.textContent = "That's okay sometimes: just stay connected to the people around you."; }
+    else if (diff <= -2){ card.classList.add('self-more');   if(icon) icon.textContent = '⚖'; if(msg) msg.textContent = "Keeping a bit more than you're giving today."; if(sub) sub.textContent = "Check in with the people in your life when you can."; }
+    else                { card.classList.add('balanced');    if(icon) icon.textContent = '⚖'; if(msg) msg.textContent = "You're balanced today."; if(sub) sub.textContent = "Giving and keeping are roughly equal. That's healthy."; }
     card.style.display = 'block';
     B.history[getBalanceDateStr()] = { give: g, self: s };
     saveB();
@@ -2087,14 +2139,9 @@ document.head.appendChild(manifestLink);
     { text: 'Did you reach out to someone first today?', yes: true },
     { text: 'Did you actually listen to someone today without rushing to respond?', yes: true },
     { text: 'Did any conversation today leave you feeling closer to that person?', yes: true },
-    { text: 'Did you do something small for someone just to show you were thinking of them?', yes: true },
     { text: 'Did you ask someone how they were really doing and actually wait for the answer?', yes: true },
-    { text: 'Did you show up for someone today even when it was not convenient?', yes: true },
-    { text: 'Is there something you have been wanting to say to someone but still have not?', yes: false },
     { text: 'Did you say something true today that you normally would have held back?', yes: true },
     { text: 'Did you feel like you could be yourself with the people around you today?', yes: true },
-    { text: 'Did any relationship feel one-sided today, like you were doing all the work?', yes: false },
-    { text: 'Did you repair or acknowledge something that felt a little off with someone?', yes: true },
     { text: 'Did you give someone your full attention today, no phone, no distractions?', yes: true },
     { text: 'Did you say something kind or encouraging to someone today?', yes: true },
     { text: 'Did you feel appreciated or valued by someone in your life today?', yes: true }
@@ -2103,7 +2150,8 @@ document.head.appendChild(manifestLink);
   function renderRelationshipQuestions() {
     var today = getBalanceDateStr();
     var ans = R.answers[today] || {};
-    var allAnswered = Object.keys(ans).length === relationshipQs.length;
+    var answeredCount = Object.keys(ans).filter(function(k){ return parseInt(k) < relationshipQs.length; }).length;
+    var allAnswered = answeredCount === relationshipQs.length;
     var qEl = document.getElementById('relationshipQuestions');
     var sc2 = document.getElementById('statusCard2');
     if (!qEl) return;
@@ -2138,7 +2186,7 @@ document.head.appendChild(manifestLink);
       if (btn) btn.classList.add('selected');
       setTimeout(function() { card.classList.add('answered'); }, 200);
     }
-    if (Object.keys(R.answers[today]).length === relationshipQs.length) {
+    if (Object.keys(R.answers[today]).filter(function(k){ return parseInt(k) < relationshipQs.length; }).length === relationshipQs.length) {
       setTimeout(function() {
         var qEl = document.getElementById('relationshipQuestions');
         if (qEl) qEl.style.display = 'none';
@@ -2160,10 +2208,10 @@ document.head.appendChild(manifestLink);
     card.className = 'status-card';
     if (cs) cs.textContent = score + '/15';
     if (hs) hs.textContent = score >= 12 ? 'Healthy' : score >= 8 ? 'Okay' : 'Needs work';
-    if (score >= 12)     { card.classList.add('balanced');    if(icon) icon.textContent = '🟢'; if(msg) msg.textContent = 'Your relationships are healthy today.'; if(sub) sub.textContent = 'You are connecting, being honest, and showing up. Keep it going.'; }
-    else if (score >= 8) { card.classList.add('giving-more'); if(icon) icon.textContent = '🟡'; if(msg) msg.textContent = 'Your relationships are okay but something is a little off.'; if(sub) sub.textContent = 'You are mostly showing up but something is going unsaid or feeling uneven.'; }
-    else if (score >= 5) { card.classList.add('self-more');   if(icon) icon.textContent = '🟠'; if(msg) msg.textContent = 'Your relationships need some attention today.'; if(sub) sub.textContent = 'You are a bit disconnected or holding back. One honest conversation can shift this.'; }
-    else                 { card.classList.add('critical');    if(icon) icon.textContent = '🔴'; if(msg) msg.textContent = 'Your relationships are struggling today.'; if(sub) sub.textContent = 'Low connection and things going unsaid. Even one small reach out can start to change that.'; }
+    if (score >= 12)     { card.classList.add('balanced');    if(icon) icon.textContent = '⚖'; if(msg) msg.textContent = 'Your relationships are healthy today.'; if(sub) sub.textContent = 'You are connecting, being honest, and showing up. Keep it going.'; }
+    else if (score >= 8) { card.classList.add('giving-more'); if(icon) icon.textContent = '⚖'; if(msg) msg.textContent = 'Your relationships are okay but something is a little off.'; if(sub) sub.textContent = 'You are mostly showing up but something is going unsaid or feeling uneven.'; }
+    else if (score >= 5) { card.classList.add('self-more');   if(icon) icon.textContent = '⚖'; if(msg) msg.textContent = 'Your relationships need some attention today.'; if(sub) sub.textContent = 'You are a bit disconnected or holding back. One honest conversation can shift this.'; }
+    else                 { card.classList.add('critical');    if(icon) icon.textContent = '⚖'; if(msg) msg.textContent = 'Your relationships are struggling today.'; if(sub) sub.textContent = 'Low connection and things going unsaid. Even one small reach out can start to change that.'; }
     card.style.display = 'block';
     R.history[getBalanceDateStr()] = { score: score };
     saveR();
@@ -2332,69 +2380,402 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<div class="section" id="balance">
+<div class="section" id="me">
   <div class="subtitle">Check in with yourself</div>
-  <h1>Balance.</h1>
-  <div style="font-family:Lora,serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0.5rem 0 1.5rem;line-height:1.6;">Answer honestly. It figures out the rest.</div>
+  <h1>Me.</h1>
 
-  <!-- Balance sub-tabs -->
-  <div class="balance-sub-tabs">
-    <button class="balance-sub-tab active" id="bstab-balance" onclick="showBalanceTab('balance')">Healthy Balance</button>
-    <button class="balance-sub-tab" id="bstab-relationships" onclick="showBalanceTab('relationships')">Relationships</button>
+  <!-- Journal-style sub-tabs -->
+  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+    <button class="journal-tab active" onclick="showMeTab('balance')" id="metab-balance">Balance</button>
+    <button class="journal-tab" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
   </div>
 
-  <!-- Date navigation (same as Schedule) -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-    <button onclick="changeBalanceDay(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8249;</button>
-    <div style="text-align:center;">
-      <input type="date" id="balance-date-picker" onchange="onBalanceDatePicked(this.value)" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;cursor:pointer;text-align:center;">
-      <div id="balance-day-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-top:0.3rem;"></div>
+  <!-- BALANCE sub-section -->
+  <div id="mesub-balance">
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0 0 1.5rem;line-height:1.6;">Answer honestly. It figures out the rest.</div>
+
+    <!-- Date navigation -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+      <button onclick="changeBalanceDay(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8249;</button>
+      <div style="text-align:center;">
+        <input type="date" id="balance-date-picker" onchange="onBalanceDatePicked(this.value)" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;cursor:pointer;text-align:center;">
+        <div id="balance-day-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-top:0.3rem;"></div>
+      </div>
+      <button onclick="changeBalanceDay(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8250;</button>
     </div>
-    <button onclick="changeBalanceDay(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8250;</button>
+
+    <!-- Side by side -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:stretch;">
+      <div style="display:flex;flex-direction:column;border:1px solid #e8e8e5;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);text-align:center;padding:0.6rem 0.5rem;border-bottom:1px solid #e8e8e5;">Healthy Balance</div>
+        <div id="balanceQuestions" style="flex:1;padding:0.5rem;"></div>
+        <div class="status-card" id="statusCard" style="display:none;border:none;border-top:1px solid #e8e8e5;">
+          <div class="status-icon" id="statusIcon">⚖</div>
+          <div class="status-msg" id="statusMsg"></div>
+          <div class="status-sub" id="statusSub"></div>
+          <div style="margin-top:1rem;display:flex;gap:12px;justify-content:center;">
+            <div style="text-align:center;">
+              <div style="font-family:'Nunito',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:3px;">Giving</div>
+              <div id="giveScore" style="font-size:1.2rem;font-weight:300;color:var(--black);font-family:'Lora',serif;"></div>
+            </div>
+            <div style="width:1px;background:#e8e8e5;"></div>
+            <div style="text-align:center;">
+              <div style="font-family:'Nunito',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:3px;">Self</div>
+              <div id="selfScore" style="font-size:1.2rem;font-weight:300;color:var(--black);font-family:'Lora',serif;"></div>
+            </div>
+          </div>
+          <button onclick="resetBalance()" style="margin-top:0.8rem;background:none;border:1px solid #e0d8cc;padding:0.3rem 0.8rem;font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);cursor:pointer;">Redo</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;border:1px solid #e8e8e5;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);text-align:center;padding:0.6rem 0.5rem;border-bottom:1px solid #e8e8e5;">Relationships</div>
+        <div id="relationshipQuestions" style="flex:1;padding:0.5rem;"></div>
+        <div class="status-card" id="statusCard2" style="display:none;border:none;border-top:1px solid #e8e8e5;">
+          <div class="status-icon" id="statusIcon2">⚖</div>
+          <div class="status-msg" id="statusMsg2"></div>
+          <div class="status-sub" id="statusSub2"></div>
+          <div style="margin-top:1rem;text-align:center;">
+            <div style="font-family:'Nunito',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:3px;">Score</div>
+            <div id="connectScore" style="font-size:1.2rem;font-weight:300;color:var(--black);font-family:'Lora',serif;"></div>
+            <div id="honestScore" style="font-family:'Nunito',sans-serif;font-size:0.72rem;color:var(--gray);margin-top:2px;"></div>
+          </div>
+          <button onclick="resetRelationships()" style="margin-top:0.8rem;background:none;border:1px solid #e0d8cc;padding:0.3rem 0.8rem;font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);cursor:pointer;">Redo</button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div>
+  <!-- WHO I AM sub-section -->
+  <div id="mesub-whiam" style="display:none;">
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0 0 1.5rem;line-height:1.6;">You performed from every angle. Now you build from within.</div>
 
-    <!-- Healthy Balance panel -->
-    <div id="bspanel-balance">
-      <div id="balanceQuestions"></div>
-      <div class="status-card" id="statusCard" style="display:none;">
-        <div class="status-icon" id="statusIcon">⚖️</div>
-        <div class="status-msg" id="statusMsg"></div>
-        <div class="status-sub" id="statusSub"></div>
-        <div style="margin-top:1.2rem;display:flex;gap:20px;justify-content:center;">
-          <div style="text-align:center;">
-            <div style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#b88a5a;margin-bottom:4px;">Giving</div>
-            <div id="giveScore" style="font-size:1.4rem;font-weight:300;color:#b88a5a;font-family:Lora,serif;"></div>
-          </div>
-          <div style="width:1px;background:#e8e8e5;"></div>
-          <div style="text-align:center;">
-            <div style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#5a8a5a;margin-bottom:4px;">Self</div>
-            <div id="selfScore" style="font-size:1.4rem;font-weight:300;color:#5a8a5a;font-family:Lora,serif;"></div>
+    <div class="wia-tabs">
+      <button class="wia-tab active" onclick="wiaTab('identity')">Identity</button>
+      <button class="wia-tab" onclick="wiaTab('perform')">Perform</button>
+      <button class="wia-tab" onclick="wiaTab('daily')">Daily</button>
+      <button class="wia-tab" onclick="wiaTab('progress')">Progress</button>
+    </div>
+
+    <!-- IDENTITY -->
+    <div class="wia-panel active" id="wia-identity">
+      <div class="wia-identity-card">
+        <div class="wia-id-label">I am</div>
+        <div class="wia-id-name" id="wiaIdName">...</div>
+        <div class="wia-id-traits" id="wiaIdTraits"><span class="wia-trait-tag empty">your traits appear here</span></div>
+      </div>
+      <div style="margin-bottom:1rem;">
+        <div class="subtitle" style="margin-bottom:0.3rem;">Your name or how you see yourself</div>
+        <input type="text" id="wiaNameInput" placeholder="e.g. a person who..." oninput="wiaUpdateCard()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+      </div>
+      <div style="margin-bottom:0.5rem;">
+        <div class="subtitle" style="margin-bottom:0.3rem;">Values</div>
+        <div style="display:flex;gap:6px;">
+          <input type="text" id="wiaValueInput" placeholder="e.g. honesty, peace..." style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <button onclick="wiaAddValue()" style="background:var(--black);border:none;padding:0 0.8rem;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;font-weight:300;letter-spacing:0.1em;cursor:pointer;">Add</button>
+        </div>
+      </div>
+      <div class="wia-tags-list" id="wiaValuesList" style="margin-bottom:0.8rem;"></div>
+      <div style="margin-bottom:0.5rem;">
+        <div class="subtitle" style="margin-bottom:0.3rem;">Traits</div>
+        <div style="display:flex;gap:6px;">
+          <input type="text" id="wiaTraitInput" placeholder="e.g. curious, caring..." style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <button onclick="wiaAddTrait()" style="background:var(--black);border:none;padding:0 0.8rem;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;font-weight:300;letter-spacing:0.1em;cursor:pointer;">Add</button>
+        </div>
+      </div>
+      <div class="wia-tags-list" id="wiaTraitsList" style="margin-bottom:0.5rem;"></div>
+    </div>
+
+    <!-- PERFORM -->
+    <div class="wia-panel" id="wia-perform">
+      <div class="subtitle" style="margin-bottom:0.8rem;">Understanding the pattern</div>
+      <div class="wia-q-card" id="wiaQCard">
+        <div class="wia-q-text" id="wiaQText"></div>
+        <textarea id="wiaQAns" placeholder="your answer..." style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);resize:none;min-height:60px;outline:none;padding:0.3rem 0;line-height:1.5;"></textarea>
+        <div class="wia-q-footer">
+          <div class="wia-q-dots" id="wiaQDots"></div>
+          <div class="wia-q-btns">
+            <button class="wia-q-btn" id="wiaQPrev" onclick="wiaGo(-1)">←</button>
+            <button class="wia-q-btn" id="wiaQNext" onclick="wiaGo(1)">→</button>
           </div>
         </div>
-        <button onclick="resetBalance()" style="margin-top:1rem;background:none;border:1px solid #e0d8cc;padding:0.35rem 1rem;font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.08em;color:var(--gray);cursor:pointer;">Redo this day</button>
       </div>
     </div>
 
-    <!-- Relationships panel -->
-    <div id="bspanel-relationships" style="display:none;">
-      <div id="relationshipQuestions"></div>
-      <div class="status-card" id="statusCard2" style="display:none;">
-        <div class="status-icon" id="statusIcon2">⚖️</div>
-        <div class="status-msg" id="statusMsg2"></div>
-        <div class="status-sub" id="statusSub2"></div>
-        <div style="margin-top:1.2rem;text-align:center;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:4px;">Today's score</div>
-          <div id="connectScore" style="font-size:1.6rem;font-weight:300;color:var(--black);font-family:Lora,serif;"></div>
-          <div id="honestScore" style="font-family:'Nunito',sans-serif;font-size:0.78rem;color:var(--gray);margin-top:2px;"></div>
-        </div>
-        <button onclick="resetRelationships()" style="margin-top:1rem;background:none;border:1px solid #e0d8cc;padding:0.35rem 1rem;font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.08em;color:var(--gray);cursor:pointer;">Redo this day</button>
+    <!-- DAILY -->
+    <div class="wia-panel" id="wia-daily">
+      <div class="wia-aff-box" onclick="wiaNewAff()" style="cursor:pointer;user-select:none;">
+        <div class="wia-aff-text" id="wiaAffText"></div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;font-weight:300;color:var(--gray);letter-spacing:0.12em;text-transform:uppercase;margin-top:0.4rem;">tap for a new one</div>
       </div>
+      <div class="subtitle" style="margin-bottom:0.8rem;">Do this today</div>
+      <div id="wiaChecklist"></div>
     </div>
 
+    <!-- PROGRESS -->
+    <div class="wia-panel" id="wia-progress">
+      <div class="wia-streak-row" id="wiaStreakRow"></div>
+      <div class="subtitle" style="margin-bottom:0.6rem;">Practices this week</div>
+      <div id="wiaPracticeBreakdown" style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:1.2rem;"></div>
+      <div class="subtitle" style="margin-bottom:0.6rem;">Last 30 days</div>
+      <div class="wia-calendar" id="wiaCalendar"></div>
+      <div class="subtitle" style="margin-top:1.2rem;margin-bottom:0.8rem;">Weekly check-in</div>
+      <div class="wia-q-card">
+        <div class="wia-q-text" id="wiaWQText"></div>
+        <textarea id="wiaWQAns" placeholder="your answer..." style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);resize:none;min-height:60px;outline:none;padding:0.3rem 0;line-height:1.5;"></textarea>
+        <div class="wia-q-footer">
+          <div class="wia-q-dots" id="wiaWDots"></div>
+          <div class="wia-q-btns">
+            <button class="wia-q-btn" id="wiaWPrev" onclick="wiaGoW(-1)">←</button>
+            <button class="wia-q-btn" id="wiaWNext" onclick="wiaGoW(1)">→</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>
+
+<script>
+// ── Who I Am ────────────────────────────────────────────────
+
+var WIA = JSON.parse(localStorage.getItem('wia2') || '{"j":{},"c":{},"traits":[],"values":[],"name":"","wj":{}}');
+if (!WIA.traits) WIA.traits = [];
+if (!WIA.values) WIA.values = [];
+if (!WIA.j) WIA.j = {};
+if (!WIA.c) WIA.c = {};
+if (!WIA.wj) WIA.wj = {};
+if (!WIA.name) WIA.name = '';
+if (!WIA.notes) WIA.notes = {};
+
+var wiaQi = parseInt(localStorage.getItem('wia2q') || '0');
+var wiaWqi = parseInt(localStorage.getItem('wia2wq') || '0');
+var wiaAffIdx = parseInt(localStorage.getItem('wia2aff') || '0');
+var _wiaInited = false;
+
+function wiaSave() { localStorage.setItem('wia2', JSON.stringify(WIA)); }
+
+function wiaTab(id) {
+  document.querySelectorAll('.wia-tab').forEach(function(t, i) {
+    t.classList.toggle('active', ['identity','perform','daily','progress'][i] === id);
+  });
+  document.querySelectorAll('.wia-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('wia-' + id).classList.add('active');
+}
+
+function initWhiAm() {
+  if (_wiaInited) return;
+  _wiaInited = true;
+  var ni = document.getElementById('wiaNameInput');
+  if (ni) ni.value = WIA.name;
+  document.getElementById('wiaValueInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddValue(); });
+  document.getElementById('wiaTraitInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddTrait(); });
+  document.getElementById('wiaQAns').addEventListener('input', function() { WIA.j[wiaQi] = this.value; wiaSave(); wiaRenderQ(); });
+  document.getElementById('wiaWQAns').addEventListener('input', function() { WIA.wj[wiaWqi] = this.value; wiaSave(); wiaRenderWQ(); });
+  wiaRenderValues(); wiaRenderTraits(); wiaUpdateCard();
+  wiaRenderQ();
+  document.getElementById('wiaAffText').textContent = wiaAffs[wiaAffIdx];
+  wiaRenderChecks();
+  wiaRenderStreakRow(); wiaRenderPractice(); wiaRenderCalendar(); wiaRenderWQ();
+}
+
+// IDENTITY
+function wiaUpdateCard() {
+  WIA.name = (document.getElementById('wiaNameInput') || {}).value || WIA.name;
+  wiaSave();
+  document.getElementById('wiaIdName').textContent = WIA.name || '...';
+  var all = WIA.traits.concat(WIA.values);
+  document.getElementById('wiaIdTraits').innerHTML = all.length
+    ? all.map(function(t) { return '<span class="wia-trait-tag">' + t + '</span>'; }).join('')
+    : '<span class="wia-trait-tag empty">your traits appear here</span>';
+}
+function wiaRenderValues() {
+  document.getElementById('wiaValuesList').innerHTML = WIA.values.map(function(v, i) {
+    return '<div class="wia-tag">' + v + '<button onclick="wiaDelValue(' + i + ')">×</button></div>';
+  }).join('');
+  wiaUpdateCard();
+}
+function wiaAddValue() {
+  var inp = document.getElementById('wiaValueInput');
+  var v = inp.value.trim(); if (!v) return;
+  WIA.values.push(v); inp.value = ''; wiaSave(); wiaRenderValues();
+}
+function wiaDelValue(i) { WIA.values.splice(i,1); wiaSave(); wiaRenderValues(); }
+function wiaRenderTraits() {
+  document.getElementById('wiaTraitsList').innerHTML = WIA.traits.map(function(t, i) {
+    return '<div class="wia-tag">' + t + '<button onclick="wiaDelTrait(' + i + ')">×</button></div>';
+  }).join('');
+  wiaUpdateCard();
+}
+function wiaAddTrait() {
+  var inp = document.getElementById('wiaTraitInput');
+  var v = inp.value.trim(); if (!v) return;
+  WIA.traits.push(v); inp.value = ''; wiaSave(); wiaRenderTraits();
+}
+function wiaDelTrait(i) { WIA.traits.splice(i,1); wiaSave(); wiaRenderTraits(); }
+
+// PERFORM
+var wiaQs = [
+  'When did you first learn that love or approval had to be earned?',
+  'Growing up, what happened when you did not meet expectations?',
+  'Whose voice is loudest when you feel like you are not enough?',
+  'When you achieve something, how long does the relief last before the pressure returns?',
+  'What would the people around you think if you simply stopped trying to impress?',
+  'Underneath the performing, what are you most afraid people would see?',
+  'What does it feel like in your body when you are just existing, no goal, no audience?',
+  'Who are you when nobody is watching and nothing needs to be done?',
+  'What would acting from your values look like, even if nobody noticed or applauded?',
+  'What is one thing true about you that has nothing to do with what you have achieved?'
+];
+function wiaRenderQ() {
+  document.getElementById('wiaQText').textContent = wiaQs[wiaQi];
+  var ans = document.getElementById('wiaQAns'); if (ans) ans.value = WIA.j[wiaQi] || '';
+  var prev = document.getElementById('wiaQPrev'); if (prev) prev.disabled = wiaQi === 0;
+  var next = document.getElementById('wiaQNext'); if (next) next.disabled = wiaQi === wiaQs.length - 1;
+  document.getElementById('wiaQDots').innerHTML = wiaQs.map(function(_, i) {
+    return '<div class="wia-dot' + (WIA.j[i] ? ' done' : '') + (i === wiaQi ? ' current' : '') + '" onclick="wiaJump(' + i + ')"></div>';
+  }).join('');
+}
+function wiaGo(dir) {
+  wiaQi = Math.max(0, Math.min(wiaQs.length - 1, wiaQi + dir));
+  localStorage.setItem('wia2q', wiaQi); wiaRenderQ();
+}
+function wiaJump(i) { wiaQi = i; localStorage.setItem('wia2q', wiaQi); wiaRenderQ(); }
+
+// DAILY
+var wiaAffs = [
+  'I am enough before I do anything today.',
+  'My worth is not a reward I have to earn.',
+  'I exist. That is already enough.',
+  'I do not need an audience to be real.',
+  'My values guide me. Other opinions inform me. Only one gets to lead.',
+  'I am allowed to rest without justifying it to anyone.',
+  'Who I am has never been what I produce.',
+  'I do not have to be impressive to deserve love and belonging.',
+  'Peace is not something I achieve. It is something I return to.',
+  'I am becoming, not proving.',
+  'Acting from fear makes me smaller. Acting from values makes me whole.',
+  'I already know who I am. I am just learning to trust it.'
+];
+function wiaNewAff() {
+  var el = document.getElementById('wiaAffText');
+  el.style.opacity = '0';
+  setTimeout(function() {
+    wiaAffIdx = (wiaAffIdx + 1) % wiaAffs.length;
+    localStorage.setItem('wia2aff', wiaAffIdx);
+    el.textContent = wiaAffs[wiaAffIdx];
+    el.style.opacity = '1';
+  }, 180);
+}
+var wiaDailyItems = [
+  "Read today's affirmation slowly, out loud",
+  'Catch one moment you performed. Ask: what was I afraid of?',
+  'Do one small thing from your values, not for approval',
+  'Sit still for 2 minutes. No doing. Just existing.',
+  'Name one thing true about you unrelated to achievement'
+];
+function wiaRenderChecks() {
+  var today = new Date().toDateString();
+  var tc = WIA.c[today] || {};
+  document.getElementById('wiaChecklist').innerHTML = wiaDailyItems.map(function(t, i) {
+    return '<div class="wia-check-wrap">' +
+      '<div class="wia-check' + (tc[i] ? ' done' : '') + '" onclick="wiaTog(' + i + ')">' +
+        '<div class="wia-box">' + (tc[i] ? '✓' : '') + '</div>' +
+        '<div class="wia-check-text">' + t + '</div>' +
+      '</div></div>';
+  }).join('');
+}
+function wiaTog(i) {
+  var today = new Date().toDateString();
+  if (!WIA.c[today]) WIA.c[today] = {};
+  WIA.c[today][i] = !WIA.c[today][i];
+  wiaSave(); wiaRenderChecks();
+}
+
+// PROGRESS
+function wiaStreak() {
+  var s = 0, d = new Date();
+  while (true) {
+    var k = d.toDateString();
+    var done = Object.values(WIA.c[k] || {}).filter(Boolean).length;
+    if (!done) break; s++; d.setDate(d.getDate() - 1);
+  } return s;
+}
+function wiaTotalDays() {
+  return Object.keys(WIA.c).filter(function(k){ return Object.values(WIA.c[k]).some(Boolean); }).length;
+}
+function wiaBestStreak() {
+  var best = 0, cur = 0, d = new Date();
+  for (var i = 0; i < 365; i++) {
+    var k = new Date(d.getTime() - i*86400000).toDateString();
+    var done = Object.values(WIA.c[k] || {}).filter(Boolean).length;
+    if (done) { cur++; if (cur > best) best = cur; } else cur = 0;
+  } return best;
+}
+function wiaRenderStreakRow() {
+  document.getElementById('wiaStreakRow').innerHTML =
+    '<div class="wia-streak-card"><div class="wia-streak-num">' + wiaStreak() + '</div><div class="wia-streak-label">Day Streak</div></div>' +
+    '<div class="wia-streak-card"><div class="wia-streak-num">' + wiaTotalDays() + '</div><div class="wia-streak-label">Total Days</div></div>' +
+    '<div class="wia-streak-card"><div class="wia-streak-num">' + wiaBestStreak() + '</div><div class="wia-streak-label">Best Streak</div></div>';
+}
+function wiaRenderCalendar() {
+  var days = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  var html = '<div class="wia-cal-label">' + days.map(function(d){ return '<div class="wia-cal-day-label">'+d+'</div>'; }).join('') + '</div>';
+  var today = new Date(); today.setHours(0,0,0,0);
+  var first = new Date(today); first.setDate(today.getDate() - 29);
+  var pad = first.getDay();
+  for (var p = 0; p < pad; p++) html += '<div></div>';
+  for (var i = 29; i >= 0; i--) {
+    var d2 = new Date(today); d2.setDate(today.getDate() - i);
+    var k = d2.toDateString();
+    var done = Object.values(WIA.c[k] || {}).filter(Boolean).length;
+    var cls = 'wia-cal-day';
+    if (done >= 5) cls += ' dfull';
+    else if (done >= 3) cls += ' d3';
+    else if (done >= 2) cls += ' d2';
+    else if (done >= 1) cls += ' d1';
+    if (i === 0) cls += ' today';
+    html += '<div class="' + cls + '"></div>';
+  }
+  document.getElementById('wiaCalendar').innerHTML = html;
+}
+function wiaRenderPractice() {
+  var counts = wiaDailyItems.map(function(){ return 0; });
+  var d = new Date();
+  for (var i = 0; i < 7; i++) {
+    var k = new Date(d.getTime() - i*86400000).toDateString();
+    var tc = WIA.c[k] || {};
+    wiaDailyItems.forEach(function(_, j){ if(tc[j]) counts[j]++; });
+  }
+  document.getElementById('wiaPracticeBreakdown').innerHTML = wiaDailyItems.map(function(t, i) {
+    var pct = Math.round((counts[i]/7)*100);
+    return '<div class="wia-practice-row"><div class="wia-practice-name">'+t+'</div>' +
+      '<div class="wia-bar-wrap"><div class="wia-bar" style="width:'+pct+'%"></div></div>' +
+      '<div class="wia-practice-count">'+counts[i]+'/7</div></div>';
+  }).join('');
+}
+// WEEKLY Q
+var wiaWqs = [
+  'Overall this week, how did you do with just existing without performing?',
+  'What was the biggest trigger for performing this week?',
+  'What moment this week felt most like the real you?',
+  'Which value did you act from most this week?',
+  'What do you want to focus on next week?'
+];
+function wiaRenderWQ() {
+  document.getElementById('wiaWQText').textContent = wiaWqs[wiaWqi];
+  var ans = document.getElementById('wiaWQAns'); if (ans) ans.value = WIA.wj[wiaWqi] || '';
+  var prev = document.getElementById('wiaWPrev'); if (prev) prev.disabled = wiaWqi === 0;
+  var next = document.getElementById('wiaWNext'); if (next) next.disabled = wiaWqi === wiaWqs.length - 1;
+  document.getElementById('wiaWDots').innerHTML = wiaWqs.map(function(_, i) {
+    return '<div class="wia-dot' + (WIA.wj[i] ? ' done' : '') + (i === wiaWqi ? ' current' : '') + '" onclick="wiaJumpW(' + i + ')"></div>';
+  }).join('');
+}
+function wiaGoW(dir) {
+  wiaWqi = Math.max(0, Math.min(wiaWqs.length - 1, wiaWqi + dir));
+  localStorage.setItem('wia2wq', wiaWqi); wiaRenderWQ();
+}
+function wiaJumpW(i) { wiaWqi = i; localStorage.setItem('wia2wq', wiaWqi); wiaRenderWQ(); }
+</script>
+
 </body>
 </html>
