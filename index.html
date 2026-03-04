@@ -2592,11 +2592,6 @@ window.addEventListener('DOMContentLoaded', function() {
       <input id="rfm-new-val" type="text" placeholder="Add your own value…" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;" onkeydown="if(event.key==='Enter')rfmAddValue()">
       <button class="btn" onclick="rfmAddValue()" style="padding:0.5rem 1.2rem;">Add</button>
     </div>
-    <div style="margin-top:2rem;border-top:1px solid var(--light);padding-top:1.2rem;">
-      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:1rem;">Qualities by OP type tap to add</div>
-      <div id="rfm-suggestions" style="display:flex;flex-direction:column;gap:0;"></div>
-    </div>
-
     <!-- Personality Types -->
     <div style="margin-top:2rem;border-top:1px solid var(--light);padding-top:1.2rem;">
       <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.3rem;">Objective Personality Type</div>
@@ -2653,10 +2648,18 @@ window.addEventListener('DOMContentLoaded', function() {
 
       <!-- Result -->
       <div id="rfm-type-result" style="display:none;border:1px solid #c8c8c5;padding:1rem 1.2rem;margin-top:1.2rem;">
-        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Type</div>
-        <div id="rfm-type-code" style="font-family:'Lora',serif;font-size:1.1rem;margin-bottom:0.3rem;"></div>
-        <div id="rfm-type-desc" style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.5;margin-bottom:1rem;"></div>
-        <div id="rfm-type-qualities" style="margin-bottom:0.8rem;"></div>
+        <div id="rfm-type-mbti" style="display:none;margin-bottom:1rem;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;">Closest MBTI — pick one</div>
+          <div id="rfm-mbti-options" style="display:flex;gap:0.5rem;flex-wrap:wrap;"></div>
+        </div>
+
+        <div style="border-top:1px solid var(--light);padding-top:0.8rem;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Type</div>
+          <div id="rfm-type-combined" style="font-family:'Lora',serif;font-size:1.1rem;margin-bottom:0.3rem;"></div>
+          <div id="rfm-type-code" style="display:none;"></div>
+          <div id="rfm-type-desc" style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.5;margin-bottom:1rem;"></div>
+        </div>
+
         <button onclick="rfmAddPersonalityType()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add type as value</button>
       </div>
     </div>
@@ -3316,18 +3319,7 @@ var opAnimalDesc = {
   S: 'Sleep — introverted decider + introverted observer. Preserving energy, processing, introspecting, going inward.'
 };
 
-var opQualities = {
-  O:  ['Observant — takes in before acting', 'Reads the room deeply', 'Gathers info before reacting', 'Quietly attentive and perceptive'],
-  D:  ['Decisive and action-first', 'Moves things forward confidently', 'Takes initiative without waiting', 'Acts on the world before absorbing it'],
-  S:  ['Grounded in concrete, present reality', 'Reliable and consistent', 'Shows up in practical tangible ways', 'Values what is real over theoretical'],
-  N:  ['Sees patterns and future possibilities', 'Thinks in big pictures and meaning', 'Connects dots across ideas', 'Drawn to depth and abstract thinking'],
-  F:  ['Leads with empathy and compassion', 'Prioritises harmony and people', 'Attuned to your emotional state', 'Makes decisions with the heart'],
-  T:  ['Logically consistent and fair', 'Gives honest feedback without softening', 'Treats everyone by the same standard', 'Thinks through problems systematically'],
-  P:  ['Spontaneous and present-focused', 'Fun and action-oriented', 'Adventurous and hands-on', 'Expends energy freely for the tribe'],
-  B:  ['Energising and idea-spreading', 'Teaches and shares naturally', 'Brings excitement and momentum', 'Makes you feel alive in conversation'],
-  C:  ['Curious and always learning', 'Researches deeply before acting', 'Independent thinker who forms own views', 'Quiet but precise in what they say'],
-  Si: ['Deeply emotionally aware', 'Has a strong inner moral compass', 'Needs space and gives space', 'Values authenticity over performance']
-};
+
 
 function opSelect(coin, val, btn) {
   // Deselect siblings
@@ -3351,6 +3343,35 @@ function opSelect(coin, val, btn) {
   opUpdateResult();
 }
 
+function opGetMBTI(od, sn, ft) {
+  var mbtiMap = {
+    'O-S-F': ['ISFJ', 'ESFJ'],
+    'O-S-T': ['ISTJ', 'ESTJ'],
+    'O-N-F': ['INFJ', 'ENFP'],
+    'O-N-T': ['INTJ', 'ENTP'],
+    'D-F-S': ['ESFJ', 'ISFP'],
+    'D-F-N': ['ENFJ', 'INFP'],
+    'D-T-S': ['ESTJ', 'ISTP'],
+    'D-T-N': ['ENTJ', 'INTP'],
+  };
+  var key = od + '-' + ft + '-' + sn;
+  return mbtiMap[key] || [];
+}
+
+var selectedMBTI = null;
+
+function opSelectMBTI(type, btn) {
+  selectedMBTI = type;
+  document.querySelectorAll('.mbti-opt-btn').forEach(function(b) {
+    b.style.background = 'none';
+    b.style.color = 'var(--black)';
+  });
+  btn.style.background = 'var(--black)';
+  btn.style.color = 'var(--white)';
+  var code = document.getElementById('rfm-type-code').textContent;
+  document.getElementById('rfm-type-combined').textContent = type + ' ' + code;
+}
+
 function opUpdateResult() {
   var c = opCoins;
   var resultEl = document.getElementById('rfm-type-result');
@@ -3359,7 +3380,6 @@ function opUpdateResult() {
   var animalLabels = { P:'Play', B:'Blast', C:'Consume', S:'Sleep' };
   var typeCode = c.od + c.sn + '/' + c.ft + '/' + c.a1 + c.a2;
 
-  // Build description
   var odDesc = c.od === 'O'
     ? 'Observer — gathers information before deciding or acting.'
     : 'Decider — acts and decides before fully observing.';
@@ -3371,41 +3391,31 @@ function opUpdateResult() {
     : 'Thinking — decides based on logic, fairness, and systems.';
   var animalDesc = animalLabels[c.a1] + ' / ' + animalLabels[c.a2] + '. ' + opAnimalDesc[c.a1];
 
+  var types = opGetMBTI(c.od, c.sn, c.ft);
+  selectedMBTI = null;
+
   document.getElementById('rfm-type-code').textContent = typeCode;
+  document.getElementById('rfm-type-combined').textContent = typeCode;
   document.getElementById('rfm-type-desc').textContent = odDesc + ' ' + snDesc + ' ' + ftDesc + ' Animal stack: ' + animalDesc;
 
-  // Qualities from all coins
-  var sleepKey = c.a1 === 'S' || c.a2 === 'S' ? 'Si' : null;
-  var allQualities = []
-    .concat(opQualities[c.od] || [])
-    .concat(opQualities[c.ft] || [])
-    .concat(opQualities[c.a1] || [])
-    .concat(sleepKey ? opQualities[sleepKey] : []);
-  // Dedupe
-  var seen = {};
-  allQualities = allQualities.filter(function(q){ if(seen[q]) return false; seen[q]=true; return true; });
-
-  var ql = document.getElementById('rfm-type-qualities');
-  ql.innerHTML = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Qualities tap to add</div>' +
-    '<div style="display:flex;flex-direction:column;gap:0.3rem;">' +
-    allQualities.map(function(q) {
-      return '<button onclick="rfmAddQuality(\'' + q.replace(/'/g, "\\'") + '\')" ' +
-        'style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;border:1px solid #c8c8c5;background:none;color:var(--black);padding:0.4rem 0.8rem;cursor:pointer;text-align:left;transition:background 0.15s;" ' +
-        'onmouseover="this.style.background=\'var(--light)\'" onmouseout="this.style.background=\'none\'">' +
-        q + '</button>';
-    }).join('') + '</div>';
+  var mbtiEl = document.getElementById('rfm-type-mbti');
+  var optsEl = document.getElementById('rfm-mbti-options');
+  if (types.length) {
+    optsEl.innerHTML = types.map(function(t) {
+      return '<button class="mbti-opt-btn" onclick="opSelectMBTI(\'' + t + '\', this)" ' +
+        'style="font-family:\'Lora\',serif;font-size:1rem;font-style:italic;border:1px solid #c8c8c5;background:none;color:var(--black);padding:0.5rem 1.4rem;cursor:pointer;transition:background 0.15s,color 0.15s;">' +
+        t + '</button>';
+    }).join('');
+    mbtiEl.style.display = 'block';
+  } else {
+    mbtiEl.style.display = 'none';
+  }
 
   resultEl.style.display = 'block';
 }
 
-function rfmAddQuality(name) {
-  if (rfmData.values.find(function(v){ return v.name.toLowerCase() === name.toLowerCase(); })) return;
-  rfmData.values.push({ name: name, must: false });
-  rfmSave(); rfmRenderValues(); rfmRenderSuggestions();
-}
-
 function rfmAddPersonalityType() {
-  var code = document.getElementById('rfm-type-code').textContent;
+  var code = document.getElementById('rfm-type-combined').textContent;
   if (!code) return;
   rfmData.values.push({ name: code, must: false });
   rfmSave(); rfmRenderValues(); rfmRenderSuggestions();
