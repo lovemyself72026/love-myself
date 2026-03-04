@@ -1393,16 +1393,15 @@ function removeScheduleItem(key, idx) {
 
 // Meals
 function saveMeal(meal) {
-  const val = document.getElementById(`meal-${meal}`)?.value.trim();
+  const val = document.getElementById('meal-' + meal)?.value.trim();
   if (!val) return;
   const key = getDateKey();
   if (!allPlannerData[key]) allPlannerData[key] = {};
-  if (!allPlannerData[key].mealEntries) allPlannerData[key].mealEntries = {breakfast:[],lunch:[],dinner:[]};
+  if (!allPlannerData[key].mealEntries) allPlannerData[key].mealEntries = {};
+  if (!allPlannerData[key].mealEntries[meal]) allPlannerData[key].mealEntries[meal] = [];
   const time = new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
   allPlannerData[key].mealEntries[meal].push({ id: Date.now(), text: val, time });
-  document.getElementById(`meal-${meal}`).value = '';
-  const span = document.getElementById(`meal-time-${meal}`);
-  if (span) { span.textContent = 'Saved ✓'; setTimeout(() => span.textContent = '', 1500); }
+  document.getElementById('meal-' + meal).value = '';
   localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
   renderMeals();
 }
