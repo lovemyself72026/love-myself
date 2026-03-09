@@ -16,7 +16,7 @@
 <script>
   window._rawLS = localStorage.setItem.bind(localStorage);
   const DB_URL = 'https://lovemyselfapp-default-rtdb.firebaseio.com/my-love-myself-data';
-  const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books','habits_data'];
+  const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books','habits_data','cali_log'];
 
   window.syncToCloud = async function(key, value) {
     if (!SYNC_KEYS.includes(key)) return;
@@ -129,13 +129,15 @@
   .counter-btn { width: 30px; height: 30px; border: 1px solid #c8c8c5; background: none; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: background 0.15s, color 0.15s; font-family: 'Nunito', sans-serif; }
   .counter-btn:hover { background: var(--black); color: var(--white); }
   .counter-num { font-family: 'Nunito', sans-serif; font-size: 1rem; min-width: 24px; text-align: center; }
-  .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #c8c8c5; border: 1px solid #c8c8c5; margin-bottom: 2rem; }
-  .home-card { background: var(--white); padding: 1.5rem; cursor: pointer; transition: background 0.2s; min-height: 100px; display: flex; flex-direction: column; justify-content: center; }
+  .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid #c8c8c5; margin-bottom: 2rem; }
+  .home-card { background: var(--white); padding: 1.2rem 1.5rem; cursor: pointer; transition: background 0.2s; display: flex; flex-direction: column; justify-content: flex-start; border-right: 1px solid #c8c8c5; border-bottom: 1px solid #c8c8c5; }
+  .home-card:nth-child(even) { border-right: none; }
+  .home-card:hover, .home-card:active { background: var(--light); }
   .home-card:hover, .home-card:active { background: var(--light); }
   .home-card-title { font-family: 'Nunito', sans-serif; font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.6rem; color: var(--gray); }
   .home-card-text { font-size: 1.1rem; font-weight: 300; }
   .save-note { font-family: 'Nunito', sans-serif; font-size: 0.65rem; color: var(--gray); letter-spacing: 0.08em; margin-top: 0.8rem; }
-  @media (max-width: 480px) { .home-grid { grid-template-columns: 1fr 1fr; } .nav-tabs { gap: 0; } .nav-tab { font-size: 0.88rem; letter-spacing: 0.04em; white-space: nowrap; } .home-card { min-height: 90px; padding: 1rem; } }
+  @media (max-width: 480px) { .nav-tabs { gap: 0; } .nav-tab { font-size: 0.88rem; letter-spacing: 0.04em; white-space: nowrap; } .home-card { padding: 1rem; } }
   @media (max-width: 600px) { .books-vent-grid { grid-template-columns: 1fr !important; } }
 
   /* Balance & Relationships */
@@ -165,8 +167,8 @@
 
   .journal-tab { font-family:'Nunito',sans-serif; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; color:var(--gray); border:none; background:none; padding:0.5rem 1rem 0.6rem; border-bottom:2px solid transparent; transition:color 0.2s,border-color 0.2s; white-space:nowrap; flex:1; text-align:center; }
   .journal-tab.active, .journal-tab:hover { color:var(--black); border-bottom-color:var(--black); }
-  @media (max-width: 600px) { #planner-grid { grid-template-columns: 1fr !important; } .vision-items-grid { grid-template-columns: 1fr !important; } }
-  .vision-items-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:1rem; }
+  @media (max-width: 600px) { #planner-grid { grid-template-columns: 1fr !important; } .vision-items-grid { grid-template-columns: 1fr 1fr !important; } }
+  .vision-items-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.4rem; margin-top:1rem; }
   /* ── Who I Am ── */
   .wia-tabs { display:flex; gap:0; background:transparent; border:1px solid #c8c8c5; padding:0; margin-top:0.5rem; margin-bottom:1.5rem; }
   .wia-tab { flex:1; text-align:center; padding:7px 6px; border-radius:0; border:none; border-right:1px solid #c8c8c5; background:transparent; font-family:'Nunito',sans-serif; font-size:0.6rem; font-weight:300; color:var(--gray); cursor:pointer; transition:all 0.2s; text-transform:uppercase; letter-spacing:0.12em; }
@@ -233,12 +235,11 @@
 <nav>
   <div class="logo">love myself</div>
   <div class="nav-tabs">
+    <button class="nav-tab" onclick="showSection('jesus')">Jesus Christ</button>
     <button class="nav-tab active" onclick="showSection('home')">Home</button>
     <button class="nav-tab" onclick="showSection('vision')">Vision</button>
     <button class="nav-tab" onclick="showSection('schedule')">Schedule</button>
     <button class="nav-tab" onclick="showSection('affirmations')">Journal</button>
-    <button class="nav-tab" onclick="showSection('me')">Me</button>
-    <button class="nav-tab" onclick="showSection('habits')">Habits</button>
   </div>
 </nav>
 
@@ -247,10 +248,60 @@
   <div class="subtitle">My Daily practice</div>
   <h1>Good to see you today.</h1><br>
   <div class="home-grid">
-    <div class="home-card" onclick="showSection('vision')"><div class="home-card-title">Vision Board</div><div class="home-card-text">Dream it, live it</div></div>
-    <div class="home-card" onclick="showSection('affirmations');setTimeout(()=>showJournalTab('vent'),100)"><div class="home-card-title">Journal</div><div class="home-card-text">Let it out</div></div>
-    <div class="home-card" onclick="showSection('schedule')"><div class="home-card-title">Schedule</div><div class="home-card-text">Plan your day</div></div>
-    <div class="home-card" onclick="showSection('affirmations');setTimeout(()=>showJournalTab('wins'),100)"><div class="home-card-title">My Wins</div><div class="home-card-text">Celebrate myself</div></div>
+
+    <div class="home-card" style="cursor:default;">
+      <div class="home-card-title">Vision Board</div>
+      <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
+        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-spiritual')&&document.getElementById('dim-spiritual').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Spiritual</div>
+        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-social')&&document.getElementById('dim-social').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Social</div>
+        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-physical')&&document.getElementById('dim-physical').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Physical</div>
+        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-nutritional')&&document.getElementById('dim-nutritional').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Nutritional</div>
+        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-emotional')&&document.getElementById('dim-emotional').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Emotional</div>
+        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-financial')&&document.getElementById('dim-financial').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Financial</div>
+        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('whoi-grid')&&document.getElementById('whoi-grid').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Who I Am</div>
+      </div>
+    </div>
+
+    <div class="home-card" style="cursor:default;">
+      <div class="home-card-title">Schedule</div>
+      <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
+        <div onclick="showSection('schedule');setTimeout(()=>document.getElementById('ps-schedule')&&document.getElementById('ps-schedule').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Schedule</div>
+        <div onclick="showSection('schedule');setTimeout(()=>document.getElementById('ps-todo')&&document.getElementById('ps-todo').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">To Do</div>
+        <div onclick="showSection('schedule');setTimeout(()=>document.getElementById('ps-mood')&&document.getElementById('ps-mood').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Mood</div>
+        <div onclick="showSection('schedule');setTimeout(()=>document.getElementById('ps-sleep')&&document.getElementById('ps-sleep').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Sleep</div>
+        <div onclick="showSection('schedule');setTimeout(()=>document.getElementById('ps-water')&&document.getElementById('ps-water').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Water</div>
+        <div onclick="showSection('schedule');setTimeout(()=>document.getElementById('ps-meals')&&document.getElementById('ps-meals').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Meals</div>
+        <div onclick="showSection('schedule');setTimeout(()=>document.getElementById('ps-notes')&&document.getElementById('ps-notes').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Notes</div>
+      </div>
+    </div>
+
+    <div class="home-card" style="cursor:default;">
+      <div class="home-card-title">Journal</div>
+      <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
+        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('belief'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Belief</div>
+        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('vent'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Journal</div>
+        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('books'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Books</div>
+        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('wins'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Wins</div>
+      </div>
+    </div>
+
+    <div class="home-card" style="cursor:default;">
+      <div class="home-card-title">Me</div>
+      <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
+        <div onclick="showSection('me');setTimeout(()=>showMeTab('whiam'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Who I Am</div>
+        <div onclick="showSection('me');setTimeout(()=>showMeTab('balance'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Balance</div>
+        <div onclick="showSection('me');setTimeout(()=>showMeTab('rightforme'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Right For Me</div>
+      </div>
+    </div>
+
+    <div class="home-card" style="cursor:default;">
+      <div class="home-card-title">Habits</div>
+      <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
+        <div onclick="showSection('habits');setTimeout(()=>showHabitsTab('myhabits'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">My Habits</div>
+        <div onclick="showSection('habits');setTimeout(()=>showHabitsTab('calisthenics'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Calisthenics</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Analytics -->
@@ -445,23 +496,21 @@
   <div class="subtitle">Plan your day</div>
   <h1>My schedule.</h1><br>
 
-  <!-- Date navigation with inline calendar popup -->
+  <!-- Date navigation -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-    <button id="sched-prev" onclick="savePlannerDay();changeScheduleDay(-1);" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8249;</button>
+    <button onclick="savePlannerDay();changeScheduleDay(-1);" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8249;</button>
     <div style="text-align:center;flex:1;min-width:0;position:relative;">
       <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;">
-        <input type="date" id="schedule-date-picker" onchange="changeScheduleDate(this.value)" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;cursor:pointer;text-align:center;max-width:180px;">
-        <button onclick="toggleSchedCal()" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;" title="Open calendar">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;">
+        <div id="schedule-day-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--black);"></div>
+        <button onclick="toggleSchedCal()" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;flex-shrink:0;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;">
             <rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
           </svg>
         </button>
       </div>
-      <div id="schedule-day-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-top:0.3rem;"></div>
-
       <!-- Popup calendar -->
       <div id="sched-cal-popup" style="display:none;position:absolute;top:calc(100% + 0.5rem);left:50%;transform:translateX(-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.8rem;z-index:100;min-width:220px;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
           <button onclick="schedCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
           <div id="sched-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
           <button onclick="schedCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
@@ -470,43 +519,36 @@
         <div id="sched-cal-grid"></div>
       </div>
     </div>
-    <button id="sched-next" onclick="savePlannerDay();changeScheduleDay(1);" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8250;</button>
+    <button onclick="savePlannerDay();changeScheduleDay(1);" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8250;</button>
   </div>
 
-  <!-- Planner grid -->
+
   <!-- Planner grid -->
   <div id="planner-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;align-items:start;">
-
-    <!-- Goals + To Do always side by side - full width -->
-    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div class="planner-label">Goals</div>
-        <div id="goals-list" style="margin-top:0.5rem;"></div>
-        <input id="goals-input" placeholder="Add goal..." onkeydown="if(event.key==='Enter')addGoal()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.4rem;">
-      </div>
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div class="planner-label">To Do</div>
-        <div id="todo-list" style="margin-top:0.5rem;"></div>
-        <input id="todo-input" placeholder="Add task..." onkeydown="if(event.key==='Enter')addTodo()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
-      </div>
-    </div>
 
     <!-- LEFT: Schedule -->
     <div style="display:flex;flex-direction:column;gap:0.6rem;">
 
       <!-- Schedule -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div id="ps-schedule" style="border:1px solid #c8c8c5;padding:0.8rem;">
         <div class="planner-label">Schedule</div>
         <div style="display:grid;grid-template-columns:auto 1fr;gap:0 0.4rem;margin-top:0.5rem;" id="schedule-time-rows"></div>
       </div>
 
     </div>
 
-    <!-- RIGHT: Mood, Sleep, Water, Bible Verse, Exercise, Meals -->
+    <!-- RIGHT: Goals, To Do, Mood, Sleep, Water, Bible Verse, Exercise, Meals -->
     <div style="display:flex;flex-direction:column;gap:0.6rem;">
 
+      <!-- To Do -->
+      <div id="ps-todo" style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label">To Do</div>
+        <div id="todo-list" style="margin-top:0.5rem;"></div>
+        <input id="todo-input" placeholder="Add task..." onkeydown="if(event.key==='Enter')addTodo()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
+      </div>
+
       <!-- Mood -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div id="ps-mood" style="border:1px solid #c8c8c5;padding:0.8rem;">
         <div class="planner-label">Mood</div>
         <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;">
           <span class="mood-btn" onclick="toggleMood(this,'😊')">😊</span>
@@ -534,7 +576,7 @@
       </div>
 
       <!-- Sleep -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div id="ps-sleep" style="border:1px solid #c8c8c5;padding:0.8rem;">
         <div style="display:flex;align-items:center;justify-content:space-between;">
           <div class="planner-label">Sleep (hrs)</div>
           <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">9:00 PM</span>
@@ -549,7 +591,7 @@
       </div>
 
       <!-- Water -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div id="ps-water" style="border:1px solid #c8c8c5;padding:0.8rem;">
         <div class="planner-label">Water</div>
         <div style="display:flex;gap:0.2rem;margin-top:0.5rem;justify-content:space-between;" id="water-cups">
           <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
@@ -587,35 +629,8 @@
         </div>
       </div>
 
-      <!-- Bible Verse -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">
-          <div class="planner-label">Bible Verse</div>
-          <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">5:30 AM</span>
-        </div>
-        <textarea id="bible-verse" placeholder="Enter today's verse..." rows="2" onblur="savePlannerDay()" style="width:100%;border:none;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.2rem 0;"></textarea>
-        <input id="bible-ref" placeholder="e.g. John 3:16" onblur="savePlannerDay()" style="width:100%;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);outline:none;padding:0.2rem 0;margin-top:0.2rem;">
-      </div>
-
-      <!-- Exercise -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div class="planner-label">Calisthenics</div>
-          <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">4:30 AM</span>
-        </div>
-        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">
-          <span class="exercise-btn" onclick="toggleExercise(this,'Push-ups')">Push-ups</span>
-          <span class="exercise-btn" onclick="toggleExercise(this,'Bodyweight squats')">Bodyweight squats</span>
-          <span class="exercise-btn" onclick="toggleExercise(this,'Plank')">Plank</span>
-          <span class="exercise-btn" onclick="toggleExercise(this,'Glute bridges')">Glute bridges</span>
-          <span class="exercise-btn" onclick="toggleExercise(this,'Dead hang')">Dead hang</span>
-          <span class="exercise-btn" onclick="toggleExercise(this,'Pull-ups')">Assisted / Negative pull-ups</span>
-          <span class="exercise-btn" onclick="toggleExercise(this,'Rest')">Rest</span>
-        </div>
-      </div>
-
       <!-- Meals -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div id="ps-meals" style="border:1px solid #c8c8c5;padding:0.8rem;">
 
         <div style="display:flex;align-items:center;justify-content:space-between;">
           <div class="planner-label">Breakfast</div>
@@ -644,7 +659,7 @@
       </div>
 
       <!-- Notes -->
-      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div id="ps-notes" style="border:1px solid #c8c8c5;padding:0.8rem;">
         <div class="planner-label">Notes</div>
         <textarea class="planner-textarea" id="planner-notes" placeholder="" rows="1" style="width:100%;margin-top:0.3rem;min-height:28px;max-height:60px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();saveNote()}"></textarea>
         <div id="notes-list" style="margin-top:0.3rem;"></div>
@@ -769,13 +784,15 @@ function showSection(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  const map=['home','vision','schedule','affirmations','me','habits'];
-  document.querySelectorAll('.nav-tab')[map.indexOf(id)].classList.add('active');
+  const map=['jesus','home','vision','schedule','affirmations'];
+  const navTab = document.querySelectorAll('.nav-tab')[map.indexOf(id)];
+  if (navTab) navTab.classList.add('active');
   window.scrollTo(0,0);
   if (id === 'home') renderAnalytics();
-  if (id === 'schedule') { initScheduleDatePicker(); loadPlannerDay(); renderSchedCal(); }
+  if (id === 'schedule') { initScheduleDatePicker(); loadPlannerDay(); }
   if (id === 'me') initMeSection();
-  if (id === 'habits') habitsInit();
+  if (id === 'habits' && typeof habitsInit === 'function') habitsInit();
+  if (id === 'jesus' && typeof jesusInit === 'function') jesusInit();
 }
 
 function showJournalTab(tab) {
@@ -1042,9 +1059,8 @@ function renderDimensionBoards() {
     const items = dimensionItems[d.key] || [];
     const activeType = activeDimType[d.key] || 'dream';
     return `
-    <div style="border:1px solid #c8c8c5;padding:1.2rem;margin-bottom:0.75rem;">
+    <div id="dim-${d.key}" style="border:1px solid #c8c8c5;padding:1.2rem;margin-bottom:0.75rem;">
       <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.8rem;">
-        <span style="font-size:1.3rem;">${d.icon}</span>
         <div>
           <div style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;">${d.label}</div>
           <div style="font-family:'Lora',serif;font-style:italic;font-size:0.75rem;color:var(--gray);">${d.desc}</div>
@@ -1284,20 +1300,17 @@ function getDateKey() { return currentScheduleDate; }
 function getPlannerDay() { return allPlannerData[getDateKey()] || {}; }
 
 function initScheduleDatePicker() {
-  document.getElementById('schedule-date-picker').value = currentScheduleDate;
   updateDayLabel();
+  renderSchedCal();
 }
-
-
-
 
 function updateDayLabel() {
   const d = new Date(currentScheduleDate + 'T00:00:00');
   const today = new Date().toISOString().split('T')[0];
   let label = d.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
   if (currentScheduleDate === today) label += ' — Today';
-  document.getElementById('schedule-day-label').textContent = label;
-  document.getElementById('schedule-date-picker').value = currentScheduleDate;
+  const el = document.getElementById('schedule-day-label');
+  if (el) el.textContent = label;
 }
 
 function changeScheduleDate(val) {
@@ -1305,6 +1318,7 @@ function changeScheduleDate(val) {
   currentScheduleDate = val;
   updateDayLabel();
   loadPlannerDay();
+  renderSchedCal();
 }
 
 function changeScheduleDay(dir) {
@@ -1316,6 +1330,9 @@ function changeScheduleDay(dir) {
   loadPlannerDay();
   renderSchedCal();
 }
+
+// ── Schedule Calendar ────────────────────────────────────────
+var schedCalOffset = 0;
 
 function toggleSchedCal() {
   const popup = document.getElementById('sched-cal-popup');
@@ -1331,9 +1348,6 @@ document.addEventListener('click', function(e) {
     popup.style.display = 'none';
   }
 });
-
-
-var schedCalOffset = 0; // months from current
 
 function schedCalShift(dir) {
   schedCalOffset += dir;
@@ -1370,29 +1384,24 @@ function renderSchedCal() {
 
   lbl.textContent = base.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-  // Day name headers
   const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   if (dayNamesEl) {
     dayNamesEl.innerHTML = dayNames.map(n =>
-      `<div style="text-align:center;font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);font-weight:300;">${n}</div>`
+      `<div style="text-align:center;font-family:'Nunito',sans-serif;font-size:0.42rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);font-weight:300;">${n}</div>`
     ).join('');
   }
 
-  const firstDow   = (new Date(year, month, 1).getDay() + 6) % 7; // Mon=0
+  const firstDow    = (new Date(year, month, 1).getDay() + 6) % 7;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  // Build flat array of cells
   let cells = [];
-  for (let i = 0; i < firstDow; i++) cells.push(null); // empty
+  for (let i = 0; i < firstDow; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-
-  // Pad to full weeks
   while (cells.length % 7 !== 0) cells.push(null);
 
-  // Render week rows
   let html = '';
   for (let w = 0; w < cells.length / 7; w++) {
-    html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;margin-bottom:0.3rem;">`;
+    html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px;">`;
     for (let i = 0; i < 7; i++) {
       const day = cells[w * 7 + i];
       if (!day) { html += `<div></div>`; continue; }
@@ -1405,27 +1414,38 @@ function renderSchedCal() {
       const hasData    = dayHasData(dateStr);
       const isFuture   = dateStr > todayStr;
 
-      const bg      = isSelected ? 'var(--black)' : hasData ? '#e8e8e5' : 'transparent';
-      const border  = isSelected ? 'var(--black)' : hasData ? '#0a0a0a' : '#c8c8c5';
-      const color   = isSelected ? 'var(--white)' : isToday ? 'var(--black)' : hasData ? 'var(--black)' : 'var(--gray)';
-      const opacity = isFuture && !isSelected ? '0.35' : '1';
-      const fw      = (isToday || isSelected) ? '400' : '300';
+      // Style logic:
+      // selected = solid black fill (you're viewing this day)
+      // today only = circle outline, bold number
+      // hasData (not today, not selected) = light gray fill
+      // future = faded
+      let bg, border, color, extraInner = '';
+      const opacity = isFuture && !isSelected ? '0.3' : '1';
+      const fw = (isToday || isSelected) ? '600' : '300';
 
-      html += `<div onclick="schedCalJump('${dateStr}')" style="
-        display:flex;align-items:center;justify-content:center;
-        border:1px solid ${border};
-        background:${bg};
-        opacity:${opacity};
-        cursor:pointer;
-        aspect-ratio:1;
-        transition:all 0.15s;
-      ">
-        <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;font-weight:${fw};color:${color};line-height:1;">${day}</span>
+      if (isSelected && isToday) {
+        // selected AND today: black fill + small dot below
+        bg = 'var(--black)'; border = 'var(--black)'; color = 'var(--white)';
+        extraInner = `<div style="width:3px;height:3px;border-radius:50%;background:var(--white);margin-top:1px;"></div>`;
+      } else if (isSelected) {
+        bg = 'var(--black)'; border = 'var(--black)'; color = 'var(--white)';
+      } else if (isToday) {
+        // today: no fill, thick border circle to stand out
+        bg = 'transparent'; border = 'var(--black)'; color = 'var(--black)';
+        extraInner = `<div style="width:3px;height:3px;border-radius:50%;background:var(--black);margin-top:1px;"></div>`;
+      } else if (hasData) {
+        bg = '#e8e8e5'; border = '#0a0a0a'; color = 'var(--black)';
+      } else {
+        bg = 'transparent'; border = '#c8c8c5'; color = 'var(--gray)';
+      }
+
+      html += `<div onclick="schedCalJump('${dateStr}')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid ${border};background:${bg};opacity:${opacity};cursor:pointer;aspect-ratio:1;transition:all 0.15s;${isToday && !isSelected ? 'border-width:2px;' : ''}">
+        <span style="font-family:'Nunito',sans-serif;font-size:0.55rem;font-weight:${fw};color:${color};line-height:1;">${day}</span>
+        ${extraInner}
       </div>`;
     }
     html += `</div>`;
   }
-
   grid.innerHTML = html;
 }
 
@@ -1690,8 +1710,8 @@ function toggleGoal(id) {
 }
 function renderGoals() {
   const el = document.getElementById('goals-list');
+  if (!el) return;
   el.innerHTML = plannerGoals.map(g => `
-    <div class="todo-item">
       <div class="todo-check${g.done?' done':''}" onclick="toggleGoal(${g.id})"></div>
       <div style="flex:1;"><div class="todo-text${g.done?' done':''}">${g.text}</div>${g.time?`<div style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);">${g.time}</div>`:''}</div>
       <button onclick="removeGoal(${g.id})" style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.08em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;flex-shrink:0;">✕</button>
@@ -1796,11 +1816,11 @@ const visionStyle = document.createElement('style');
 visionStyle.textContent = `
   .vision-type-btn { font-family:'Nunito',sans-serif; font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; border:1px solid #c8c8c5; background:none; color:var(--gray); padding:0.45rem 1rem; cursor:pointer; transition:all 0.2s; }
   .vision-type-btn.active { background:var(--black); color:var(--white); border-color:var(--black); }
-  .vision-card { break-inside:avoid; margin-bottom:0.75rem; border:1px solid #c8c8c5; padding:1.2rem; position:relative; }
-  .vision-card-type { font-family:'Nunito',sans-serif; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gray); margin-bottom:0.5rem; }
-  .vision-card-content { font-family:'Lora',serif; font-size:1rem; font-weight:400; line-height:1.5; word-break:break-word; }
-  .vision-card-word { font-family:'Lora',serif; font-size:1.4rem; font-style:italic; font-weight:400; text-align:center; padding:0.5rem 0; }
-  .vision-card img { width:100%; display:block; border-radius:0; }
+  .vision-card { break-inside:avoid; border:1px solid #c8c8c5; position:relative; overflow:hidden; }
+  .vision-card-type { font-family:'Nunito',sans-serif; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gray); margin-bottom:0.5rem; padding:0.8rem 0.8rem 0; }
+  .vision-card-content { font-family:'Lora',serif; font-size:0.9rem; font-weight:400; line-height:1.5; word-break:break-word; padding:0 0.8rem 0.8rem; }
+  .vision-card-word { font-family:'Lora',serif; font-size:1.2rem; font-style:italic; font-weight:400; text-align:center; padding:0.8rem; }
+  .vision-card img { width:100%; aspect-ratio:1/1; object-fit:cover; display:block; }
   .vision-remove { position:absolute; top:0.5rem; right:0.6rem; font-family:'Nunito',sans-serif; font-size:0.55rem; letter-spacing:0.1em; color:var(--gray); border:none; background:none; cursor:pointer; text-transform:uppercase; }
 `;
 document.head.appendChild(visionStyle);
@@ -1956,7 +1976,25 @@ function renderAnalytics() {
     <!-- Date nav -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
       <button onclick="changeAnalyticsDay(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8249;</button>
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--black);text-align:center;">${dateLabel}${isToday ? ' <span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">Today</span>' : ''}</div>
+      <div style="position:relative;text-align:center;">
+        <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+          <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--black);">${dateLabel}${isToday ? ' <span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">Today</span>' : ''}</div>
+          <button onclick="toggleAnalyticsCal()" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;">
+              <rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
+            </svg>
+          </button>
+        </div>
+        <div id="analytics-cal-popup" style="display:none;position:absolute;top:calc(100% + 0.5rem);left:50%;transform:translateX(-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.8rem;z-index:100;min-width:220px;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+            <button onclick="analyticsCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
+            <div id="analytics-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+            <button onclick="analyticsCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+          </div>
+          <div id="analytics-cal-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px;"></div>
+          <div id="analytics-cal-grid"></div>
+        </div>
+      </div>
       <button onclick="changeAnalyticsDay(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8250;</button>
     </div>
 
@@ -2037,10 +2075,106 @@ function reloadAllData() {
   const wi = JSON.parse(localStorage.getItem('whoi_history') || '[]'); whoiItems = Array.isArray(wi) ? wi : [];
   const b = JSON.parse(localStorage.getItem('my_books') || '[]'); books = Array.isArray(b) ? b : [];
   const ap = JSON.parse(localStorage.getItem('all_planner_data') || '{}'); allPlannerData = (ap && typeof ap === 'object' && !Array.isArray(ap)) ? ap : {};
+  const cl = JSON.parse(localStorage.getItem('cali_log') || '{}'); caliLog = (cl && typeof cl === 'object') ? cl : {};
+  if (typeof habitsLoad === 'function') habitsLoad();
   renderWins(); renderSavedAffirmations(); renderVentEntries(); renderDimensionBoards(); renderWhoiGrid(); renderBooks(); renderAnalytics();
 }
 
 renderAnalytics();
+
+// ── Analytics Calendar (popup) ───────────────────────────────
+var analyticsCalOffset = 0;
+
+function toggleAnalyticsCal() {
+  const popup = document.getElementById('analytics-cal-popup');
+  if (!popup) return;
+  const isOpen = popup.style.display !== 'none';
+  popup.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) renderAnalyticsCal();
+}
+
+document.addEventListener('click', function(e) {
+  const popup = document.getElementById('analytics-cal-popup');
+  if (!popup || popup.style.display === 'none') return;
+  if (!popup.contains(e.target) && !e.target.closest('[onclick="toggleAnalyticsCal()"]')) {
+    popup.style.display = 'none';
+  }
+});
+
+function analyticsCalShift(dir) {
+  analyticsCalOffset += dir;
+  renderAnalyticsCal();
+}
+
+function renderAnalyticsCal() {
+  const grid = document.getElementById('analytics-cal-grid');
+  const lbl  = document.getElementById('analytics-cal-label');
+  const dayNamesEl = document.getElementById('analytics-cal-daynames');
+  if (!grid || !lbl) return;
+
+  const now   = new Date();
+  const base  = new Date(now.getFullYear(), now.getMonth() + analyticsCalOffset, 1);
+  const year  = base.getFullYear();
+  const month = base.getMonth();
+  const todayStr = now.toISOString().split('T')[0];
+  const selectedStr = analyticsDateKey(analyticsDate);
+
+  lbl.textContent = base.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  if (dayNamesEl) {
+    dayNamesEl.innerHTML = dayNames.map(n =>
+      `<div style="text-align:center;font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);font-weight:300;">${n}</div>`
+    ).join('');
+  }
+
+  const firstDow    = (new Date(year, month, 1).getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const allPlanner  = JSON.parse(localStorage.getItem('all_planner_data') || '{}');
+
+  let cells = [];
+  for (let i = 0; i < firstDow; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  let html = '';
+  for (let w = 0; w < cells.length / 7; w++) {
+    html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px;">`;
+    for (let i = 0; i < 7; i++) {
+      const day = cells[w * 7 + i];
+      if (!day) { html += `<div></div>`; continue; }
+
+      const mm      = String(month + 1).padStart(2,'0');
+      const dd      = String(day).padStart(2,'0');
+      const dateStr = `${year}-${mm}-${dd}`;
+      const isToday    = dateStr === todayStr;
+      const isSelected = dateStr === selectedStr;
+      const hasData    = dayHasData(dateStr);
+      const isFuture   = dateStr > todayStr;
+
+      const bg     = isSelected ? 'var(--black)' : hasData ? '#e8e8e5' : 'transparent';
+      const border = isSelected ? 'var(--black)' : hasData ? '#0a0a0a' : '#c8c8c5';
+      const color  = isSelected ? 'var(--white)' : isToday ? 'var(--black)' : hasData ? 'var(--black)' : 'var(--gray)';
+      const opacity = isFuture && !isSelected ? '0.35' : '1';
+      const fw     = (isToday || isSelected) ? '400' : '300';
+
+      html += `<div onclick="analyticsCalJump('${dateStr}')" style="display:flex;align-items:center;justify-content:center;border:1px solid ${border};background:${bg};opacity:${opacity};cursor:pointer;aspect-ratio:1;transition:all 0.15s;">
+        <span style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:${fw};color:${color};line-height:1;">${day}</span>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function analyticsCalJump(dateStr) {
+  analyticsDate = new Date(dateStr + 'T00:00:00');
+  const now = new Date();
+  analyticsCalOffset = (analyticsDate.getFullYear() - now.getFullYear()) * 12 + (analyticsDate.getMonth() - now.getMonth());
+  renderAnalytics();
+  const popup = document.getElementById('analytics-cal-popup');
+  if (popup) popup.style.display = 'none';
+}
 
 function showCopySchedule() {
   const box = document.getElementById('copy-schedule-box');
@@ -2905,51 +3039,817 @@ window.addEventListener('DOMContentLoaded', function() {
   <div class="subtitle">Build yourself daily</div>
   <h1>Habits.</h1>
 
-  <!-- Week strip -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;margin-top:1.5rem;">
-    <button onclick="habitsWeekShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8249;</button>
-    <div id="habits-week-label" style="font-family:'Nunito',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></div>
-    <button onclick="habitsWeekShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8250;</button>
+  <!-- Sub-tabs -->
+  <div style="display:flex;border-bottom:1px solid #c8c8c5;margin-bottom:1.5rem;margin-top:1rem;">
+    <button id="htab-myhabits" onclick="showHabitsTab('myhabits')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:none;background:none;cursor:pointer;padding:0.5rem 0;margin-right:1.5rem;border-bottom:2px solid var(--black);color:var(--black);font-weight:300;">My Habits</button>
+    <button id="htab-calisthenics" onclick="showHabitsTab('calisthenics')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:none;background:none;cursor:pointer;padding:0.5rem 0;margin-right:1.5rem;border-bottom:2px solid transparent;color:var(--gray);font-weight:300;">Calisthenics</button>
   </div>
 
-  <!-- Day columns -->
-  <div id="habits-day-strip" style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;margin-bottom:1.5rem;"></div>
+  <!-- MY HABITS -->
+  <div id="hsub-myhabits">
+    <!-- Week strip -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+      <button onclick="habitsWeekShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8249;</button>
+      <div id="habits-week-label" style="font-family:'Nunito',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></div>
+      <button onclick="habitsWeekShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8250;</button>
+    </div>
+    <div id="habits-day-strip" style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;margin-bottom:1.5rem;"></div>
+    <div id="habits-list"></div>
 
-  <!-- Habit list -->
-  <div id="habits-list"></div>
-
-  <!-- Add habit -->
-  <div style="margin-top:1.5rem;border-top:1px solid var(--light);padding-top:1.2rem;">
-    <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Add a habit</div>
-    <div style="display:flex;gap:0.6rem;align-items:flex-end;flex-wrap:wrap;">
-      <input id="habit-name-input" type="text" placeholder="e.g. drink water, journal, walk…" onkeydown="if(event.key==='Enter')habitsAdd()" style="flex:1;min-width:140px;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-      <div style="display:flex;gap:0.3rem;align-items:center;">
-        <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);">Color</span>
-        <div id="habit-color-picker" style="display:flex;gap:0.3rem;">
-          <button class="habit-color-opt selected" data-color="#0a0a0a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#0a0a0a;border:2px solid #0a0a0a;cursor:pointer;"></button>
-          <button class="habit-color-opt" data-color="#888" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#888;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="habit-color-opt" data-color="#b07a5a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#b07a5a;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="habit-color-opt" data-color="#5a7a8a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#5a7a8a;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="habit-color-opt" data-color="#7a8a5a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#7a8a5a;border:2px solid transparent;cursor:pointer;"></button>
+    <!-- Add habit -->
+    <div style="margin-top:1.5rem;border-top:1px solid var(--light);padding-top:1.2rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Add a habit</div>
+      <div style="display:flex;gap:0.6rem;align-items:flex-end;flex-wrap:wrap;">
+        <input id="habit-name-input" type="text" placeholder="e.g. drink water, journal, walk…" onkeydown="if(event.key==='Enter')habitsAdd()" style="flex:1;min-width:140px;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+        <div style="display:flex;gap:0.3rem;align-items:center;">
+          <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);">Color</span>
+          <div style="display:flex;gap:0.3rem;">
+            <button class="habit-color-opt selected" data-color="#0a0a0a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#0a0a0a;border:2px solid #0a0a0a;cursor:pointer;"></button>
+            <button class="habit-color-opt" data-color="#888" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#888;border:2px solid transparent;cursor:pointer;"></button>
+            <button class="habit-color-opt" data-color="#b07a5a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#b07a5a;border:2px solid transparent;cursor:pointer;"></button>
+            <button class="habit-color-opt" data-color="#5a7a8a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#5a7a8a;border:2px solid transparent;cursor:pointer;"></button>
+            <button class="habit-color-opt" data-color="#7a8a5a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#7a8a5a;border:2px solid transparent;cursor:pointer;"></button>
+          </div>
         </div>
+        <button onclick="habitsAdd()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
       </div>
-      <button onclick="habitsAdd()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
     </div>
   </div>
+
+  <!-- CALISTHENICS FOR BEGINNER -->
+  <div id="hsub-calisthenics" style="display:none;">
+    <div style="border:1px solid #c8c8c5;padding:1rem;margin-bottom:1.2rem;background:#fafaf8;">
+      <div style="font-family:'Lora',serif;font-size:0.88rem;margin-bottom:0.5rem;">What is Calisthenics?</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:300;color:var(--gray);line-height:1.6;">Calisthenics means using your own bodyweight as resistance no gym, no equipment. Push-ups, squats, planks that's calisthenics. It builds real strength, flexibility, and body control at your own pace.</div>
+      <div style="font-family:'Lora',serif;font-size:0.88rem;margin-top:0.8rem;margin-bottom:0.4rem;">What does "3 rounds × 10" mean?</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:300;color:var(--gray);line-height:1.6;"><b style="font-weight:400;">Rounds</b> = how many times you repeat a group of reps. <b style="font-weight:400;">Reps</b> = how many times you do one movement. So <b style="font-weight:400;">3 rounds × 10 reps</b> means: do the exercise 10 times, rest, do it again, rest, do it one more time. That's it 🤍</div>
+    </div>
+    <div class="subtitle" style="margin-bottom:1.2rem;">Beginner Program</div>
+    <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:1.2rem;" id="cali-week-btns"></div>
+    <div id="cali-plan"></div>
+  </div>
+</div>
+<div class="section" id="jesus" style="padding-top:1.5rem;">
+  <div class="subtitle">Walk with Him daily</div>
+  <h1>Jesus Christ.</h1>
+
+  <!-- Date navigation with calendar -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;margin-top:1rem;">
+    <button onclick="jesusChangeDay(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8249;</button>
+    <div style="text-align:center;flex:1;min-width:0;position:relative;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+        <div id="jesus-day-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--black);"></div>
+        <button onclick="toggleJesusCal()" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;flex-shrink:0;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;">
+            <rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
+          </svg>
+        </button>
+      </div>
+      <div id="jesus-cal-popup" style="display:none;position:absolute;top:calc(100% + 0.5rem);left:50%;transform:translateX(-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.8rem;z-index:100;min-width:220px;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+          <button onclick="jesusCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
+          <div id="jesus-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+          <button onclick="jesusCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+        </div>
+        <div id="jesus-cal-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px;"></div>
+        <div id="jesus-cal-grid"></div>
+      </div>
+    </div>
+    <button onclick="jesusChangeDay(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8250;</button>
+  </div>
+
+  <!-- Sub-tabs -->
+  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;overflow-x:auto;">
+    <button id="jtab-whoisjesus" onclick="showJesusTab('whoisjesus')" class="journal-tab active">Jesus Christ</button>
+    <button id="jtab-prayer" onclick="showJesusTab('prayer')" class="journal-tab">Prayer</button>
+    <button id="jtab-action" onclick="showJesusTab('action')" class="journal-tab">Today's Action</button>
+    <button id="jtab-study" onclick="showJesusTab('study')" class="journal-tab">Study the Bible</button>
+  </div>
+
+  <!-- PRAYER & WORD -->
+  <div id="jsub-prayer">
+
+    <!-- Inner sub-tabs -->
+    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+      <button class="journal-tab active" id="jpwtab-things" onclick="showJesusPrayWordTab('things')">Things to Pray</button>
+      <button class="journal-tab" id="jpwtab-people" onclick="showJesusPrayWordTab('people')">People</button>
+      <button class="journal-tab" id="jpwtab-verse" onclick="showJesusPrayWordTab('verse')">Bible Verse</button>
+      <button class="journal-tab" id="jpwtab-godsaid" onclick="showJesusPrayWordTab('godsaid')">God Said</button>
+    </div>
+
+    <!-- Things to Pray -->
+    <div id="jpwsub-things">
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">Bring everything to Him. He hears every word.</div>
+      <div id="jesus-pray-things-list" style="margin-bottom:0.6rem;"></div>
+      <input id="jesus-pray-things-input" placeholder="Add something…" onkeydown="if(event.key==='Enter')jesusSavePrayThing()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+    </div>
+
+    <!-- People to Pray For -->
+    <div id="jpwsub-people" style="display:none;">
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">Who are you lifting up today?</div>
+      <div id="jesus-pray-people-list" style="margin-bottom:0.6rem;"></div>
+      <input id="jesus-pray-people-input" placeholder="Add a person…" onkeydown="if(event.key==='Enter')jesusSavePrayPerson()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+    </div>
+
+    <!-- Bible Verse -->
+    <div id="jpwsub-verse" style="display:none;">
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">Save verses that speak to your heart.</div>
+      <div id="jesus-verse-list" style="margin-bottom:1rem;"></div>
+      <input id="jesus-verse-text" placeholder="Type or paste a verse…" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.5rem;box-sizing:border-box;">
+      <input id="jesus-verse-ref" placeholder="Reference e.g. John 3:16" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);outline:none;padding:0.3rem 0;margin-bottom:0.7rem;box-sizing:border-box;">
+      <button onclick="jesusSaveVerse()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.5rem 1.2rem;cursor:pointer;">Save</button>
+    </div>
+
+    <!-- What God Said -->
+    <div id="jpwsub-godsaid" style="display:none;">
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">What did God speak to you today?</div>
+      <div id="jesus-godsaid-list" style="margin-bottom:1rem;"></div>
+      <textarea id="jesus-godsaid-body" placeholder="What God said today…" rows="4" style="width:100%;border:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.8rem;box-sizing:border-box;margin-bottom:0.6rem;"></textarea>
+      <button onclick="jesusSaveGodSaid()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.5rem 1.2rem;cursor:pointer;">Save</button>
+    </div>
+
+  </div>
+
+  <!-- TODAY'S ACTION -->
+  <div id="jsub-action" style="display:none;">
+
+    <!-- Inner sub-tabs -->
+    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+      <button class="journal-tab active" id="jatab-action" onclick="showJesusActionTab('action')">Today's Action</button>
+      <button class="journal-tab" id="jatab-forgive" onclick="showJesusActionTab('forgive')">Forgiveness</button>
+      <button class="journal-tab" id="jatab-repent" onclick="showJesusActionTab('repent')">Repentance</button>
+    </div>
+
+    <!-- Today's Action -->
+    <div id="jasub-action">
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">What will you do today to walk in faith?</div>
+      <div id="jesus-action-list" style="margin-bottom:0.6rem;"></div>
+      <div style="display:flex;gap:0.5rem;">
+        <input id="jesus-action-input" placeholder="Add an action for today…" onkeydown="if(event.key==='Enter')jesusSaveAction()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;">
+        <button onclick="jesusSaveAction()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 0.9rem;cursor:pointer;">Add</button>
+      </div>
+    </div>
+
+    <!-- Forgiveness -->
+    <div id="jasub-forgive" style="display:none;">
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">Who do you need to forgive today?</div>
+      <div id="jesus-forgive-list" style="margin-bottom:0.6rem;"></div>
+      <input id="jesus-forgive-input" placeholder="I forgive…" onkeydown="if(event.key==='Enter')jesusSaveForgive()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+    </div>
+
+    <!-- Repentance -->
+    <div id="jasub-repent" style="display:none;">
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">Bring it to Him. He is faithful and just to forgive. (1 John 1:9)</div>
+      <div id="jesus-repent-list" style="margin-bottom:0.6rem;"></div>
+      <input id="jesus-repent-input" placeholder="Lord, I repent of…" onkeydown="if(event.key==='Enter')jesusSaveRepent()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+    </div>
+
+  </div>
+
+  <!-- STUDY THE BIBLE -->
+  <div id="jsub-study" style="display:none;">
+
+    <!-- Inner sub-tabs -->
+    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+      <button class="journal-tab active" id="jstab-howto" onclick="showJesusStudyTab('howto')">How to Study</button>
+      <button class="journal-tab" id="jstab-notes" onclick="showJesusStudyTab('notes')">My Notes</button>
+      <button class="journal-tab" id="jstab-questions" onclick="showJesusStudyTab('questions')">Questions</button>
+    </div>
+
+    <!-- How to Study -->
+    <div id="jssub-howto">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);margin-bottom:1rem;">A Simple Method</div>
+      <div style="display:flex;flex-direction:column;">
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:24px;text-align:center;">1</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">Pray before you open it</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Ask the Holy Spirit to be your teacher. The Bible is spiritually discerned: ask God to open your eyes before you read a single word. (Psalm 119:18, John 16:13)</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:24px;text-align:center;">2</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">Observe: What does it say?</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Read slowly. Read it more than once. Note who is speaking, who it's written to, what is happening. Don't rush past the words: let them land.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:24px;text-align:center;">3</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">Interpret: What does it mean?</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">What was God saying to the original audience? Context matters: a verse never means something it couldn't have meant when it was written. Look at the surrounding passages.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:24px;text-align:center;">4</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">Apply: What does it mean for me?</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">How does this change the way you think, speak, or act today? The goal of Bible study is not information: it is transformation. (James 1:22, Romans 12:2)</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:24px;text-align:center;">5</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">Meditate: Let it stay with you</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Carry a verse through your day. Mull it over. Come back to it. Biblical meditation is not emptying your mind: it is filling it with God's Word until it changes how you see everything. (Joshua 1:8, Psalm 1:2–3)</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:24px;text-align:center;">6</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">Let Scripture interpret Scripture</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">When you don't understand a passage, look for other places in the Bible that speak to the same theme. The Bible is its own best commentary: it is one unified story pointing to Jesus. (Luke 24:27)</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);margin-bottom:1rem;margin-top:2rem;">Books of the Bible</div>
+      <div style="display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.9rem;font-style:italic;">Start with the Gospels</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">Matthew, Mark, Luke, John</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.9rem;font-style:italic;">For the early church</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">Acts, Romans, Ephesians</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.9rem;font-style:italic;">For wisdom & prayer</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">Psalms, Proverbs, James</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.9rem;font-style:italic;">For prophecy & promise</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">Isaiah, Jeremiah, Revelation</span></div>
+      </div>
+    </div>
+
+    <!-- My Notes -->
+    <div id="jssub-notes" style="display:none;">
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">What stood out to you in your study today?</div>
+      <div id="jesus-study-notes-list" style="margin-bottom:1rem;"></div>
+      <input id="jesus-study-passage" placeholder="Passage e.g. Romans 8:1–4" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);outline:none;padding:0.3rem 0;margin-bottom:0.5rem;box-sizing:border-box;">
+      <textarea id="jesus-study-note" placeholder="What did you observe, learn, or feel called to apply?" rows="4" style="width:100%;border:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.8rem;box-sizing:border-box;margin-bottom:0.7rem;"></textarea>
+      <button onclick="jesusSaveStudyNote()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.5rem 1.2rem;cursor:pointer;">Save</button>
+    </div>
+
+    <!-- Questions -->
+    <div id="jssub-questions" style="display:none;">
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">Questions you have for God, for the text, or about your faith.</div>
+      <div id="jesus-study-questions-list" style="margin-bottom:0.6rem;"></div>
+      <input id="jesus-study-question-input" placeholder="I want to understand…" onkeydown="if(event.key==='Enter')jesusSaveStudyQuestion()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+    </div>
+
+  </div>
+
+  <!-- WHO IS JESUS CHRIST & HIS HABITS -->
+  <div id="jsub-whoisjesus" style="display:none;">
+
+    <!-- Inner sub-tabs -->
+    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+      <button class="journal-tab active" id="jctab-whois" onclick="showJesusChristTab('whois')">Who He Is</button>
+      <button class="journal-tab" id="jctab-habits" onclick="showJesusChristTab('habits')">His Habits</button>
+      <button class="journal-tab" id="jctab-heis" onclick="showJesusChristTab('heis')">He Is...</button>
+    </div>
+
+    <!-- Who He Is -->
+    <div id="jcsub-whois">
+      <div style="display:flex;flex-direction:column;margin-bottom:1.5rem;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Son of God</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 3:16</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Word Made Flesh</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 1:14</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Saviour</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Luke 19:10</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Lord & King</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Philippians 2:9–11</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Great High Priest</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Hebrews 4:14–15</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Way, the Truth, the Life</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 14:6</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Resurrection and the Life</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 11:25</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Lamb of God</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 1:29</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Immanuel, God With Us</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Matthew 1:23</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Good Shepherd</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 10:11</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Light of the World</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 8:12</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Alpha and Omega</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Revelation 22:13</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Bread of Life</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 6:35</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Prince of Peace</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Isaiah 9:6</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Faithful & True</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Revelation 19:11</span></div>
+      </div>
+    </div>
+
+    <!-- His Habits -->
+    <div id="jcsub-habits" style="display:none;">
+      <div style="display:flex;flex-direction:column;margin-bottom:2rem;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Prayer</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Luke 5:16, Mark 1:35</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Scripture</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Matthew 4:4, Luke 4:16</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Solitude & Rest</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Mark 6:31, Matthew 8:24</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Community</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 15:15, Luke 8:1</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Serving Others</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Mark 10:45, John 13:5</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Fasting</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Matthew 4:2</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Obedience to the Father</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 5:19, Luke 22:42</span></div>
+      </div>
+
+      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);margin-bottom:1.2rem;">His Daily Rhythm</div>
+
+      <div style="display:flex;flex-direction:column;gap:0;">
+
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">Early Morning</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He rose before dawn to pray alone</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Before the crowds came, before the demands of the day, Jesus was already with the Father. He withdrew to isolated places: a mountain, a garden, the wilderness: and spent the early hours in prayer. This was not occasional. It was His rhythm. (Mark 1:35, Luke 6:12)</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">Morning</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He taught, healed, and engaged with people</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Jesus was deeply present with people. He taught in synagogues and on hillsides, healed those who came to Him, and engaged with everyone: the religious, the outcast, the children, the desperate. He was never in a hurry, yet He was always purposeful. (Luke 4:16, Matthew 9:35)</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">Midday</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He shared meals and walked with His disciples</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Much of Jesus' ministry happened around a table or on the road. He ate with tax collectors and sinners, fed thousands, and used everyday moments: a meal, a journey, a well: to speak life into people. He was fully human: He got hungry, tired, and sat down to rest. (Luke 19:5, John 4:6, John 6:11)</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">Evening</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He gathered with His disciples and withdrew to rest</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Evenings were often for deeper conversation with the twelve: unpacking what had happened, answering their questions, preparing their hearts. After ministry He would withdraw, sometimes crossing the lake just to have space. He honoured rest and did not run on empty. (Mark 4:35, John 13–17)</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">Always</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He only did what He saw the Father doing</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">The thread through every part of His day was this: total surrender to the Father. He did not act on His own initiative. He listened, He obeyed, He moved in step with the Spirit. His whole life: morning to night: was one continuous act of dependence and love. (John 5:19, John 8:28)</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- He Is... -->
+    <div id="jcsub-heis" style="display:none;">
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:1rem;">What have you discovered about Him? Add it here.</div>
+      <div id="jesus-heis-list" style="margin-bottom:1rem;"></div>
+      <input id="jesus-heis-input" placeholder="He is..." onkeydown="if(event.key==='Enter')jesusSaveHeIs()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+    </div>
+
+  </div>
+
 </div>
 
 <script>
-// ── HABITS ──────────────────────────────────────────────────
+// ── JESUS CHRIST ─────────────────────────────────────────────
+var JESUS_KEY = 'jesus_data';
+var jesusCurrentDate = new Date().toISOString().split('T')[0];
+var jesusCalOffset = 0;
+var jesusData = {};
+
+function jesusGetDay(date) {
+  if (!jesusData[date]) jesusData[date] = { prayThings: [], prayPeople: [], verses: [], godsaid: [], actions: [] };
+  return jesusData[date];
+}
+
+function jesusLoad() {
+  try { var d = localStorage.getItem(JESUS_KEY); if (d) jesusData = JSON.parse(d); } catch(e) {}
+  if (typeof jesusData !== 'object' || Array.isArray(jesusData)) jesusData = {};
+}
+
+function jesusSave() {
+  localStorage.setItem(JESUS_KEY, JSON.stringify(jesusData));
+  if (window.syncToCloud) window.syncToCloud(JESUS_KEY, jesusData);
+}
+
+function jesusInit() {
+  jesusLoad();
+  jesusUpdateDayLabel();
+  renderJesusCal();
+  showJesusTab('whoisjesus');
+}
+
+function jesusTimestamp() {
+  return new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+}
+
+function jesusUpdateDayLabel() {
+  var d = new Date(jesusCurrentDate + 'T00:00:00');
+  var today = new Date().toISOString().split('T')[0];
+  var full = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  var label = jesusCurrentDate === today ? full + ' · Today' : full;
+  document.getElementById('jesus-day-label').textContent = label;
+}
+
+function jesusChangeDay(dir) {
+  var d = new Date(jesusCurrentDate + 'T00:00:00');
+  d.setDate(d.getDate() + dir);
+  jesusCurrentDate = d.toISOString().split('T')[0];
+  jesusUpdateDayLabel();
+  showJesusTab(document.querySelector('.journal-tab.active[id^="jtab-"]') ? document.querySelector('.journal-tab.active[id^="jtab-"]').id.replace('jtab-','') : 'prayer');
+}
+
+function toggleJesusCal() {
+  var p = document.getElementById('jesus-cal-popup');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  if (p.style.display === 'block') renderJesusCal();
+}
+
+function jesusCalShift(dir) { jesusCalOffset += dir; renderJesusCal(); }
+
+function renderJesusCal() {
+  var grid = document.getElementById('jesus-cal-grid');
+  var lbl = document.getElementById('jesus-cal-label');
+  var dayNamesEl = document.getElementById('jesus-cal-daynames');
+  if (!grid || !lbl) return;
+  var now = new Date();
+  var base = new Date(now.getFullYear(), now.getMonth() + jesusCalOffset, 1);
+  var year = base.getFullYear(), month = base.getMonth();
+  var todayStr = now.toISOString().split('T')[0];
+  lbl.textContent = base.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  var dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  if (dayNamesEl) dayNamesEl.innerHTML = dayNames.map(function(n){
+    return '<div style="text-align:center;font-family:\'Nunito\',sans-serif;font-size:0.42rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);font-weight:300;">'+n+'</div>';
+  }).join('');
+  var firstDow = (new Date(year,month,1).getDay()+6)%7;
+  var daysInMonth = new Date(year,month+1,0).getDate();
+  var cells = [];
+  for (var i=0;i<firstDow;i++) cells.push(null);
+  for (var d=1;d<=daysInMonth;d++) cells.push(d);
+  while (cells.length%7!==0) cells.push(null);
+  var html = '';
+  for (var w=0;w<cells.length/7;w++) {
+    html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px;">';
+    for (var ci=0;ci<7;ci++) {
+      var day = cells[w*7+ci];
+      if (!day) { html += '<div></div>'; continue; }
+      var mm = String(month+1).padStart(2,'0'), dd = String(day).padStart(2,'0');
+      var dateStr = year+'-'+mm+'-'+dd;
+      var isToday = dateStr===todayStr;
+      var isSel = dateStr===jesusCurrentDate;
+      var isFuture = dateStr > todayStr;
+      var hasData = jesusData[dateStr] && (
+        (jesusData[dateStr].prayThings && jesusData[dateStr].prayThings.length) ||
+        (jesusData[dateStr].prayPeople && jesusData[dateStr].prayPeople.length) ||
+        (jesusData[dateStr].verses && jesusData[dateStr].verses.length) ||
+        (jesusData[dateStr].godsaid && jesusData[dateStr].godsaid.length) ||
+        (jesusData[dateStr].actions && jesusData[dateStr].actions.length)
+      );
+      var opacity = (isFuture && !isSel) ? '0.3' : '1';
+      var fw = (isToday || isSel) ? '600' : '300';
+      var bg, border, color, extraInner = '';
+      if (isSel && isToday) {
+        bg='var(--black)'; border='var(--black)'; color='var(--white)';
+        extraInner='<div style="width:3px;height:3px;border-radius:50%;background:var(--white);margin-top:1px;"></div>';
+      } else if (isSel) {
+        bg='var(--black)'; border='var(--black)'; color='var(--white)';
+      } else if (isToday) {
+        bg='transparent'; border='var(--black)'; color='var(--black)';
+        extraInner='<div style="width:3px;height:3px;border-radius:50%;background:var(--black);margin-top:1px;"></div>';
+      } else if (hasData) {
+        bg='#e8e8e5'; border='#0a0a0a'; color='var(--black)';
+      } else {
+        bg='transparent'; border='#c8c8c5'; color='var(--gray)';
+      }
+      html += '<div onclick="jesusCJump(\''+dateStr+'\')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid '+border+';background:'+bg+';opacity:'+opacity+';cursor:pointer;aspect-ratio:1;transition:all 0.15s;'+(isToday&&!isSel?'border-width:2px;':'')+'">' +
+        '<span style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;font-weight:'+fw+';color:'+color+';line-height:1;">'+day+'</span>' +
+        extraInner +
+        '</div>';
+    }
+    html += '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function jesusCJump(date) {
+  jesusCurrentDate = date;
+  jesusUpdateDayLabel();
+  document.getElementById('jesus-cal-popup').style.display = 'none';
+  var activeTab = 'prayer';
+  var el = document.querySelector('[id^="jtab-"].active');
+  if (el) activeTab = el.id.replace('jtab-','');
+  showJesusTab(activeTab);
+}
+
+function showJesusTab(tab) {
+  ['prayer','action','study','whoisjesus'].forEach(function(t) {
+    var sub = document.getElementById('jsub-'+t);
+    if (sub) sub.style.display = t===tab?'block':'none';
+    var btn = document.getElementById('jtab-'+t);
+    if (btn) btn.classList.toggle('active', t===tab);
+  });
+  jesusRender(tab);
+  if (tab === 'whoisjesus') { jesusRenderHeIs(); showJesusChristTab('whois'); }
+  if (tab === 'prayer') { showJesusPrayWordTab('things'); }
+  if (tab === 'study') { showJesusStudyTab('howto'); }
+}
+
+// ── PRAYER: THINGS ───────────────────────────────────────────
+function jesusSavePrayThing() {
+  var inp = document.getElementById('jesus-pray-things-input');
+  var text = inp.value.trim(); if (!text) return;
+  jesusGetDay(jesusCurrentDate).prayThings.push({ id: Date.now(), text: text, done: false });
+  inp.value = ''; jesusSave(); jesusRender('prayer');
+}
+function jesusTogglePrayThing(id) {
+  var day = jesusGetDay(jesusCurrentDate);
+  day.prayThings = day.prayThings.map(function(x){ return x.id===id?{...x,done:!x.done}:x; });
+  jesusSave(); jesusRender('prayer');
+}
+function jesusDeletePrayThing(id) {
+  jesusGetDay(jesusCurrentDate).prayThings = jesusGetDay(jesusCurrentDate).prayThings.filter(function(x){ return x.id!==id; });
+  jesusSave(); jesusRender('prayer');
+}
+
+// ── PRAYER: PEOPLE ───────────────────────────────────────────
+function jesusSavePrayPerson() {
+  var inp = document.getElementById('jesus-pray-people-input');
+  var text = inp.value.trim(); if (!text) return;
+  jesusGetDay(jesusCurrentDate).prayPeople.push({ id: Date.now(), text: text, done: false });
+  inp.value = ''; jesusSave(); jesusRender('prayer');
+}
+function jesusTogglePrayPerson(id) {
+  var day = jesusGetDay(jesusCurrentDate);
+  day.prayPeople = day.prayPeople.map(function(x){ return x.id===id?{...x,done:!x.done}:x; });
+  jesusSave(); jesusRender('prayer');
+}
+function jesusDeletePrayPerson(id) {
+  jesusGetDay(jesusCurrentDate).prayPeople = jesusGetDay(jesusCurrentDate).prayPeople.filter(function(x){ return x.id!==id; });
+  jesusSave(); jesusRender('prayer');
+}
+
+// ── VERSE ────────────────────────────────────────────────────
+function jesusSaveVerse() {
+  var text = document.getElementById('jesus-verse-text').value.trim();
+  var ref  = document.getElementById('jesus-verse-ref').value.trim();
+  if (!text) return;
+  jesusGetDay(jesusCurrentDate).verses.unshift({ id: Date.now(), text: text, ref: ref });
+  document.getElementById('jesus-verse-text').value = '';
+  document.getElementById('jesus-verse-ref').value  = '';
+  jesusSave(); jesusRender('verse');
+}
+function jesusDeleteVerse(id) {
+  jesusGetDay(jesusCurrentDate).verses = jesusGetDay(jesusCurrentDate).verses.filter(function(v){ return v.id!==id; });
+  jesusSave(); jesusRender('verse');
+}
+
+// ── WHAT GOD SAID ────────────────────────────────────────────
+function jesusSaveGodSaid() {
+  var body = document.getElementById('jesus-godsaid-body').value.trim();
+  if (!body) return;
+  jesusGetDay(jesusCurrentDate).godsaid.unshift({ id: Date.now(), body: body });
+  document.getElementById('jesus-godsaid-body').value = '';
+  jesusSave(); jesusRender('godsaid');
+}
+function jesusDeleteGodSaid(id) {
+  jesusGetDay(jesusCurrentDate).godsaid = jesusGetDay(jesusCurrentDate).godsaid.filter(function(x){ return x.id!==id; });
+  jesusSave(); jesusRender('godsaid');
+}
+
+function showJesusStudyTab(tab) {
+  ['howto','notes','questions'].forEach(function(t) {
+    var sub = document.getElementById('jssub-'+t);
+    if (sub) sub.style.display = t===tab?'block':'none';
+    var btn = document.getElementById('jstab-'+t);
+    if (btn) btn.classList.toggle('active', t===tab);
+  });
+  if (tab==='notes') jesusRenderStudyNotes();
+  if (tab==='questions') jesusRenderStudyQuestions();
+}
+function jesusSaveStudyNote() {
+  var passage = document.getElementById('jesus-study-passage').value.trim();
+  var note = document.getElementById('jesus-study-note').value.trim();
+  if (!note) return;
+  if (!jesusData.studyNotes) jesusData.studyNotes = [];
+  jesusData.studyNotes.unshift({ id: Date.now(), passage: passage, note: note, date: jesusCurrentDate });
+  document.getElementById('jesus-study-passage').value = '';
+  document.getElementById('jesus-study-note').value = '';
+  jesusSave(); jesusRenderStudyNotes();
+}
+function jesusDeleteStudyNote(id) {
+  jesusData.studyNotes = (jesusData.studyNotes||[]).filter(function(x){ return x.id!==id; });
+  jesusSave(); jesusRenderStudyNotes();
+}
+function jesusRenderStudyNotes() {
+  var el = document.getElementById('jesus-study-notes-list'); if (!el) return;
+  var items = jesusData.studyNotes || [];
+  if (!items.length) { el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">No notes yet.</div>'; return; }
+  el.innerHTML = items.map(function(x) {
+    return '<div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;">' +
+        '<div style="flex:1;">' +
+          (x.passage ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;letter-spacing:0.08em;color:var(--gray);margin-bottom:0.3rem;">' + x.passage + '</div>' : '') +
+          '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;white-space:pre-wrap;">' + x.note + '</div>' +
+        '</div>' +
+        '<button onclick="jesusDeleteStudyNote('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">×</button>' +
+      '</div></div>';
+  }).join('');
+}
+function jesusSaveStudyQuestion() {
+  var inp = document.getElementById('jesus-study-question-input');
+  var text = inp.value.trim(); if (!text) return;
+  if (!jesusData.studyQuestions) jesusData.studyQuestions = [];
+  jesusData.studyQuestions.unshift({ id: Date.now(), text: text, answered: false });
+  inp.value = ''; jesusSave(); jesusRenderStudyQuestions();
+}
+function jesusToggleStudyQuestion(id) {
+  jesusData.studyQuestions = (jesusData.studyQuestions||[]).map(function(x){ return x.id===id?{...x,answered:!x.answered}:x; });
+  jesusSave(); jesusRenderStudyQuestions();
+}
+function jesusDeleteStudyQuestion(id) {
+  jesusData.studyQuestions = (jesusData.studyQuestions||[]).filter(function(x){ return x.id!==id; });
+  jesusSave(); jesusRenderStudyQuestions();
+}
+function jesusRenderStudyQuestions() {
+  var el = document.getElementById('jesus-study-questions-list'); if (!el) return;
+  var items = jesusData.studyQuestions || [];
+  if (!items.length) { el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">No questions yet.</div>'; return; }
+  el.innerHTML = items.map(function(x) {
+    return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;border-bottom:1px solid #f0f0ee;">' +
+      '<div onclick="jesusToggleStudyQuestion('+x.id+')" style="width:14px;height:14px;border:1px solid '+(x.answered?'var(--black)':'#c8c8c5')+';background:'+(x.answered?'var(--black)':'transparent')+';cursor:pointer;flex-shrink:0;"></div>' +
+      '<div style="flex:1;font-family:\'Lora\',serif;font-style:italic;font-size:0.85rem;color:var(--black);'+(x.answered?'text-decoration:line-through;color:var(--gray);':'')+'">'+x.text+'</div>' +
+      '<button onclick="jesusDeleteStudyQuestion('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;">×</button>' +
+    '</div>';
+  }).join('');
+}
+
+function showJesusPrayWordTab(tab) {
+  ['things','people','verse','godsaid'].forEach(function(t) {
+    var sub = document.getElementById('jpwsub-'+t);
+    if (sub) sub.style.display = t===tab?'block':'none';
+    var btn = document.getElementById('jpwtab-'+t);
+    if (btn) btn.classList.toggle('active', t===tab);
+  });
+  var day = jesusGetDay(jesusCurrentDate);
+  if (tab==='things') { var el=document.getElementById('jesus-pray-things-list'); if(el) el.innerHTML=jesusRenderCheckList(day.prayThings||[],'jesusTogglePrayThing','jesusDeletePrayThing'); }
+  if (tab==='people') { var el=document.getElementById('jesus-pray-people-list'); if(el) el.innerHTML=jesusRenderCheckList(day.prayPeople||[],'jesusTogglePrayPerson','jesusDeletePrayPerson'); }
+  if (tab==='verse') jesusRender('word');
+  if (tab==='godsaid') jesusRender('word');
+}
+
+function showJesusWordTab(tab) {
+  ['verse','godsaid'].forEach(function(t) {
+    var sub = document.getElementById('jwsub-'+t);
+    if (sub) sub.style.display = t===tab?'block':'none';
+    var btn = document.getElementById('jwtab-'+t);
+    if (btn) btn.classList.toggle('active', t===tab);
+  });
+  var day = jesusGetDay(jesusCurrentDate);
+  if (tab==='verse') { jesusRender('word'); }
+  if (tab==='godsaid') { jesusRender('word'); }
+}
+
+function showJesusActionTab(tab) {
+  ['action','forgive','repent'].forEach(function(t) {
+    var sub = document.getElementById('jasub-'+t);
+    if (sub) sub.style.display = t===tab?'block':'none';
+    var btn = document.getElementById('jatab-'+t);
+    if (btn) btn.classList.toggle('active', t===tab);
+  });
+  var day = jesusGetDay(jesusCurrentDate);
+  if (tab==='action') { var el=document.getElementById('jesus-action-list'); if(el) el.innerHTML=jesusRenderCheckList(day.actions,'jesusToggleAction','jesusDeleteAction'); }
+  if (tab==='forgive') { var fl=document.getElementById('jesus-forgive-list'); if(fl) fl.innerHTML=jesusRenderCheckList(day.forgive||[],'jesusToggleForgive','jesusDeleteForgive'); }
+  if (tab==='repent') { var rl=document.getElementById('jesus-repent-list'); if(rl) rl.innerHTML=jesusRenderCheckList(day.repent||[],'jesusToggleRepent','jesusDeleteRepent'); }
+}
+
+function showJesusChristTab(tab) {
+  ['whois','habits','heis'].forEach(function(t) {
+    var sub = document.getElementById('jcsub-'+t);
+    if (sub) sub.style.display = t===tab?'block':'none';
+    var btn = document.getElementById('jctab-'+t);
+    if (btn) btn.classList.toggle('active', t===tab);
+  });
+  if (tab === 'heis') jesusRenderHeIs();
+}
+
+
+function jesusSaveHeIs() {
+  var inp = document.getElementById('jesus-heis-input');
+  var text = inp.value.trim(); if (!text) return;
+  if (!jesusData.heIs) jesusData.heIs = [];
+  jesusData.heIs.unshift({ id: Date.now(), text: text });
+  inp.value = ''; jesusSave(); jesusRenderHeIs();
+}
+function jesusDeleteHeIs(id) {
+  jesusData.heIs = (jesusData.heIs||[]).filter(function(x){ return x.id!==id; });
+  jesusSave(); jesusRenderHeIs();
+}
+function jesusRenderHeIs() {
+  var el = document.getElementById('jesus-heis-list');
+  if (!el) return;
+  var items = jesusData.heIs || [];
+  if (!items.length) { el.innerHTML = ''; return; }
+  el.innerHTML = items.map(function(x) {
+    return '<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #f0f0ee;gap:0.5rem;">' +
+      '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.88rem;line-height:1.6;flex:1;">He is ' + x.text + '</div>' +
+      '<button onclick="jesusDeleteHeIs('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;">×</button>' +
+    '</div>';
+  }).join('');
+}
+function jesusSaveAction() {
+  var inp = document.getElementById('jesus-action-input');
+  var text = inp.value.trim(); if (!text) return;
+  jesusGetDay(jesusCurrentDate).actions.push({ id: Date.now(), text: text, done: false });
+  inp.value = ''; jesusSave(); jesusRender('action');
+}
+function jesusToggleAction(id) {
+  var day = jesusGetDay(jesusCurrentDate);
+  day.actions = day.actions.map(function(x){ return x.id===id?{...x,done:!x.done}:x; });
+  jesusSave(); jesusRender('action');
+}
+function jesusDeleteAction(id) {
+  jesusGetDay(jesusCurrentDate).actions = jesusGetDay(jesusCurrentDate).actions.filter(function(x){ return x.id!==id; });
+  jesusSave(); jesusRender('action');
+}
+function jesusSaveForgive() {
+  var inp = document.getElementById('jesus-forgive-input');
+  var text = inp.value.trim(); if (!text) return;
+  var day = jesusGetDay(jesusCurrentDate);
+  if (!day.forgive) day.forgive = [];
+  day.forgive.push({ id: Date.now(), text: text, done: false });
+  inp.value = ''; jesusSave(); jesusRender('action');
+}
+function jesusToggleForgive(id) {
+  var day = jesusGetDay(jesusCurrentDate);
+  if (!day.forgive) day.forgive = [];
+  day.forgive = day.forgive.map(function(x){ return x.id===id?{...x,done:!x.done}:x; });
+  jesusSave(); jesusRender('action');
+}
+function jesusDeleteForgive(id) {
+  var day = jesusGetDay(jesusCurrentDate);
+  day.forgive = (day.forgive||[]).filter(function(x){ return x.id!==id; });
+  jesusSave(); jesusRender('action');
+}
+function jesusSaveRepent() {
+  var inp = document.getElementById('jesus-repent-input');
+  var text = inp.value.trim(); if (!text) return;
+  var day = jesusGetDay(jesusCurrentDate);
+  if (!day.repent) day.repent = [];
+  day.repent.push({ id: Date.now(), text: text, done: false });
+  inp.value = ''; jesusSave(); jesusRender('action');
+}
+function jesusToggleRepent(id) {
+  var day = jesusGetDay(jesusCurrentDate);
+  if (!day.repent) day.repent = [];
+  day.repent = day.repent.map(function(x){ return x.id===id?{...x,done:!x.done}:x; });
+  jesusSave(); jesusRender('action');
+}
+function jesusDeleteRepent(id) {
+  var day = jesusGetDay(jesusCurrentDate);
+  day.repent = (day.repent||[]).filter(function(x){ return x.id!==id; });
+  jesusSave(); jesusRender('action');
+}
+
+// ── RENDER ───────────────────────────────────────────────────
+function jesusRenderCheckList(items, toggleFn, deleteFn) {
+  if (!items || !items.length) return '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">Nothing added yet.</div>';
+  return items.map(function(x) {
+    return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;border-bottom:1px solid #f0f0ee;">' +
+      '<div onclick="'+toggleFn+'('+x.id+')" style="width:14px;height:14px;border:1px solid '+(x.done?'var(--black)':'#c8c8c5')+';background:'+(x.done?'var(--black)':'transparent')+';cursor:pointer;flex-shrink:0;"></div>' +
+      '<div style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);'+(x.done?'text-decoration:line-through;color:var(--gray);':'')+'">' + x.text + '</div>' +
+      '<button onclick="'+deleteFn+'('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;">×</button>' +
+    '</div>';
+  }).join('');
+}
+
+function jesusRender(tab) {
+  var day = jesusGetDay(jesusCurrentDate);
+  if (tab === 'prayer') {
+    var things = document.getElementById('jesus-pray-things-list');
+    var people = document.getElementById('jesus-pray-people-list');
+    if (things) things.innerHTML = jesusRenderCheckList(day.prayThings||[], 'jesusTogglePrayThing', 'jesusDeletePrayThing');
+    if (people) people.innerHTML = jesusRenderCheckList(day.prayPeople||[], 'jesusTogglePrayPerson', 'jesusDeletePrayPerson');
+    var vel = document.getElementById('jesus-verse-list');
+    if (vel) {
+      if (!day.verses || !day.verses.length) { vel.innerHTML = ''; }
+      else vel.innerHTML = day.verses.map(function(v) {
+        return '<div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;">' +
+            '<div style="flex:1;"><div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.82rem;line-height:1.7;">' + v.text + '</div>' +
+            (v.ref?'<div style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;color:var(--gray);margin-top:0.3rem;letter-spacing:0.06em;">— '+v.ref+'</div>':'') + '</div>' +
+            '<button onclick="jesusDeleteVerse('+v.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">×</button>' +
+          '</div></div>';
+      }).join('');
+    }
+    var gel = document.getElementById('jesus-godsaid-list');
+    if (gel) {
+      if (!day.godsaid || !day.godsaid.length) { gel.innerHTML = ''; }
+      else gel.innerHTML = day.godsaid.map(function(x) {
+        return '<div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;">' +
+            '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;white-space:pre-wrap;flex:1;">' + x.body + '</div>' +
+            '<button onclick="jesusDeleteGodSaid('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">×</button>' +
+          '</div></div>';
+      }).join('');
+    }
+  }
+  if (tab === 'action') {
+    var activJA = document.querySelector('#jatab-action.active, #jatab-forgive.active, #jatab-repent.active');
+    var curJA = activJA ? activJA.id.replace('jatab-','') : 'action';
+    showJesusActionTab(curJA);
+  }
+}
+</script>
+<script>
 var HABITS_KEY = 'habits_data';
-var habitsData = { habits: [], log: {} }; // log: { 'YYYY-MM-DD': { habitId: true } }
+var habitsData = { habits: [], log: {} };
 var habitsWeekOffset = 0;
 var habitsSelectedColor = '#0a0a0a';
 
 function habitsLoad() {
-  try {
-    var d = localStorage.getItem(HABITS_KEY);
-    if (d) habitsData = JSON.parse(d);
-  } catch(e) {}
+  try { var d = localStorage.getItem(HABITS_KEY); if (d) habitsData = JSON.parse(d); } catch(e) {}
   if (!habitsData.habits) habitsData.habits = [];
   if (!habitsData.log) habitsData.log = {};
 }
@@ -2961,7 +3861,7 @@ function habitsSave() {
 
 function habitsGetWeekDates(offset) {
   var today = new Date();
-  var dow = today.getDay(); // 0=Sun
+  var dow = today.getDay();
   var monday = new Date(today);
   monday.setDate(today.getDate() - ((dow + 6) % 7) + offset * 7);
   var days = [];
@@ -2975,7 +3875,22 @@ function habitsGetWeekDates(offset) {
 
 function habitsInit() {
   habitsLoad();
+  showHabitsTab('myhabits');
   habitsRender();
+}
+
+function showHabitsTab(tab) {
+  var btn = document.getElementById('htab-myhabits');
+  if (btn) { btn.style.borderBottom = 'none'; btn.style.color = 'var(--gray)'; }
+  var btn2 = document.getElementById('htab-calisthenics');
+  if (btn2) { btn2.style.borderBottom = 'none'; btn2.style.color = 'var(--gray)'; }
+  var active = document.getElementById('htab-' + tab);
+  if (active) { active.style.borderBottom = '2px solid var(--black)'; active.style.color = 'var(--black)'; }
+  ['myhabits','calisthenics'].forEach(function(t) {
+    var el = document.getElementById('hsub-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+  });
+  if (tab === 'calisthenics') renderCalisthenics();
 }
 
 function habitsWeekShift(dir) {
@@ -2988,24 +3903,21 @@ function habitsRender() {
   var todayStr = new Date().toISOString().split('T')[0];
   var dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
-  // Week label
   var first = new Date(days[0] + 'T00:00:00');
   var last  = new Date(days[6] + 'T00:00:00');
   document.getElementById('habits-week-label').textContent =
     first.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' – ' +
     last.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
-  // Day strip header
   var strip = document.getElementById('habits-day-strip');
   strip.innerHTML = days.map(function(date, i) {
     var isToday = date === todayStr;
     return '<div style="text-align:center;">' +
-      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:' + (isToday ? 'var(--black)' : 'var(--gray)') + ';font-weight:' + (isToday ? '400' : '300') + ';">' + dayNames[i] + '</div>' +
-      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.7rem;font-weight:' + (isToday ? '400' : '300') + ';color:' + (isToday ? 'var(--black)' : 'var(--gray)') + ';margin-top:0.1rem;">' + new Date(date + 'T00:00:00').getDate() + '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:' + (isToday?'var(--black)':'var(--gray)') + ';font-weight:' + (isToday?'400':'300') + ';">' + dayNames[i] + '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.7rem;font-weight:' + (isToday?'400':'300') + ';color:' + (isToday?'var(--black)':'var(--gray)') + ';margin-top:0.1rem;">' + new Date(date+'T00:00:00').getDate() + '</div>' +
     '</div>';
   }).join('');
 
-  // Habit rows
   var list = document.getElementById('habits-list');
   if (!habitsData.habits.length) {
     list.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.9rem;color:var(--gray);padding:1rem 0;">No habits yet. Add one below.</div>';
@@ -3016,14 +3928,11 @@ function habitsRender() {
     var dotRow = days.map(function(date) {
       var done = habitsData.log[date] && habitsData.log[date][h.id];
       var isFuture = date > todayStr;
-      return '<div onclick="habitsToggle(\'' + h.id + '\',\'' + date + '\')" style="display:flex;justify-content:center;align-items:center;cursor:' + (isFuture ? 'default' : 'pointer') + ';">' +
-        '<div style="width:18px;height:18px;border:1px solid ' + (done ? h.color : '#c8c8c5') + ';background:' + (done ? h.color : 'transparent') + ';transition:all 0.15s;' + (isFuture ? 'opacity:0.3;' : '') + '"></div>' +
+      return '<div onclick="habitsToggle(\'' + h.id + '\',\'' + date + '\')" style="display:flex;justify-content:center;align-items:center;cursor:' + (isFuture?'default':'pointer') + ';">' +
+        '<div style="width:18px;height:18px;border:1px solid ' + (done?h.color:'#c8c8c5') + ';background:' + (done?h.color:'transparent') + ';transition:all 0.15s;' + (isFuture?'opacity:0.3;':'') + '"></div>' +
       '</div>';
     }).join('');
-
-    // Streak
     var streak = habitsStreak(h.id, todayStr);
-
     return '<div style="margin-bottom:1.2rem;">' +
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">' +
         '<div style="display:flex;align-items:center;gap:0.5rem;">' +
@@ -3031,7 +3940,7 @@ function habitsRender() {
           '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;">' + h.name + '</span>' +
         '</div>' +
         '<div style="display:flex;align-items:center;gap:0.8rem;">' +
-          (streak > 0 ? '<span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;color:var(--gray);letter-spacing:0.06em;">' + streak + ' day streak</span>' : '') +
+          (streak>0?'<span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;color:var(--gray);letter-spacing:0.06em;">'+streak+' day streak</span>':'') +
           '<button onclick="habitsDelete(\'' + h.id + '\')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;line-height:1;padding:0;">×</button>' +
         '</div>' +
       '</div>' +
@@ -3042,7 +3951,7 @@ function habitsRender() {
 
 function habitsToggle(id, date) {
   var todayStr = new Date().toISOString().split('T')[0];
-  if (date > todayStr) return; // no future
+  if (date > todayStr) return;
   if (!habitsData.log[date]) habitsData.log[date] = {};
   habitsData.log[date][id] = !habitsData.log[date][id];
   habitsSave();
@@ -3054,10 +3963,7 @@ function habitsStreak(id, todayStr) {
   var d = new Date(todayStr + 'T00:00:00');
   while (true) {
     var key = d.toISOString().split('T')[0];
-    if (habitsData.log[key] && habitsData.log[key][id]) {
-      streak++;
-      d.setDate(d.getDate() - 1);
-    } else break;
+    if (habitsData.log[key] && habitsData.log[key][id]) { streak++; d.setDate(d.getDate()-1); } else break;
   }
   return streak;
 }
@@ -3066,8 +3972,7 @@ function habitsAdd() {
   var inp = document.getElementById('habit-name-input');
   var name = inp.value.trim();
   if (!name) return;
-  var id = 'h' + Date.now();
-  habitsData.habits.push({ id: id, name: name, color: habitsSelectedColor });
+  habitsData.habits.push({ id: 'h'+Date.now(), name: name, color: habitsSelectedColor });
   inp.value = '';
   habitsSave();
   habitsRender();
@@ -3080,14 +3985,247 @@ function habitsDelete(id) {
 }
 
 function habitPickColor(btn) {
-  document.querySelectorAll('.habit-color-opt').forEach(function(b){ b.style.border = '2px solid transparent'; });
+  document.querySelectorAll('.habit-color-opt').forEach(function(b){ b.style.border='2px solid transparent'; });
   btn.style.border = '2px solid var(--black)';
   habitsSelectedColor = btn.getAttribute('data-color');
+}
+
+// ── CALISTHENICS FOR BEGINNER ────────────────────────────────
+var caliWeek = 1;
+var caliLog = JSON.parse(localStorage.getItem('cali_log') || '{}');
+
+var caliYT = {
+  'Wall Push-ups':'https://www.youtube.com/results?search_query=wall+push+ups+how+to+beginners',
+  'Bodyweight Squats':'https://www.youtube.com/results?search_query=bodyweight+squat+form+beginners',
+  'Knee Plank':'https://www.youtube.com/results?search_query=knee+plank+how+to+beginners',
+  'Glute Bridge':'https://www.youtube.com/results?search_query=glute+bridge+how+to+beginners',
+  'Incline Push-ups':'https://www.youtube.com/results?search_query=incline+push+ups+beginners+how+to',
+  'Tricep Dips (chair)':'https://www.youtube.com/results?search_query=tricep+dips+chair+beginners',
+  'Superman Hold':'https://www.youtube.com/results?search_query=superman+hold+exercise+how+to',
+  'Dead Hang':'https://www.youtube.com/results?search_query=dead+hang+beginners+how+to',
+  'Reverse Lunges':'https://www.youtube.com/results?search_query=reverse+lunge+beginners+how+to',
+  'Calf Raises':'https://www.youtube.com/results?search_query=calf+raises+how+to+beginners',
+  'Side-lying Leg Raise':'https://www.youtube.com/results?search_query=side+lying+leg+raise+how+to',
+  'Wall Sit':'https://www.youtube.com/results?search_query=wall+sit+exercise+how+to+beginners',
+  'Dead Bug':'https://www.youtube.com/results?search_query=dead+bug+exercise+how+to+beginners',
+  'Bird Dog':'https://www.youtube.com/results?search_query=bird+dog+exercise+how+to+beginners',
+  'Heel Taps':'https://www.youtube.com/results?search_query=heel+taps+core+exercise+how+to',
+  'Cat-Cow Stretch':'https://www.youtube.com/results?search_query=cat+cow+stretch+how+to+beginners',
+  'Knee Push-ups':'https://www.youtube.com/results?search_query=knee+push+ups+how+to+beginners',
+  'Goblet Squat (no weight)':'https://www.youtube.com/results?search_query=goblet+squat+no+weight+how+to',
+  'Forearm Plank':'https://www.youtube.com/results?search_query=forearm+plank+how+to+beginners',
+  'Hip Thrust':'https://www.youtube.com/results?search_query=hip+thrust+bodyweight+how+to+beginners',
+  'Push-ups':'https://www.youtube.com/results?search_query=push+ups+proper+form+beginners',
+  'Pike Push-ups':'https://www.youtube.com/results?search_query=pike+push+ups+how+to+beginners',
+  'Scapular Push-ups':'https://www.youtube.com/results?search_query=scapular+push+ups+how+to',
+  'Australian Row (table)':'https://www.youtube.com/results?search_query=australian+row+table+how+to+beginners',
+  'Jump Squats (low)':'https://www.youtube.com/results?search_query=jump+squats+beginners+low+impact',
+  'Step-ups':'https://www.youtube.com/results?search_query=step+ups+exercise+how+to+beginners',
+  'Glute Kickbacks':'https://www.youtube.com/results?search_query=glute+kickbacks+how+to+beginners',
+  'Single-leg Calf Raise':'https://www.youtube.com/results?search_query=single+leg+calf+raise+how+to',
+  'Plank Shoulder Taps':'https://www.youtube.com/results?search_query=plank+shoulder+taps+how+to+beginners',
+  'Reverse Crunch':'https://www.youtube.com/results?search_query=reverse+crunch+how+to+beginners',
+  'Side Plank (knee)':'https://www.youtube.com/results?search_query=knee+side+plank+how+to+beginners',
+  'Leg Lowering':'https://www.youtube.com/results?search_query=leg+lowering+exercise+how+to+beginners',
+  'Jump Squats':'https://www.youtube.com/results?search_query=jump+squat+beginners+proper+form',
+  'Decline Push-ups':'https://www.youtube.com/results?search_query=decline+push+ups+how+to+beginners',
+  'Diamond Push-ups':'https://www.youtube.com/results?search_query=diamond+push+ups+how+to+beginners',
+  'Australian Row':'https://www.youtube.com/results?search_query=australian+row+how+to+beginners',
+  'Bulgarian Split Squat':'https://www.youtube.com/results?search_query=bulgarian+split+squat+beginners+how+to',
+  'Squat Pulse':'https://www.youtube.com/results?search_query=squat+pulse+exercise+how+to',
+  'Nordic Curl (assisted)':'https://www.youtube.com/results?search_query=assisted+nordic+curl+beginners',
+  'Single-leg Glute Bridge':'https://www.youtube.com/results?search_query=single+leg+glute+bridge+how+to',
+  'Full Plank to Forearm':'https://www.youtube.com/results?search_query=plank+to+forearm+plank+how+to',
+  'V-sit Hold':'https://www.youtube.com/results?search_query=v+sit+hold+how+to+beginners',
+  'Side Plank':'https://www.youtube.com/results?search_query=side+plank+how+to+beginners',
+  'Mountain Climbers':'https://www.youtube.com/results?search_query=mountain+climbers+exercise+how+to+beginners',
+  'Archer Push-ups':'https://www.youtube.com/results?search_query=archer+push+ups+how+to+beginners',
+  'Pistol Squat (assisted)':'https://www.youtube.com/results?search_query=assisted+pistol+squat+beginners',
+  'Plank':'https://www.youtube.com/results?search_query=plank+exercise+proper+form+beginners',
+  'Single-leg Hip Thrust':'https://www.youtube.com/results?search_query=single+leg+hip+thrust+how+to',
+  'Close-grip Push-ups':'https://www.youtube.com/results?search_query=close+grip+push+ups+how+to',
+  'Wide Push-ups':'https://www.youtube.com/results?search_query=wide+push+ups+how+to+beginners',
+  'Inverted Row':'https://www.youtube.com/results?search_query=inverted+row+how+to+beginners',
+  'Handstand Hold (wall)':'https://www.youtube.com/results?search_query=wall+handstand+how+to+beginners',
+  'Plyometric Lunge':'https://www.youtube.com/results?search_query=plyometric+lunge+jump+lunge+how+to',
+  'Hamstring Curl (towel)':'https://www.youtube.com/results?search_query=towel+hamstring+curl+how+to',
+  'Box Jump (low)':'https://www.youtube.com/results?search_query=low+box+jump+beginners+how+to',
+  'L-sit Hold (chairs)':'https://www.youtube.com/results?search_query=l+sit+chairs+beginners+how+to',
+  'Dragon Flag (tuck)':'https://www.youtube.com/results?search_query=tuck+dragon+flag+beginners+how+to',
+  'Windshield Wipers':'https://www.youtube.com/results?search_query=windshield+wipers+exercise+how+to',
+  'Hollow Body Hold':'https://www.youtube.com/results?search_query=hollow+body+hold+how+to+beginners',
+};
+
+var caliProgram = {
+  1: [
+    { day:'Day 1', focus:'Full Body', exercises:[
+      { name:'Wall Push-ups', reps:'3 rounds of 10', note:'Place hands on wall at shoulder height, keep your body in a straight line, bend elbows to bring chest toward wall' },
+      { name:'Bodyweight Squats', reps:'3 rounds of 10', note:'Stand feet shoulder-width apart, chest up, sit back and down like you\'re lowering onto a chair' },
+      { name:'Knee Plank', reps:'3 rounds, hold 20 seconds', note:'Rest on your knees and forearms, keep hips level don\'t let them sag or rise' },
+      { name:'Glute Bridge', reps:'3 rounds of 10', note:'Lie on your back, feet flat, push your hips up until your body makes a straight line from knees to shoulders' },
+    ]},
+    { day:'Day 2', focus:'Rest / Walk', exercises:[] },
+    { day:'Day 3', focus:'Upper Body', exercises:[
+      { name:'Incline Push-ups', reps:'3 rounds of 8', note:'Place hands on a chair or table instead of the floor easier on the wrists and great for building up to full push-ups' },
+      { name:'Tricep Dips (chair)', reps:'3 rounds of 8', note:'Sit on edge of chair, hands gripping the seat, slide off and bend elbows to lower your body then press back up' },
+      { name:'Superman Hold', reps:'3 rounds of 10', note:'Lie face down, stretch arms forward, then lift arms, chest and legs off the floor at the same time hold for a second' },
+      { name:'Dead Hang', reps:'3 rounds, hold 10 seconds', note:'Hang from a bar or sturdy door frame, arms straight, just let gravity do the work great for grip and shoulder health' },
+    ]},
+    { day:'Day 4', focus:'Rest / Stretch', exercises:[] },
+    { day:'Day 5', focus:'Lower Body', exercises:[
+      { name:'Reverse Lunges', reps:'3 rounds of 8 each leg', note:'Step one foot backward and lower your back knee toward the floor, then return to standing easier on the knees than forward lunges' },
+      { name:'Calf Raises', reps:'3 rounds of 15', note:'Stand tall, rise up onto your toes slowly, hold a second at the top, lower slowly' },
+      { name:'Side-lying Leg Raise', reps:'3 rounds of 12 each side', note:'Lie on your side, keep leg straight, raise the top leg up and lower it with control' },
+      { name:'Wall Sit', reps:'3 rounds, hold 20 seconds', note:'Back flat on the wall, slide down until thighs are parallel to the floor, hold it burns but it works!' },
+    ]},
+    { day:'Day 6', focus:'Core & Balance', exercises:[
+      { name:'Dead Bug', reps:'3 rounds of 6 each side', note:'Lie on back, arms up, knees bent at 90°, slowly lower opposite arm and leg toward the floor then bring them back keep your lower back pressed flat' },
+      { name:'Bird Dog', reps:'3 rounds of 6 each side', note:'On all fours, extend one arm and the opposite leg at the same time, hold a second, return keep your hips square' },
+      { name:'Heel Taps', reps:'3 rounds of 12 each side', note:'Lie on back, knees bent, crunch slightly to one side to tap your heel with your hand, alternate sides' },
+      { name:'Cat-Cow Stretch', reps:'1 round of 10 slow', note:'On all fours, arch your back up (cat) then dip it down (cow), breathe with each movement amazing for your spine' },
+    ]},
+    { day:'Day 7', focus:'Rest', exercises:[] },
+  ],
+  2: [
+    { day:'Day 1', focus:'Full Body', exercises:[
+      { name:'Knee Push-ups', reps:'3 rounds of 12', note:'Knees on floor, lower chest all the way down and press back up full range of motion matters more than speed' },
+      { name:'Goblet Squat (no weight)', reps:'3 rounds of 12', note:'Clasp your hands at chest height, squat deep, keep chest tall and knees tracking over toes' },
+      { name:'Forearm Plank', reps:'3 rounds, hold 25 seconds', note:'Rest on forearms and toes, body in one straight line from head to heels breathe steadily' },
+      { name:'Hip Thrust', reps:'3 rounds of 12', note:'Rest your shoulders on a couch or bench, feet flat, drive hips up and squeeze glutes hard at the top' },
+    ]},
+    { day:'Day 2', focus:'Rest / Walk', exercises:[] },
+    { day:'Day 3', focus:'Upper Body', exercises:[
+      { name:'Push-ups', reps:'3 rounds of 6–8', note:'Full push-up hands slightly wider than shoulders, lower chest to floor, press up. Drop to knees if needed' },
+      { name:'Pike Push-ups', reps:'3 rounds of 8', note:'Form an upside-down V with your body, bend elbows to lower the top of your head toward the floor trains your shoulders' },
+      { name:'Scapular Push-ups', reps:'3 rounds of 10', note:'In a plank position, squeeze shoulder blades together then spread them apart without bending elbows tiny movement, big shoulder benefit' },
+      { name:'Australian Row (table)', reps:'3 rounds of 8', note:'Lie under a sturdy table, grip the edge, hang with straight body and pull your chest up to the table like an upside-down push-up' },
+    ]},
+    { day:'Day 4', focus:'Rest / Stretch', exercises:[] },
+    { day:'Day 5', focus:'Lower Body', exercises:[
+      { name:'Jump Squats (low)', reps:'3 rounds of 8', note:'Squat down then explode up with a small jump, land softly by bending knees keep the jump low to protect your joints' },
+      { name:'Step-ups', reps:'3 rounds of 10 each leg', note:'Step one foot onto a sturdy chair, drive through that heel to stand up, step back down great for balance and legs' },
+      { name:'Glute Kickbacks', reps:'3 rounds of 12 each side', note:'On all fours, kick one leg straight back and up, squeezing your glute at the top keep your back flat' },
+      { name:'Single-leg Calf Raise', reps:'3 rounds of 10 each side', note:'Stand on one foot, hold a wall for balance, rise up onto your toes and lower slowly' },
+    ]},
+    { day:'Day 6', focus:'Core & Balance', exercises:[
+      { name:'Plank Shoulder Taps', reps:'3 rounds of 10 each side', note:'In a full plank, tap one shoulder with the opposite hand the key is keeping your hips as still as possible' },
+      { name:'Reverse Crunch', reps:'3 rounds of 12', note:'Lie on back, curl your knees toward your chest using your lower abs, not momentum lower slowly' },
+      { name:'Side Plank (knee)', reps:'3 rounds, hold 20 seconds each side', note:'Stack your knees, lift hips off the floor and hold body makes a straight line from head to knees' },
+      { name:'Leg Lowering', reps:'3 rounds of 8', note:'Lie on back, raise both legs straight up, slowly lower them toward the floor without letting your lower back lift stop before it does' },
+    ]},
+    { day:'Day 7', focus:'Rest', exercises:[] },
+  ],
+  3: [
+    { day:'Day 1', focus:'Full Body', exercises:[
+      { name:'Push-ups', reps:'4 rounds of 10', note:'Focus on perfect form no sagging hips, chest touches floor, full lockout at top' },
+      { name:'Jump Squats', reps:'3 rounds of 10', note:'Squat down, explode up as high as you can, land softly with bent knees absorb the landing' },
+      { name:'Plank', reps:'3 rounds, hold 35 seconds', note:'Full plank on hands and toes, keep everything tight core, glutes, legs' },
+      { name:'Hip Thrust', reps:'4 rounds of 15', note:'Really squeeze those glutes at the top and hold for a second quality over speed' },
+    ]},
+    { day:'Day 2', focus:'Rest / Walk', exercises:[] },
+    { day:'Day 3', focus:'Upper Body', exercises:[
+      { name:'Decline Push-ups', reps:'3 rounds of 8', note:'Place feet on a chair, hands on floor shifts more work to your upper chest and shoulders' },
+      { name:'Diamond Push-ups', reps:'3 rounds of 8', note:'Place hands close together forming a diamond shape under your chest really targets the triceps' },
+      { name:'Australian Row', reps:'3 rounds of 10', note:'Under a table, pull chest all the way to the table the closer to horizontal you are, the harder it is' },
+      { name:'Pike Push-ups', reps:'3 rounds of 10', note:'Think of it as a shoulder press using your bodyweight hips high, lower your head between your hands' },
+    ]},
+    { day:'Day 4', focus:'Rest / Stretch', exercises:[] },
+    { day:'Day 5', focus:'Lower Body', exercises:[
+      { name:'Bulgarian Split Squat', reps:'3 rounds of 8 each leg', note:'Rear foot rests on a chair behind you, front foot forward, lower your back knee toward the floor one of the best leg exercises' },
+      { name:'Squat Pulse', reps:'3 rounds of 20', note:'Hold the bottom of a squat and do small up-and-down pulses stay low the whole time, it burns!' },
+      { name:'Nordic Curl (assisted)', reps:'3 rounds of 5', note:'Hook feet under something heavy, start kneeling upright, slowly lower your body toward the floor use hands to catch yourself. Incredible for hamstrings' },
+      { name:'Single-leg Glute Bridge', reps:'3 rounds of 12 each side', note:'Same as glute bridge but one leg extended straight much harder, isolates each glute' },
+    ]},
+    { day:'Day 6', focus:'Core & Balance', exercises:[
+      { name:'Full Plank to Forearm', reps:'3 rounds of 8 each arm', note:'Start in full plank, lower one arm at a time to forearms then push back up alternate which arm leads' },
+      { name:'V-sit Hold', reps:'3 rounds, hold 20 seconds', note:'Sit on floor, lean back slightly, lift legs straight your body forms a V shape. Hold and breathe' },
+      { name:'Side Plank', reps:'3 rounds, hold 25 seconds each side', note:'Full side plank on hand and feet (not knees), stack feet or stagger them, lift hips high' },
+      { name:'Mountain Climbers', reps:'3 rounds of 20 total', note:'In a plank, drive knees toward chest one at a time in a running motion go controlled, not fast' },
+    ]},
+    { day:'Day 7', focus:'Rest', exercises:[] },
+  ],
+  4: [
+    { day:'Day 1', focus:'Full Body', exercises:[
+      { name:'Archer Push-ups', reps:'3 rounds of 6 each side', note:'Wide hand position, shift weight to one side as you lower the other arm stays nearly straight. A step toward one-arm push-ups' },
+      { name:'Pistol Squat (assisted)', reps:'3 rounds of 5 each leg', note:'Hold a doorframe or pole for balance, extend one leg forward and squat down on the other go as deep as you can' },
+      { name:'Plank', reps:'3 rounds, hold 45 seconds', note:'By now this should feel more manageable focus on breathing, not just surviving' },
+      { name:'Single-leg Hip Thrust', reps:'3 rounds of 12 each side', note:'One leg extended, drive through the planted heel, squeeze hard at the top' },
+    ]},
+    { day:'Day 2', focus:'Rest / Walk', exercises:[] },
+    { day:'Day 3', focus:'Upper Body', exercises:[
+      { name:'Close-grip Push-ups', reps:'4 rounds of 10', note:'Hands shoulder-width or slightly narrower, elbows stay close to your body as you lower heavy tricep and chest work' },
+      { name:'Wide Push-ups', reps:'4 rounds of 10', note:'Hands much wider than shoulders targets the outer chest. Go right after close-grip for maximum burn' },
+      { name:'Inverted Row', reps:'3 rounds of 10', note:'Under a table, body straight as a board, pull chest up to the table the more horizontal you are, the harder' },
+      { name:'Handstand Hold (wall)', reps:'3 rounds, hold 10 seconds', note:'Kick up carefully against a wall, arms straight, hold build shoulder and core stability. Always have something soft nearby' },
+    ]},
+    { day:'Day 4', focus:'Rest / Stretch', exercises:[] },
+    { day:'Day 5', focus:'Lower Body', exercises:[
+      { name:'Pistol Squat (assisted)', reps:'3 rounds of 6 each leg', note:'Each session try to use the support a little less you\'re building toward a full unassisted pistol squat' },
+      { name:'Plyometric Lunge', reps:'3 rounds of 10 total', note:'Start in a lunge, jump and switch legs in the air land softly, immediately go into the next lunge' },
+      { name:'Hamstring Curl (towel)', reps:'3 rounds of 8', note:'Lie on a smooth floor, heels on a folded towel, bend knees to curl your heels toward your glutes the floor slides under you' },
+      { name:'Box Jump (low)', reps:'3 rounds of 6', note:'Jump onto a low surface (a step, low bench), land softly with bent knees, step back down never jump back down' },
+    ]},
+    { day:'Day 6', focus:'Core & Balance', exercises:[
+      { name:'L-sit Hold (chairs)', reps:'3 rounds, hold 10 seconds', note:'Press down on two chairs on either side of you, straighten arms and try to lift your hips and legs off the seat incredibly hard, incredibly rewarding' },
+      { name:'Dragon Flag (tuck)', reps:'3 rounds of 5', note:'Lie on a bench, hold something behind your head, tuck knees and lift your entire lower body control the lowering phase' },
+      { name:'Windshield Wipers', reps:'3 rounds of 8 each side', note:'Lie on back, raise legs straight up, rotate them side to side like wipers keep shoulders on the floor' },
+      { name:'Hollow Body Hold', reps:'3 rounds, hold 25 seconds', note:'Lie on back, press lower back into floor, extend arms overhead and lift legs your whole body curves like a bowl. Core fundamental' },
+    ]},
+    { day:'Day 7', focus:'Rest', exercises:[] },
+  ],
+};
+
+var caliDoneKey = function(week, dayIdx, exIdx) { return 'w'+week+'_d'+dayIdx+'_e'+exIdx; };
+
+function renderCalisthenics() {
+  var weekBtns = document.getElementById('cali-week-btns');
+  weekBtns.innerHTML = [1,2,3,4].map(function(w) {
+    var active = w === caliWeek;
+    return '<button onclick="caliSetWeek('+w+')" style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid '+(active?'var(--black)':'#c8c8c5')+';background:'+(active?'var(--black)':'transparent')+';color:'+(active?'var(--white)':'var(--gray)')+';padding:0.3rem 0.8rem;cursor:pointer;font-weight:300;">Week '+w+'</button>';
+  }).join('');
+  var plan = caliProgram[caliWeek];
+  var planEl = document.getElementById('cali-plan');
+  planEl.innerHTML = plan.map(function(d, di) {
+    var isRest = d.exercises.length === 0;
+    return '<div style="margin-bottom:1.5rem;border:1px solid #c8c8c5;padding:1rem;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.8rem;">' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + d.day + '</div>' +
+        '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.88rem;">' + d.focus + '</div>' +
+      '</div>' +
+      (isRest
+        ? '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.82rem;color:var(--gray);padding:0.5rem 0;">Take it easy 🤍 stretch or go for a walk</div>'
+        : d.exercises.map(function(ex, ei) {
+            var key = caliDoneKey(caliWeek, di, ei);
+            var done = !!caliLog[key];
+            var ytLink = caliYT[ex.name] || ('https://www.youtube.com/results?search_query='+encodeURIComponent(ex.name+' how to exercise'));
+            return '<div style="display:flex;gap:0.8rem;padding:0.7rem 0;border-bottom:1px solid var(--light);align-items:flex-start;">' +
+              '<div onclick="caliToggle(\''+key+'\')" style="width:16px;height:16px;border:1px solid '+(done?'var(--black)':'#c8c8c5')+';background:'+(done?'var(--black)':'transparent')+';flex-shrink:0;cursor:pointer;margin-top:3px;transition:all 0.15s;"></div>' +
+              '<div style="flex:1;">' +
+                '<div style="display:flex;align-items:baseline;gap:0.6rem;flex-wrap:wrap;">' +
+                  '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:'+(done?'var(--gray)':'var(--black)')+';'+(done?'text-decoration:line-through;':'')+'">'+ex.name+'</div>' +
+                  '<a href="'+ytLink+'" target="_blank" style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);text-decoration:none;">▶ How to</a>' +
+                '</div>' +
+                '<div style="font-family:\'Nunito\',sans-serif;font-size:0.7rem;color:var(--gray);margin-top:0.2rem;">'+ex.reps+'</div>' +
+                '<div style="font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-top:0.3rem;line-height:1.5;">'+ex.note+'</div>' +
+              '</div>' +
+            '</div>';
+          }).join('')
+      ) +
+    '</div>';
+  }).join('');
+}
+
+function caliSetWeek(w) { caliWeek = w; renderCalisthenics(); }
+
+function caliToggle(key) {
+  caliLog[key] = !caliLog[key];
+  localStorage.setItem('cali_log', JSON.stringify(caliLog));
+  if (window.syncToCloud) window.syncToCloud('cali_log', caliLog);
+  renderCalisthenics();
 }
 </script>
 
 <script>
-// ── Who I Am ────────────────────────────────────────────────
 var WIA = JSON.parse(localStorage.getItem('wia2') || '{"j":{},"c":{},"traits":[],"values":[],"name":"","wj":{}}');
 if (!WIA.traits) WIA.traits = [];
 if (!WIA.values) WIA.values = [];
@@ -3389,7 +4527,7 @@ var rfmSuggestions = [
     ]
   },
   {
-    group: 'Blast', desc: 'Extroverted iNtuition — ideas and energy outward',
+    group: 'Blast', desc: 'Extroverted iNtuition: ideas and energy outward',
     items: [
       { name: 'Energising and idea-generating', must: false },
       { name: 'Brings excitement and possibility to life', must: false },
@@ -3398,7 +4536,7 @@ var rfmSuggestions = [
     ]
   },
   {
-    group: 'Play', desc: 'Extroverted Sensing — action and presence outward',
+    group: 'Play', desc: 'Extroverted Sensing: action and presence outward',
     items: [
       { name: 'Spontaneous and lives in the moment', must: false },
       { name: 'Fun and action-oriented', must: false },
@@ -3407,7 +4545,7 @@ var rfmSuggestions = [
     ]
   },
   {
-    group: 'Sleep', desc: 'Introverted Feeling — deep inner emotional world',
+    group: 'Sleep', desc: 'Introverted Feeling: deep inner emotional world',
     items: [
       { name: 'Deeply emotionally aware', must: false },
       { name: 'Has a strong inner moral compass', must: false },
@@ -3416,7 +4554,7 @@ var rfmSuggestions = [
     ]
   },
   {
-    group: 'Consume', desc: 'Introverted Thinking — deep inner knowledge world',
+    group: 'Consume', desc: 'Introverted Thinking: deep inner knowledge world',
     items: [
       { name: 'Curious and always learning', must: false },
       { name: 'Builds knowledge deeply before sharing', must: false },
@@ -3619,15 +4757,15 @@ function rfmOpenDetail(i) {
     if (result.pct === 0) {
       verdict = 'Start rating to get your clarity reading.';
     } else if (result.mustFail) {
-      verdict = person.name + ' is missing something non-negotiable for you. That matters. Your must-haves exist for a reason — they protect your peace.';
+      verdict = person.name + ' is missing something non-negotiable for you. That matters. Your must-haves exist for a reason: they protect your peace.';
     } else if (result.pct >= 85) {
-      verdict = person.name + ' strongly aligns with what you need. That doesn\'t mean perfect — it means they show up in the ways that matter most to you.';
+      verdict = person.name + ' strongly aligns with what you need. That doesn\'t mean perfect: it means they show up in the ways that matter most to you.';
     } else if (result.pct >= 70) {
       verdict = 'There\'s real compatibility here. Notice which gaps feel workable and which feel like you\'d be shrinking yourself to accommodate.';
     } else if (result.pct >= 55) {
       verdict = 'Some alignment, some distance. Ask yourself: are you hoping they\'ll change, or accepting who they actually are right now?';
     } else if (result.pct >= 40) {
-      verdict = 'This connection needs honest reflection. The pull you feel may be real — but is it who they are, or who you want them to be?';
+      verdict = 'This connection needs honest reflection. The pull you feel may be real: but is it who they are, or who you want them to be?';
     } else {
       verdict = 'The numbers are reflecting something your heart may already know. You deserve someone who meets you where you are.';
     }
@@ -3710,10 +4848,10 @@ var opCoins = { od: null, sn: null, ft: null, a1: null, a2: null };
 var opAnimalOpposites = { P:'S', S:'P', B:'C', C:'B' };
 
 var opAnimalDesc = {
-  P: 'Play — extroverted decider + extroverted observer. Expending energy, doing, working, showing up for the tribe.',
-  B: 'Blast — extroverted decider + introverted observer. Teaching, sharing, starting, spreading ideas outward.',
-  C: 'Consume — introverted decider + extroverted observer. Learning, researching, taking in, filling themselves.',
-  S: 'Sleep — introverted decider + introverted observer. Preserving energy, processing, introspecting, going inward.'
+  P: 'Play: extroverted decider + extroverted observer. Expending energy, doing, working, showing up for the tribe.',
+  B: 'Blast: extroverted decider + introverted observer. Teaching, sharing, starting, spreading ideas outward.',
+  C: 'Consume: introverted decider + extroverted observer. Learning, researching, taking in, filling themselves.',
+  S: 'Sleep: introverted decider + introverted observer. Preserving energy, processing, introspecting, going inward.'
 };
 
 
@@ -3778,14 +4916,14 @@ function opUpdateResult() {
   var typeCode = c.od + c.sn + '/' + c.ft + '/' + c.a1 + c.a2;
 
   var odDesc = c.od === 'O'
-    ? 'Observer — gathers information before deciding or acting.'
-    : 'Decider — acts and decides before fully observing.';
+    ? 'Observer: gathers information before deciding or acting.'
+    : 'Decider: acts and decides before fully observing.';
   var snDesc = c.sn === 'S'
-    ? 'Sensory — anchored in concrete, present, tangible reality.'
-    : 'iNtuitive — drawn to patterns, meaning, and future possibilities.';
+    ? 'Sensory: anchored in concrete, present, tangible reality.'
+    : 'iNtuitive: drawn to patterns, meaning, and future possibilities.';
   var ftDesc = c.ft === 'F'
-    ? 'Feeling — decides based on people, values, and harmony.'
-    : 'Thinking — decides based on logic, fairness, and systems.';
+    ? 'Feeling: decides based on people, values, and harmony.'
+    : 'Thinking: decides based on logic, fairness, and systems.';
   var animalDesc = animalLabels[c.a1] + ' / ' + animalLabels[c.a2] + '. ' + opAnimalDesc[c.a1];
 
   var types = opGetMBTI(c.od, c.sn, c.ft);
@@ -3857,7 +4995,7 @@ function rfmRenderCompare() {
   var top = scored[0];
   var note = '';
   if (top && top.pct >= 70 && !top.mustFail) {
-    note = top.name + ' aligns most with what you\'ve said you need. Let that be data, not a decision — only you know the full picture.';
+    note = top.name + ' aligns most with what you\'ve said you need. Let that be data, not a decision: only you know the full picture.';
   } else if (top && top.mustFail) {
     note = 'Everyone here is missing at least one must-have. It may be worth asking if these are the right options, or if your standards need space to be honored.';
   } else if (top && top.pct > 0) {
