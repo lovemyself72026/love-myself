@@ -16,7 +16,7 @@
 <script>
   window._rawLS = localStorage.setItem.bind(localStorage);
   const DB_URL = 'https://lovemyselfapp-default-rtdb.firebaseio.com/my-love-myself-data';
-  const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books','habits_data','cali_log'];
+  const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books','habits_data','cali_log','wia2'];
 
   window.syncToCloud = async function(key, value) {
     if (!SYNC_KEYS.includes(key)) return;
@@ -331,10 +331,166 @@
   <div id="import-msg" style="font-family:'Nunito',sans-serif;font-size:0.62rem;color:var(--gray);letter-spacing:0.08em;margin-top:0.4rem;text-align:center;"></div>
 </div>
 
-<div class="section" id="affirmations" style="display:none!important;">
-  <!-- content moved into schedule > journal tab -->
 
-  <!-- Books sub-section -->
+
+<div class="section" id="vision">
+  <div class="subtitle">Dream it, live it</div>
+  <h1>My vision board.</h1>
+  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0.5rem 0 2rem;line-height:1.6;">Build a vision board for every area of your life 🤍</div>
+  <div id="dimension-boards"></div>
+
+  <!-- Who I Am -->
+  <hr style="margin:2.5rem 0;">
+  <div class="subtitle" style="margin-bottom:0.5rem;">Who I am</div>
+  <h2 style="margin-bottom:0.5rem;">Track your growth.</h2>
+  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Add words, thoughts, and pictures that reflect who you are 🤍</div>
+
+  <!-- Date navigation -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+    <button onclick="changeWhoiDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
+    <span id="whoi-date-picker-label" onclick="document.getElementById('whoi-date-picker').showPicker?document.getElementById('whoi-date-picker').showPicker():document.getElementById('whoi-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="whoi-date-picker" onchange="renderWhoiGrid()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
+    <button onclick="changeWhoiDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
+  </div>
+
+  <!-- Type selector -->
+  <div style="display:flex;gap:0.4rem;margin-bottom:0.8rem;">
+    <button class="vision-type-btn active" id="whoi-btn-word" onclick="setWhoiType('word')">Word</button>
+    <button class="vision-type-btn" id="whoi-btn-thought" onclick="setWhoiType('thought')">Thought</button>
+    <button class="vision-type-btn" id="whoi-btn-image" onclick="setWhoiType('image')">Image</button>
+  </div>
+
+  <div id="whoi-input-word" style="display:flex;gap:0.5rem;align-items:center;">
+    <input id="whoi-text-word" placeholder="e.g. Resilient, Creative, Kind..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
+    <button onclick="addWhoiItem()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
+  </div>
+  <div id="whoi-input-thought" style="display:none;gap:0.5rem;align-items:center;">
+    <input id="whoi-text-thought" placeholder="Something true about me..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
+    <button onclick="addWhoiItem()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
+  </div>
+  <div id="whoi-input-image" style="display:none;">
+    <input type="file" accept="image/*" onchange="addWhoiImage(this)" style="font-size:0.82rem;width:100%;">
+  </div>
+
+  <div id="whoi-grid" class="vision-items-grid" style="margin-top:1rem;"></div>
+  <div id="whoi-saved-note" style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);letter-spacing:0.1em;text-align:center;margin-top:0.5rem;"></div>
+</div>
+
+<div class="section" id="schedule">
+  <div class="subtitle">Plan your day</div>
+  <h1>My schedule.</h1><br>
+
+  <!-- Date navigation -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+    <button onclick="savePlannerDay();changeScheduleDay(-1);" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8249;</button>
+    <div style="text-align:center;flex:1;min-width:0;position:relative;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+        <div id="schedule-day-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--black);"></div>
+        <button onclick="toggleSchedCal()" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;flex-shrink:0;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;">
+            <rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
+          </svg>
+        </button>
+      </div>
+      <!-- Popup calendar -->
+      <div id="sched-cal-popup" style="display:none;position:absolute;top:calc(100% + 0.5rem);left:50%;transform:translateX(-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.8rem;z-index:100;min-width:220px;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+          <button onclick="schedCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
+          <div id="sched-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+          <button onclick="schedCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+        </div>
+        <div id="sched-cal-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;"></div>
+        <div id="sched-cal-grid"></div>
+      </div>
+    </div>
+    <button onclick="savePlannerDay();changeScheduleDay(1);" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8250;</button>
+  </div>
+
+
+  <!-- Planner grid -->
+  <div id="planner-grid" style="display:flex;flex-direction:column;gap:0.6rem;">
+
+    <!-- Mood -->
+    <div id="ps-mood" style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div class="planner-label">Mood</div>
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;">
+        <span class="mood-btn" onclick="toggleMood(this,'😊')">😊</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😔')">😔</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😰')">😰</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😡')">😡</span>
+        <span class="mood-btn" onclick="toggleMood(this,'🥰')">🥰</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😴')">😴</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😐')">😐</span>
+        <span class="mood-btn" onclick="toggleMood(this,'🥺')">🥺</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😤')">😤</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😭')">😭</span>
+        <span class="mood-btn" onclick="toggleMood(this,'🤩')">🤩</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😌')">😌</span>
+        <span class="mood-btn" onclick="toggleMood(this,'🤗')">🤗</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😶')">😶</span>
+        <span class="mood-btn" onclick="toggleMood(this,'🥱')">🥱</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😇')">😇</span>
+        <span class="mood-btn" onclick="toggleMood(this,'🤯')">🤯</span>
+        <span class="mood-btn" onclick="toggleMood(this,'💪')">💪</span>
+        <span class="mood-btn" onclick="toggleMood(this,'🔥')">🔥</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😞')">😞</span>
+        <span class="mood-btn" onclick="toggleMood(this,'🥹')">🥹</span>
+      </div>
+    </div>
+
+    <!-- To Do -->
+    <div id="ps-todo" style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div class="planner-label">To Do</div>
+      <div id="todo-list" style="margin-top:0.5rem;"></div>
+      <input id="todo-input" placeholder="Add task..." onkeydown="if(event.key==='Enter')addTodo()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
+    </div>
+
+    <!-- Schedule -->
+    <div id="ps-schedule" style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div class="planner-label">Schedule</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:0 0.4rem;margin-top:0.5rem;" id="schedule-time-rows"></div>
+    </div>
+
+  </div>
+
+  <div style="display:flex;justify-content:space-between;margin-top:1rem;flex-wrap:wrap;gap:0.5rem;">
+    <button class="btn fill" onclick="savePlannerDay()">Save day</button>
+    <button class="btn" onclick="showCopySchedule()">Copy to another day</button>
+  </div>
+
+  <!-- Copy schedule picker -->
+  <div id="copy-schedule-box" style="display:none;border:1px solid #c8c8c5;padding:1rem;margin-top:0.6rem;">
+    <div class="planner-label" style="margin-bottom:0.6rem;">Copy this day's schedule to:</div>
+    <input type="date" id="copy-target-date" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;color:var(--black);outline:none;padding:0.3rem 0;width:100%;margin-bottom:0.8rem;">
+    <div style="display:flex;gap:0.5rem;">
+      <button class="btn fill" onclick="copyScheduleToDay()" style="flex:1;">Copy</button>
+      <button class="btn" onclick="document.getElementById('copy-schedule-box').style.display='none'" style="flex:1;">Cancel</button>
+    </div>
+    <div id="copy-msg" style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);margin-top:0.5rem;text-align:center;"></div>
+  </div>
+
+</div>
+
+<div class="section" id="affirmations">
+
+  <!-- Celebration overlay -->
+  <div id="book-celebrate" style="display:none;position:fixed;inset:0;z-index:999;pointer-events:none;">
+    <canvas id="confetti-canvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+    <div id="book-toast" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--black);color:var(--white);padding:1.5rem 2rem;text-align:center;min-width:220px;opacity:0;transition:opacity 0.3s;">
+      <div style="font-size:1.8rem;margin-bottom:0.5rem;">🎉</div>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:1.1rem;margin-bottom:0.2rem;" id="toast-title"></div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#aaa;">Added to your reading list 🤍</div>
+    </div>
+  </div>
+
+  <!-- Journal sub-tabs -->
+  <div id="journal-tabs" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+    <button class="journal-tab active" onclick="showJournalTab('belief')" id="jtab-belief">Belief</button>
+    <button class="journal-tab" onclick="showJournalTab('vent')" id="jtab-vent">Journal</button>
+    <button class="journal-tab" onclick="showJournalTab('books')" id="jtab-books">Books</button>
+    <button class="journal-tab" onclick="showJournalTab('wins')" id="jtab-wins">Wins</button>
+  </div>
+
+    <!-- Books sub-section -->
   <div id="jsub-books" style="display:none;">
     <!-- Books I've Read -->
     <div>
@@ -442,268 +598,6 @@
 
   </div><!-- end jsub-wins -->
 
-</div><!-- end #affirmations -->
-
-<div class="section" id="vision">
-  <div class="subtitle">Dream it, live it</div>
-  <h1>My vision board.</h1>
-  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0.5rem 0 2rem;line-height:1.6;">Build a vision board for every area of your life 🤍</div>
-  <div id="dimension-boards"></div>
-
-  <!-- Who I Am -->
-  <hr style="margin:2.5rem 0;">
-  <div class="subtitle" style="margin-bottom:0.5rem;">Who I am</div>
-  <h2 style="margin-bottom:0.5rem;">Track your growth.</h2>
-  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Add words, thoughts, and pictures that reflect who you are 🤍</div>
-
-  <!-- Date navigation -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-    <button onclick="changeWhoiDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
-    <span id="whoi-date-picker-label" onclick="document.getElementById('whoi-date-picker').showPicker?document.getElementById('whoi-date-picker').showPicker():document.getElementById('whoi-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="whoi-date-picker" onchange="renderWhoiGrid()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
-    <button onclick="changeWhoiDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
-  </div>
-
-  <!-- Type selector -->
-  <div style="display:flex;gap:0.4rem;margin-bottom:0.8rem;">
-    <button class="vision-type-btn active" id="whoi-btn-word" onclick="setWhoiType('word')">Word</button>
-    <button class="vision-type-btn" id="whoi-btn-thought" onclick="setWhoiType('thought')">Thought</button>
-    <button class="vision-type-btn" id="whoi-btn-image" onclick="setWhoiType('image')">Image</button>
-  </div>
-
-  <div id="whoi-input-word" style="display:flex;gap:0.5rem;align-items:center;">
-    <input id="whoi-text-word" placeholder="e.g. Resilient, Creative, Kind..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
-    <button onclick="addWhoiItem()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
-  </div>
-  <div id="whoi-input-thought" style="display:none;gap:0.5rem;align-items:center;">
-    <input id="whoi-text-thought" placeholder="Something true about me..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
-    <button onclick="addWhoiItem()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
-  </div>
-  <div id="whoi-input-image" style="display:none;">
-    <input type="file" accept="image/*" onchange="addWhoiImage(this)" style="font-size:0.82rem;width:100%;">
-  </div>
-
-  <div id="whoi-grid" class="vision-items-grid" style="margin-top:1rem;"></div>
-  <div id="whoi-saved-note" style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);letter-spacing:0.1em;text-align:center;margin-top:0.5rem;"></div>
-</div>
-
-<div class="section" id="schedule">
-  <div class="subtitle">Plan your day</div>
-  <h1>My schedule.</h1><br>
-
-  <!-- Date navigation -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-    <button onclick="savePlannerDay();changeScheduleDay(-1);" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8249;</button>
-    <div style="text-align:center;flex:1;min-width:0;position:relative;">
-      <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;">
-        <div id="schedule-day-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--black);"></div>
-        <button onclick="toggleSchedCal()" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;flex-shrink:0;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;">
-            <rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
-          </svg>
-        </button>
-      </div>
-      <!-- Popup calendar -->
-      <div id="sched-cal-popup" style="display:none;position:absolute;top:calc(100% + 0.5rem);left:50%;transform:translateX(-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.8rem;z-index:100;min-width:220px;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
-          <button onclick="schedCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
-          <div id="sched-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
-          <button onclick="schedCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
-        </div>
-        <div id="sched-cal-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px;"></div>
-        <div id="sched-cal-grid"></div>
-      </div>
-    </div>
-    <button onclick="savePlannerDay();changeScheduleDay(1);" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8250;</button>
-  </div>
-
-
-  <!-- Planner grid -->
-  <div id="planner-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;align-items:start;">
-
-    <!-- LEFT: Schedule -->
-    <div style="display:flex;flex-direction:column;gap:0.6rem;">
-
-      <!-- Schedule -->
-      <div id="ps-schedule" style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div class="planner-label">Schedule</div>
-        <div style="display:grid;grid-template-columns:auto 1fr;gap:0 0.4rem;margin-top:0.5rem;" id="schedule-time-rows"></div>
-      </div>
-
-    </div>
-
-    <!-- RIGHT: Goals, To Do, Mood, Sleep, Water, Bible Verse, Exercise, Meals -->
-    <div style="display:flex;flex-direction:column;gap:0.6rem;">
-
-      <!-- To Do -->
-      <div id="ps-todo" style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div class="planner-label">To Do</div>
-        <div id="todo-list" style="margin-top:0.5rem;"></div>
-        <input id="todo-input" placeholder="Add task..." onkeydown="if(event.key==='Enter')addTodo()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
-      </div>
-
-      <!-- Mood -->
-      <div id="ps-mood" style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div class="planner-label">Mood</div>
-        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;">
-          <span class="mood-btn" onclick="toggleMood(this,'😊')">😊</span>
-          <span class="mood-btn" onclick="toggleMood(this,'😔')">😔</span>
-          <span class="mood-btn" onclick="toggleMood(this,'😰')">😰</span>
-          <span class="mood-btn" onclick="toggleMood(this,'😡')">😡</span>
-          <span class="mood-btn" onclick="toggleMood(this,'🥰')">🥰</span>
-          <span class="mood-btn" onclick="toggleMood(this,'😴')">😴</span>
-          <span class="mood-btn" onclick="toggleMood(this,'😐')">😐</span>
-          <span class="mood-btn" onclick="toggleMood(this,'🥺')">🥺</span>
-          <span class="mood-btn" onclick="toggleMood(this,'😤')">😤</span>
-          <span class="mood-btn" onclick="toggleMood(this,'😭')">😭</span>
-          <span class="mood-btn" onclick="toggleMood(this,'🤩')">🤩</span>
-          <span class="mood-btn" onclick="toggleMood(this,'😌')">😌</span>
-          <span class="mood-btn" onclick="toggleMood(this,'🤗')">🤗</span>
-          <span class="mood-btn" onclick="toggleMood(this,'😶')">😶</span>
-          <span class="mood-btn" onclick="toggleMood(this,'🥱')">🥱</span>
-          <span class="mood-btn" onclick="toggleMood(this,'😇')">😇</span>
-          <span class="mood-btn" onclick="toggleMood(this,'🤯')">🤯</span>
-          <span class="mood-btn" onclick="toggleMood(this,'💪')">💪</span>
-          <span class="mood-btn" onclick="toggleMood(this,'🔥')">🔥</span>
-          <span class="mood-btn" onclick="toggleMood(this,'😞')">😞</span>
-          <span class="mood-btn" onclick="toggleMood(this,'🥹')">🥹</span>
-        </div>
-      </div>
-
-      <!-- Sleep -->
-      <div id="ps-sleep" style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div class="planner-label">Sleep (hrs)</div>
-          <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">9:00 PM</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-top:0.5rem;">
-          <span class="sleep-btn" onclick="setSleep(this,4)">4</span>
-          <span class="sleep-btn" onclick="setSleep(this,5)">5</span>
-          <span class="sleep-btn" onclick="setSleep(this,6)">6</span>
-          <span class="sleep-btn" onclick="setSleep(this,7)">7</span>
-          <span class="sleep-btn" onclick="setSleep(this,8)">8+</span>
-        </div>
-      </div>
-
-      <!-- Water -->
-      <div id="ps-water" style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div class="planner-label">Water</div>
-        <div style="display:flex;gap:0.2rem;margin-top:0.5rem;justify-content:space-between;" id="water-cups">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
-            <span class="water-cup" onclick="toggleWater(this)">💧</span>
-            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">7:00 AM</span>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
-            <span class="water-cup" onclick="toggleWater(this)">💧</span>
-            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">8:00 AM</span>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
-            <span class="water-cup" onclick="toggleWater(this)">💧</span>
-            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">9:00 AM</span>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
-            <span class="water-cup" onclick="toggleWater(this)">💧</span>
-            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">11:00 AM</span>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
-            <span class="water-cup" onclick="toggleWater(this)">💧</span>
-            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">1:00 PM</span>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
-            <span class="water-cup" onclick="toggleWater(this)">💧</span>
-            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">3:00 PM</span>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
-            <span class="water-cup" onclick="toggleWater(this)">💧</span>
-            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">5:00 PM</span>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;">
-            <span class="water-cup" onclick="toggleWater(this)">💧</span>
-            <span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">7:00 PM</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Meals -->
-      <div id="ps-meals" style="border:1px solid #c8c8c5;padding:0.8rem;">
-
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div class="planner-label">Breakfast</div>
-          <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">6:30 AM</span>
-        </div>
-        <textarea class="planner-textarea" id="meal-breakfast" placeholder="" rows="1" style="width:100%;margin-top:0.3rem;min-height:28px;max-height:60px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();saveMeal('breakfast')}"></textarea>
-        <span id="meal-time-breakfast" style="font-family:'Nunito',sans-serif;font-size:0.58rem;color:var(--gray);"></span>
-        <div id="meal-saved-breakfast" style="margin-top:0.3rem;"></div>
-
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.8rem;">
-          <div class="planner-label">Lunch</div>
-          <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">12:30 PM</span>
-        </div>
-        <textarea class="planner-textarea" id="meal-lunch" placeholder="" rows="1" style="width:100%;margin-top:0.3rem;min-height:28px;max-height:60px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();saveMeal('lunch')}"></textarea>
-        <span id="meal-time-lunch" style="font-family:'Nunito',sans-serif;font-size:0.58rem;color:var(--gray);"></span>
-        <div id="meal-saved-lunch" style="margin-top:0.3rem;"></div>
-
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.8rem;">
-          <div class="planner-label">Dinner</div>
-          <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">7:00 PM</span>
-        </div>
-        <textarea class="planner-textarea" id="meal-dinner" placeholder="" rows="1" style="width:100%;margin-top:0.3rem;min-height:28px;max-height:60px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();saveMeal('dinner')}"></textarea>
-        <span id="meal-time-dinner" style="font-family:'Nunito',sans-serif;font-size:0.58rem;color:var(--gray);"></span>
-        <div id="meal-saved-dinner" style="margin-top:0.3rem;"></div>
-
-      </div>
-
-      <!-- Notes -->
-      <div id="ps-notes" style="border:1px solid #c8c8c5;padding:0.8rem;">
-        <div class="planner-label">Notes</div>
-        <textarea class="planner-textarea" id="planner-notes" placeholder="" rows="1" style="width:100%;margin-top:0.3rem;min-height:28px;max-height:60px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();saveNote()}"></textarea>
-        <div id="notes-list" style="margin-top:0.3rem;"></div>
-      </div>
-
-    </div>
-
-  </div>
-
-  <div style="display:flex;justify-content:space-between;margin-top:1rem;flex-wrap:wrap;gap:0.5rem;">
-    <button class="btn fill" onclick="savePlannerDay()">Save day</button>
-    <button class="btn" onclick="showCopySchedule()">Copy to another day</button>
-  </div>
-
-  <!-- Copy schedule picker -->
-  <div id="copy-schedule-box" style="display:none;border:1px solid #c8c8c5;padding:1rem;margin-top:0.6rem;">
-    <div class="planner-label" style="margin-bottom:0.6rem;">Copy this day's schedule to:</div>
-    <input type="date" id="copy-target-date" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;color:var(--black);outline:none;padding:0.3rem 0;width:100%;margin-bottom:0.8rem;">
-    <div style="display:flex;gap:0.5rem;">
-      <button class="btn fill" onclick="copyScheduleToDay()" style="flex:1;">Copy</button>
-      <button class="btn" onclick="document.getElementById('copy-schedule-box').style.display='none'" style="flex:1;">Cancel</button>
-    </div>
-    <div id="copy-msg" style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);margin-top:0.5rem;text-align:center;"></div>
-  </div>
-
-</div>
-
-<div class="section" id="affirmations">
-
-  <!-- Celebration overlay -->
-  <div id="book-celebrate" style="display:none;position:fixed;inset:0;z-index:999;pointer-events:none;">
-    <canvas id="confetti-canvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
-    <div id="book-toast" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--black);color:var(--white);padding:1.5rem 2rem;text-align:center;min-width:220px;opacity:0;transition:opacity 0.3s;">
-      <div style="font-size:1.8rem;margin-bottom:0.5rem;">🎉</div>
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:1.1rem;margin-bottom:0.2rem;" id="toast-title"></div>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#aaa;">Added to your reading list 🤍</div>
-    </div>
-  </div>
-
-  <!-- Journal sub-tabs -->
-  <div id="journal-tabs" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-    <button class="journal-tab active" onclick="showJournalTab('belief')" id="jtab-belief">Belief</button>
-    <button class="journal-tab" onclick="showJournalTab('vent')" id="jtab-vent">Journal</button>
-    <button class="journal-tab" onclick="showJournalTab('books')" id="jtab-books">Books</button>
-    <button class="journal-tab" onclick="showJournalTab('wins')" id="jtab-wins">Wins</button>
-  </div>
-
-
-  </div>
-
 </div>
 
 
@@ -805,7 +699,6 @@ function showSection(id){
   if (id === 'home') renderAnalytics();
   if (id === 'schedule') { initScheduleDatePicker(); loadPlannerDay(); }
   if (id === 'me') initMeSection();
-  if (id === 'habits' && typeof habitsInit === 'function') habitsInit();
   if (id === 'jesus' && typeof jesusInit === 'function') jesusInit();
 }
 
@@ -1401,7 +1294,7 @@ function renderSchedCal() {
   const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   if (dayNamesEl) {
     dayNamesEl.innerHTML = dayNames.map(n =>
-      `<div style="text-align:center;font-family:'Nunito',sans-serif;font-size:0.42rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);font-weight:300;">${n}</div>`
+      `<div style="text-align:center;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);font-weight:300;">${n}</div>`
     ).join('');
   }
 
@@ -1415,7 +1308,7 @@ function renderSchedCal() {
 
   let html = '';
   for (let w = 0; w < cells.length / 7; w++) {
-    html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px;">`;
+    html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;">`;
     for (let i = 0; i < 7; i++) {
       const day = cells[w * 7 + i];
       if (!day) { html += `<div></div>`; continue; }
@@ -1647,6 +1540,7 @@ function toggleExercise(el) {
 let plannerTodos = [];
 function addTodo() {
   const inp = document.getElementById('todo-input');
+  if (!inp) return;
   const text = inp.value.trim();
   if (!text) return;
   plannerTodos.push({id: Date.now(), text, done: false, time: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})});
@@ -1661,6 +1555,7 @@ function toggleTodo(id) {
 }
 function renderTodos() {
   const el = document.getElementById('todo-list');
+  if (!el) return;
   el.innerHTML = plannerTodos.map(t => `
     <div class="todo-item">
       <div class="todo-check${t.done?' done':''}" onclick="toggleTodo(${t.id})"></div>
@@ -1724,6 +1619,7 @@ function toggleGoal(id) {
 }
 function renderGoals() {
   const el = document.getElementById('goals-list');
+  if (!el) return;
   if (!el) return;
   el.innerHTML = plannerGoals.map(g => `
       <div class="todo-check${g.done?' done':''}" onclick="toggleGoal(${g.id})"></div>
@@ -2005,7 +1901,7 @@ function renderAnalytics() {
             <div id="analytics-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
             <button onclick="analyticsCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
           </div>
-          <div id="analytics-cal-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px;"></div>
+          <div id="analytics-cal-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;"></div>
           <div id="analytics-cal-grid"></div>
         </div>
       </div>
@@ -2090,7 +1986,6 @@ function reloadAllData() {
   const b = JSON.parse(localStorage.getItem('my_books') || '[]'); books = Array.isArray(b) ? b : [];
   const ap = JSON.parse(localStorage.getItem('all_planner_data') || '{}'); allPlannerData = (ap && typeof ap === 'object' && !Array.isArray(ap)) ? ap : {};
   const cl = JSON.parse(localStorage.getItem('cali_log') || '{}'); caliLog = (cl && typeof cl === 'object') ? cl : {};
-  if (typeof habitsLoad === 'function') habitsLoad();
   renderWins(); renderSavedAffirmations(); renderVentEntries(); renderDimensionBoards(); renderWhoiGrid(); renderBooks(); renderAnalytics();
 }
 
@@ -2153,7 +2048,7 @@ function renderAnalyticsCal() {
 
   let html = '';
   for (let w = 0; w < cells.length / 7; w++) {
-    html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px;">`;
+    html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;">`;
     for (let i = 0; i < 7; i++) {
       const day = cells[w * 7 + i];
       if (!day) { html += `<div></div>`; continue; }
@@ -2316,20 +2211,17 @@ document.head.appendChild(manifestLink);
   var storage = { getItem: function(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }, setItem: function(k,v) { try { localStorage.setItem(k,v); } catch(e) {} } };
 
   var currentBalanceDate = new Date().toISOString().split('T')[0];
+  var balanceCalOffset = 0;
 
   function getBalanceDateStr() {
     return new Date(currentBalanceDate + 'T00:00:00').toDateString();
   }
 
   function initBalanceDatePicker() {
-    var dp = document.getElementById('balance-date-picker');
-    if (dp) dp.value = currentBalanceDate;
     updateBalanceDayLabel();
   }
 
   function updateBalanceDayLabel() {
-    var dp = document.getElementById('balance-date-picker');
-    if (dp) dp.value = currentBalanceDate;
     var d = new Date(currentBalanceDate + 'T00:00:00');
     var today = new Date().toISOString().split('T')[0];
     var label = d.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
@@ -2350,6 +2242,7 @@ document.head.appendChild(manifestLink);
     currentBalanceDate = d.toISOString().split('T')[0];
     updateBalanceDayLabel();
     reloadBalanceDay();
+    renderBalanceCal();
   }
 
   function reloadBalanceDay() {
@@ -2360,6 +2253,118 @@ document.head.appendChild(manifestLink);
     renderBalanceQuestions();
     renderRelationshipQuestions();
   }
+
+  function balanceCalToggle() {
+    var popup = document.getElementById('balance-cal-popup');
+    if (!popup) return;
+    if (popup.style.display === 'none') {
+      // sync offset to current date
+      var now = new Date();
+      var cur = new Date(currentBalanceDate + 'T00:00:00');
+      balanceCalOffset = (cur.getFullYear() - now.getFullYear()) * 12 + (cur.getMonth() - now.getMonth());
+      popup.style.display = 'block';
+      renderBalanceCal();
+    } else {
+      popup.style.display = 'none';
+    }
+  }
+
+  function balanceCalShift(dir) {
+    balanceCalOffset += dir;
+    renderBalanceCal();
+  }
+
+  function balanceCalJump(dateStr) {
+    currentBalanceDate = dateStr;
+    var now = new Date();
+    var d = new Date(dateStr + 'T00:00:00');
+    balanceCalOffset = (d.getFullYear() - now.getFullYear()) * 12 + (d.getMonth() - now.getMonth());
+    updateBalanceDayLabel();
+    reloadBalanceDay();
+    renderBalanceCal();
+    document.getElementById('balance-cal-popup').style.display = 'none';
+  }
+
+  function renderBalanceCal() {
+    var grid = document.getElementById('balance-cal-grid');
+    var lbl  = document.getElementById('balance-cal-label');
+    var dayNamesEl = document.getElementById('balance-cal-daynames');
+    if (!grid || !lbl) return;
+
+    var now   = new Date();
+    var base  = new Date(now.getFullYear(), now.getMonth() + balanceCalOffset, 1);
+    var year  = base.getFullYear();
+    var month = base.getMonth();
+    var todayStr = now.toISOString().split('T')[0];
+
+    lbl.textContent = base.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    var dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    if (dayNamesEl) {
+      dayNamesEl.innerHTML = dayNames.map(function(n) {
+        return '<div style="text-align:center;font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);font-weight:300;">' + n + '</div>';
+      }).join('');
+    }
+
+    var firstDow    = (new Date(year, month, 1).getDay() + 6) % 7;
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+    var cells = [];
+    for (var i = 0; i < firstDow; i++) cells.push(null);
+    for (var d = 1; d <= daysInMonth; d++) cells.push(d);
+    while (cells.length % 7 !== 0) cells.push(null);
+
+    var allBalance = JSON.parse(localStorage.getItem('balance_data') || '{}');
+
+    var html = '';
+    for (var w = 0; w < cells.length / 7; w++) {
+      html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;">';
+      for (var ci = 0; ci < 7; ci++) {
+        var day = cells[w*7+ci];
+        if (!day) { html += '<div></div>'; continue; }
+        var mm = String(month+1).padStart(2,'0');
+        var dd = String(day).padStart(2,'0');
+        var dateStr = year + '-' + mm + '-' + dd;
+        var isToday    = dateStr === todayStr;
+        var isSelected = dateStr === currentBalanceDate;
+        var isFuture   = dateStr > todayStr;
+        var hasData    = !!(allBalance[dateStr]);
+
+        var bg, border, color, extraInner = '';
+        var opacity = isFuture && !isSelected ? '0.3' : '1';
+        var fw = (isToday || isSelected) ? '600' : '300';
+
+        if (isSelected && isToday) {
+          bg = 'var(--black)'; border = 'var(--black)'; color = 'var(--white)';
+          extraInner = '<div style="width:3px;height:3px;border-radius:50%;background:var(--white);margin-top:1px;"></div>';
+        } else if (isSelected) {
+          bg = 'var(--black)'; border = 'var(--black)'; color = 'var(--white)';
+        } else if (isToday) {
+          bg = 'transparent'; border = 'var(--black)'; color = 'var(--black)';
+          extraInner = '<div style="width:3px;height:3px;border-radius:50%;background:var(--black);margin-top:1px;"></div>';
+        } else if (hasData) {
+          bg = '#e8e8e5'; border = '#0a0a0a'; color = 'var(--black)';
+        } else {
+          bg = 'transparent'; border = '#c8c8c5'; color = 'var(--gray)';
+        }
+
+        html += '<div onclick="balanceCalJump(\'' + dateStr + '\')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid ' + border + ';background:' + bg + ';opacity:' + opacity + ';cursor:pointer;aspect-ratio:1;transition:all 0.15s;' + (isToday && !isSelected ? 'border-width:2px;' : '') + '">'
+          + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;font-weight:' + fw + ';color:' + color + ';line-height:1;">' + day + '</span>'
+          + extraInner
+          + '</div>';
+      }
+      html += '</div>';
+    }
+    grid.innerHTML = html;
+  }
+
+  // close balance popup on outside click
+  document.addEventListener('click', function(e) {
+    var popup = document.getElementById('balance-cal-popup');
+    var btn = document.getElementById('balance-cal-btn');
+    if (popup && popup.style.display !== 'none' && !popup.contains(e.target) && !(btn && btn.contains(e.target))) {
+      popup.style.display = 'none';
+    }
+  });
 
 function showMeTab(tab) {
   ['balance','whiam','rightforme'].forEach(function(t) {
@@ -2757,9 +2762,22 @@ window.addEventListener('DOMContentLoaded', function() {
     <!-- Date navigation -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
       <button onclick="changeBalanceDay(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8249;</button>
-      <div style="text-align:center;">
-        <input type="date" id="balance-date-picker" onchange="onBalanceDatePicked(this.value)" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;cursor:pointer;text-align:center;">
-        <div id="balance-day-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-top:0.3rem;"></div>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <div id="balance-day-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;" onclick="balanceCalToggle()"></div>
+        <div style="position:relative;">
+          <button id="balance-cal-btn" onclick="balanceCalToggle()" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+          </button>
+          <div id="balance-cal-popup" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.8rem;z-index:1000;width:min(80vw,280px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+              <button onclick="balanceCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
+              <div id="balance-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+              <button onclick="balanceCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+            </div>
+            <div id="balance-cal-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;"></div>
+            <div id="balance-cal-grid"></div>
+          </div>
+        </div>
       </div>
       <button onclick="changeBalanceDay(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8250;</button>
     </div>
@@ -2809,48 +2827,43 @@ window.addEventListener('DOMContentLoaded', function() {
   <div id="mesub-whiam">
     <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">You performed from every angle. Now you build from within.</div>
 
-    <div class="wia-tabs">
-      <button class="wia-tab active" onclick="wiaTab('identity')">Identity</button>
-      <button class="wia-tab" onclick="wiaTab('perform')">Perform</button>
-      <button class="wia-tab" onclick="wiaTab('daily')">Daily</button>
-      <button class="wia-tab" onclick="wiaTab('progress')">Progress</button>
+    <div class="balance-sub-tabs">
+      <button class="balance-sub-tab active" onclick="wiaTab('identity')">Identity</button>
+      <button class="balance-sub-tab" onclick="wiaTab('perform')">Perform</button>
+      <button class="balance-sub-tab" onclick="wiaTab('daily')">Daily</button>
     </div>
 
     <!-- IDENTITY -->
     <div class="wia-panel active" id="wia-identity">
-      <div class="wia-identity-card">
+      <div class="wia-identity-card" style="margin-bottom:0.6rem;">
         <div class="wia-id-label">I am</div>
         <div class="wia-id-name" id="wiaIdName">...</div>
         <div class="wia-id-traits" id="wiaIdTraits"><span class="wia-trait-tag empty">your traits appear here</span></div>
       </div>
-      <div style="margin-bottom:1rem;">
-        <div class="subtitle" style="margin-bottom:0.3rem;">Your name or how you see yourself</div>
-        <input type="text" id="wiaNameInput" placeholder="e.g. a person who..." oninput="wiaUpdateCard()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-      </div>
       <div style="margin-bottom:0.5rem;">
-        <div class="subtitle" style="margin-bottom:0.3rem;">Values</div>
-        <div style="display:flex;gap:6px;">
-          <input type="text" id="wiaValueInput" placeholder="e.g. honesty, peace..." style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-          <button onclick="wiaAddValue()" style="background:var(--black);border:none;padding:0 0.8rem;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;font-weight:300;letter-spacing:0.1em;cursor:pointer;">Add</button>
+        <div class="subtitle" style="margin-bottom:0.2rem;">How you see yourself</div>
+        <input type="text" id="wiaNameInput" placeholder="e.g. a person who..." oninput="wiaUpdateCard()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.2rem 0;">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.5rem;">
+        <div>
+          <div class="subtitle" style="margin-bottom:0.2rem;">Values</div>
+          <input type="text" id="wiaValueInput" placeholder="e.g. honesty, peace…" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.2rem 0;">
+          <div class="wia-tags-list" id="wiaValuesList" style="margin-top:0.3rem;"></div>
+        </div>
+        <div>
+          <div class="subtitle" style="margin-bottom:0.2rem;">Traits</div>
+          <input type="text" id="wiaTraitInput" placeholder="e.g. curious, caring…" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.2rem 0;">
+          <div class="wia-tags-list" id="wiaTraitsList" style="margin-top:0.3rem;"></div>
         </div>
       </div>
-      <div class="wia-tags-list" id="wiaValuesList" style="margin-bottom:0.8rem;"></div>
-      <div style="margin-bottom:0.5rem;">
-        <div class="subtitle" style="margin-bottom:0.3rem;">Traits</div>
-        <div style="display:flex;gap:6px;">
-          <input type="text" id="wiaTraitInput" placeholder="e.g. curious, caring..." style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-          <button onclick="wiaAddTrait()" style="background:var(--black);border:none;padding:0 0.8rem;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;font-weight:300;letter-spacing:0.1em;cursor:pointer;">Add</button>
-        </div>
-      </div>
-      <div class="wia-tags-list" id="wiaTraitsList" style="margin-bottom:0.5rem;"></div>
     </div>
 
     <!-- PERFORM -->
     <div class="wia-panel" id="wia-perform">
-      <div class="subtitle" style="margin-bottom:0.8rem;">Understanding the pattern</div>
+      <div class="subtitle" style="margin-bottom:0.5rem;">Understanding the pattern</div>
       <div class="wia-q-card" id="wiaQCard">
         <div class="wia-q-text" id="wiaQText"></div>
-        <textarea id="wiaQAns" placeholder="your answer..." style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);resize:none;min-height:60px;outline:none;padding:0.3rem 0;line-height:1.5;"></textarea>
+        <textarea id="wiaQAns" placeholder="your answer..." style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);resize:none;min-height:50px;outline:none;padding:0.3rem 0;line-height:1.5;"></textarea>
         <div class="wia-q-footer">
           <div class="wia-q-dots" id="wiaQDots"></div>
           <div class="wia-q-btns">
@@ -2861,36 +2874,52 @@ window.addEventListener('DOMContentLoaded', function() {
       </div>
     </div>
 
-    <!-- DAILY -->
+    <!-- DAILY + PROGRESS -->
     <div class="wia-panel" id="wia-daily">
-      <div class="wia-aff-box" onclick="wiaNewAff()" style="cursor:pointer;user-select:none;">
+      <!-- Daily -->
+      <div class="wia-aff-box" onclick="wiaNewAff()" style="cursor:pointer;user-select:none;padding:0.8rem;">
         <div class="wia-aff-text" id="wiaAffText"></div>
-        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;font-weight:300;color:var(--gray);letter-spacing:0.12em;text-transform:uppercase;margin-top:0.4rem;">tap for a new one</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;font-weight:300;color:var(--gray);letter-spacing:0.12em;text-transform:uppercase;margin-top:0.3rem;">tap for a new one</div>
       </div>
-      <div class="subtitle" style="margin-bottom:0.8rem;">Do this today</div>
-      <div id="wiaChecklist"></div>
-    </div>
+      <div class="subtitle" style="margin-bottom:0.5rem;margin-top:0.8rem;">Do this today</div>
+      <div id="wiaChecklist" style="margin-bottom:1rem;"></div>
 
-    <!-- PROGRESS -->
-    <div class="wia-panel" id="wia-progress">
-      <div class="wia-streak-row" id="wiaStreakRow"></div>
-      <div class="subtitle" style="margin-bottom:0.6rem;">Practices this week</div>
-      <div id="wiaPracticeBreakdown" style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:1.2rem;"></div>
-      <div class="subtitle" style="margin-bottom:0.6rem;">Last 30 days</div>
-      <div class="wia-calendar" id="wiaCalendar"></div>
-      <div class="subtitle" style="margin-top:1.2rem;margin-bottom:0.8rem;">Weekly check-in</div>
-      <div class="wia-q-card">
-        <div class="wia-q-text" id="wiaWQText"></div>
-        <textarea id="wiaWQAns" placeholder="your answer..." style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);resize:none;min-height:60px;outline:none;padding:0.3rem 0;line-height:1.5;"></textarea>
-        <div class="wia-q-footer">
-          <div class="wia-q-dots" id="wiaWDots"></div>
-          <div class="wia-q-btns">
-            <button class="wia-q-btn" id="wiaWPrev" onclick="wiaGoW(-1)">←</button>
-            <button class="wia-q-btn" id="wiaWNext" onclick="wiaGoW(1)">→</button>
+      <!-- Progress (merged) -->
+      <div style="border-top:1px solid var(--light);padding-top:0.8rem;">
+        <div class="wia-streak-row" id="wiaStreakRow" style="margin-bottom:0.6rem;"></div>
+        <div class="subtitle" style="margin-bottom:0.4rem;">Practices this week</div>
+        <div id="wiaPracticeBreakdown" style="border:1px solid #c8c8c5;padding:0.6rem;margin-bottom:0.8rem;"></div>
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;">
+          <div class="subtitle" style="margin-bottom:0;">Last 30 days</div>
+          <div style="position:relative;">
+            <button id="wia-cal-btn" onclick="wiaCalToggle()" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></button>
+            <div id="wia-cal-popup" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:1rem;z-index:1000;width:min(80vw,280px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+                <button onclick="wiaCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
+                <div id="wia-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+                <button onclick="wiaCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+              </div>
+              <div id="wia-cal-grid"></div>
+            </div>
+          </div>
+        </div>
+        <div class="subtitle" style="margin-bottom:0.5rem;">Weekly check-in</div>
+        <div class="wia-q-card" style="padding:0.8rem 0.8rem 0.6rem;">
+          <div class="wia-q-text" id="wiaWQText"></div>
+          <textarea id="wiaWQAns" placeholder="your answer..." style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);resize:none;min-height:50px;outline:none;padding:0.3rem 0;line-height:1.5;"></textarea>
+          <div class="wia-q-footer">
+            <div class="wia-q-dots" id="wiaWDots"></div>
+            <div class="wia-q-btns">
+              <button class="wia-q-btn" id="wiaWPrev" onclick="wiaGoW(-1)">←</button>
+              <button class="wia-q-btn" id="wiaWNext" onclick="wiaGoW(1)">→</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- PROGRESS panel kept as alias so JS wiaTab('progress') doesn't break -->
+    <div class="wia-panel" id="wia-progress" style="display:none;"></div>
   </div>
 
 
@@ -3058,37 +3087,6 @@ window.addEventListener('DOMContentLoaded', function() {
     <button class="journal-tab" id="htab-bodycare" onclick="showHabitsTab('bodycare')">Body Care</button>
   </div>
 
-  <!-- MY HABITS -->
-  <div id="hsub-myhabits">
-    <!-- Week strip -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
-      <button onclick="habitsWeekShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8249;</button>
-      <div id="habits-week-label" style="font-family:'Nunito',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></div>
-      <button onclick="habitsWeekShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8250;</button>
-    </div>
-    <div id="habits-day-strip" style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;margin-bottom:1.5rem;"></div>
-    <div id="habits-list"></div>
-
-    <!-- Add habit -->
-    <div style="margin-top:1.5rem;border-top:1px solid var(--light);padding-top:1.2rem;">
-      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Add a habit</div>
-      <div style="display:flex;gap:0.6rem;align-items:flex-end;flex-wrap:wrap;">
-        <input id="habit-name-input" type="text" placeholder="e.g. drink water, journal, walk…" onkeydown="if(event.key==='Enter')habitsAdd()" style="flex:1;min-width:140px;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-        <div style="display:flex;gap:0.3rem;align-items:center;">
-          <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);">Color</span>
-          <div style="display:flex;gap:0.3rem;">
-            <button class="habit-color-opt selected" data-color="#0a0a0a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#0a0a0a;border:2px solid #0a0a0a;cursor:pointer;"></button>
-            <button class="habit-color-opt" data-color="#c8b8a8" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#c8b8a8;border:2px solid transparent;cursor:pointer;"></button>
-            <button class="habit-color-opt" data-color="#a8b8c8" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#a8b8c8;border:2px solid transparent;cursor:pointer;"></button>
-            <button class="habit-color-opt" data-color="#b8c8a8" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#b8c8a8;border:2px solid transparent;cursor:pointer;"></button>
-            <button class="habit-color-opt" data-color="#c8a8b8" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#c8a8b8;border:2px solid transparent;cursor:pointer;"></button>
-          </div>
-        </div>
-        <button onclick="habitsAdd()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
-      </div>
-    </div>
-  </div>
-
   <!-- CALISTHENICS FOR BEGINNER -->
   <div id="hsub-calisthenics" style="display:none;">
 
@@ -3122,62 +3120,223 @@ window.addEventListener('DOMContentLoaded', function() {
 
   <!-- BODY CARE -->
   <div id="hsub-bodycare" style="display:none;">
-    <div style="display:flex;flex-direction:column;gap:1.2rem;">
 
-      <!-- Face -->
-      <div style="border:1px solid #c8c8c5;padding:1rem;">
-        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;margin-bottom:0.8rem;">Face</div>
-        <div id="bodycare-face-list"></div>
-        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.8rem;border-top:1px solid var(--light);padding-top:0.8rem;">
-          <input id="bodycare-face-input" type="text" placeholder="Add a face care step…" onkeydown="if(event.key==='Enter')bodycareAdd('face')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-          <button onclick="bodycareAdd('face')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
+    <!-- Body Care Tabs -->
+    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+      <button id="bctab-face"  onclick="showBodycareTab('face')"  class="journal-tab active">Face</button>
+      <button id="bctab-ears"  onclick="showBodycareTab('ears')"  class="journal-tab">Ears</button>
+      <button id="bctab-hair"  onclick="showBodycareTab('hair')"  class="journal-tab">Hair & Body</button>
+      <button id="bctab-skin"  onclick="showBodycareTab('skin')"  class="journal-tab">Skin</button>
+      <button id="bctab-nails" onclick="showBodycareTab('nails')" class="journal-tab">Nails</button>
+    </div>
+
+    <!-- Face -->
+    <div id="bcpanel-face" style="display:block;">
+
+      <!-- Face Habit Tracker -->
+      <div style="margin-bottom:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+          <button onclick="faceHabitsWeekShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8249;</button>
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <div id="face-habits-week-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);"></div>
+            <div style="position:relative;">
+              <button id="bccal-btn-face" onclick="bcCalToggle('face')" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></button>
+              <div id="bccal-popup-face" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:1rem;z-index:1000;width:min(80vw,280px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+                  <button onclick="bcCalShift('face',-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
+                  <div id="bccal-label-face" style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+                  <button onclick="bcCalShift('face',1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+                </div>
+                <div id="bccal-grid-face"></div>
+              </div>
+            </div>
+          </div>
+          <button onclick="faceHabitsWeekShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8250;</button>
         </div>
+        <div id="face-habits-day-strip" style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;margin-bottom:1.5rem;"></div>
+        <div id="face-habits-list"></div>
       </div>
 
-      <!-- Hair -->
-      <div style="border:1px solid #c8c8c5;padding:1rem;">
-        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;margin-bottom:0.8rem;">Hair</div>
-        <div id="bodycare-hair-list"></div>
-        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.8rem;border-top:1px solid var(--light);padding-top:0.8rem;">
-          <input id="bodycare-hair-input" type="text" placeholder="Add a hair care step…" onkeydown="if(event.key==='Enter')bodycareAdd('hair')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-          <button onclick="bodycareAdd('hair')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
-        </div>
-      </div>
-
-      <!-- Skin -->
-      <div style="border:1px solid #c8c8c5;padding:1rem;">
-        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;margin-bottom:0.8rem;">Skin</div>
-        <div id="bodycare-skin-list"></div>
-        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.8rem;border-top:1px solid var(--light);padding-top:0.8rem;">
-          <input id="bodycare-skin-input" type="text" placeholder="Add a skin care step…" onkeydown="if(event.key==='Enter')bodycareAdd('skin')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-          <button onclick="bodycareAdd('skin')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
-        </div>
-      </div>
-
-      <!-- Ears -->
-      <div style="border:1px solid #c8c8c5;padding:1rem;">
-        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;margin-bottom:0.8rem;">Ears</div>
-        <div id="bodycare-ears-list"></div>
-        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.8rem;border-top:1px solid var(--light);padding-top:0.8rem;">
-          <input id="bodycare-ears-input" type="text" placeholder="Add an ear care step…" onkeydown="if(event.key==='Enter')bodycareAdd('ears')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-          <button onclick="bodycareAdd('ears')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
-        </div>
-      </div>
-
-      <!-- Nails -->
-      <div style="border:1px solid #c8c8c5;padding:1rem;">
-        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;margin-bottom:0.8rem;">Nails</div>
-        <div id="bodycare-nails-list"></div>
-        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.8rem;border-top:1px solid var(--light);padding-top:0.8rem;">
-          <input id="bodycare-nails-input" type="text" placeholder="Add a nail care step…" onkeydown="if(event.key==='Enter')bodycareAdd('nails')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-          <button onclick="bodycareAdd('nails')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
+      <div style="border-top:1px solid var(--light);padding-top:1.2rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Add a face habit</div>
+        <div style="display:flex;gap:0.6rem;align-items:flex-end;flex-wrap:wrap;">
+          <input id="face-habit-name-input" type="text" placeholder="e.g. moisturise, SPF, cleanse…" onkeydown="if(event.key==='Enter')faceHabitsAdd()" style="flex:1;min-width:140px;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <div style="display:flex;gap:0.3rem;align-items:center;">
+            <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);">Color</span>
+            <div style="display:flex;gap:0.3rem;">
+              <button class="face-habit-color-opt selected" data-color="#f9a8c9" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;"></button>
+              <button class="face-habit-color-opt" data-color="#a8d8f0" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
+              <button class="face-habit-color-opt" data-color="#b8f0c8" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
+              <button class="face-habit-color-opt" data-color="#f9e4a8" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
+              <button class="face-habit-color-opt" data-color="#d4b8f9" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;"></button>
+              <button class="face-habit-color-opt" data-color="#f9c8a8" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;"></button>
+            </div>
+          </div>
+          <button onclick="faceHabitsAdd()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
         </div>
       </div>
 
     </div>
+
+    <!-- Hair -->
+    <div id="bcpanel-hair" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;">
+        <button onclick="bcWeekShift('hair',-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8249;</button>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div id="bc-hair-week-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);"></div>
+          <div style="position:relative;">
+            <button id="bccal-btn-hair" onclick="bcCalToggle('hair')" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></button>
+            <div id="bccal-popup-hair" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:1rem;z-index:1000;width:min(80vw,280px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+                <button onclick="bcCalShift('hair',-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
+                <div id="bccal-label-hair" style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+                <button onclick="bcCalShift('hair',1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+              </div>
+              <div id="bccal-grid-hair"></div>
+            </div>
+          </div>
+        </div>
+        <button onclick="bcWeekShift('hair',1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8250;</button>
+      </div>
+      <div id="bc-hair-day-strip" style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;margin-bottom:1.2rem;"></div>
+      <div id="bc-hair-list"></div>
+      <div style="margin-top:1.2rem;border-top:1px solid var(--light);padding-top:1rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Add a habit</div>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <input id="bc-hair-input" type="text" placeholder="e.g. wash, oil, shave, wax, trim…" onkeydown="if(event.key==='Enter')bcAdd('hair')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <button onclick="bcAdd('hair')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
+        </div>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;" id="bc-hair-colors">
+          <button class="bc-color-opt hair selected" data-cat="hair" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;"></button>
+          <button class="bc-color-opt hair" data-cat="hair" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt hair" data-cat="hair" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt hair" data-cat="hair" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt hair" data-cat="hair" data-color="#d4b8f9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt hair" data-cat="hair" data-color="#f9c8a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skin -->
+    <div id="bcpanel-skin" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;">
+        <button onclick="bcWeekShift('skin',-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8249;</button>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div id="bc-skin-week-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);"></div>
+          <div style="position:relative;">
+            <button id="bccal-btn-skin" onclick="bcCalToggle('skin')" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></button>
+            <div id="bccal-popup-skin" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:1rem;z-index:1000;width:min(80vw,280px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+                <button onclick="bcCalShift('skin',-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
+                <div id="bccal-label-skin" style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+                <button onclick="bcCalShift('skin',1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+              </div>
+              <div id="bccal-grid-skin"></div>
+            </div>
+          </div>
+        </div>
+        <button onclick="bcWeekShift('skin',1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8250;</button>
+      </div>
+      <div id="bc-skin-day-strip" style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;margin-bottom:1.2rem;"></div>
+      <div id="bc-skin-list"></div>
+      <div style="margin-top:1.2rem;border-top:1px solid var(--light);padding-top:1rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Add a habit</div>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <input id="bc-skin-input" type="text" placeholder="e.g. moisturise, SPF, serum…" onkeydown="if(event.key==='Enter')bcAdd('skin')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <button onclick="bcAdd('skin')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
+        </div>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;" id="bc-skin-colors">
+          <button class="bc-color-opt skin selected" data-cat="skin" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;"></button>
+          <button class="bc-color-opt skin" data-cat="skin" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt skin" data-cat="skin" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt skin" data-cat="skin" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt skin" data-cat="skin" data-color="#d4b8f9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt skin" data-cat="skin" data-color="#f9c8a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ears -->
+    <div id="bcpanel-ears" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;">
+        <button onclick="bcWeekShift('ears',-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8249;</button>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div id="bc-ears-week-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);"></div>
+          <div style="position:relative;">
+            <button id="bccal-btn-ears" onclick="bcCalToggle('ears')" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></button>
+            <div id="bccal-popup-ears" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:1rem;z-index:1000;width:min(80vw,280px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+                <button onclick="bcCalShift('ears',-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
+                <div id="bccal-label-ears" style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+                <button onclick="bcCalShift('ears',1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+              </div>
+              <div id="bccal-grid-ears"></div>
+            </div>
+          </div>
+        </div>
+        <button onclick="bcWeekShift('ears',1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8250;</button>
+      </div>
+      <div id="bc-ears-day-strip" style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;margin-bottom:1.2rem;"></div>
+      <div id="bc-ears-list"></div>
+      <div style="margin-top:1.2rem;border-top:1px solid var(--light);padding-top:1rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Add a habit</div>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <input id="bc-ears-input" type="text" placeholder="e.g. clean, drops, massage…" onkeydown="if(event.key==='Enter')bcAdd('ears')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <button onclick="bcAdd('ears')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
+        </div>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;" id="bc-ears-colors">
+          <button class="bc-color-opt ears selected" data-cat="ears" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;"></button>
+          <button class="bc-color-opt ears" data-cat="ears" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt ears" data-cat="ears" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt ears" data-cat="ears" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt ears" data-cat="ears" data-color="#d4b8f9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt ears" data-cat="ears" data-color="#f9c8a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nails -->
+    <div id="bcpanel-nails" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;">
+        <button onclick="bcWeekShift('nails',-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8249;</button>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div id="bc-nails-week-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);"></div>
+          <div style="position:relative;">
+            <button id="bccal-btn-nails" onclick="bcCalToggle('nails')" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></button>
+            <div id="bccal-popup-nails" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:1rem;z-index:1000;width:min(80vw,280px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+                <button onclick="bcCalShift('nails',-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
+                <div id="bccal-label-nails" style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+                <button onclick="bcCalShift('nails',1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+              </div>
+              <div id="bccal-grid-nails"></div>
+            </div>
+          </div>
+        </div>
+        <button onclick="bcWeekShift('nails',1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8250;</button>
+      </div>
+      <div id="bc-nails-day-strip" style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;margin-bottom:1.2rem;"></div>
+      <div id="bc-nails-list"></div>
+      <div style="margin-top:1.2rem;border-top:1px solid var(--light);padding-top:1rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Add a habit</div>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <input id="bc-nails-input" type="text" placeholder="e.g. file, polish, cuticle oil…" onkeydown="if(event.key==='Enter')bcAdd('nails')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <button onclick="bcAdd('nails')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
+        </div>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;" id="bc-nails-colors">
+          <button class="bc-color-opt nails selected" data-cat="nails" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;"></button>
+          <button class="bc-color-opt nails" data-cat="nails" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt nails" data-cat="nails" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt nails" data-cat="nails" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt nails" data-cat="nails" data-color="#d4b8f9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt nails" data-cat="nails" data-color="#f9c8a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;"></button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <div id="hsub-daily" style="display:none;">
+    <div id="hsub-daily" style="display:none;">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;align-items:stretch;">
 
       <!-- LEFT: Meals -->
@@ -3262,14 +3421,14 @@ window.addEventListener('DOMContentLoaded', function() {
         <div style="border:1px solid #c8c8c5;padding:0.8rem;">
           <div class="planner-label">Water</div>
           <div style="display:flex;gap:0.2rem;margin-top:0.5rem;justify-content:space-between;">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,0)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">7 AM</span></div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,1)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">8 AM</span></div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,2)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">9 AM</span></div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,3)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">11 AM</span></div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,4)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">1 PM</span></div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,5)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">3 PM</span></div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,6)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">5 PM</span></div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,7)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">7 PM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,0)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">7 AM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,1)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">8 AM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,2)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">9 AM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,3)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">11 AM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,4)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">1 PM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,5)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">3 PM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,6)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">5 PM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,7)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">7 PM</span></div>
           </div>
         </div>
 
@@ -3300,7 +3459,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <div id="jesus-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
           <button onclick="jesusCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
         </div>
-        <div id="jesus-cal-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px;"></div>
+        <div id="jesus-cal-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;"></div>
         <div id="jesus-cal-grid"></div>
       </div>
     </div>
@@ -3649,7 +3808,7 @@ function renderJesusCal() {
   lbl.textContent = base.toLocaleDateString('en-US',{month:'long',year:'numeric'});
   var dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   if (dayNamesEl) dayNamesEl.innerHTML = dayNames.map(function(n){
-    return '<div style="text-align:center;font-family:\'Nunito\',sans-serif;font-size:0.42rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);font-weight:300;">'+n+'</div>';
+    return '<div style="text-align:center;font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);font-weight:300;">'+n+'</div>';
   }).join('');
   var firstDow = (new Date(year,month,1).getDay()+6)%7;
   var daysInMonth = new Date(year,month+1,0).getDate();
@@ -3659,7 +3818,7 @@ function renderJesusCal() {
   while (cells.length%7!==0) cells.push(null);
   var html = '';
   for (var w=0;w<cells.length/7;w++) {
-    html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px;">';
+    html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;">';
     for (var ci=0;ci<7;ci++) {
       var day = cells[w*7+ci];
       if (!day) { html += '<div></div>'; continue; }
@@ -4031,55 +4190,26 @@ function jesusRender(tab) {
 }
 </script>
 <script>
-var HABITS_KEY = 'habits_data';
-var habitsData = { habits: [], log: {} };
-var habitsWeekOffset = 0;
-var habitsSelectedColor = '#0a0a0a';
 
-function habitsLoad() {
-  try { var d = localStorage.getItem(HABITS_KEY); if (d) habitsData = JSON.parse(d); } catch(e) {}
-  if (!habitsData.habits) habitsData.habits = [];
-  if (!habitsData.log) habitsData.log = {};
-}
-
-function habitsSave() {
-  localStorage.setItem(HABITS_KEY, JSON.stringify(habitsData));
-  if (window.syncToCloud) window.syncToCloud(HABITS_KEY, habitsData);
-}
-
-function habitsGetWeekDates(offset) {
-  var today = new Date();
-  var dow = today.getDay();
-  var monday = new Date(today);
-  monday.setDate(today.getDate() - ((dow + 6) % 7) + offset * 7);
-  var days = [];
-  for (var i = 0; i < 7; i++) {
-    var d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    days.push(d.toISOString().split('T')[0]);
-  }
-  return days;
-}
-
+// ── HABITS TAB CONTROLLER ────────────────────────────────────
 function habitsInit() {
-  habitsLoad();
   bodycareLoad();
   showHabitsTab('calisthenics');
-  habitsRender();
 }
 
 function showHabitsTab(tab) {
-  ['myhabits','calisthenics','bodycare','daily'].forEach(function(t) {
+  ['calisthenics','bodycare','daily'].forEach(function(t) {
     var btn = document.getElementById('htab-' + t);
     if (btn) btn.classList.toggle('active', t === tab);
     var el = document.getElementById('hsub-' + t);
     if (el) el.style.display = t === tab ? 'block' : 'none';
   });
   if (tab === 'calisthenics') renderCalisthenics();
-  if (tab === 'bodycare') bodycareRender();
+  if (tab === 'bodycare') { bodycareRender(); faceHabitsRender(); }
   if (tab === 'daily') dailyLoad();
 }
 
+// ── DAILY ────────────────────────────────────────────────────
 var DAILY_KEY = 'daily_data';
 var dailyData = {};
 
@@ -4100,23 +4230,15 @@ function dailySaveAll() {
 function dailyLoad() {
   try { var d = localStorage.getItem(DAILY_KEY); if (d) dailyData = JSON.parse(d); } catch(e) {}
   var today = dailyGetToday();
-
-  // Mood
   document.querySelectorAll('#hsub-daily .mood-btn').forEach(function(btn) {
     btn.classList.toggle('selected', today.mood.indexOf(btn.textContent) !== -1);
   });
-
-  // Sleep
   document.querySelectorAll('#hsub-daily .sleep-btn').forEach(function(btn) {
     btn.classList.toggle('selected', parseInt(btn.textContent) === today.sleep || (btn.textContent === '8+' && today.sleep === 8));
   });
-
-  // Water
   document.querySelectorAll('#hsub-daily .water-cup').forEach(function(cup, i) {
     cup.style.opacity = today.water[i] ? '1' : '0.3';
   });
-
-  // Meals
   dailyRenderMeals();
 }
 
@@ -4157,177 +4279,678 @@ function dailyAddMeal(meal) {
   dailyRenderMeals();
 }
 
-function dailyDeleteMeal(meal, i) {
-  var today = dailyGetToday();
-  if (Array.isArray(today.meals[meal])) today.meals[meal].splice(i, 1);
-  dailySaveAll();
-  dailyRenderMeals();
-}
-
 function dailyRenderMeals() {
   var today = dailyGetToday();
   ['breakfast','lunch','dinner'].forEach(function(meal) {
     var el = document.getElementById('daily-meal-'+meal+'-list');
     if (!el) return;
-    var items = Array.isArray(today.meals[meal]) ? today.meals[meal] : (today.meals[meal] ? [today.meals[meal]] : []);
+    var items = today.meals[meal] || [];
+    if (typeof items === 'string') items = items ? [items] : [];
     el.innerHTML = items.map(function(item, i) {
-      return '<div style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0;border-bottom:1px solid var(--light);">' +
-        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);flex:1;">'+item+'</div>' +
-        '<button onclick="dailyDeleteMeal(\''+meal+'\','+i+')" style="background:none;border:none;color:#ccc;font-size:0.9rem;cursor:pointer;padding:0;line-height:1;">×</button>' +
-      '</div>';
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.2rem 0;font-family:Nunito,sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);">'
+        + item
+        + '<button onclick="dailyRemoveMeal(\'' + meal + '\''+',' + i + ')" style="background:none;border:none;color:#ccc;cursor:pointer;font-size:0.9rem;padding:0;line-height:1;">&times;</button>'
+        + '</div>';
     }).join('');
   });
 }
 
-function dailySaveMeal(meal) {}
+function dailyRemoveMeal(meal, i) {
+  var today = dailyGetToday();
+  if (!today.meals[meal]) return;
+  if (typeof today.meals[meal] === 'string') today.meals[meal] = today.meals[meal] ? [today.meals[meal]] : [];
+  today.meals[meal].splice(i, 1);
+  dailySaveAll();
+  dailyRenderMeals();
+}
 
-var BODYCARE_KEY = 'bodycare_data';
+// ── BODY CARE ────────────────────────────────────────────────
 var bodycareData = { face: [], hair: [], skin: [], ears: [], nails: [] };
 
-function bodycareLoad() {
-  try { var d = localStorage.getItem(BODYCARE_KEY); if (d) bodycareData = JSON.parse(d); } catch(e) {}
-  if (!bodycareData.face) bodycareData.face = [];
-  if (!bodycareData.hair) bodycareData.hair = [];
-  if (!bodycareData.skin) bodycareData.skin = [];
-  if (!bodycareData.ears) bodycareData.ears = [];
-  if (!bodycareData.nails) bodycareData.nails = [];
-}
+function bodycareLoad() {}
+function bodycareSave() {}
+function bodycareRender() { bcLoad(); ['hair','skin','ears','nails'].forEach(function(c){ bcRender(c); }); }
+function bodycareAdd(cat) {}
+function bodycareDelete(cat, i) {}
 
-function bodycareSave() {
-  localStorage.setItem(BODYCARE_KEY, JSON.stringify(bodycareData));
-}
+// ── BODYCARE HABIT TRACKER (hair/skin/ears/nails) ────────────
+var BC_KEY = 'bc_habits_data';
+var bcData = {};
+var bcWeekOffsets = { hair:0, skin:0, ears:0, nails:0 };
+var bcSelectedColors = { hair:'#f9a8c9', skin:'#f9a8c9', ears:'#f9a8c9', nails:'#f9a8c9' };
+var _bcPressTimer = null;
+var _bcPressTriggered = false;
 
-function bodycareRender() {
-  bodycareLoad();
-  ['face','hair','skin','ears','nails'].forEach(function(cat) {
-    var el = document.getElementById('bodycare-'+cat+'-list');
-    if (!el) return;
-    if (!bodycareData[cat].length) {
-      el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.82rem;color:var(--gray);padding:0.3rem 0;">Nothing added yet.</div>';
-      return;
-    }
-    el.innerHTML = bodycareData[cat].map(function(item, i) {
-      return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0;border-bottom:1px solid var(--light);">' +
-        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);flex:1;">'+item+'</div>' +
-        '<button onclick="bodycareDelete(\''+cat+'\','+i+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;line-height:1;padding:0;">×</button>' +
-      '</div>';
-    }).join('');
+function bcLoad() {
+  try { var d = localStorage.getItem(BC_KEY); if (d) bcData = JSON.parse(d); } catch(e) {}
+  ['hair','skin','ears','nails'].forEach(function(cat) {
+    if (!bcData[cat]) bcData[cat] = { habits:[], log:{} };
+    if (!bcData[cat].habits) bcData[cat].habits = [];
+    if (!bcData[cat].log) bcData[cat].log = {};
   });
 }
 
-function bodycareAdd(cat) {
-  var input = document.getElementById('bodycare-'+cat+'-input');
-  var val = input.value.trim();
-  if (!val) return;
-  bodycareLoad();
-  bodycareData[cat].push(val);
-  bodycareSave();
-  input.value = '';
-  bodycareRender();
+function bcSave() {
+  localStorage.setItem(BC_KEY, JSON.stringify(bcData));
+  if (window.syncToCloud) window.syncToCloud(BC_KEY, bcData);
 }
 
-function bodycareDelete(cat, i) {
-  bodycareLoad();
-  bodycareData[cat].splice(i, 1);
-  bodycareSave();
-  bodycareRender();
+function showBodycareTab(tab) {
+  ['face','hair','skin','ears','nails'].forEach(function(t) {
+    var panel = document.getElementById('bcpanel-'+t);
+    var btn   = document.getElementById('bctab-'+t);
+    if (!panel || !btn) return;
+    panel.style.display = t === tab ? 'block' : 'none';
+    btn.classList.toggle('active', t === tab);
+  });
+  if (tab === 'face') faceHabitsRender();
+  else if (['hair','skin','ears','nails'].indexOf(tab) !== -1) bcRender(tab);
 }
 
-function habitsWeekShift(dir) {
-  habitsWeekOffset += dir;
-  habitsRender();
+function bcGetWeekDates(offset) {
+  var today = new Date();
+  var dow = today.getDay();
+  var monday = new Date(today);
+  monday.setDate(today.getDate() - ((dow + 6) % 7) + offset * 7);
+  var days = [];
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  return days;
 }
 
-function habitsRender() {
-  var days = habitsGetWeekDates(habitsWeekOffset);
+function bcGetCount(cat, id, date) {
+  var v = bcData[cat] && bcData[cat].log[date] && bcData[cat].log[date][id];
+  if (!v) return 0;
+  if (typeof v === 'number') return v;
+  return v ? 1 : 0;
+}
+
+function bcStreak(cat, id, todayStr) {
+  var streak = 0;
+  var d = new Date(todayStr + 'T00:00:00');
+  while (true) {
+    var key = d.toISOString().split('T')[0];
+    if (bcGetCount(cat, id, key) > 0) { streak++; d.setDate(d.getDate()-1); } else break;
+  }
+  return streak;
+}
+
+
+// ── MONTH CALENDAR HELPER ────────────────────────────────────
+function buildMonthCal(getCountFn, habitId, color) {
+  var now = new Date();
+  var y = now.getFullYear(), m = now.getMonth();
+  var daysInMonth = new Date(y, m+1, 0).getDate();
+  var firstDow = (new Date(y, m, 1).getDay() + 6) % 7;
+  var todayStr = now.toISOString().split('T')[0];
+  var dayNames = ['M','T','W','T','F','S','S'];
+
+  // Find max count this month for intensity scaling
+  var maxCount = 1;
+  for (var d = 1; d <= daysInMonth; d++) {
+    var ds = y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    var c = getCountFn(habitId, ds);
+    if (c > maxCount) maxCount = c;
+  }
+
+  var monthName = ['January','February','March','April','May','June','July','August','September','October','November','December'][m];
+  var html = '<div style="margin-top:0.8rem;">'
+    + '<div style="font-family:Nunito,sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">' + monthName + ' ' + y + '</div>'
+    + '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:2px;">'
+    + dayNames.map(function(n){ return '<div style="text-align:center;font-family:Nunito,sans-serif;font-size:0.38rem;color:var(--gray);">' + n + '</div>'; }).join('')
+    + '</div>';
+
+  // Build cells
+  var cells = [];
+  for (var i = 0; i < firstDow; i++) cells.push(null);
+  for (var d = 1; d <= daysInMonth; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  for (var w = 0; w < cells.length / 7; w++) {
+    html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:1px;">';
+    for (var ci = 0; ci < 7; ci++) {
+      var day = cells[w*7+ci];
+      if (!day) { html += '<div style="aspect-ratio:1;"></div>'; continue; }
+      var ds = y + '-' + String(m+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+      var count = getCountFn(habitId, ds);
+      var isFuture = ds > todayStr;
+      var isToday  = ds === todayStr;
+      var intensity = count > 0 ? Math.max(0.18, Math.min(1, count / maxCount)) : 0;
+      var bg = count > 0 ? hexToRgba(color, intensity) : 'transparent';
+      var border = isToday ? '1px solid var(--black)' : '1px solid ' + (count > 0 ? 'transparent' : '#e8e8e5');
+      html += '<div title="' + ds + ': ' + count + 'x" style="aspect-ratio:1;background:' + bg + ';border:' + border + ';opacity:' + (isFuture ? 0.3 : 1) + ';display:flex;align-items:center;justify-content:center;">'
+        + '<span style="font-family:Nunito,sans-serif;font-size:0.35rem;color:var(--black);font-weight:' + (isToday?'700':'300') + ';">' + day + '</span>'
+        + '</div>';
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function hexToRgba(hex, alpha) {
+  var r = parseInt(hex.slice(1,3),16);
+  var g = parseInt(hex.slice(3,5),16);
+  var b = parseInt(hex.slice(5,7),16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
+
+
+// ── BODYCARE POPUP CALENDAR ──────────────────────────────────
+var bcCalOffsets = { face:0, hair:0, skin:0, ears:0, nails:0 };
+
+function bcCalToggle(cat) {
+  var popup = document.getElementById('bccal-popup-' + cat);
+  if (!popup) return;
+  var isOpen = popup.style.display !== 'none';
+  // Close all others
+  ['face','hair','skin','ears','nails'].forEach(function(c) {
+    var p = document.getElementById('bccal-popup-' + c);
+    if (p) p.style.display = 'none';
+  });
+  if (!isOpen) {
+    popup.style.display = 'block';
+    bcCalRender(cat);
+  }
+}
+
+document.addEventListener('click', function(e) {
+  ['face','hair','skin','ears','nails'].forEach(function(cat) {
+    var popup = document.getElementById('bccal-popup-' + cat);
+    if (!popup || popup.style.display === 'none') return;
+    var btn = document.getElementById('bccal-btn-' + cat);
+    if (!popup.contains(e.target) && !(btn && btn.contains(e.target))) {
+      popup.style.display = 'none';
+    }
+  });
+});
+
+function bcCalShift(cat, dir) {
+  bcCalOffsets[cat] = (bcCalOffsets[cat] || 0) + dir;
+  bcCalRender(cat);
+}
+
+function bcCalRender(cat) {
+  var grid = document.getElementById('bccal-grid-' + cat);
+  var lbl  = document.getElementById('bccal-label-' + cat);
+  if (!grid || !lbl) return;
+
+  var offset = bcCalOffsets[cat] || 0;
+  var now = new Date();
+  var base = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+  var y = base.getFullYear(), m = base.getMonth();
+  var todayStr = now.toISOString().split('T')[0];
+
+  lbl.textContent = base.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  var dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var daysInMonth = new Date(y, m+1, 0).getDate();
+  var firstDow = (new Date(y, m, 1).getDay() + 6) % 7;
+
+  // Get all habits
+  var habits = [];
+  if (cat === 'face') { faceHabitsLoad(); habits = faceHabitsData.habits; }
+  else { bcLoad(); habits = (bcData[cat] && bcData[cat].habits) || []; }
+
+  // Per-habit count for a date
+  function getHabitCount(habitId, ds) {
+    if (cat === 'face') return faceHabitsGetCount(habitId, ds);
+    return bcGetCount(cat, habitId, ds);
+  }
+
+  // Day name headers
+  var html = '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;">'
+    + dayNames.map(function(n) {
+        return '<div style="text-align:center;font-family:Nunito,sans-serif;font-size:0.6rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);font-weight:300;">' + n + '</div>';
+      }).join('')
+    + '</div>';
+
+  // Build cells
+  var cells = [];
+  for (var i = 0; i < firstDow; i++) cells.push(null);
+  for (var d = 1; d <= daysInMonth; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  for (var w = 0; w < cells.length / 7; w++) {
+    html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;">';
+    for (var ci = 0; ci < 7; ci++) {
+      var day = cells[w*7+ci];
+      if (!day) { html += '<div></div>'; continue; }
+
+      var ds = y + '-' + String(m+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+      var isFuture = ds > todayStr;
+      var isToday  = ds === todayStr;
+      var fw = isToday ? '600' : '300';
+      var opacity = isFuture && !isToday ? '0.3' : '1';
+
+      // Which habits were done this day
+      var doneHabits = habits.filter(function(h){ return getHabitCount(h.id, ds) > 0; });
+      var totalCount = doneHabits.reduce(function(sum, h){ return sum + getHabitCount(h.id, ds); }, 0);
+
+      // Build colored dot strip (one dot per done habit, using its color)
+      var dots = doneHabits.map(function(h) {
+        var cnt = getHabitCount(h.id, ds);
+        // Show up to 3 dots per habit (for multiple counts)
+        var n = Math.min(cnt, 3);
+        var d2 = '';
+        for (var x = 0; x < n; x++) {
+          d2 += '<div style="width:6px;height:6px;border-radius:50%;background:' + h.color + ';flex-shrink:0;"></div>';
+        }
+        return d2;
+      }).join('');
+
+      var border = isToday ? 'var(--black)' : (doneHabits.length > 0 ? '#c8c8c5' : '#c8c8c5');
+      var borderWidth = isToday ? 'border-width:' + (doneHabits.length === 0 ? '2' : '1') + 'px;' : '';
+
+      html += '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid ' + border + ';opacity:' + opacity + ';aspect-ratio:1;padding:1px;' + borderWidth + '">'
+        + '<span style="font-family:Nunito,sans-serif;font-size:0.8rem;font-weight:' + fw + ';color:var(--black);line-height:1;">' + day + '</span>'
+        + (dots ? '<div style="display:flex;flex-wrap:wrap;gap:1px;justify-content:center;margin-top:1px;max-width:18px;">' + dots + '</div>' : '')
+        + (isToday && doneHabits.length === 0 ? '<div style="width:3px;height:3px;border-radius:50%;background:var(--black);margin-top:1px;"></div>' : '')
+        + '</div>';
+    }
+    html += '</div>';
+  }
+
+  // Legend
+  if (habits.length > 0) {
+    html += '<div style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.4rem;">';
+    habits.forEach(function(h) {
+      html += '<div style="display:flex;align-items:center;gap:3px;">'
+        + '<div style="width:6px;height:6px;border-radius:50%;background:' + h.color + ';"></div>'
+        + '<span style="font-family:Nunito,sans-serif;font-size:0.65rem;color:var(--gray);">' + h.name + '</span>'
+        + '</div>';
+    });
+    html += '</div>';
+  }
+
+  grid.innerHTML = html;
+}
+
+function bcRender(cat) {
+  bcLoad();
+  var days = bcGetWeekDates(bcWeekOffsets[cat] || 0);
+  var todayStr = new Date().toISOString().split('T')[0];
+  var dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  var first = new Date(days[0]+'T00:00:00'), last = new Date(days[6]+'T00:00:00');
+  var lbl = document.getElementById('bc-'+cat+'-week-label');
+  if (lbl) {
+    var isCurrentWeek = (bcWeekOffsets[cat] || 0) === 0;
+    if (isCurrentWeek) {
+      var now = new Date();
+      var dn = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      lbl.textContent = dn[now.getDay()] + ', ' + now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' — Today';
+    } else {
+      lbl.textContent = first.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' – ' + last.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    }
+  }
+
+  var strip = document.getElementById('bc-'+cat+'-day-strip');
+  if (strip) strip.innerHTML = days.map(function(date, i) {
+    var isToday = date === todayStr;
+    var isFuture = date > todayStr;
+    var col = isToday ? 'var(--black)' : 'var(--gray)';
+    var fw = isToday ? '400' : '300';
+    // Collect dots for habits done this day
+    var habits = bcData[cat] ? bcData[cat].habits : [];
+    var doneDots = habits.filter(function(h){ return bcGetCount(cat, h.id, date) > 0; })
+      .map(function(h){
+        var cnt = Math.min(bcGetCount(cat, h.id, date), 3);
+        var d = '';
+        for (var x = 0; x < cnt; x++) d += '<div style="width:5px;height:5px;border-radius:50%;background:'+h.color+';flex-shrink:0;"></div>';
+        return d;
+      }).join('');
+    return '<div style="text-align:center;opacity:'+(isFuture?'0.4':'1')+'">'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:'+col+';font-weight:'+fw+';">' + dayNames[i] + '</div>'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.7rem;font-weight:'+fw+';color:'+col+';margin-top:0.1rem;">' + new Date(date+'T00:00:00').getDate() + '</div>'
+      + (doneDots ? '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:1px;margin-top:2px;">' + doneDots + '</div>' : '')
+      + '</div>';
+  }).join('');
+
+  var list = document.getElementById('bc-'+cat+'-list');
+  if (!list) return;
+  var habits = bcData[cat].habits;
+  if (!habits.length) {
+    list.innerHTML = '<div style="font-family:Lora,serif;font-style:italic;font-size:0.9rem;color:var(--gray);padding:1rem 0;">No habits yet. Add one below.</div>';
+    return;
+  }
+
+  list.innerHTML = habits.map(function(h) {
+    var dotRow = days.map(function(date) {
+      var count = bcGetCount(cat, h.id, date);
+      var isFuture = date > todayStr;
+      var isToday  = date === todayStr;
+      var filled = count > 0;
+      var inc = "bcIncrement(\'" + cat + "\',\'" + h.id + "\',\'" + date + "\')";
+      var dec = "bcDecrementEvt(event,\'" + cat + "\',\'" + h.id + "\',\'" + date + "\')";
+      var pd  = "bcPointerDown(event,\'" + cat + "\',\'" + h.id + "\',\'" + date + "\')";
+      var pu  = "bcPointerUp(event,\'" + cat + "\',\'" + h.id + "\',\'" + date + "\')";
+
+      if (isToday) {
+        return '<div style="display:flex;justify-content:center;align-items:center;" onclick="'+inc+'" oncontextmenu="'+dec+'" onpointerdown="'+pd+'" onpointerup="'+pu+'" onpointercancel="bcPointerCancel()">'
+          + '<div style="width:22px;height:22px;border:1px solid '+(filled?h.color:'#c8c8c5')+';background:'+(filled?h.color:'transparent')+';cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">'
+            + '<span style="font-family:Nunito,sans-serif;font-size:0.58rem;font-weight:700;color:var(--black);line-height:1;">' + (count > 0 ? count : '+') + '</span>'
+          + '</div></div>';
+      }
+      return '<div style="display:flex;justify-content:center;align-items:center;cursor:'+(isFuture?'default':'pointer')+';margin:0 auto;"'
+        + (!isFuture ? ' onclick="'+inc+'" oncontextmenu="'+dec+'" onpointerdown="'+pd+'" onpointerup="'+pu+'" onpointercancel="bcPointerCancel()"' : '')
+        + '><div style="width:18px;height:18px;border:1px solid '+(filled?h.color:'#c8c8c5')+';background:'+(filled?h.color:'transparent')+';display:flex;align-items:center;justify-content:center;transition:all 0.15s;'+(isFuture?'opacity:0.3;':'')+'">'
+          + (count > 0 ? '<span style="font-family:Nunito,sans-serif;font-size:0.48rem;font-weight:700;color:var(--black);line-height:1;">'+count+'</span>' : '')
+        + '</div></div>';
+    }).join('');
+
+    var streak = bcStreak(cat, h.id, todayStr);
+    var todayCount = bcGetCount(cat, h.id, todayStr);
+    return '<div style="margin-bottom:1.5rem;">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">'
+        + '<div style="display:flex;align-items:center;gap:0.5rem;">'
+          + '<div style="width:8px;height:8px;background:'+h.color+';flex-shrink:0;"></div>'
+          + '<span style="font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:300;">'+h.name+'</span>'
+        + '</div>'
+        + '<div style="display:flex;align-items:center;gap:0.8rem;">'
+          + (todayCount > 0 ? '<span style="font-family:Nunito,sans-serif;font-size:0.6rem;color:var(--gray);">'+todayCount+'x today</span>' : '')
+          + (streak > 0 ? '<span style="font-family:Nunito,sans-serif;font-size:0.6rem;color:var(--gray);">'+streak+' day streak</span>' : '')
+          + '<button onclick="bcDelete(\'' + cat + '\',\'' + h.id + '\')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;line-height:1;padding:0;">&times;</button>'
+        + '</div>'
+      + '</div>'
+      + '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;">' + dotRow + '</div>'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.65rem;color:var(--gray);margin-top:0.25rem;text-align:right;">tap + · hold −</div>'
+      + '</div>';
+  }).join('');
+}
+
+function bcIncrement(cat, id, date) {
+  var todayStr = new Date().toISOString().split('T')[0];
+  if (date > todayStr) return;
+  bcLoad();
+  if (!bcData[cat].log[date]) bcData[cat].log[date] = {};
+  bcData[cat].log[date][id] = bcGetCount(cat, id, date) + 1;
+  bcSave();
+  bcRender(cat);
+}
+
+function bcDecrement(cat, id, date) {
+  bcLoad();
+  var cur = bcGetCount(cat, id, date);
+  if (cur <= 0) return;
+  if (!bcData[cat].log[date]) bcData[cat].log[date] = {};
+  bcData[cat].log[date][id] = cur - 1;
+  bcSave();
+  bcRender(cat);
+}
+
+function bcDecrementEvt(e, cat, id, date) {
+  e.preventDefault();
+  bcDecrement(cat, id, date);
+}
+
+function bcPointerDown(e, cat, id, date) {
+  _bcPressTriggered = false;
+  _bcPressTimer = setTimeout(function() {
+    _bcPressTriggered = true;
+    bcDecrement(cat, id, date);
+  }, 500);
+}
+
+function bcPointerUp(e, cat, id, date) {
+  clearTimeout(_bcPressTimer);
+  if (_bcPressTriggered) { e.preventDefault(); e.stopPropagation(); }
+}
+
+function bcPointerCancel() { clearTimeout(_bcPressTimer); }
+
+function bcAdd(cat) {
+  var inp = document.getElementById('bc-'+cat+'-input');
+  var name = inp ? inp.value.trim() : '';
+  if (!name) return;
+  bcLoad();
+  bcData[cat].habits.push({ id: 'bc'+Date.now(), name: name, color: bcSelectedColors[cat] || '#f9a8c9' });
+  inp.value = '';
+  bcSave();
+  bcRender(cat);
+}
+
+function bcDelete(cat, id) {
+  bcLoad();
+  bcData[cat].habits = bcData[cat].habits.filter(function(h){ return h.id !== id; });
+  bcSave();
+  bcRender(cat);
+}
+
+function bcPickColor(btn) {
+  var cat = btn.getAttribute('data-cat');
+  document.querySelectorAll('.bc-color-opt.'+cat).forEach(function(b){ b.style.border='2px solid transparent'; });
+  btn.style.border = '2px solid var(--black)';
+  bcSelectedColors[cat] = btn.getAttribute('data-color');
+}
+
+function bcWeekShift(cat, dir) {
+  if (!bcWeekOffsets[cat]) bcWeekOffsets[cat] = 0;
+  bcWeekOffsets[cat] += dir;
+  bcRender(cat);
+}
+
+
+// ── FACE HABIT TRACKER ───────────────────────────────────────
+var FACE_HABITS_KEY = 'face_habits_data';
+var faceHabitsData = { habits: [], log: {} };
+var faceHabitsWeekOffset = 0;
+var faceHabitsSelectedColor = '#f9a8c9';
+
+function faceHabitsLoad() {
+  try { var d = localStorage.getItem(FACE_HABITS_KEY); if (d) faceHabitsData = JSON.parse(d); } catch(e) {}
+  if (!faceHabitsData.habits) faceHabitsData.habits = [];
+  if (!faceHabitsData.log) faceHabitsData.log = {};
+}
+
+function faceHabitsSave() {
+  localStorage.setItem(FACE_HABITS_KEY, JSON.stringify(faceHabitsData));
+  if (window.syncToCloud) window.syncToCloud(FACE_HABITS_KEY, faceHabitsData);
+}
+
+function faceHabitsGetWeekDates(offset) {
+  var today = new Date();
+  var dow = today.getDay();
+  var monday = new Date(today);
+  monday.setDate(today.getDate() - ((dow + 6) % 7) + offset * 7);
+  var days = [];
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  return days;
+}
+
+function faceHabitsGetCount(id, date) {
+  var v = faceHabitsData.log[date] && faceHabitsData.log[date][id];
+  if (!v) return 0;
+  if (typeof v === 'number') return v;
+  return v ? 1 : 0;
+}
+
+function faceHabitsRender() {
+  faceHabitsLoad();
+  var days = faceHabitsGetWeekDates(faceHabitsWeekOffset);
   var todayStr = new Date().toISOString().split('T')[0];
   var dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
   var first = new Date(days[0] + 'T00:00:00');
   var last  = new Date(days[6] + 'T00:00:00');
-  document.getElementById('habits-week-label').textContent =
-    first.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' – ' +
-    last.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  var label = document.getElementById('face-habits-week-label');
+  if (label) {
+    var isCurrentWeek = faceHabitsWeekOffset === 0;
+    if (isCurrentWeek) {
+      var now = new Date();
+      var dn = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      label.textContent = dn[now.getDay()] + ', ' + now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' — Today';
+    } else {
+      label.textContent = first.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' – ' + last.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    }
+  }
 
-  var strip = document.getElementById('habits-day-strip');
-  strip.innerHTML = days.map(function(date, i) {
+  var strip = document.getElementById('face-habits-day-strip');
+  if (strip) strip.innerHTML = days.map(function(date, i) {
     var isToday = date === todayStr;
-    return '<div style="text-align:center;">' +
-      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:' + (isToday?'var(--black)':'var(--gray)') + ';font-weight:' + (isToday?'400':'300') + ';">' + dayNames[i] + '</div>' +
-      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.7rem;font-weight:' + (isToday?'400':'300') + ';color:' + (isToday?'var(--black)':'var(--gray)') + ';margin-top:0.1rem;">' + new Date(date+'T00:00:00').getDate() + '</div>' +
-    '</div>';
+    var isFuture = date > todayStr;
+    var col = isToday ? 'var(--black)' : 'var(--gray)';
+    var fw  = isToday ? '400' : '300';
+    // Collect dots for habits done this day
+    var doneDots = faceHabitsData.habits.filter(function(h){ return faceHabitsGetCount(h.id, date) > 0; })
+      .map(function(h){
+        var cnt = Math.min(faceHabitsGetCount(h.id, date), 3);
+        var d = '';
+        for (var x = 0; x < cnt; x++) d += '<div style="width:5px;height:5px;border-radius:50%;background:'+h.color+';flex-shrink:0;"></div>';
+        return d;
+      }).join('');
+    return '<div style="text-align:center;opacity:'+(isFuture?'0.4':'1')+'">'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:' + col + ';font-weight:' + fw + ';">' + dayNames[i] + '</div>'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.7rem;font-weight:' + fw + ';color:' + col + ';margin-top:0.1rem;">' + new Date(date+'T00:00:00').getDate() + '</div>'
+      + (doneDots ? '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:1px;margin-top:2px;">' + doneDots + '</div>' : '')
+      + '</div>';
   }).join('');
 
-  var list = document.getElementById('habits-list');
-  if (!habitsData.habits.length) {
-    list.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.9rem;color:var(--gray);padding:1rem 0;">No habits yet. Add one below.</div>';
+  var list = document.getElementById('face-habits-list');
+  if (!list) return;
+  if (!faceHabitsData.habits.length) {
+    list.innerHTML = '<div style="font-family:Lora,serif;font-style:italic;font-size:0.9rem;color:var(--gray);padding:1rem 0;">No face habits yet. Add one below.</div>';
     return;
   }
 
-  list.innerHTML = habitsData.habits.map(function(h, hi) {
+  list.innerHTML = faceHabitsData.habits.map(function(h) {
     var dotRow = days.map(function(date) {
-      var done = habitsData.log[date] && habitsData.log[date][h.id];
+      var count = faceHabitsGetCount(h.id, date);
       var isFuture = date > todayStr;
-      return '<div onclick="habitsToggle(\'' + h.id + '\',\'' + date + '\')" style="display:flex;justify-content:center;align-items:center;cursor:' + (isFuture?'default':'pointer') + ';">' +
-        '<div style="width:18px;height:18px;border:1px solid ' + (done?h.color:'#c8c8c5') + ';background:' + (done?h.color:'transparent') + ';transition:all 0.15s;' + (isFuture?'opacity:0.3;':'') + '"></div>' +
-      '</div>';
+      var isToday  = date === todayStr;
+      var filled = count > 0;
+
+      // Today cell: show stepper − count +
+      if (isToday) {
+        return '<div style="display:flex;justify-content:center;align-items:center;" onclick="faceHabitsIncrement(\'' + h.id + '\',\'' + date + '\')" oncontextmenu="faceHabitsDecrementEvt(event,\'' + h.id + '\',\'' + date + '\')" onpointerdown="faceHabitsPointerDown(event,\'' + h.id + '\',\'' + date + '\')" onpointerup="faceHabitsPointerUp(event,\'' + h.id + '\',\'' + date + '\')" onpointercancel="faceHabitsPointerCancel()" onpointerdown="faceHabitsPointerDown(event,\'' + h.id + '\',\'' + date + '\')" onpointerup="faceHabitsPointerUp(event,\'' + h.id + '\',\'' + date + '\')" onpointercancel="faceHabitsPointerCancel()">'
+          + '<div style="width:22px;height:22px;border:1px solid ' + (filled ? h.color : '#c8c8c5') + ';background:' + (filled ? h.color : 'transparent') + ';cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">'
+            + '<span style="font-family:Nunito,sans-serif;font-size:0.58rem;font-weight:700;color:var(--black);line-height:1;">' + (count > 0 ? count : '+') + '</span>'
+          + '</div>'
+          + '</div>';
+      }
+
+      // Past cells: tap to add, right-click to remove
+      return '<div style="display:flex;justify-content:center;align-items:center;cursor:' + (isFuture ? 'default' : 'pointer') + ';"'
+        + (!isFuture ? ' onclick="faceHabitsIncrement(\'' + h.id + '\',\'' + date + '\')" oncontextmenu="faceHabitsDecrementEvt(event,\'' + h.id + '\',\'' + date + '\')" onpointerdown="faceHabitsPointerDown(event,\'' + h.id + '\',\'' + date + '\')" onpointerup="faceHabitsPointerUp(event,\'' + h.id + '\',\'' + date + '\')" onpointercancel="faceHabitsPointerCancel()"' : '')
+        + '>'
+        + '<div style="width:18px;height:18px;border:1px solid ' + (filled ? h.color : '#c8c8c5') + ';background:' + (filled ? h.color : 'transparent') + ';display:flex;align-items:center;justify-content:center;transition:all 0.15s;' + (isFuture ? 'opacity:0.3;' : '') + '">'
+          + (count > 0 ? '<span style="font-family:Nunito,sans-serif;font-size:0.48rem;font-weight:700;color:var(--black);line-height:1;">' + count + '</span>' : '')
+        + '</div>'
+        + '</div>';
     }).join('');
-    var streak = habitsStreak(h.id, todayStr);
-    return '<div style="margin-bottom:1.2rem;">' +
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">' +
-        '<div style="display:flex;align-items:center;gap:0.5rem;">' +
-          '<div style="width:8px;height:8px;background:' + h.color + ';flex-shrink:0;"></div>' +
-          '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;">' + h.name + '</span>' +
-        '</div>' +
-        '<div style="display:flex;align-items:center;gap:0.8rem;">' +
-          (streak>0?'<span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;color:var(--gray);letter-spacing:0.06em;">'+streak+' day streak</span>':'') +
-          '<button onclick="habitsDelete(\'' + h.id + '\')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;line-height:1;padding:0;">×</button>' +
-        '</div>' +
-      '</div>' +
-      '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;">' + dotRow + '</div>' +
-    '</div>';
+
+    var streak = faceHabitsStreak(h.id, todayStr);
+    var todayCount = faceHabitsGetCount(h.id, todayStr);
+    return '<div style="margin-bottom:1.5rem;">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">'
+        + '<div style="display:flex;align-items:center;gap:0.5rem;">'
+          + '<div style="width:8px;height:8px;background:' + h.color + ';flex-shrink:0;"></div>'
+          + '<span style="font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:300;">' + h.name + '</span>'
+        + '</div>'
+        + '<div style="display:flex;align-items:center;gap:0.8rem;">'
+          + (todayCount > 0 ? '<span style="font-family:Nunito,sans-serif;font-size:0.6rem;color:var(--gray);">' + todayCount + 'x today</span>' : '')
+          + (streak > 0 ? '<span style="font-family:Nunito,sans-serif;font-size:0.6rem;color:var(--gray);letter-spacing:0.06em;">' + streak + ' day streak</span>' : '')
+          + '<button onclick="faceHabitsDelete(\'' + h.id + '\')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;line-height:1;padding:0;">&times;</button>'
+        + '</div>'
+      + '</div>'
+      + '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;">' + dotRow + '</div>'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.65rem;color:var(--gray);margin-top:0.25rem;text-align:right;">tap + · hold −</div>'
+      + '</div>';
   }).join('');
 }
 
-function habitsToggle(id, date) {
+function faceHabitsIncrement(id, date) {
   var todayStr = new Date().toISOString().split('T')[0];
   if (date > todayStr) return;
-  if (!habitsData.log[date]) habitsData.log[date] = {};
-  habitsData.log[date][id] = !habitsData.log[date][id];
-  habitsSave();
-  habitsRender();
+  if (!faceHabitsData.log[date]) faceHabitsData.log[date] = {};
+  var cur = faceHabitsGetCount(id, date);
+  faceHabitsData.log[date][id] = cur + 1;
+  faceHabitsSave();
+  faceHabitsRender();
 }
 
-function habitsStreak(id, todayStr) {
+function faceHabitsDecrement(id, date) {
+  if (!faceHabitsData.log[date]) return;
+  var cur = faceHabitsGetCount(id, date);
+  if (cur <= 0) return;
+  faceHabitsData.log[date][id] = cur - 1;
+  faceHabitsSave();
+  faceHabitsRender();
+}
+
+function faceHabitsDecrementEvt(e, id, date) {
+  e.preventDefault();
+  faceHabitsDecrement(id, date);
+}
+
+// Long-press support for mobile
+var _fhPressTimer = null;
+var _fhPressTriggered = false;
+
+function faceHabitsPointerDown(e, id, date) {
+  _fhPressTriggered = false;
+  _fhPressTimer = setTimeout(function() {
+    _fhPressTriggered = true;
+    faceHabitsDecrement(id, date);
+  }, 500);
+}
+
+function faceHabitsPointerUp(e, id, date) {
+  clearTimeout(_fhPressTimer);
+  if (_fhPressTriggered) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}
+
+function faceHabitsPointerCancel() {
+  clearTimeout(_fhPressTimer);
+}
+
+function faceHabitsStreak(id, todayStr) {
   var streak = 0;
   var d = new Date(todayStr + 'T00:00:00');
   while (true) {
     var key = d.toISOString().split('T')[0];
-    if (habitsData.log[key] && habitsData.log[key][id]) { streak++; d.setDate(d.getDate()-1); } else break;
+    if (faceHabitsGetCount(id, key) > 0) { streak++; d.setDate(d.getDate()-1); } else break;
   }
   return streak;
 }
 
-function habitsAdd() {
-  var inp = document.getElementById('habit-name-input');
-  var name = inp.value.trim();
+function faceHabitsAdd() {
+  var inp = document.getElementById('face-habit-name-input');
+  var name = inp ? inp.value.trim() : '';
   if (!name) return;
-  habitsData.habits.push({ id: 'h'+Date.now(), name: name, color: habitsSelectedColor });
+  faceHabitsLoad();
+  faceHabitsData.habits.push({ id: 'fh'+Date.now(), name: name, color: faceHabitsSelectedColor });
   inp.value = '';
-  habitsSave();
-  habitsRender();
+  faceHabitsSave();
+  faceHabitsRender();
 }
 
-function habitsDelete(id) {
-  habitsData.habits = habitsData.habits.filter(function(h){ return h.id !== id; });
-  habitsSave();
-  habitsRender();
+function faceHabitsDelete(id) {
+  faceHabitsLoad();
+  faceHabitsData.habits = faceHabitsData.habits.filter(function(h){ return h.id !== id; });
+  faceHabitsSave();
+  faceHabitsRender();
 }
 
-function habitPickColor(btn) {
-  document.querySelectorAll('.habit-color-opt').forEach(function(b){ b.style.border='2px solid transparent'; });
+function faceHabitPickColor(btn) {
+  document.querySelectorAll('.face-habit-color-opt').forEach(function(b){ b.style.border='2px solid transparent'; });
   btn.style.border = '2px solid var(--black)';
-  habitsSelectedColor = btn.getAttribute('data-color');
+  faceHabitsSelectedColor = btn.getAttribute('data-color');
+}
+
+function faceHabitsWeekShift(dir) {
+  faceHabitsWeekOffset += dir;
+  faceHabitsRender();
 }
 
 // ── CALISTHENICS FOR BEGINNER ────────────────────────────────
@@ -4589,10 +5212,11 @@ function renderCalisthenics() {
       '</div>' +
       '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;">' +
         '<div style="font-family:\'Nunito\',sans-serif;font-size:0.62rem;color:var(--gray);letter-spacing:0.08em;text-transform:uppercase;flex-shrink:0;">Date done</div>' +
-        '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.8rem;color:'+(savedDate?'var(--black)':'var(--gray)')+';cursor:pointer;border-bottom:1px solid #c8c8c5;padding:0.1rem 0;min-width:180px;min-height:1.2rem;" onclick="caliOpenCal(\''+dateKey+'\',this)">'+
-          (savedDate ? caliFormatDate(savedDate) : '&nbsp;') +
-        '</div>' +
-        (savedDate ? '<span onclick="caliClearDate(\''+dateKey+'\')" style="font-family:\'Nunito\',sans-serif;font-size:0.7rem;color:#ccc;cursor:pointer;margin-left:0.3rem;">×</span>' : '') +
+        (savedDate
+          ? '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.8rem;color:var(--black);border-bottom:1px solid #c8c8c5;padding:0.1rem 0;min-width:180px;min-height:1.2rem;">'+caliFormatDate(savedDate)+'</div>' +
+            '<span onclick="caliClearDate(\''+dateKey+'\')" title="Remove date" style="font-family:\'Nunito\',sans-serif;font-size:0.7rem;color:#ccc;cursor:pointer;margin-left:0.3rem;">×</span>'
+          : '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.8rem;color:var(--gray);cursor:pointer;border-bottom:1px solid #c8c8c5;padding:0.1rem 0;min-width:180px;min-height:1.2rem;" onclick="caliOpenCal(\''+dateKey+'\',this)">&nbsp;</div>'
+        ) +
       '</div>' +
       (isRest
         ? '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.82rem;color:var(--gray);padding:0.5rem 0;">Take it easy 🤍 stretch or go for a walk</div>'
@@ -4712,14 +5336,12 @@ function caliPickDate(dateStr) {
   caliLog[_caliCalKey] = dateStr;
   localStorage.setItem('cali_log', JSON.stringify(caliLog));
   if (window.syncToCloud) window.syncToCloud('cali_log', caliLog);
-  if (_caliCalEl) {
-    _caliCalEl.textContent = caliFormatDate(dateStr);
-    _caliCalEl.style.color = 'var(--black)';
-  }
   var popup = document.getElementById('cali-cal-popup');
   if (popup) popup.remove();
   document.removeEventListener('click', caliCloseCal, true);
   _caliCalKey = null;
+  _caliCalEl = null;
+  renderCalisthenics();
   renderCaliTracker();
 }
 
@@ -4764,11 +5386,12 @@ var wiaWqi = parseInt(localStorage.getItem('wia2wq') || '0');
 var wiaAffIdx = parseInt(localStorage.getItem('wia2aff') || '0');
 var _wiaInited = false;
 
-function wiaSave() { localStorage.setItem('wia2', JSON.stringify(WIA)); }
+function wiaSave() { localStorage.setItem('wia2', JSON.stringify(WIA)); if(typeof syncToCloud==='function') syncToCloud('wia2', WIA); }
 
 function wiaTab(id) {
-  document.querySelectorAll('.wia-tab').forEach(function(t, i) {
-    t.classList.toggle('active', ['identity','perform','daily','progress'][i] === id);
+  document.querySelectorAll('.balance-sub-tabs .balance-sub-tab').forEach(function(t) {
+    var tab = t.textContent.trim().toLowerCase();
+    t.classList.toggle('active', tab === id);
   });
   document.querySelectorAll('.wia-panel').forEach(function(p) { p.classList.remove('active'); });
   document.getElementById('wia-' + id).classList.add('active');
@@ -4929,27 +5552,85 @@ function wiaRenderStreakRow() {
     '<div class="wia-streak-card"><div class="wia-streak-num">' + wiaTotalDays() + '</div><div class="wia-streak-label">Total Days</div></div>' +
     '<div class="wia-streak-card"><div class="wia-streak-num">' + wiaBestStreak() + '</div><div class="wia-streak-label">Best Streak</div></div>';
 }
-function wiaRenderCalendar() {
-  var days = ['Su','Mo','Tu','We','Th','Fr','Sa'];
-  var html = '<div class="wia-cal-label">' + days.map(function(d){ return '<div class="wia-cal-day-label">'+d+'</div>'; }).join('') + '</div>';
-  var today = new Date(); today.setHours(0,0,0,0);
-  var first = new Date(today); first.setDate(today.getDate() - 29);
-  var pad = first.getDay();
-  for (var p = 0; p < pad; p++) html += '<div></div>';
-  for (var i = 29; i >= 0; i--) {
-    var d2 = new Date(today); d2.setDate(today.getDate() - i);
-    var k = d2.toDateString();
-    var done = Object.values(WIA.c[k] || {}).filter(Boolean).length;
-    var cls = 'wia-cal-day';
-    if (done >= 5) cls += ' dfull';
-    else if (done >= 3) cls += ' d3';
-    else if (done >= 2) cls += ' d2';
-    else if (done >= 1) cls += ' d1';
-    if (i === 0) cls += ' today';
-    html += '<div class="' + cls + '"></div>';
+var wiaCalMonthOffset = 0;
+
+function wiaCalToggle() {
+  var popup = document.getElementById('wia-cal-popup');
+  if (!popup) return;
+  if (popup.style.display === 'none') {
+    popup.style.display = 'block';
+    wiaCalRender();
+  } else {
+    popup.style.display = 'none';
   }
-  document.getElementById('wiaCalendar').innerHTML = html;
 }
+function wiaCalShift(dir) {
+  wiaCalMonthOffset += dir;
+  wiaCalRender();
+}
+function wiaRenderCalendar() { /* no-op: now popup only */ }
+function wiaCalRender() {
+  var grid = document.getElementById('wia-cal-grid');
+  var lbl  = document.getElementById('wia-cal-label');
+  if (!grid || !lbl) return;
+
+  var now = new Date();
+  var base = new Date(now.getFullYear(), now.getMonth() + wiaCalMonthOffset, 1);
+  var y = base.getFullYear(), m = base.getMonth();
+  var todayStr = now.toISOString().split('T')[0];
+
+  lbl.textContent = base.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  var dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var daysInMonth = new Date(y, m+1, 0).getDate();
+  var firstDow = (new Date(y, m, 1).getDay() + 6) % 7;
+
+  var html = '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px;">'
+    + dayNames.map(function(n) {
+        return '<div style="text-align:center;font-family:Nunito,sans-serif;font-size:0.6rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);font-weight:300;">' + n + '</div>';
+      }).join('') + '</div>';
+
+  var cells = [];
+  for (var i = 0; i < firstDow; i++) cells.push(null);
+  for (var d = 1; d <= daysInMonth; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  for (var w = 0; w < cells.length / 7; w++) {
+    html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;">';
+    for (var ci = 0; ci < 7; ci++) {
+      var day = cells[w*7+ci];
+      if (!day) { html += '<div></div>'; continue; }
+      var ds = y + '-' + String(m+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+      var dayDate = new Date(ds + 'T00:00:00');
+      var k = dayDate.toDateString();
+      var done = Object.values(WIA.c[k] || {}).filter(Boolean).length;
+      var total = wiaDailyItems.length || 5;
+      var isToday = ds === todayStr;
+      var isFuture = ds > todayStr;
+      var intensity = done > 0 ? Math.max(0.2, Math.min(1, done / total)) : 0;
+      // Color based on completion: green-ish
+      var bg = done > 0 ? 'rgba(168,216,176,' + intensity + ')' : 'transparent';
+      var border = isToday ? 'var(--black)' : (done > 0 ? '#a8d8b0' : '#c8c8c5');
+      var fw = isToday ? '600' : '300';
+      var opacity = isFuture && !isToday ? '0.3' : '1';
+      html += '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid ' + border + ';background:' + bg + ';opacity:' + opacity + ';aspect-ratio:1;padding:1px;">'
+        + '<span style="font-family:Nunito,sans-serif;font-size:0.8rem;font-weight:' + fw + ';color:var(--black);line-height:1;">' + day + '</span>'
+        + (done > 0 ? '<div style="font-family:Nunito,sans-serif;font-size:0.38rem;font-weight:700;color:var(--black);line-height:1;">' + done + '/' + total + '</div>' : '')
+        + '</div>';
+    }
+    html += '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+// close popup on outside click
+document.addEventListener('click', function(e) {
+  var popup = document.getElementById('wia-cal-popup');
+  var btn = document.getElementById('wia-cal-btn');
+  if (popup && popup.style.display !== 'none' && !popup.contains(e.target) && !(btn && btn.contains(e.target))) {
+    popup.style.display = 'none';
+  }
+});
 function wiaRenderPractice() {
   var counts = wiaDailyItems.map(function(){ return 0; });
   var d = new Date();
