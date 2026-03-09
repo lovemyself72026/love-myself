@@ -16,7 +16,7 @@
 <script>
   window._rawLS = localStorage.setItem.bind(localStorage);
   const DB_URL = 'https://lovemyselfapp-default-rtdb.firebaseio.com/my-love-myself-data';
-  const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books'];
+  const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books','habits_data'];
 
   window.syncToCloud = async function(key, value) {
     if (!SYNC_KEYS.includes(key)) return;
@@ -238,6 +238,7 @@
     <button class="nav-tab" onclick="showSection('schedule')">Schedule</button>
     <button class="nav-tab" onclick="showSection('affirmations')">Journal</button>
     <button class="nav-tab" onclick="showSection('me')">Me</button>
+    <button class="nav-tab" onclick="showSection('habits')">Habits</button>
   </div>
 </nav>
 
@@ -444,14 +445,32 @@
   <div class="subtitle">Plan your day</div>
   <h1>My schedule.</h1><br>
 
-  <!-- Date navigation -->
+  <!-- Date navigation with inline calendar popup -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-    <button onclick="changeScheduleDay(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8249;</button>
-    <div style="text-align:center;">
-      <input type="date" id="schedule-date-picker" onchange="changeScheduleDate(this.value)" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;cursor:pointer;text-align:center;">
+    <button id="sched-prev" onclick="savePlannerDay();changeScheduleDay(-1);" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8249;</button>
+    <div style="text-align:center;flex:1;min-width:0;position:relative;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+        <input type="date" id="schedule-date-picker" onchange="changeScheduleDate(this.value)" style="border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;cursor:pointer;text-align:center;max-width:180px;">
+        <button onclick="toggleSchedCal()" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;" title="Open calendar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;">
+            <rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
+          </svg>
+        </button>
+      </div>
       <div id="schedule-day-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-top:0.3rem;"></div>
+
+      <!-- Popup calendar -->
+      <div id="sched-cal-popup" style="display:none;position:absolute;top:calc(100% + 0.5rem);left:50%;transform:translateX(-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.8rem;z-index:100;min-width:220px;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+          <button onclick="schedCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
+          <div id="sched-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+          <button onclick="schedCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+        </div>
+        <div id="sched-cal-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px;"></div>
+        <div id="sched-cal-grid"></div>
+      </div>
     </div>
-    <button onclick="changeScheduleDay(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);">&#8250;</button>
+    <button id="sched-next" onclick="savePlannerDay();changeScheduleDay(1);" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8250;</button>
   </div>
 
   <!-- Planner grid -->
@@ -750,13 +769,13 @@ function showSection(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  const map=['home','vision','schedule','affirmations','me'];
+  const map=['home','vision','schedule','affirmations','me','habits'];
   document.querySelectorAll('.nav-tab')[map.indexOf(id)].classList.add('active');
   window.scrollTo(0,0);
   if (id === 'home') renderAnalytics();
-  if (id === 'me') {
-    initMeSection();
-  }
+  if (id === 'schedule') { initScheduleDatePicker(); loadPlannerDay(); renderSchedCal(); }
+  if (id === 'me') initMeSection();
+  if (id === 'habits') habitsInit();
 }
 
 function showJournalTab(tab) {
@@ -1269,6 +1288,9 @@ function initScheduleDatePicker() {
   updateDayLabel();
 }
 
+
+
+
 function updateDayLabel() {
   const d = new Date(currentScheduleDate + 'T00:00:00');
   const today = new Date().toISOString().split('T')[0];
@@ -1292,6 +1314,132 @@ function changeScheduleDay(dir) {
   currentScheduleDate = d.toISOString().split('T')[0];
   updateDayLabel();
   loadPlannerDay();
+  renderSchedCal();
+}
+
+function toggleSchedCal() {
+  const popup = document.getElementById('sched-cal-popup');
+  const isOpen = popup.style.display !== 'none';
+  popup.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) renderSchedCal();
+}
+
+document.addEventListener('click', function(e) {
+  const popup = document.getElementById('sched-cal-popup');
+  if (!popup || popup.style.display === 'none') return;
+  if (!popup.contains(e.target) && !e.target.closest('[onclick="toggleSchedCal()"]')) {
+    popup.style.display = 'none';
+  }
+});
+
+
+var schedCalOffset = 0; // months from current
+
+function schedCalShift(dir) {
+  schedCalOffset += dir;
+  renderSchedCal();
+}
+
+function dayHasData(dateStr) {
+  const d = allPlannerData[dateStr];
+  if (!d) return false;
+  if (d.mood && d.mood.length) return true;
+  if (d.sleep) return true;
+  if (d.water && d.water.some(Boolean)) return true;
+  if (d.exercise && d.exercise.length) return true;
+  if (d.bibleVerse) return true;
+  if (d.notesList && d.notesList.length) return true;
+  if (d.todos && d.todos.length) return true;
+  if (d.goals && d.goals.length) return true;
+  if (d.mealEntries && Object.keys(d.mealEntries).some(k => d.mealEntries[k].length)) return true;
+  if (d.schedule && Object.keys(d.schedule).some(k => d.schedule[k].items && d.schedule[k].items.length)) return true;
+  return false;
+}
+
+function renderSchedCal() {
+  const grid = document.getElementById('sched-cal-grid');
+  const lbl  = document.getElementById('sched-cal-label');
+  const dayNamesEl = document.getElementById('sched-cal-daynames');
+  if (!grid || !lbl) return;
+
+  const now   = new Date();
+  const base  = new Date(now.getFullYear(), now.getMonth() + schedCalOffset, 1);
+  const year  = base.getFullYear();
+  const month = base.getMonth();
+  const todayStr = now.toISOString().split('T')[0];
+
+  lbl.textContent = base.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  // Day name headers
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  if (dayNamesEl) {
+    dayNamesEl.innerHTML = dayNames.map(n =>
+      `<div style="text-align:center;font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);font-weight:300;">${n}</div>`
+    ).join('');
+  }
+
+  const firstDow   = (new Date(year, month, 1).getDay() + 6) % 7; // Mon=0
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  // Build flat array of cells
+  let cells = [];
+  for (let i = 0; i < firstDow; i++) cells.push(null); // empty
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  // Pad to full weeks
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  // Render week rows
+  let html = '';
+  for (let w = 0; w < cells.length / 7; w++) {
+    html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;margin-bottom:0.3rem;">`;
+    for (let i = 0; i < 7; i++) {
+      const day = cells[w * 7 + i];
+      if (!day) { html += `<div></div>`; continue; }
+
+      const mm      = String(month + 1).padStart(2,'0');
+      const dd      = String(day).padStart(2,'0');
+      const dateStr = `${year}-${mm}-${dd}`;
+      const isToday    = dateStr === todayStr;
+      const isSelected = dateStr === currentScheduleDate;
+      const hasData    = dayHasData(dateStr);
+      const isFuture   = dateStr > todayStr;
+
+      const bg     = isSelected ? 'var(--black)' : hasData ? '#0a0a0a' : 'transparent';
+      const border  = hasData || isSelected ? 'var(--black)' : '#c8c8c5';
+      const color   = (isSelected || hasData) ? 'var(--white)' : isToday ? 'var(--black)' : 'var(--gray)';
+      const opacity = isFuture && !isSelected ? '0.35' : '1';
+      const fw      = isToday ? '400' : '300';
+
+      html += `<div onclick="schedCalJump('${dateStr}')" style="
+        display:flex;align-items:center;justify-content:center;
+        border:1px solid ${border};
+        background:${bg};
+        opacity:${opacity};
+        cursor:pointer;
+        aspect-ratio:1;
+        transition:all 0.15s;
+      ">
+        <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;font-weight:${fw};color:${color};line-height:1;">${day}</span>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  grid.innerHTML = html;
+}
+
+function schedCalJump(dateStr) {
+  savePlannerDay();
+  currentScheduleDate = dateStr;
+  const d = new Date(dateStr + 'T00:00:00');
+  const now = new Date();
+  schedCalOffset = (d.getFullYear() - now.getFullYear()) * 12 + (d.getMonth() - now.getMonth());
+  updateDayLabel();
+  loadPlannerDay();
+  renderSchedCal();
+  const popup = document.getElementById('sched-cal-popup');
+  if (popup) popup.style.display = 'none';
 }
 
 // Schedule time rows
@@ -1574,10 +1722,6 @@ function savePlannerDay() {
   d.lunch = document.getElementById('meal-lunch')?.value || '';
   d.dinner = document.getElementById('meal-dinner')?.value || '';
   if (!d.mealTimes) d.mealTimes = {};
-  d.timeWater = document.getElementById('time-water')?.value || '';
-  d.timeBreakfast = document.getElementById('time-breakfast')?.value || '';
-  d.timeLunch = document.getElementById('time-lunch')?.value || '';
-  d.timeDinner = document.getElementById('time-dinner')?.value || '';
   // notes & grateful
   d.notes = document.getElementById('planner-notes')?.value || '';
   d.bibleVerse = document.getElementById('bible-verse')?.value || '';
@@ -1591,9 +1735,11 @@ function savePlannerDay() {
   localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
   const btn = document.querySelector('[onclick="savePlannerDay()"]');
   if (btn) { btn.textContent = 'Saved ✓'; setTimeout(()=>btn.textContent='Save day',1500); }
+  renderSchedCal();
 }
 
 function loadPlannerDay() {
+  try {
   const d = getPlannerDay();
 
   // Always clear everything first
@@ -1614,18 +1760,10 @@ function loadPlannerDay() {
   if (document.getElementById('meal-breakfast')) document.getElementById('meal-breakfast').value = '';
   if (document.getElementById('meal-lunch')) document.getElementById('meal-lunch').value = '';
   if (document.getElementById('meal-dinner')) document.getElementById('meal-dinner').value = '';
-  ['breakfast','lunch','dinner'].forEach(m => {
-    const span = document.getElementById(`meal-time-${m}`);
-    if (span) span.textContent = '';
-  });
   renderMeals();
-  if (document.getElementById('planner-notes')) document.getElementById('planner-notes').value = d.notes||'';
+  if (document.getElementById('planner-notes')) document.getElementById('planner-notes').value = '';
   if (document.getElementById('bible-verse')) document.getElementById('bible-verse').value = d.bibleVerse||'';
   if (document.getElementById('bible-ref')) document.getElementById('bible-ref').value = d.bibleRef||'';
-  if (document.getElementById('time-water')) document.getElementById('time-water').value = d.timeWater||'';
-  if (document.getElementById('time-breakfast')) document.getElementById('time-breakfast').value = d.timeBreakfast||'';
-  if (document.getElementById('time-lunch')) document.getElementById('time-lunch').value = d.timeLunch||'';
-  if (document.getElementById('time-dinner')) document.getElementById('time-dinner').value = d.timeDinner||'';
   plannerNotes = d.notesList || [];
   renderNotes();
 
@@ -1635,7 +1773,8 @@ function loadPlannerDay() {
   renderTodos();
   renderGoals();
   renderMeals();
-  renderSchedule();
+  try { renderSchedule(); } catch(e) { console.error('renderSchedule error:', e); }
+  } catch(e) { console.error('loadPlannerDay error:', e); }
 }
 
 function resetSchedule() {
@@ -1898,7 +2037,7 @@ function reloadAllData() {
   const wi = JSON.parse(localStorage.getItem('whoi_history') || '[]'); whoiItems = Array.isArray(wi) ? wi : [];
   const b = JSON.parse(localStorage.getItem('my_books') || '[]'); books = Array.isArray(b) ? b : [];
   const ap = JSON.parse(localStorage.getItem('all_planner_data') || '{}'); allPlannerData = (ap && typeof ap === 'object' && !Array.isArray(ap)) ? ap : {};
-  renderWins(); renderSavedAffirmations(); renderVentEntries(); renderDimensionBoards(); renderWhoiGrid(); renderBooks(); renderAnalytics(); loadPlannerDay();
+  renderWins(); renderSavedAffirmations(); renderVentEntries(); renderDimensionBoards(); renderWhoiGrid(); renderBooks(); renderAnalytics();
 }
 
 renderAnalytics();
@@ -2761,9 +2900,194 @@ window.addEventListener('DOMContentLoaded', function() {
 
 </div>
 
+<!-- HABITS SECTION -->
+<div class="section" id="habits" style="padding-top:1.5rem;">
+  <div class="subtitle">Build yourself daily</div>
+  <h1>Habits.</h1>
+
+  <!-- Week strip -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;margin-top:1.5rem;">
+    <button onclick="habitsWeekShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8249;</button>
+    <div id="habits-week-label" style="font-family:'Nunito',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></div>
+    <button onclick="habitsWeekShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8250;</button>
+  </div>
+
+  <!-- Day columns -->
+  <div id="habits-day-strip" style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;margin-bottom:1.5rem;"></div>
+
+  <!-- Habit list -->
+  <div id="habits-list"></div>
+
+  <!-- Add habit -->
+  <div style="margin-top:1.5rem;border-top:1px solid var(--light);padding-top:1.2rem;">
+    <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Add a habit</div>
+    <div style="display:flex;gap:0.6rem;align-items:flex-end;flex-wrap:wrap;">
+      <input id="habit-name-input" type="text" placeholder="e.g. drink water, journal, walk…" onkeydown="if(event.key==='Enter')habitsAdd()" style="flex:1;min-width:140px;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+      <div style="display:flex;gap:0.3rem;align-items:center;">
+        <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);">Color</span>
+        <div id="habit-color-picker" style="display:flex;gap:0.3rem;">
+          <button class="habit-color-opt selected" data-color="#0a0a0a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#0a0a0a;border:2px solid #0a0a0a;cursor:pointer;"></button>
+          <button class="habit-color-opt" data-color="#888" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#888;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="habit-color-opt" data-color="#b07a5a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#b07a5a;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="habit-color-opt" data-color="#5a7a8a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#5a7a8a;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="habit-color-opt" data-color="#7a8a5a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#7a8a5a;border:2px solid transparent;cursor:pointer;"></button>
+        </div>
+      </div>
+      <button onclick="habitsAdd()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── HABITS ──────────────────────────────────────────────────
+var HABITS_KEY = 'habits_data';
+var habitsData = { habits: [], log: {} }; // log: { 'YYYY-MM-DD': { habitId: true } }
+var habitsWeekOffset = 0;
+var habitsSelectedColor = '#0a0a0a';
+
+function habitsLoad() {
+  try {
+    var d = localStorage.getItem(HABITS_KEY);
+    if (d) habitsData = JSON.parse(d);
+  } catch(e) {}
+  if (!habitsData.habits) habitsData.habits = [];
+  if (!habitsData.log) habitsData.log = {};
+}
+
+function habitsSave() {
+  localStorage.setItem(HABITS_KEY, JSON.stringify(habitsData));
+  if (window.syncToCloud) window.syncToCloud(HABITS_KEY, habitsData);
+}
+
+function habitsGetWeekDates(offset) {
+  var today = new Date();
+  var dow = today.getDay(); // 0=Sun
+  var monday = new Date(today);
+  monday.setDate(today.getDate() - ((dow + 6) % 7) + offset * 7);
+  var days = [];
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  return days;
+}
+
+function habitsInit() {
+  habitsLoad();
+  habitsRender();
+}
+
+function habitsWeekShift(dir) {
+  habitsWeekOffset += dir;
+  habitsRender();
+}
+
+function habitsRender() {
+  var days = habitsGetWeekDates(habitsWeekOffset);
+  var todayStr = new Date().toISOString().split('T')[0];
+  var dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  // Week label
+  var first = new Date(days[0] + 'T00:00:00');
+  var last  = new Date(days[6] + 'T00:00:00');
+  document.getElementById('habits-week-label').textContent =
+    first.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' – ' +
+    last.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+
+  // Day strip header
+  var strip = document.getElementById('habits-day-strip');
+  strip.innerHTML = days.map(function(date, i) {
+    var isToday = date === todayStr;
+    return '<div style="text-align:center;">' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:' + (isToday ? 'var(--black)' : 'var(--gray)') + ';font-weight:' + (isToday ? '400' : '300') + ';">' + dayNames[i] + '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.7rem;font-weight:' + (isToday ? '400' : '300') + ';color:' + (isToday ? 'var(--black)' : 'var(--gray)') + ';margin-top:0.1rem;">' + new Date(date + 'T00:00:00').getDate() + '</div>' +
+    '</div>';
+  }).join('');
+
+  // Habit rows
+  var list = document.getElementById('habits-list');
+  if (!habitsData.habits.length) {
+    list.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.9rem;color:var(--gray);padding:1rem 0;">No habits yet. Add one below.</div>';
+    return;
+  }
+
+  list.innerHTML = habitsData.habits.map(function(h, hi) {
+    var dotRow = days.map(function(date) {
+      var done = habitsData.log[date] && habitsData.log[date][h.id];
+      var isFuture = date > todayStr;
+      return '<div onclick="habitsToggle(\'' + h.id + '\',\'' + date + '\')" style="display:flex;justify-content:center;align-items:center;cursor:' + (isFuture ? 'default' : 'pointer') + ';">' +
+        '<div style="width:18px;height:18px;border:1px solid ' + (done ? h.color : '#c8c8c5') + ';background:' + (done ? h.color : 'transparent') + ';transition:all 0.15s;' + (isFuture ? 'opacity:0.3;' : '') + '"></div>' +
+      '</div>';
+    }).join('');
+
+    // Streak
+    var streak = habitsStreak(h.id, todayStr);
+
+    return '<div style="margin-bottom:1.2rem;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">' +
+        '<div style="display:flex;align-items:center;gap:0.5rem;">' +
+          '<div style="width:8px;height:8px;background:' + h.color + ';flex-shrink:0;"></div>' +
+          '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;">' + h.name + '</span>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:0.8rem;">' +
+          (streak > 0 ? '<span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;color:var(--gray);letter-spacing:0.06em;">' + streak + ' day streak</span>' : '') +
+          '<button onclick="habitsDelete(\'' + h.id + '\')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;line-height:1;padding:0;">×</button>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;">' + dotRow + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function habitsToggle(id, date) {
+  var todayStr = new Date().toISOString().split('T')[0];
+  if (date > todayStr) return; // no future
+  if (!habitsData.log[date]) habitsData.log[date] = {};
+  habitsData.log[date][id] = !habitsData.log[date][id];
+  habitsSave();
+  habitsRender();
+}
+
+function habitsStreak(id, todayStr) {
+  var streak = 0;
+  var d = new Date(todayStr + 'T00:00:00');
+  while (true) {
+    var key = d.toISOString().split('T')[0];
+    if (habitsData.log[key] && habitsData.log[key][id]) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else break;
+  }
+  return streak;
+}
+
+function habitsAdd() {
+  var inp = document.getElementById('habit-name-input');
+  var name = inp.value.trim();
+  if (!name) return;
+  var id = 'h' + Date.now();
+  habitsData.habits.push({ id: id, name: name, color: habitsSelectedColor });
+  inp.value = '';
+  habitsSave();
+  habitsRender();
+}
+
+function habitsDelete(id) {
+  habitsData.habits = habitsData.habits.filter(function(h){ return h.id !== id; });
+  habitsSave();
+  habitsRender();
+}
+
+function habitPickColor(btn) {
+  document.querySelectorAll('.habit-color-opt').forEach(function(b){ b.style.border = '2px solid transparent'; });
+  btn.style.border = '2px solid var(--black)';
+  habitsSelectedColor = btn.getAttribute('data-color');
+}
+</script>
+
 <script>
 // ── Who I Am ────────────────────────────────────────────────
-
 var WIA = JSON.parse(localStorage.getItem('wia2') || '{"j":{},"c":{},"traits":[],"values":[],"name":"","wj":{}}');
 if (!WIA.traits) WIA.traits = [];
 if (!WIA.values) WIA.values = [];
