@@ -250,6 +250,26 @@
   <div class="home-grid">
 
     <div class="home-card" style="cursor:default;">
+      <div class="home-card-title">Jesus Christ</div>
+      <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
+        <div onclick="showSection('jesus');setTimeout(()=>showJesusTab('whoisjesus'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Jesus Christ</div>
+        <div onclick="showSection('jesus');setTimeout(()=>showJesusTab('prayer'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Prayer</div>
+        <div onclick="showSection('jesus');setTimeout(()=>showJesusTab('action'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Today's Action</div>
+        <div onclick="showSection('jesus');setTimeout(()=>showJesusTab('study'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Study the Bible</div>
+      </div>
+    </div>
+
+    <div class="home-card" style="cursor:default;">
+      <div class="home-card-title">Journal</div>
+      <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
+        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('belief'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Belief</div>
+        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('vent'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Journal</div>
+        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('books'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Books</div>
+        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('wins'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Wins</div>
+      </div>
+    </div>
+
+    <div class="home-card" style="cursor:default;">
       <div class="home-card-title">Vision Board</div>
       <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
         <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-spiritual')&&document.getElementById('dim-spiritual').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Spiritual</div>
@@ -276,16 +296,6 @@
     </div>
 
     <div class="home-card" style="cursor:default;">
-      <div class="home-card-title">Journal</div>
-      <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
-        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('belief'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Belief</div>
-        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('vent'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Journal</div>
-        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('books'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Books</div>
-        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('wins'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Wins</div>
-      </div>
-    </div>
-
-    <div class="home-card" style="cursor:default;">
       <div class="home-card-title">Me</div>
       <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
         <div onclick="showSection('me');setTimeout(()=>showMeTab('whiam'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Who I Am</div>
@@ -297,8 +307,9 @@
     <div class="home-card" style="cursor:default;">
       <div class="home-card-title">Habits</div>
       <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
-        <div onclick="showSection('habits');setTimeout(()=>showHabitsTab('myhabits'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">My Habits</div>
-        <div onclick="showSection('habits');setTimeout(()=>showHabitsTab('calisthenics'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Calisthenics</div>
+        <div onclick="showSection('habits');setTimeout(()=>showHabitsTab('calisthenics'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Calisthenics</div>
+        <div onclick="showSection('habits');setTimeout(()=>showHabitsTab('daily'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Daily</div>
+        <div onclick="showSection('habits');setTimeout(()=>showHabitsTab('bodycare'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Body Care</div>
       </div>
     </div>
 
@@ -320,25 +331,8 @@
   <div id="import-msg" style="font-family:'Nunito',sans-serif;font-size:0.62rem;color:var(--gray);letter-spacing:0.08em;margin-top:0.4rem;text-align:center;"></div>
 </div>
 
-<div class="section" id="affirmations">
-
-  <!-- Celebration overlay -->
-  <div id="book-celebrate" style="display:none;position:fixed;inset:0;z-index:999;pointer-events:none;">
-    <canvas id="confetti-canvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
-    <div id="book-toast" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--black);color:var(--white);padding:1.5rem 2rem;text-align:center;min-width:220px;opacity:0;transition:opacity 0.3s;">
-      <div style="font-size:1.8rem;margin-bottom:0.5rem;">🎉</div>
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:1.1rem;margin-bottom:0.2rem;" id="toast-title"></div>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#aaa;">Added to your reading list 🤍</div>
-    </div>
-  </div>
-
-  <!-- Journal sub-tabs -->
-  <div id="journal-tabs" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-    <button class="journal-tab active" onclick="showJournalTab('belief')" id="jtab-belief">Belief</button>
-    <button class="journal-tab" onclick="showJournalTab('vent')" id="jtab-vent">Journal</button>
-    <button class="journal-tab" onclick="showJournalTab('books')" id="jtab-books">Books</button>
-    <button class="journal-tab" onclick="showJournalTab('wins')" id="jtab-wins">Wins</button>
-  </div>
+<div class="section" id="affirmations" style="display:none!important;">
+  <!-- content moved into schedule > journal tab -->
 
   <!-- Books sub-section -->
   <div id="jsub-books" style="display:none;">
@@ -686,6 +680,26 @@
   </div>
 
 </div>
+
+<div class="section" id="affirmations">
+
+  <!-- Celebration overlay -->
+  <div id="book-celebrate" style="display:none;position:fixed;inset:0;z-index:999;pointer-events:none;">
+    <canvas id="confetti-canvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+    <div id="book-toast" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--black);color:var(--white);padding:1.5rem 2rem;text-align:center;min-width:220px;opacity:0;transition:opacity 0.3s;">
+      <div style="font-size:1.8rem;margin-bottom:0.5rem;">🎉</div>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:1.1rem;margin-bottom:0.2rem;" id="toast-title"></div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#aaa;">Added to your reading list 🤍</div>
+    </div>
+  </div>
+
+  <!-- Journal sub-tabs -->
+  <div id="journal-tabs" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+    <button class="journal-tab active" onclick="showJournalTab('belief')" id="jtab-belief">Belief</button>
+    <button class="journal-tab" onclick="showJournalTab('vent')" id="jtab-vent">Journal</button>
+    <button class="journal-tab" onclick="showJournalTab('books')" id="jtab-books">Books</button>
+    <button class="journal-tab" onclick="showJournalTab('wins')" id="jtab-wins">Wins</button>
+  </div>
 
 
   </div>
@@ -3036,13 +3050,12 @@ window.addEventListener('DOMContentLoaded', function() {
 
 <!-- HABITS SECTION -->
 <div class="section" id="habits" style="padding-top:1.5rem;">
-  <div class="subtitle">Build yourself daily</div>
-  <h1>Habits.</h1>
 
   <!-- Sub-tabs -->
-  <div style="display:flex;border-bottom:1px solid #c8c8c5;margin-bottom:1.5rem;margin-top:1rem;">
-    <button id="htab-myhabits" onclick="showHabitsTab('myhabits')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:none;background:none;cursor:pointer;padding:0.5rem 0;margin-right:1.5rem;border-bottom:2px solid var(--black);color:var(--black);font-weight:300;">My Habits</button>
-    <button id="htab-calisthenics" onclick="showHabitsTab('calisthenics')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:none;background:none;cursor:pointer;padding:0.5rem 0;margin-right:1.5rem;border-bottom:2px solid transparent;color:var(--gray);font-weight:300;">Calisthenics</button>
+  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+    <button class="journal-tab active" id="htab-calisthenics" onclick="showHabitsTab('calisthenics')">Calisthenics</button>
+    <button class="journal-tab" id="htab-daily" onclick="showHabitsTab('daily')">Daily</button>
+    <button class="journal-tab" id="htab-bodycare" onclick="showHabitsTab('bodycare')">Body Care</button>
   </div>
 
   <!-- MY HABITS -->
@@ -3065,10 +3078,10 @@ window.addEventListener('DOMContentLoaded', function() {
           <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);">Color</span>
           <div style="display:flex;gap:0.3rem;">
             <button class="habit-color-opt selected" data-color="#0a0a0a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#0a0a0a;border:2px solid #0a0a0a;cursor:pointer;"></button>
-            <button class="habit-color-opt" data-color="#888" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#888;border:2px solid transparent;cursor:pointer;"></button>
-            <button class="habit-color-opt" data-color="#b07a5a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#b07a5a;border:2px solid transparent;cursor:pointer;"></button>
-            <button class="habit-color-opt" data-color="#5a7a8a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#5a7a8a;border:2px solid transparent;cursor:pointer;"></button>
-            <button class="habit-color-opt" data-color="#7a8a5a" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#7a8a5a;border:2px solid transparent;cursor:pointer;"></button>
+            <button class="habit-color-opt" data-color="#c8b8a8" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#c8b8a8;border:2px solid transparent;cursor:pointer;"></button>
+            <button class="habit-color-opt" data-color="#a8b8c8" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#a8b8c8;border:2px solid transparent;cursor:pointer;"></button>
+            <button class="habit-color-opt" data-color="#b8c8a8" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#b8c8a8;border:2px solid transparent;cursor:pointer;"></button>
+            <button class="habit-color-opt" data-color="#c8a8b8" onclick="habitPickColor(this)" style="width:16px;height:16px;background:#c8a8b8;border:2px solid transparent;cursor:pointer;"></button>
           </div>
         </div>
         <button onclick="habitsAdd()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
@@ -3078,16 +3091,192 @@ window.addEventListener('DOMContentLoaded', function() {
 
   <!-- CALISTHENICS FOR BEGINNER -->
   <div id="hsub-calisthenics" style="display:none;">
-    <div style="border:1px solid #c8c8c5;padding:1rem;margin-bottom:1.2rem;background:#fafaf8;">
-      <div style="font-family:'Lora',serif;font-size:0.88rem;margin-bottom:0.5rem;">What is Calisthenics?</div>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:300;color:var(--gray);line-height:1.6;">Calisthenics means using your own bodyweight as resistance no gym, no equipment. Push-ups, squats, planks that's calisthenics. It builds real strength, flexibility, and body control at your own pace.</div>
-      <div style="font-family:'Lora',serif;font-size:0.88rem;margin-top:0.8rem;margin-bottom:0.4rem;">What does "3 rounds × 10" mean?</div>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:300;color:var(--gray);line-height:1.6;"><b style="font-weight:400;">Rounds</b> = how many times you repeat a group of reps. <b style="font-weight:400;">Reps</b> = how many times you do one movement. So <b style="font-weight:400;">3 rounds × 10 reps</b> means: do the exercise 10 times, rest, do it again, rest, do it one more time. That's it 🤍</div>
+
+    <!-- Top row: info left, calendar right -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:stretch;margin-bottom:1.2rem;">
+
+      <div style="border:1px solid #c8c8c5;padding:1rem;background:#fafaf8;">
+        <div style="font-family:'Lora',serif;font-size:0.88rem;margin-bottom:0.5rem;">What is Calisthenics?</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:300;color:var(--gray);line-height:1.6;">Calisthenics means using your own bodyweight as resistance no gym, no equipment. Push-ups, squats, planks that's calisthenics. It builds real strength, flexibility, and body control at your own pace.</div>
+        <div style="font-family:'Lora',serif;font-size:0.88rem;margin-top:0.8rem;margin-bottom:0.4rem;">What does "3 sets × 10" mean?</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:300;color:var(--gray);line-height:1.6;"><b style="font-weight:400;">Sets</b> = how many times you repeat a group of reps. <b style="font-weight:400;">Reps</b> = how many times you do one movement. So <b style="font-weight:400;">3 sets × 10 reps</b> means: do the exercise 10 times, rest, do it again, rest, do it one more time. That's it 🤍</div>
+      </div>
+
+      <!-- Mini habit tracker calendar -->
+      <div style="border:1px solid #c8c8c5;padding:1rem;">
+        <div style="display:flex;align-items:center;justify-content:center;gap:0.3rem;margin-bottom:0.7rem;">
+          <button onclick="caliTrackerShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.1rem 0.2rem;">&#8249;</button>
+          <div id="cali-tracker-label" style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></div>
+          <button onclick="caliTrackerShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.1rem 0.2rem;">&#8250;</button>
+        </div>
+        <div id="cali-tracker-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;"></div>
+        <div id="cali-tracker-grid"></div>
+      </div>
+
     </div>
+
     <div class="subtitle" style="margin-bottom:1.2rem;">Beginner Program</div>
     <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:1.2rem;" id="cali-week-btns"></div>
     <div id="cali-plan"></div>
   </div>
+
+  <!-- BODY CARE -->
+  <div id="hsub-bodycare" style="display:none;">
+    <div style="display:flex;flex-direction:column;gap:1.2rem;">
+
+      <!-- Face -->
+      <div style="border:1px solid #c8c8c5;padding:1rem;">
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;margin-bottom:0.8rem;">Face</div>
+        <div id="bodycare-face-list"></div>
+        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.8rem;border-top:1px solid var(--light);padding-top:0.8rem;">
+          <input id="bodycare-face-input" type="text" placeholder="Add a face care step…" onkeydown="if(event.key==='Enter')bodycareAdd('face')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <button onclick="bodycareAdd('face')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
+        </div>
+      </div>
+
+      <!-- Hair -->
+      <div style="border:1px solid #c8c8c5;padding:1rem;">
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;margin-bottom:0.8rem;">Hair</div>
+        <div id="bodycare-hair-list"></div>
+        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.8rem;border-top:1px solid var(--light);padding-top:0.8rem;">
+          <input id="bodycare-hair-input" type="text" placeholder="Add a hair care step…" onkeydown="if(event.key==='Enter')bodycareAdd('hair')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <button onclick="bodycareAdd('hair')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
+        </div>
+      </div>
+
+      <!-- Skin -->
+      <div style="border:1px solid #c8c8c5;padding:1rem;">
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;margin-bottom:0.8rem;">Skin</div>
+        <div id="bodycare-skin-list"></div>
+        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.8rem;border-top:1px solid var(--light);padding-top:0.8rem;">
+          <input id="bodycare-skin-input" type="text" placeholder="Add a skin care step…" onkeydown="if(event.key==='Enter')bodycareAdd('skin')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <button onclick="bodycareAdd('skin')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
+        </div>
+      </div>
+
+      <!-- Ears -->
+      <div style="border:1px solid #c8c8c5;padding:1rem;">
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;margin-bottom:0.8rem;">Ears</div>
+        <div id="bodycare-ears-list"></div>
+        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.8rem;border-top:1px solid var(--light);padding-top:0.8rem;">
+          <input id="bodycare-ears-input" type="text" placeholder="Add an ear care step…" onkeydown="if(event.key==='Enter')bodycareAdd('ears')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <button onclick="bodycareAdd('ears')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
+        </div>
+      </div>
+
+      <!-- Nails -->
+      <div style="border:1px solid #c8c8c5;padding:1rem;">
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;margin-bottom:0.8rem;">Nails</div>
+        <div id="bodycare-nails-list"></div>
+        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.8rem;border-top:1px solid var(--light);padding-top:0.8rem;">
+          <input id="bodycare-nails-input" type="text" placeholder="Add a nail care step…" onkeydown="if(event.key==='Enter')bodycareAdd('nails')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <button onclick="bodycareAdd('nails')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="hsub-daily" style="display:none;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;align-items:stretch;">
+
+      <!-- LEFT: Meals -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;display:flex;flex-direction:column;height:100%;">
+
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div class="planner-label">Breakfast</div>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">6:30 AM</span>
+          </div>
+          <div style="display:flex;gap:0.4rem;align-items:center;margin-top:0.4rem;">
+            <input id="daily-meal-breakfast-input" type="text" placeholder="What did you eat?" onkeydown="if(event.key==='Enter')dailyAddMeal('breakfast')" onblur="dailyAddMeal('breakfast')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.2rem 0;">
+          </div>
+          <div id="daily-meal-breakfast-list" style="margin-top:0.4rem;flex:1;"></div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.8rem;">
+            <div class="planner-label">Lunch</div>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">12:30 PM</span>
+          </div>
+          <div style="display:flex;gap:0.4rem;align-items:center;margin-top:0.4rem;">
+            <input id="daily-meal-lunch-input" type="text" placeholder="What did you eat?" onkeydown="if(event.key==='Enter')dailyAddMeal('lunch')" onblur="dailyAddMeal('lunch')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.2rem 0;">
+          </div>
+          <div id="daily-meal-lunch-list" style="margin-top:0.4rem;flex:1;"></div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.8rem;">
+            <div class="planner-label">Dinner</div>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">7:00 PM</span>
+          </div>
+          <div style="display:flex;gap:0.4rem;align-items:center;margin-top:0.4rem;">
+            <input id="daily-meal-dinner-input" type="text" placeholder="What did you eat?" onkeydown="if(event.key==='Enter')dailyAddMeal('dinner')" onblur="dailyAddMeal('dinner')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.2rem 0;">
+          </div>
+          <div id="daily-meal-dinner-list" style="margin-top:0.4rem;flex:1;"></div>
+
+      </div>
+
+      <!-- RIGHT: Mood, Sleep, Water -->
+      <div style="display:flex;flex-direction:column;gap:0.8rem;">
+
+        <!-- Mood -->
+        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+          <div class="planner-label">Mood</div>
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;">
+            <span class="mood-btn" onclick="dailyToggleMood(this,'😊')">😊</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'😔')">😔</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'😰')">😰</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'😡')">😡</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'🥰')">🥰</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'😴')">😴</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'😐')">😐</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'🥺')">🥺</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'😤')">😤</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'😭')">😭</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'🤩')">🤩</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'😌')">😌</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'🤗')">🤗</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'😶')">😶</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'🥱')">🥱</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'😇')">😇</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'🤯')">🤯</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'💪')">💪</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'🔥')">🔥</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'😞')">😞</span>
+            <span class="mood-btn" onclick="dailyToggleMood(this,'🥹')">🥹</span>
+          </div>
+        </div>
+
+        <!-- Sleep -->
+        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div class="planner-label">Sleep (hrs)</div>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">9:00 PM</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:0.5rem;">
+            <span class="sleep-btn" onclick="dailySetSleep(this,4)">4</span>
+            <span class="sleep-btn" onclick="dailySetSleep(this,5)">5</span>
+            <span class="sleep-btn" onclick="dailySetSleep(this,6)">6</span>
+            <span class="sleep-btn" onclick="dailySetSleep(this,7)">7</span>
+            <span class="sleep-btn" onclick="dailySetSleep(this,8)">8+</span>
+          </div>
+        </div>
+
+        <!-- Water -->
+        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+          <div class="planner-label">Water</div>
+          <div style="display:flex;gap:0.2rem;margin-top:0.5rem;justify-content:space-between;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,0)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">7 AM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,1)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">8 AM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,2)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">9 AM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,3)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">11 AM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,4)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">1 PM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,5)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">3 PM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,6)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">5 PM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" onclick="dailyToggleWater(this,7)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.5rem;color:var(--gray);">7 PM</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </div>
 <div class="section" id="jesus" style="padding-top:1.5rem;">
   <div class="subtitle">Walk with Him daily</div>
@@ -3186,7 +3375,6 @@ window.addEventListener('DOMContentLoaded', function() {
       <div id="jesus-action-list" style="margin-bottom:0.6rem;"></div>
       <div style="display:flex;gap:0.5rem;">
         <input id="jesus-action-input" placeholder="Add an action for today…" onkeydown="if(event.key==='Enter')jesusSaveAction()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;">
-        <button onclick="jesusSaveAction()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 0.9rem;cursor:pointer;">Add</button>
       </div>
     </div>
 
@@ -3875,22 +4063,174 @@ function habitsGetWeekDates(offset) {
 
 function habitsInit() {
   habitsLoad();
-  showHabitsTab('myhabits');
+  bodycareLoad();
+  showHabitsTab('calisthenics');
   habitsRender();
 }
 
 function showHabitsTab(tab) {
-  var btn = document.getElementById('htab-myhabits');
-  if (btn) { btn.style.borderBottom = 'none'; btn.style.color = 'var(--gray)'; }
-  var btn2 = document.getElementById('htab-calisthenics');
-  if (btn2) { btn2.style.borderBottom = 'none'; btn2.style.color = 'var(--gray)'; }
-  var active = document.getElementById('htab-' + tab);
-  if (active) { active.style.borderBottom = '2px solid var(--black)'; active.style.color = 'var(--black)'; }
-  ['myhabits','calisthenics'].forEach(function(t) {
+  ['myhabits','calisthenics','bodycare','daily'].forEach(function(t) {
+    var btn = document.getElementById('htab-' + t);
+    if (btn) btn.classList.toggle('active', t === tab);
     var el = document.getElementById('hsub-' + t);
     if (el) el.style.display = t === tab ? 'block' : 'none';
   });
   if (tab === 'calisthenics') renderCalisthenics();
+  if (tab === 'bodycare') bodycareRender();
+  if (tab === 'daily') dailyLoad();
+}
+
+var DAILY_KEY = 'daily_data';
+var dailyData = {};
+
+function dailyTodayKey() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function dailyGetToday() {
+  var k = dailyTodayKey();
+  if (!dailyData[k]) dailyData[k] = { mood: [], sleep: null, water: [false,false,false,false,false,false,false,false], meals: {} };
+  return dailyData[k];
+}
+
+function dailySaveAll() {
+  localStorage.setItem(DAILY_KEY, JSON.stringify(dailyData));
+}
+
+function dailyLoad() {
+  try { var d = localStorage.getItem(DAILY_KEY); if (d) dailyData = JSON.parse(d); } catch(e) {}
+  var today = dailyGetToday();
+
+  // Mood
+  document.querySelectorAll('#hsub-daily .mood-btn').forEach(function(btn) {
+    btn.classList.toggle('selected', today.mood.indexOf(btn.textContent) !== -1);
+  });
+
+  // Sleep
+  document.querySelectorAll('#hsub-daily .sleep-btn').forEach(function(btn) {
+    btn.classList.toggle('selected', parseInt(btn.textContent) === today.sleep || (btn.textContent === '8+' && today.sleep === 8));
+  });
+
+  // Water
+  document.querySelectorAll('#hsub-daily .water-cup').forEach(function(cup, i) {
+    cup.style.opacity = today.water[i] ? '1' : '0.3';
+  });
+
+  // Meals
+  dailyRenderMeals();
+}
+
+function dailyToggleMood(btn, emoji) {
+  var today = dailyGetToday();
+  var idx = today.mood.indexOf(emoji);
+  if (idx === -1) today.mood.push(emoji); else today.mood.splice(idx,1);
+  btn.classList.toggle('selected', today.mood.indexOf(emoji) !== -1);
+  dailySaveAll();
+}
+
+function dailySetSleep(btn, val) {
+  var today = dailyGetToday();
+  today.sleep = val;
+  dailySaveAll();
+  document.querySelectorAll('#hsub-daily .sleep-btn').forEach(function(b) {
+    b.classList.toggle('selected', parseInt(b.textContent) === val || (b.textContent === '8+' && val === 8));
+  });
+}
+
+function dailyToggleWater(cup, i) {
+  var today = dailyGetToday();
+  today.water[i] = !today.water[i];
+  cup.style.opacity = today.water[i] ? '1' : '0.3';
+  dailySaveAll();
+}
+
+function dailyAddMeal(meal) {
+  var input = document.getElementById('daily-meal-'+meal+'-input');
+  var val = input ? input.value.trim() : '';
+  if (!val) return;
+  var today = dailyGetToday();
+  if (!today.meals[meal]) today.meals[meal] = [];
+  if (typeof today.meals[meal] === 'string') today.meals[meal] = today.meals[meal] ? [today.meals[meal]] : [];
+  today.meals[meal].push(val);
+  input.value = '';
+  dailySaveAll();
+  dailyRenderMeals();
+}
+
+function dailyDeleteMeal(meal, i) {
+  var today = dailyGetToday();
+  if (Array.isArray(today.meals[meal])) today.meals[meal].splice(i, 1);
+  dailySaveAll();
+  dailyRenderMeals();
+}
+
+function dailyRenderMeals() {
+  var today = dailyGetToday();
+  ['breakfast','lunch','dinner'].forEach(function(meal) {
+    var el = document.getElementById('daily-meal-'+meal+'-list');
+    if (!el) return;
+    var items = Array.isArray(today.meals[meal]) ? today.meals[meal] : (today.meals[meal] ? [today.meals[meal]] : []);
+    el.innerHTML = items.map(function(item, i) {
+      return '<div style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0;border-bottom:1px solid var(--light);">' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);flex:1;">'+item+'</div>' +
+        '<button onclick="dailyDeleteMeal(\''+meal+'\','+i+')" style="background:none;border:none;color:#ccc;font-size:0.9rem;cursor:pointer;padding:0;line-height:1;">×</button>' +
+      '</div>';
+    }).join('');
+  });
+}
+
+function dailySaveMeal(meal) {}
+
+var BODYCARE_KEY = 'bodycare_data';
+var bodycareData = { face: [], hair: [], skin: [], ears: [], nails: [] };
+
+function bodycareLoad() {
+  try { var d = localStorage.getItem(BODYCARE_KEY); if (d) bodycareData = JSON.parse(d); } catch(e) {}
+  if (!bodycareData.face) bodycareData.face = [];
+  if (!bodycareData.hair) bodycareData.hair = [];
+  if (!bodycareData.skin) bodycareData.skin = [];
+  if (!bodycareData.ears) bodycareData.ears = [];
+  if (!bodycareData.nails) bodycareData.nails = [];
+}
+
+function bodycareSave() {
+  localStorage.setItem(BODYCARE_KEY, JSON.stringify(bodycareData));
+}
+
+function bodycareRender() {
+  bodycareLoad();
+  ['face','hair','skin','ears','nails'].forEach(function(cat) {
+    var el = document.getElementById('bodycare-'+cat+'-list');
+    if (!el) return;
+    if (!bodycareData[cat].length) {
+      el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.82rem;color:var(--gray);padding:0.3rem 0;">Nothing added yet.</div>';
+      return;
+    }
+    el.innerHTML = bodycareData[cat].map(function(item, i) {
+      return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0;border-bottom:1px solid var(--light);">' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);flex:1;">'+item+'</div>' +
+        '<button onclick="bodycareDelete(\''+cat+'\','+i+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;line-height:1;padding:0;">×</button>' +
+      '</div>';
+    }).join('');
+  });
+}
+
+function bodycareAdd(cat) {
+  var input = document.getElementById('bodycare-'+cat+'-input');
+  var val = input.value.trim();
+  if (!val) return;
+  bodycareLoad();
+  bodycareData[cat].push(val);
+  bodycareSave();
+  input.value = '';
+  bodycareRender();
+}
+
+function bodycareDelete(cat, i) {
+  bodycareLoad();
+  bodycareData[cat].splice(i, 1);
+  bodycareSave();
+  bodycareRender();
 }
 
 function habitsWeekShift(dir) {
@@ -4059,117 +4399,117 @@ var caliYT = {
 var caliProgram = {
   1: [
     { day:'Day 1', focus:'Full Body', exercises:[
-      { name:'Wall Push-ups', reps:'3 rounds of 10', note:'Place hands on wall at shoulder height, keep your body in a straight line, bend elbows to bring chest toward wall' },
-      { name:'Bodyweight Squats', reps:'3 rounds of 10', note:'Stand feet shoulder-width apart, chest up, sit back and down like you\'re lowering onto a chair' },
-      { name:'Knee Plank', reps:'3 rounds, hold 20 seconds', note:'Rest on your knees and forearms, keep hips level don\'t let them sag or rise' },
-      { name:'Glute Bridge', reps:'3 rounds of 10', note:'Lie on your back, feet flat, push your hips up until your body makes a straight line from knees to shoulders' },
+      { name:'Wall Push-ups', reps:'3 sets of 10', note:'Place hands on wall at shoulder height, keep your body in a straight line, bend elbows to bring chest toward wall' },
+      { name:'Bodyweight Squats', reps:'3 sets of 10', note:'Stand feet shoulder-width apart, chest up, sit back and down like you\'re lowering onto a chair' },
+      { name:'Knee Plank', reps:'3 sets, hold 20 seconds', note:'Rest on your knees and forearms, keep hips level don\'t let them sag or rise' },
+      { name:'Glute Bridge', reps:'3 sets of 10', note:'Lie on your back, feet flat, push your hips up until your body makes a straight line from knees to shoulders' },
     ]},
     { day:'Day 2', focus:'Rest / Walk', exercises:[] },
     { day:'Day 3', focus:'Upper Body', exercises:[
-      { name:'Incline Push-ups', reps:'3 rounds of 8', note:'Place hands on a chair or table instead of the floor easier on the wrists and great for building up to full push-ups' },
-      { name:'Tricep Dips (chair)', reps:'3 rounds of 8', note:'Sit on edge of chair, hands gripping the seat, slide off and bend elbows to lower your body then press back up' },
-      { name:'Superman Hold', reps:'3 rounds of 10', note:'Lie face down, stretch arms forward, then lift arms, chest and legs off the floor at the same time hold for a second' },
-      { name:'Dead Hang', reps:'3 rounds, hold 10 seconds', note:'Hang from a bar or sturdy door frame, arms straight, just let gravity do the work great for grip and shoulder health' },
+      { name:'Incline Push-ups', reps:'3 sets of 8', note:'Place hands on a chair or table instead of the floor easier on the wrists and great for building up to full push-ups' },
+      { name:'Tricep Dips (chair)', reps:'3 sets of 8', note:'Sit on edge of chair, hands gripping the seat, slide off and bend elbows to lower your body then press back up' },
+      { name:'Superman Hold', reps:'3 sets of 10', note:'Lie face down, stretch arms forward, then lift arms, chest and legs off the floor at the same time hold for a second' },
+      { name:'Dead Hang', reps:'3 sets, hold 10 seconds', note:'Hang from a bar or sturdy door frame, arms straight, just let gravity do the work great for grip and shoulder health' },
     ]},
     { day:'Day 4', focus:'Rest / Stretch', exercises:[] },
     { day:'Day 5', focus:'Lower Body', exercises:[
-      { name:'Reverse Lunges', reps:'3 rounds of 8 each leg', note:'Step one foot backward and lower your back knee toward the floor, then return to standing easier on the knees than forward lunges' },
-      { name:'Calf Raises', reps:'3 rounds of 15', note:'Stand tall, rise up onto your toes slowly, hold a second at the top, lower slowly' },
-      { name:'Side-lying Leg Raise', reps:'3 rounds of 12 each side', note:'Lie on your side, keep leg straight, raise the top leg up and lower it with control' },
-      { name:'Wall Sit', reps:'3 rounds, hold 20 seconds', note:'Back flat on the wall, slide down until thighs are parallel to the floor, hold it burns but it works!' },
+      { name:'Reverse Lunges', reps:'3 sets of 8 each leg', note:'Step one foot backward and lower your back knee toward the floor, then return to standing easier on the knees than forward lunges' },
+      { name:'Calf Raises', reps:'3 sets of 15', note:'Stand tall, rise up onto your toes slowly, hold a second at the top, lower slowly' },
+      { name:'Side-lying Leg Raise', reps:'3 sets of 12 each side', note:'Lie on your side, keep leg straight, raise the top leg up and lower it with control' },
+      { name:'Wall Sit', reps:'3 sets, hold 20 seconds', note:'Back flat on the wall, slide down until thighs are parallel to the floor, hold it burns but it works!' },
     ]},
     { day:'Day 6', focus:'Core & Balance', exercises:[
-      { name:'Dead Bug', reps:'3 rounds of 6 each side', note:'Lie on back, arms up, knees bent at 90°, slowly lower opposite arm and leg toward the floor then bring them back keep your lower back pressed flat' },
-      { name:'Bird Dog', reps:'3 rounds of 6 each side', note:'On all fours, extend one arm and the opposite leg at the same time, hold a second, return keep your hips square' },
-      { name:'Heel Taps', reps:'3 rounds of 12 each side', note:'Lie on back, knees bent, crunch slightly to one side to tap your heel with your hand, alternate sides' },
-      { name:'Cat-Cow Stretch', reps:'1 round of 10 slow', note:'On all fours, arch your back up (cat) then dip it down (cow), breathe with each movement amazing for your spine' },
+      { name:'Dead Bug', reps:'3 sets of 6 each side', note:'Lie on back, arms up, knees bent at 90°, slowly lower opposite arm and leg toward the floor then bring them back keep your lower back pressed flat' },
+      { name:'Bird Dog', reps:'3 sets of 6 each side', note:'On all fours, extend one arm and the opposite leg at the same time, hold a second, return keep your hips square' },
+      { name:'Heel Taps', reps:'3 sets of 12 each side', note:'Lie on back, knees bent, crunch slightly to one side to tap your heel with your hand, alternate sides' },
+      { name:'Cat-Cow Stretch', reps:'1 set of 10 slow', note:'On all fours, arch your back up (cat) then dip it down (cow), breathe with each movement amazing for your spine' },
     ]},
     { day:'Day 7', focus:'Rest', exercises:[] },
   ],
   2: [
     { day:'Day 1', focus:'Full Body', exercises:[
-      { name:'Knee Push-ups', reps:'3 rounds of 12', note:'Knees on floor, lower chest all the way down and press back up full range of motion matters more than speed' },
-      { name:'Goblet Squat (no weight)', reps:'3 rounds of 12', note:'Clasp your hands at chest height, squat deep, keep chest tall and knees tracking over toes' },
-      { name:'Forearm Plank', reps:'3 rounds, hold 25 seconds', note:'Rest on forearms and toes, body in one straight line from head to heels breathe steadily' },
-      { name:'Hip Thrust', reps:'3 rounds of 12', note:'Rest your shoulders on a couch or bench, feet flat, drive hips up and squeeze glutes hard at the top' },
+      { name:'Knee Push-ups', reps:'3 sets of 12', note:'Knees on floor, lower chest all the way down and press back up full range of motion matters more than speed' },
+      { name:'Goblet Squat (no weight)', reps:'3 sets of 12', note:'Clasp your hands at chest height, squat deep, keep chest tall and knees tracking over toes' },
+      { name:'Forearm Plank', reps:'3 sets, hold 25 seconds', note:'Rest on forearms and toes, body in one straight line from head to heels breathe steadily' },
+      { name:'Hip Thrust', reps:'3 sets of 12', note:'Rest your shoulders on a couch or bench, feet flat, drive hips up and squeeze glutes hard at the top' },
     ]},
     { day:'Day 2', focus:'Rest / Walk', exercises:[] },
     { day:'Day 3', focus:'Upper Body', exercises:[
-      { name:'Push-ups', reps:'3 rounds of 6–8', note:'Full push-up hands slightly wider than shoulders, lower chest to floor, press up. Drop to knees if needed' },
-      { name:'Pike Push-ups', reps:'3 rounds of 8', note:'Form an upside-down V with your body, bend elbows to lower the top of your head toward the floor trains your shoulders' },
-      { name:'Scapular Push-ups', reps:'3 rounds of 10', note:'In a plank position, squeeze shoulder blades together then spread them apart without bending elbows tiny movement, big shoulder benefit' },
-      { name:'Australian Row (table)', reps:'3 rounds of 8', note:'Lie under a sturdy table, grip the edge, hang with straight body and pull your chest up to the table like an upside-down push-up' },
+      { name:'Push-ups', reps:'3 sets of 6–8', note:'Full push-up hands slightly wider than shoulders, lower chest to floor, press up. Drop to knees if needed' },
+      { name:'Pike Push-ups', reps:'3 sets of 8', note:'Form an upside-down V with your body, bend elbows to lower the top of your head toward the floor trains your shoulders' },
+      { name:'Scapular Push-ups', reps:'3 sets of 10', note:'In a plank position, squeeze shoulder blades together then spread them apart without bending elbows tiny movement, big shoulder benefit' },
+      { name:'Australian Row (table)', reps:'3 sets of 8', note:'Lie under a sturdy table, grip the edge, hang with straight body and pull your chest up to the table like an upside-down push-up' },
     ]},
     { day:'Day 4', focus:'Rest / Stretch', exercises:[] },
     { day:'Day 5', focus:'Lower Body', exercises:[
-      { name:'Jump Squats (low)', reps:'3 rounds of 8', note:'Squat down then explode up with a small jump, land softly by bending knees keep the jump low to protect your joints' },
-      { name:'Step-ups', reps:'3 rounds of 10 each leg', note:'Step one foot onto a sturdy chair, drive through that heel to stand up, step back down great for balance and legs' },
-      { name:'Glute Kickbacks', reps:'3 rounds of 12 each side', note:'On all fours, kick one leg straight back and up, squeezing your glute at the top keep your back flat' },
-      { name:'Single-leg Calf Raise', reps:'3 rounds of 10 each side', note:'Stand on one foot, hold a wall for balance, rise up onto your toes and lower slowly' },
+      { name:'Jump Squats (low)', reps:'3 sets of 8', note:'Squat down then explode up with a small jump, land softly by bending knees keep the jump low to protect your joints' },
+      { name:'Step-ups', reps:'3 sets of 10 each leg', note:'Step one foot onto a sturdy chair, drive through that heel to stand up, step back down great for balance and legs' },
+      { name:'Glute Kickbacks', reps:'3 sets of 12 each side', note:'On all fours, kick one leg straight back and up, squeezing your glute at the top keep your back flat' },
+      { name:'Single-leg Calf Raise', reps:'3 sets of 10 each side', note:'Stand on one foot, hold a wall for balance, rise up onto your toes and lower slowly' },
     ]},
     { day:'Day 6', focus:'Core & Balance', exercises:[
-      { name:'Plank Shoulder Taps', reps:'3 rounds of 10 each side', note:'In a full plank, tap one shoulder with the opposite hand the key is keeping your hips as still as possible' },
-      { name:'Reverse Crunch', reps:'3 rounds of 12', note:'Lie on back, curl your knees toward your chest using your lower abs, not momentum lower slowly' },
-      { name:'Side Plank (knee)', reps:'3 rounds, hold 20 seconds each side', note:'Stack your knees, lift hips off the floor and hold body makes a straight line from head to knees' },
-      { name:'Leg Lowering', reps:'3 rounds of 8', note:'Lie on back, raise both legs straight up, slowly lower them toward the floor without letting your lower back lift stop before it does' },
+      { name:'Plank Shoulder Taps', reps:'3 sets of 10 each side', note:'In a full plank, tap one shoulder with the opposite hand the key is keeping your hips as still as possible' },
+      { name:'Reverse Crunch', reps:'3 sets of 12', note:'Lie on back, curl your knees toward your chest using your lower abs, not momentum lower slowly' },
+      { name:'Side Plank (knee)', reps:'3 sets, hold 20 seconds each side', note:'Stack your knees, lift hips off the floor and hold body makes a straight line from head to knees' },
+      { name:'Leg Lowering', reps:'3 sets of 8', note:'Lie on back, raise both legs straight up, slowly lower them toward the floor without letting your lower back lift stop before it does' },
     ]},
     { day:'Day 7', focus:'Rest', exercises:[] },
   ],
   3: [
     { day:'Day 1', focus:'Full Body', exercises:[
-      { name:'Push-ups', reps:'4 rounds of 10', note:'Focus on perfect form no sagging hips, chest touches floor, full lockout at top' },
-      { name:'Jump Squats', reps:'3 rounds of 10', note:'Squat down, explode up as high as you can, land softly with bent knees absorb the landing' },
-      { name:'Plank', reps:'3 rounds, hold 35 seconds', note:'Full plank on hands and toes, keep everything tight core, glutes, legs' },
-      { name:'Hip Thrust', reps:'4 rounds of 15', note:'Really squeeze those glutes at the top and hold for a second quality over speed' },
+      { name:'Push-ups', reps:'4 sets of 10', note:'Focus on perfect form no sagging hips, chest touches floor, full lockout at top' },
+      { name:'Jump Squats', reps:'3 sets of 10', note:'Squat down, explode up as high as you can, land softly with bent knees absorb the landing' },
+      { name:'Plank', reps:'3 sets, hold 35 seconds', note:'Full plank on hands and toes, keep everything tight core, glutes, legs' },
+      { name:'Hip Thrust', reps:'4 sets of 15', note:'Really squeeze those glutes at the top and hold for a second quality over speed' },
     ]},
     { day:'Day 2', focus:'Rest / Walk', exercises:[] },
     { day:'Day 3', focus:'Upper Body', exercises:[
-      { name:'Decline Push-ups', reps:'3 rounds of 8', note:'Place feet on a chair, hands on floor shifts more work to your upper chest and shoulders' },
-      { name:'Diamond Push-ups', reps:'3 rounds of 8', note:'Place hands close together forming a diamond shape under your chest really targets the triceps' },
-      { name:'Australian Row', reps:'3 rounds of 10', note:'Under a table, pull chest all the way to the table the closer to horizontal you are, the harder it is' },
-      { name:'Pike Push-ups', reps:'3 rounds of 10', note:'Think of it as a shoulder press using your bodyweight hips high, lower your head between your hands' },
+      { name:'Decline Push-ups', reps:'3 sets of 8', note:'Place feet on a chair, hands on floor shifts more work to your upper chest and shoulders' },
+      { name:'Diamond Push-ups', reps:'3 sets of 8', note:'Place hands close together forming a diamond shape under your chest really targets the triceps' },
+      { name:'Australian Row', reps:'3 sets of 10', note:'Under a table, pull chest all the way to the table the closer to horizontal you are, the harder it is' },
+      { name:'Pike Push-ups', reps:'3 sets of 10', note:'Think of it as a shoulder press using your bodyweight hips high, lower your head between your hands' },
     ]},
     { day:'Day 4', focus:'Rest / Stretch', exercises:[] },
     { day:'Day 5', focus:'Lower Body', exercises:[
-      { name:'Bulgarian Split Squat', reps:'3 rounds of 8 each leg', note:'Rear foot rests on a chair behind you, front foot forward, lower your back knee toward the floor one of the best leg exercises' },
-      { name:'Squat Pulse', reps:'3 rounds of 20', note:'Hold the bottom of a squat and do small up-and-down pulses stay low the whole time, it burns!' },
-      { name:'Nordic Curl (assisted)', reps:'3 rounds of 5', note:'Hook feet under something heavy, start kneeling upright, slowly lower your body toward the floor use hands to catch yourself. Incredible for hamstrings' },
-      { name:'Single-leg Glute Bridge', reps:'3 rounds of 12 each side', note:'Same as glute bridge but one leg extended straight much harder, isolates each glute' },
+      { name:'Bulgarian Split Squat', reps:'3 sets of 8 each leg', note:'Rear foot rests on a chair behind you, front foot forward, lower your back knee toward the floor one of the best leg exercises' },
+      { name:'Squat Pulse', reps:'3 sets of 20', note:'Hold the bottom of a squat and do small up-and-down pulses stay low the whole time, it burns!' },
+      { name:'Nordic Curl (assisted)', reps:'3 sets of 5', note:'Hook feet under something heavy, start kneeling upright, slowly lower your body toward the floor use hands to catch yourself. Incredible for hamstrings' },
+      { name:'Single-leg Glute Bridge', reps:'3 sets of 12 each side', note:'Same as glute bridge but one leg extended straight much harder, isolates each glute' },
     ]},
     { day:'Day 6', focus:'Core & Balance', exercises:[
-      { name:'Full Plank to Forearm', reps:'3 rounds of 8 each arm', note:'Start in full plank, lower one arm at a time to forearms then push back up alternate which arm leads' },
-      { name:'V-sit Hold', reps:'3 rounds, hold 20 seconds', note:'Sit on floor, lean back slightly, lift legs straight your body forms a V shape. Hold and breathe' },
-      { name:'Side Plank', reps:'3 rounds, hold 25 seconds each side', note:'Full side plank on hand and feet (not knees), stack feet or stagger them, lift hips high' },
-      { name:'Mountain Climbers', reps:'3 rounds of 20 total', note:'In a plank, drive knees toward chest one at a time in a running motion go controlled, not fast' },
+      { name:'Full Plank to Forearm', reps:'3 sets of 8 each arm', note:'Start in full plank, lower one arm at a time to forearms then push back up alternate which arm leads' },
+      { name:'V-sit Hold', reps:'3 sets, hold 20 seconds', note:'Sit on floor, lean back slightly, lift legs straight your body forms a V shape. Hold and breathe' },
+      { name:'Side Plank', reps:'3 sets, hold 25 seconds each side', note:'Full side plank on hand and feet (not knees), stack feet or stagger them, lift hips high' },
+      { name:'Mountain Climbers', reps:'3 sets of 20 total', note:'In a plank, drive knees toward chest one at a time in a running motion go controlled, not fast' },
     ]},
     { day:'Day 7', focus:'Rest', exercises:[] },
   ],
   4: [
     { day:'Day 1', focus:'Full Body', exercises:[
-      { name:'Archer Push-ups', reps:'3 rounds of 6 each side', note:'Wide hand position, shift weight to one side as you lower the other arm stays nearly straight. A step toward one-arm push-ups' },
-      { name:'Pistol Squat (assisted)', reps:'3 rounds of 5 each leg', note:'Hold a doorframe or pole for balance, extend one leg forward and squat down on the other go as deep as you can' },
-      { name:'Plank', reps:'3 rounds, hold 45 seconds', note:'By now this should feel more manageable focus on breathing, not just surviving' },
-      { name:'Single-leg Hip Thrust', reps:'3 rounds of 12 each side', note:'One leg extended, drive through the planted heel, squeeze hard at the top' },
+      { name:'Archer Push-ups', reps:'3 sets of 6 each side', note:'Wide hand position, shift weight to one side as you lower the other arm stays nearly straight. A step toward one-arm push-ups' },
+      { name:'Pistol Squat (assisted)', reps:'3 sets of 5 each leg', note:'Hold a doorframe or pole for balance, extend one leg forward and squat down on the other go as deep as you can' },
+      { name:'Plank', reps:'3 sets, hold 45 seconds', note:'By now this should feel more manageable focus on breathing, not just surviving' },
+      { name:'Single-leg Hip Thrust', reps:'3 sets of 12 each side', note:'One leg extended, drive through the planted heel, squeeze hard at the top' },
     ]},
     { day:'Day 2', focus:'Rest / Walk', exercises:[] },
     { day:'Day 3', focus:'Upper Body', exercises:[
-      { name:'Close-grip Push-ups', reps:'4 rounds of 10', note:'Hands shoulder-width or slightly narrower, elbows stay close to your body as you lower heavy tricep and chest work' },
-      { name:'Wide Push-ups', reps:'4 rounds of 10', note:'Hands much wider than shoulders targets the outer chest. Go right after close-grip for maximum burn' },
-      { name:'Inverted Row', reps:'3 rounds of 10', note:'Under a table, body straight as a board, pull chest up to the table the more horizontal you are, the harder' },
-      { name:'Handstand Hold (wall)', reps:'3 rounds, hold 10 seconds', note:'Kick up carefully against a wall, arms straight, hold build shoulder and core stability. Always have something soft nearby' },
+      { name:'Close-grip Push-ups', reps:'4 sets of 10', note:'Hands shoulder-width or slightly narrower, elbows stay close to your body as you lower heavy tricep and chest work' },
+      { name:'Wide Push-ups', reps:'4 sets of 10', note:'Hands much wider than shoulders targets the outer chest. Go right after close-grip for maximum burn' },
+      { name:'Inverted Row', reps:'3 sets of 10', note:'Under a table, body straight as a board, pull chest up to the table the more horizontal you are, the harder' },
+      { name:'Handstand Hold (wall)', reps:'3 sets, hold 10 seconds', note:'Kick up carefully against a wall, arms straight, hold build shoulder and core stability. Always have something soft nearby' },
     ]},
     { day:'Day 4', focus:'Rest / Stretch', exercises:[] },
     { day:'Day 5', focus:'Lower Body', exercises:[
-      { name:'Pistol Squat (assisted)', reps:'3 rounds of 6 each leg', note:'Each session try to use the support a little less you\'re building toward a full unassisted pistol squat' },
-      { name:'Plyometric Lunge', reps:'3 rounds of 10 total', note:'Start in a lunge, jump and switch legs in the air land softly, immediately go into the next lunge' },
-      { name:'Hamstring Curl (towel)', reps:'3 rounds of 8', note:'Lie on a smooth floor, heels on a folded towel, bend knees to curl your heels toward your glutes the floor slides under you' },
-      { name:'Box Jump (low)', reps:'3 rounds of 6', note:'Jump onto a low surface (a step, low bench), land softly with bent knees, step back down never jump back down' },
+      { name:'Pistol Squat (assisted)', reps:'3 sets of 6 each leg', note:'Each session try to use the support a little less you\'re building toward a full unassisted pistol squat' },
+      { name:'Plyometric Lunge', reps:'3 sets of 10 total', note:'Start in a lunge, jump and switch legs in the air land softly, immediately go into the next lunge' },
+      { name:'Hamstring Curl (towel)', reps:'3 sets of 8', note:'Lie on a smooth floor, heels on a folded towel, bend knees to curl your heels toward your glutes the floor slides under you' },
+      { name:'Box Jump (low)', reps:'3 sets of 6', note:'Jump onto a low surface (a step, low bench), land softly with bent knees, step back down never jump back down' },
     ]},
     { day:'Day 6', focus:'Core & Balance', exercises:[
-      { name:'L-sit Hold (chairs)', reps:'3 rounds, hold 10 seconds', note:'Press down on two chairs on either side of you, straighten arms and try to lift your hips and legs off the seat incredibly hard, incredibly rewarding' },
-      { name:'Dragon Flag (tuck)', reps:'3 rounds of 5', note:'Lie on a bench, hold something behind your head, tuck knees and lift your entire lower body control the lowering phase' },
-      { name:'Windshield Wipers', reps:'3 rounds of 8 each side', note:'Lie on back, raise legs straight up, rotate them side to side like wipers keep shoulders on the floor' },
-      { name:'Hollow Body Hold', reps:'3 rounds, hold 25 seconds', note:'Lie on back, press lower back into floor, extend arms overhead and lift legs your whole body curves like a bowl. Core fundamental' },
+      { name:'L-sit Hold (chairs)', reps:'3 sets, hold 10 seconds', note:'Press down on two chairs on either side of you, straighten arms and try to lift your hips and legs off the seat incredibly hard, incredibly rewarding' },
+      { name:'Dragon Flag (tuck)', reps:'3 sets of 5', note:'Lie on a bench, hold something behind your head, tuck knees and lift your entire lower body control the lowering phase' },
+      { name:'Windshield Wipers', reps:'3 sets of 8 each side', note:'Lie on back, raise legs straight up, rotate them side to side like wipers keep shoulders on the floor' },
+      { name:'Hollow Body Hold', reps:'3 sets, hold 25 seconds', note:'Lie on back, press lower back into floor, extend arms overhead and lift legs your whole body curves like a bowl. Core fundamental' },
     ]},
     { day:'Day 7', focus:'Rest', exercises:[] },
   ],
@@ -4177,7 +4517,60 @@ var caliProgram = {
 
 var caliDoneKey = function(week, dayIdx, exIdx) { return 'w'+week+'_d'+dayIdx+'_e'+exIdx; };
 
+var _caliTrackerYear = new Date().getFullYear();
+var _caliTrackerMonth = new Date().getMonth();
+
+function caliTrackerShift(dir) {
+  _caliTrackerMonth += dir;
+  if (_caliTrackerMonth > 11) { _caliTrackerMonth = 0; _caliTrackerYear++; }
+  if (_caliTrackerMonth < 0) { _caliTrackerMonth = 11; _caliTrackerYear--; }
+  renderCaliTracker();
+}
+
+function renderCaliTracker() {
+  var labelEl = document.getElementById('cali-tracker-label');
+  var namesEl = document.getElementById('cali-tracker-daynames');
+  var gridEl  = document.getElementById('cali-tracker-grid');
+  if (!labelEl || !namesEl || !gridEl) return;
+
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var dayNames = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  labelEl.textContent = months[_caliTrackerMonth] + ' ' + _caliTrackerYear;
+
+  namesEl.innerHTML = dayNames.map(function(d) {
+    return '<div style="text-align:center;font-family:\'Nunito\',sans-serif;font-size:0.7rem;color:var(--gray);padding:2px 0;">'+d+'</div>';
+  }).join('');
+
+  // Collect all dates that have been logged
+  var doneSet = {};
+  Object.keys(caliLog).forEach(function(k) {
+    if (k.startsWith('date_w') && caliLog[k]) doneSet[caliLog[k]] = true;
+  });
+
+  var today = new Date(); today.setHours(0,0,0,0);
+  var first = new Date(_caliTrackerYear, _caliTrackerMonth, 1);
+  var startDay = first.getDay();
+  var daysInMonth = new Date(_caliTrackerYear, _caliTrackerMonth+1, 0).getDate();
+
+  var html = '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">';
+  for (var i=0; i<startDay; i++) html += '<div></div>';
+  for (var day=1; day<=daysInMonth; day++) {
+    var dateStr = _caliTrackerYear+'-'+String(_caliTrackerMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    var isToday = new Date(_caliTrackerYear,_caliTrackerMonth,day).getTime()===today.getTime();
+    var done = !!doneSet[dateStr];
+    var bg = done ? 'var(--black)' : (isToday ? '#e8e8e5' : 'transparent');
+    var col = done ? 'white' : 'var(--black)';
+    var outline = isToday && !done ? 'outline:1px solid #c8c8c5;' : '';
+    html += '<div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;background:'+bg+';color:'+col+';'+outline+'">'+
+      (done ? '🤍' : day) +
+    '</div>';
+  }
+  html += '</div>';
+  gridEl.innerHTML = html;
+}
+
 function renderCalisthenics() {
+  renderCaliTracker();
   var weekBtns = document.getElementById('cali-week-btns');
   weekBtns.innerHTML = [1,2,3,4].map(function(w) {
     var active = w === caliWeek;
@@ -4187,10 +4580,19 @@ function renderCalisthenics() {
   var planEl = document.getElementById('cali-plan');
   planEl.innerHTML = plan.map(function(d, di) {
     var isRest = d.exercises.length === 0;
+    var dateKey = 'date_w'+caliWeek+'_d'+di;
+    var savedDate = caliLog[dateKey] || '';
     return '<div style="margin-bottom:1.5rem;border:1px solid #c8c8c5;padding:1rem;">' +
-      '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.8rem;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.5rem;">' +
         '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + d.day + '</div>' +
         '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.88rem;">' + d.focus + '</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;">' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.62rem;color:var(--gray);letter-spacing:0.08em;text-transform:uppercase;flex-shrink:0;">Date done</div>' +
+        '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.8rem;color:'+(savedDate?'var(--black)':'var(--gray)')+';cursor:pointer;border-bottom:1px solid #c8c8c5;padding:0.1rem 0;min-width:180px;min-height:1.2rem;" onclick="caliOpenCal(\''+dateKey+'\',this)">'+
+          (savedDate ? caliFormatDate(savedDate) : '&nbsp;') +
+        '</div>' +
+        (savedDate ? '<span onclick="caliClearDate(\''+dateKey+'\')" style="font-family:\'Nunito\',sans-serif;font-size:0.7rem;color:#ccc;cursor:pointer;margin-left:0.3rem;">×</span>' : '') +
       '</div>' +
       (isRest
         ? '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.82rem;color:var(--gray);padding:0.5rem 0;">Take it easy 🤍 stretch or go for a walk</div>'
@@ -4219,6 +4621,128 @@ function caliSetWeek(w) { caliWeek = w; renderCalisthenics(); }
 
 function caliToggle(key) {
   caliLog[key] = !caliLog[key];
+  localStorage.setItem('cali_log', JSON.stringify(caliLog));
+  if (window.syncToCloud) window.syncToCloud('cali_log', caliLog);
+  renderCalisthenics();
+}
+
+function caliFormatDate(val) {
+  if (!val) return 'Pick a date';
+  var parts = val.split('-');
+  var d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  var today = new Date(); today.setHours(0,0,0,0);
+  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var str = days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+  if (d.getTime() === today.getTime()) str += ' — Today';
+  return str;
+}
+
+var _caliCalKey = null;
+var _caliCalEl = null;
+var _caliCalYear = null;
+var _caliCalMonth = null;
+
+function caliOpenCal(key, el) {
+  var existing = document.getElementById('cali-cal-popup');
+  if (existing) { existing.remove(); if (_caliCalKey === key) { _caliCalKey=null; return; } }
+  _caliCalKey = key;
+  _caliCalEl = el;
+  var saved = caliLog[key] || '';
+  var now = saved ? new Date(saved.replace(/-/g,'/')) : new Date();
+  _caliCalYear = now.getFullYear();
+  _caliCalMonth = now.getMonth();
+  caliRenderCal(saved);
+  document.addEventListener('click', caliCloseCal, true);
+}
+
+function caliRenderCal(selectedVal) {
+  var old = document.getElementById('cali-cal-popup');
+  if (old) old.remove();
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var days = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  var today = new Date(); today.setHours(0,0,0,0);
+  var first = new Date(_caliCalYear, _caliCalMonth, 1);
+  var startDay = first.getDay();
+  var daysInMonth = new Date(_caliCalYear, _caliCalMonth+1, 0).getDate();
+
+  var popup = document.createElement('div');
+  popup.id = 'cali-cal-popup';
+  popup.style.cssText = 'position:fixed;z-index:9999;background:white;border:1px solid #c8c8c5;padding:1rem;min-width:260px;box-shadow:0 4px 20px rgba(0,0,0,0.1);';
+
+  var rect = _caliCalEl.getBoundingClientRect();
+  var top = rect.bottom + 8;
+  var left = rect.left;
+  if (left + 270 > window.innerWidth) left = window.innerWidth - 278;
+  popup.style.top = top + 'px';
+  popup.style.left = left + 'px';
+
+  var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">' +
+    '<button onclick="caliCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.2rem;color:var(--gray);padding:0 0.3rem;">‹</button>' +
+    '<div style="font-family:\'Nunito\',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">'+months[_caliCalMonth]+' '+_caliCalYear+'</div>' +
+    '<button onclick="caliCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.2rem;color:var(--gray);padding:0 0.3rem;">›</button>' +
+  '</div>' +
+  '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;">' +
+    days.map(function(d){ return '<div style="text-align:center;font-family:\'Nunito\',sans-serif;font-size:0.6rem;color:var(--gray);padding:2px 0;">'+d+'</div>'; }).join('') +
+  '</div>' +
+  '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">';
+
+  for (var i=0; i<startDay; i++) html += '<div></div>';
+  for (var day=1; day<=daysInMonth; day++) {
+    var dateStr = _caliCalYear+'-'+String(_caliCalMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    var isToday = new Date(_caliCalYear,_caliCalMonth,day).getTime()===today.getTime();
+    var isSel = dateStr === selectedVal;
+    var bg = isSel ? 'var(--black)' : (isToday ? '#e8e8e5' : 'transparent');
+    var col = isSel ? 'white' : 'var(--black)';
+    html += '<div onclick="caliPickDate(\''+dateStr+'\')" style="text-align:center;font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;padding:5px 2px;cursor:pointer;background:'+bg+';color:'+col+';">'+day+'</div>';
+  }
+  html += '</div>';
+  popup.innerHTML = html;
+  document.body.appendChild(popup);
+}
+
+function caliCalShift(dir) {
+  _caliCalMonth += dir;
+  if (_caliCalMonth > 11) { _caliCalMonth=0; _caliCalYear++; }
+  if (_caliCalMonth < 0) { _caliCalMonth=11; _caliCalYear--; }
+  caliRenderCal(caliLog[_caliCalKey]||'');
+}
+
+function caliPickDate(dateStr) {
+  caliLog[_caliCalKey] = dateStr;
+  localStorage.setItem('cali_log', JSON.stringify(caliLog));
+  if (window.syncToCloud) window.syncToCloud('cali_log', caliLog);
+  if (_caliCalEl) {
+    _caliCalEl.textContent = caliFormatDate(dateStr);
+    _caliCalEl.style.color = 'var(--black)';
+  }
+  var popup = document.getElementById('cali-cal-popup');
+  if (popup) popup.remove();
+  document.removeEventListener('click', caliCloseCal, true);
+  _caliCalKey = null;
+  renderCaliTracker();
+}
+
+function caliCloseCal(e) {
+  var popup = document.getElementById('cali-cal-popup');
+  if (!popup) return;
+  if (!popup.contains(e.target) && e.target !== _caliCalEl) {
+    popup.remove();
+    document.removeEventListener('click', caliCloseCal, true);
+    _caliCalKey = null;
+  }
+}
+
+function caliClearDate(key) {
+  delete caliLog[key];
+  localStorage.setItem('cali_log', JSON.stringify(caliLog));
+  if (window.syncToCloud) window.syncToCloud('cali_log', caliLog);
+  renderCalisthenics();
+  renderCaliTracker();
+}
+
+function caliSaveDate(key, value) {
+  caliLog[key] = value;
   localStorage.setItem('cali_log', JSON.stringify(caliLog));
   if (window.syncToCloud) window.syncToCloud('cali_log', caliLog);
   renderCalisthenics();
