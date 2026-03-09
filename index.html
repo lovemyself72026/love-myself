@@ -1405,11 +1405,11 @@ function renderSchedCal() {
       const hasData    = dayHasData(dateStr);
       const isFuture   = dateStr > todayStr;
 
-      const bg     = isSelected ? 'var(--black)' : hasData ? '#0a0a0a' : 'transparent';
-      const border  = hasData || isSelected ? 'var(--black)' : '#c8c8c5';
-      const color   = (isSelected || hasData) ? 'var(--white)' : isToday ? 'var(--black)' : 'var(--gray)';
+      const bg      = isSelected ? 'var(--black)' : hasData ? '#e8e8e5' : 'transparent';
+      const border  = isSelected ? 'var(--black)' : hasData ? '#0a0a0a' : '#c8c8c5';
+      const color   = isSelected ? 'var(--white)' : isToday ? 'var(--black)' : hasData ? 'var(--black)' : 'var(--gray)';
       const opacity = isFuture && !isSelected ? '0.35' : '1';
-      const fw      = isToday ? '400' : '300';
+      const fw      = (isToday || isSelected) ? '400' : '300';
 
       html += `<div onclick="schedCalJump('${dateStr}')" style="
         display:flex;align-items:center;justify-content:center;
