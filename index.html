@@ -13,9 +13,18 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400&family=Nunito:wght@200;300;400&display=swap" rel="stylesheet">
-<script>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getDatabase, ref, set, get, onValue, update } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+  const firebaseConfig = {
+    databaseURL: 'https://lovemyselfapp-default-rtdb.firebaseio.com'
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const DB_REF = ref(db, 'my-love-myself-data');
+
   window._rawLS = localStorage.setItem.bind(localStorage);
-  const DB_URL = 'https://lovemyselfapp-default-rtdb.firebaseio.com/my-love-myself-data';
   const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items',
     'whoi_history','my_books','habit_tracker','cali_log','wia2','wia2aff','wia2q','wia2wq',
     'hlb','hlr','ass_checkin','ass_log','ass_entries_asking','ass_entries_giving',
@@ -33,126 +42,65 @@
     el.textContent = icons[state] || '';
   }
 
-  const PROXY = 'https://corsproxy.io/?';
-
-  async function safeFetch(url, options) {
-    try {
-      const res = await fetch(url, options);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res;
-    } catch(e) {
-      // Fallback to CORS proxy
-      const proxied = await fetch(PROXY + encodeURIComponent(url), options);
-      if (!proxied.ok) throw new Error('HTTP ' + proxied.status);
-      return proxied;
-    }
+  function shouldSync(key) {
+    return SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
   }
 
-  window.syncToCloud = async function(key, value) {
-    const shouldSync = SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
-    if (!shouldSync) return;
-    try {
-      await safeFetch(DB_URL + '/' + key + '.json', {
-        method: 'PUT',
-        body: JSON.stringify(value),
-        headers: {'Content-Type': 'application/json'}
-      });
-      setSyncStatus('ok', 'Last saved: ' + new Date().toLocaleTimeString());
-    } catch(e) {
-      console.error('[Sync] Push failed for key "' + key + '":', e.message);
-      setSyncStatus('error', 'Push failed: ' + e.message);
-    }
-  };
+  function applyCloudData(data) {
+    if (!data) return;
+    let changed = false;
+    Object.keys(data).forEach(function(k) {
+      const incoming = JSON.stringify(data[k]);
+      if (localStorage.getItem(k) !== incoming) {
+        window._rawLS(k, incoming);
+        changed = true;
+      }
+    });
+    if (changed && typeof reloadAllData === 'function') reloadAllData();
+  }
 
-  // Intercept ALL localStorage.setItem calls to auto-push to Firebase
+  // Real-time listener — phone updates instantly when laptop writes
+  onValue(DB_REF, function(snapshot) {
+    const data = snapshot.val();
+    if (data) {
+      applyCloudData(data);
+      setSyncStatus('ok', 'Live synced: ' + new Date().toLocaleTimeString());
+    }
+  }, function(err) {
+    setSyncStatus('error', 'Live sync error: ' + err.message);
+  });
+
+  // Intercept localStorage writes and push to Firebase instantly
   localStorage.setItem = function(key, value) {
     window._rawLS(key, value);
-    const shouldSync = SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
-    if (shouldSync) {
-      setSyncStatus('syncing', '');
-      try {
-        const parsed = JSON.parse(value);
-        window.syncToCloud(key, parsed);
-      } catch(e) {
-        window.syncToCloud(key, value);
-      }
-    }
-  };
-
-  window.pullFromCloud = async function(showMsg) {
-    if (showMsg) setSyncStatus('syncing', '');
-    try {
-      const res = await fetch(DB_URL + '.json');
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      if (!data) {
-        if (showMsg) { setSyncStatus('ok', 'No cloud data yet'); alert('No data found in cloud yet.'); }
-        return;
-      }
-      let changed = false;
-      Object.keys(data).forEach(function(k) {
-        let value = data[k];
-        if (value && typeof value === 'object' && value.data !== undefined && value.ts !== undefined) {
-          value = value.data;
-        }
-        const incoming = JSON.stringify(value);
-        const current = localStorage.getItem(k);
-        if (current !== incoming) {
-          window._rawLS(k, incoming);
-          changed = true;
-        }
-      });
-      if (changed && typeof reloadAllData === 'function') reloadAllData();
-      setSyncStatus('ok', 'Last synced: ' + new Date().toLocaleTimeString());
-      if (showMsg) alert('✅ Synced! 🤍');
-    } catch(e) {
-      console.error('[Sync] Pull failed:', e.message);
-      setSyncStatus('error', 'Pull failed: ' + e.message);
-      if (showMsg) alert('❌ Sync failed: ' + e.message);
-    }
-  };
-
-  // Force overwrite ALL local data with cloud data, then reload the page
-  window.forceRestoreFromCloud = async function() {
-    if (!confirm('This will replace ALL local data with your cloud data and reload the app. Continue?')) return;
+    if (!shouldSync(key)) return;
     setSyncStatus('syncing', '');
     try {
-      const res = await safeFetch(DB_URL + '.json');
-      const data = await res.json();
-      if (!data) { alert('No cloud data found.'); return; }
-      // Clear all existing local data first
-      localStorage.clear();
-      // Write everything from cloud
-      Object.keys(data).forEach(function(k) {
-        let value = data[k];
-        if (value && typeof value === 'object' && value.data !== undefined && value.ts !== undefined) {
-          value = value.data;
-        }
-        window._rawLS(k, JSON.stringify(value));
-      });
-      alert('✅ Restored from cloud! Reloading now… 🤍');
-      location.reload();
+      const parsed = JSON.parse(value);
+      var patch = {};
+      patch[key] = parsed;
+      update(DB_REF, patch)
+        .then(function(){ setSyncStatus('ok', 'Saved: ' + new Date().toLocaleTimeString()); })
+        .catch(function(e){ setSyncStatus('error', 'Save failed: ' + e.message); });
     } catch(e) {
-      setSyncStatus('error', 'Restore failed: ' + e.message);
-      alert('❌ Restore failed: ' + e.message);
+      var patch2 = {};
+      patch2[key] = value;
+      update(DB_REF, patch2)
+        .then(function(){ setSyncStatus('ok', 'Saved: ' + new Date().toLocaleTimeString()); })
+        .catch(function(e2){ setSyncStatus('error', 'Save failed: ' + e2.message); });
     }
   };
 
-  // Push ALL local sync keys to cloud in one single request
+  // Manual push all — keep for safety
   window.pushAllToCloud = async function() {
     setSyncStatus('syncing', '');
     var payload = {};
     var count = 0;
-    // Collect all SYNC_KEYS
     for (var i = 0; i < SYNC_KEYS.length; i++) {
       var k = SYNC_KEYS[i];
       var val = localStorage.getItem(k);
-      if (val !== null) {
-        try { payload[k] = JSON.parse(val); } catch(e) { payload[k] = val; }
-        count++;
-      }
+      if (val !== null) { try { payload[k] = JSON.parse(val); } catch(e) { payload[k] = val; } count++; }
     }
-    // Collect prefix keys
     for (var j = 0; j < localStorage.length; j++) {
       var key = localStorage.key(j);
       if (SYNC_PREFIXES.some(function(p){ return key.startsWith(p); })) {
@@ -161,13 +109,8 @@
       }
     }
     try {
-      const res = await fetch(DB_URL + '.json', {
-        method: 'PATCH',
-        body: JSON.stringify(payload),
-        headers: {'Content-Type': 'application/json'}
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      setSyncStatus('ok', 'Full push done: ' + count + ' keys at ' + new Date().toLocaleTimeString());
+      await update(DB_REF, payload);
+      setSyncStatus('ok', 'Pushed ' + count + ' items at ' + new Date().toLocaleTimeString());
       alert('✅ Pushed ' + count + ' items to cloud! 🤍');
     } catch(e) {
       setSyncStatus('error', 'Push failed: ' + e.message);
@@ -175,10 +118,39 @@
     }
   };
 
-  window.addEventListener('load', function() {
-    setTimeout(function(){ window.pullFromCloud(false); }, 1500);
-    setInterval(function(){ window.pullFromCloud(false); }, 30000);
-  });
+  // Manual pull all
+  window.pullFromCloud = async function(showMsg) {
+    setSyncStatus('syncing', '');
+    try {
+      const snapshot = await get(DB_REF);
+      const data = snapshot.val();
+      if (!data) { if (showMsg) alert('No cloud data found.'); return; }
+      applyCloudData(data);
+      setSyncStatus('ok', 'Pulled at ' + new Date().toLocaleTimeString());
+      if (showMsg) alert('✅ Synced! 🤍');
+    } catch(e) {
+      setSyncStatus('error', 'Pull failed: ' + e.message);
+      if (showMsg) alert('❌ Pull failed: ' + e.message);
+    }
+  };
+
+  // Force restore
+  window.forceRestoreFromCloud = async function() {
+    if (!confirm('This will replace ALL local data with your cloud data and reload the app. Continue?')) return;
+    setSyncStatus('syncing', '');
+    try {
+      const snapshot = await get(DB_REF);
+      const data = snapshot.val();
+      if (!data) { alert('No cloud data found.'); return; }
+      localStorage.clear();
+      Object.keys(data).forEach(function(k) { window._rawLS(k, JSON.stringify(data[k])); });
+      alert('✅ Restored! Reloading… 🤍');
+      location.reload();
+    } catch(e) {
+      setSyncStatus('error', 'Restore failed: ' + e.message);
+      alert('❌ Restore failed: ' + e.message);
+    }
+  };
 </script>
 
 <!-- Cloudinary image upload — outside module so it's globally accessible -->
