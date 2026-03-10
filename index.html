@@ -98,6 +98,33 @@
     }
   };
 
+  // Force overwrite ALL local data with cloud data, then reload the page
+  window.forceRestoreFromCloud = async function() {
+    if (!confirm('This will replace ALL local data with your cloud data and reload the app. Continue?')) return;
+    setSyncStatus('syncing', '');
+    try {
+      const res = await fetch(DB_URL + '.json');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      if (!data) { alert('No cloud data found.'); return; }
+      // Clear all existing local data first
+      localStorage.clear();
+      // Write everything from cloud
+      Object.keys(data).forEach(function(k) {
+        let value = data[k];
+        if (value && typeof value === 'object' && value.data !== undefined && value.ts !== undefined) {
+          value = value.data;
+        }
+        window._rawLS(k, JSON.stringify(value));
+      });
+      alert('✅ Restored from cloud! Reloading now… 🤍');
+      location.reload();
+    } catch(e) {
+      setSyncStatus('error', 'Restore failed: ' + e.message);
+      alert('❌ Restore failed: ' + e.message);
+    }
+  };
+
   // Push ALL local sync keys to cloud (force full backup)
   window.pushAllToCloud = async function() {
     setSyncStatus('syncing', '');
@@ -382,6 +409,7 @@
       <span id="sync-status" title="" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.08em;color:#888;cursor:default;"></span>
       <button onclick="window.pullFromCloud(true)" title="Pull latest from cloud" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:#888;padding:0.3rem 0.7rem;cursor:pointer;">↓ pull</button>
       <button onclick="window.pushAllToCloud()" title="Push all local data to cloud" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:#888;padding:0.3rem 0.7rem;cursor:pointer;">↑ push</button>
+      <button onclick="window.forceRestoreFromCloud()" title="Wipe local data and restore everything from cloud" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:#c0392b;padding:0.3rem 0.7rem;cursor:pointer;">⟳ restore</button>
     </div>
   </div>
   <div class="nav-tabs">
