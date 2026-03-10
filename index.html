@@ -238,7 +238,7 @@
     <button class="nav-tab active" onclick="showSection('home')">Home</button>
     <button class="nav-tab" onclick="showSection('vision')">Vision</button>
     <button class="nav-tab" onclick="showSection('schedule')">Schedule</button>
-    <button class="nav-tab" onclick="showSection('affirmations')">Journal</button>
+    <button class="nav-tab" onclick="showSection('affirmations');setTimeout(()=>showJournalTab('mejournal'),100)">Me</button>
   </div>
 </nav>
 
@@ -538,42 +538,107 @@
 
   <!-- Journal sub-tabs -->
   <div id="journal-tabs" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-    <button class="journal-tab active" onclick="showJournalTab('belief')" id="jtab-belief">Belief</button>
-    <button class="journal-tab" onclick="showJournalTab('vent')" id="jtab-vent">Journal</button>
-    <button class="journal-tab" onclick="showJournalTab('books')" id="jtab-books">Books</button>
-    <button class="journal-tab" onclick="showJournalTab('wins')" id="jtab-wins">Wins</button>
+    <button class="journal-tab active" onclick="showJournalTab('mejournal')" id="jtab-mejournal">Me</button>
+    <button class="journal-tab" onclick="showJournalTab('belief')" id="jtab-belief">Belief</button>
+    <button class="journal-tab" onclick="showJournalTab('journalbookswins')" id="jtab-journalbookswins">Wins</button>
   </div>
 
-    <!-- Books sub-section -->
-  <div id="jsub-books" style="display:none;">
-    <!-- Books I've Read -->
-    <div>
-      <div class="subtitle">My reading list</div>
-      <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:1rem;">
-        <h2 style="margin:0;">Books I've read.</h2>
-        <span id="books-count" style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
+    <!-- Me sub-section (mirrors home Me card links) -->
+  <div id="jsub-mejournal" style="display:none;">
+    <div style="display:flex;flex-direction:column;gap:0;">
+      <div onclick="showSection('me');setTimeout(()=>showMeTab('whiam'),100)" style="cursor:pointer;padding:0.9rem 0;border-bottom:1px solid var(--light);display:flex;align-items:center;justify-content:space-between;transition:color 0.2s;" onmouseover="this.style.color='var(--black)'" onmouseout="this.style.color=''">
+        <span style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:inherit;">Who I Am</span>
+        <span style="font-size:1rem;color:var(--gray);">›</span>
       </div>
-      <div style="border:1px solid #c8c8c5;padding:1.5rem;margin-bottom:1rem;">
-        <input id="book-input" placeholder="Book title..." onkeydown="if(event.key==='Enter')addBook()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
-        <input id="book-author" placeholder="Author (optional)" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:1rem;">
-        <button class="btn fill" onclick="addBook()">Add book</button>
+      <div onclick="showSection('me');setTimeout(()=>showMeTab('assertive'),100)" style="cursor:pointer;padding:0.9rem 0;border-bottom:1px solid var(--light);display:flex;align-items:center;justify-content:space-between;transition:color 0.2s;" onmouseover="this.style.color='var(--black)'" onmouseout="this.style.color=''">
+        <span style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:inherit;">Assertive</span>
+        <span style="font-size:1rem;color:var(--gray);">›</span>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-        <button onclick="changeBooksMonth(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
-        <span id="books-month-label" style="font-family:'Nunito',sans-serif;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
-        <button onclick="changeBooksMonth(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
+      <div onclick="showSection('me');setTimeout(()=>showMeTab('believe'),100)" style="cursor:pointer;padding:0.9rem 0;border-bottom:1px solid var(--light);display:flex;align-items:center;justify-content:space-between;transition:color 0.2s;" onmouseover="this.style.color='var(--black)'" onmouseout="this.style.color=''">
+        <span style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:inherit;">Believe</span>
+        <span style="font-size:1rem;color:var(--gray);">›</span>
       </div>
-      <div id="books-list"></div>
+      <div onclick="showSection('me');setTimeout(()=>showMeTab('rightforme'),100)" style="cursor:pointer;padding:0.9rem 0;border-bottom:1px solid var(--light);display:flex;align-items:center;justify-content:space-between;transition:color 0.2s;" onmouseover="this.style.color='var(--black)'" onmouseout="this.style.color=''">
+        <span style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:inherit;">Right For Me</span>
+        <span style="font-size:1rem;color:var(--gray);">›</span>
+      </div>
+      <div onclick="showSection('me');setTimeout(()=>showMeTab('balance'),100)" style="cursor:pointer;padding:0.9rem 0;display:flex;align-items:center;justify-content:space-between;transition:color 0.2s;" onmouseover="this.style.color='var(--black)'" onmouseout="this.style.color=''">
+        <span style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:inherit;">Balance</span>
+        <span style="font-size:1rem;color:var(--gray);">›</span>
+      </div>
     </div>
   </div>
 
+    <!-- Books sub-section -->
+  <!-- Combined Wins / Journal / Books tab -->
+  <div id="jsub-journalbookswins" style="display:none;">
+    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+      <button class="balance-sub-tab active" onclick="showJBWTab('wins')" id="jbwtab-wins">Wins</button>
+      <button class="balance-sub-tab" onclick="showJBWTab('vent')" id="jbwtab-vent">Journal</button>
+      <button class="balance-sub-tab" onclick="showJBWTab('books')" id="jbwtab-books">Books</button>
+    </div>
+
+    <div id="jsub-wins">
+      <div style="margin-bottom:2rem;">
+        <div class="subtitle">Celebrate myself</div>
+        <h2 style="margin-bottom:1rem;">My wins.</h2>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <button onclick="changeWinsDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
+          <span id="wins-date-picker-label" onclick="document.getElementById('wins-date-picker').showPicker?document.getElementById('wins-date-picker').showPicker():document.getElementById('wins-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="wins-date-picker" onchange="loadWinsDay()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
+          <button onclick="changeWinsDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
+        </div>
+        <div style="border:1px solid #c8c8c5;padding:2rem;margin-bottom:1.5rem;">
+          <div style="font-family:'Lora',serif;font-style:italic;font-size:1.05rem;margin-bottom:1rem;">Add a win — big or small, they all count</div>
+          <input id="win-input" placeholder="e.g. I got out of bed today" onkeydown="if(event.key==='Enter')addWin()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1.2rem;">
+          <button class="btn fill" onclick="addWin()">Add win</button>
+        </div>
+        <div id="wins-list"></div>
+      </div>
+    </div>
+
+    <div id="jsub-vent" style="display:none;">
+      <div>
+        <div id="vent-section" class="subtitle" style="margin-bottom:0.5rem;">Let it all out</div>
+        <h2 style="margin-bottom:1rem;">Journal.</h2>
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Your safe space. No judgment 🤍</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <button onclick="changeVentDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
+          <span id="vent-date-picker-label" onclick="document.getElementById('vent-date-picker').showPicker?document.getElementById('vent-date-picker').showPicker():document.getElementById('vent-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="vent-date-picker" onchange="loadVentDay()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
+          <button onclick="changeVentDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
+        </div>
+        <textarea id="vent-input" placeholder="Let it all out here..." rows="8" oninput="saveVentAuto()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.5rem 0;margin-bottom:1rem;min-height:150px;"></textarea>
+        <div id="vent-entries" style="margin-top:1rem;"></div>
+      </div>
+    </div>
+
+    <div id="jsub-books" style="display:none;">
+      <div>
+        <div class="subtitle">My reading list</div>
+        <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:1rem;">
+          <h2 style="margin:0;">Books I've read.</h2>
+          <span id="books-count" style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
+        </div>
+        <div style="border:1px solid #c8c8c5;padding:1.5rem;margin-bottom:1rem;">
+          <input id="book-input" placeholder="Book title..." onkeydown="if(event.key==='Enter')addBook()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
+          <input id="book-author" placeholder="Author (optional)" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:1rem;">
+          <button class="btn fill" onclick="addBook()">Add book</button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <button onclick="changeBooksMonth(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
+          <span id="books-month-label" style="font-family:'Nunito',sans-serif;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
+          <button onclick="changeBooksMonth(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
+        </div>
+        <div id="books-list"></div>
+      </div>
+    </div>
+  </div><!-- end jsub-journalbookswins -->
+
   <!-- Belief sub-section -->
-  <div id="jsub-belief">
+  <div id="jsub-belief" style="display:none;">
     <div>
       <div class="subtitle">Rewire your mind</div>
       <h2 style="margin-bottom:0.3rem;">Change your belief.</h2>
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Simple. Daily. It works over time.</div>
-
       <div style="border:1px solid #c8c8c5;padding:1.2rem;margin-bottom:1.5rem;">
         <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Now I choose to believe</div>
         <input type="text" id="belief-new" placeholder="e.g. I am enough, always." onkeydown="if(event.key==='Enter')document.getElementById('belief-old').focus()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:0.9rem;">
@@ -592,49 +657,9 @@
           </div>
         </div>
       </div>
-
       <div id="belief-list"></div>
     </div>
   </div>
-
-  <!-- Vent sub-section -->
-  <div id="jsub-vent" style="display:none;">
-    <!-- I need to vent -->
-    <div>
-      <div id="vent-section" class="subtitle" style="margin-bottom:0.5rem;">Let it all out</div>
-      <h2 style="margin-bottom:1rem;">Journal.</h2>
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Your safe space. No judgment 🤍</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-        <button onclick="changeVentDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
-        <span id="vent-date-picker-label" onclick="document.getElementById('vent-date-picker').showPicker?document.getElementById('vent-date-picker').showPicker():document.getElementById('vent-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="vent-date-picker" onchange="loadVentDay()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
-        <button onclick="changeVentDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
-      </div>
-      <textarea id="vent-input" placeholder="Let it all out here..." rows="8" oninput="saveVentAuto()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.5rem 0;margin-bottom:1rem;min-height:150px;"></textarea>
-      <div id="vent-entries" style="margin-top:1rem;"></div>
-    </div>
-
-  </div>
-
-  <!-- Wins sub-section -->
-  <div id="jsub-wins" style="display:none;">
-    <!-- My Wins -->
-  <div style="margin-bottom:2rem;">
-    <div class="subtitle">Celebrate myself</div>
-    <h2 style="margin-bottom:1rem;">My wins.</h2>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-      <button onclick="changeWinsDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
-      <span id="wins-date-picker-label" onclick="document.getElementById('wins-date-picker').showPicker?document.getElementById('wins-date-picker').showPicker():document.getElementById('wins-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="wins-date-picker" onchange="loadWinsDay()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
-      <button onclick="changeWinsDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
-    </div>
-    <div style="border:1px solid #c8c8c5;padding:2rem;margin-bottom:1.5rem;">
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:1.05rem;margin-bottom:1rem;">Add a win — big or small, they all count</div>
-      <input id="win-input" placeholder="e.g. I got out of bed today" onkeydown="if(event.key==='Enter')addWin()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1.2rem;">
-      <button class="btn fill" onclick="addWin()">Add win</button>
-    </div>
-    <div id="wins-list"></div>
-  </div>
-
-  </div><!-- end jsub-wins -->
 
 </div>
 
@@ -750,14 +775,23 @@ function goToScheduleItem(elId) {
 }
 
 function showJournalTab(tab) {
-  ['books','belief','vent','wins'].forEach(t => {
-    document.getElementById('jsub-' + t).style.display = t === tab ? 'block' : 'none';
-    document.getElementById('jtab-' + t).classList.toggle('active', t === tab);
+  ['belief','journalbookswins','mejournal'].forEach(t => {
+    var el = document.getElementById('jsub-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+    var btn = document.getElementById('jtab-' + t);
+    if (btn) btn.classList.toggle('active', t === tab);
   });
-  if (tab === 'belief') {
-    beliefRenderAll();
-  }
+  if (tab === 'belief') beliefRenderAll();
+  if (tab === 'journalbookswins') showJBWTab('wins');
+  if (tab === 'mejournal') {} 
   window.scrollTo(0,0);
+}
+
+function showJBWTab(tab) {
+  ['wins','vent','books'].forEach(t => {
+    document.getElementById('jsub-' + t).style.display = t === tab ? 'block' : 'none';
+    document.getElementById('jbwtab-' + t).classList.toggle('active', t === tab);
+  });
 }
 
 let shuffled = [...affirmations].sort(() => Math.random() - 0.5);
