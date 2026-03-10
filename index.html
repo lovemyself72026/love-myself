@@ -2592,7 +2592,7 @@ document.head.appendChild(manifestLink);
   });
 
 function showMeTab(tab) {
-  ['balance','whiam','rightforme','assertive'].forEach(function(t) {
+  ['balance','whiam','rightforme','assertive','believe'].forEach(function(t) {
     document.getElementById('mesub-' + t).style.display = t === tab ? 'block' : 'none';
     document.getElementById('metab-' + t).classList.toggle('active', t === tab);
   });
@@ -2604,6 +2604,7 @@ function showMeTab(tab) {
   if (tab === 'whiam') initWhiAm();
   if (tab === 'rightforme') rfmRender();
   if (tab === 'assertive') initAssertive();
+  if (tab === 'believe') initBelieve();
 }
 
 function initMeSection() {
@@ -3125,6 +3126,7 @@ window.addEventListener('DOMContentLoaded', function() {
   <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;">
     <button class="journal-tab active" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
     <button class="journal-tab" onclick="showMeTab('assertive')" id="metab-assertive">Assertive</button>
+    <button class="journal-tab" onclick="showMeTab('believe')" id="metab-believe">Believe</button>
     <button class="journal-tab" onclick="showMeTab('rightforme')" id="metab-rightforme">Right For Me</button>
     <button class="journal-tab" onclick="showMeTab('balance')" id="metab-balance">Balance</button>
   </div>
@@ -3446,6 +3448,143 @@ window.addEventListener('DOMContentLoaded', function() {
   <div id="rfm-person-detail" style="display:none;">
     <button class="rfm-back" onclick="rfmCloseDetail()">← Back</button>
     <div id="rfm-detail-content"></div>
+  </div>
+</div>
+
+<!-- BELIEVE SECTION -->
+<div id="mesub-believe" style="display:none;">
+  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">You don't have to earn the right to believe in yourself. But here's how to build it anyway.</div>
+
+  <!-- Inner tabs -->
+  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+    <button class="balance-sub-tab active" onclick="believeInnerTab('foundation')" id="beltab-foundation">Foundation</button>
+    <button class="balance-sub-tab" onclick="believeInnerTab('evidence')" id="beltab-evidence">Evidence</button>
+    <button class="balance-sub-tab" onclick="believeInnerTab('failure')" id="beltab-failure">After Failure</button>
+  </div>
+
+  <!-- FOUNDATION panel -->
+  <div id="belpanel-foundation">
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:1.2rem;">The truth about self-belief</div>
+
+    <div style="border:1px solid #0a0a0a;padding:1rem 1.2rem;margin-bottom:1.5rem;">
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:1rem;color:var(--black);line-height:1.8;">Self-belief is not about being sure you'll succeed. It's about trusting that you can handle whatever happens.</div>
+    </div>
+
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">You do not need to</div>
+    <div style="display:grid;gap:0.3rem;margin-bottom:1.8rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;border-bottom:1px solid var(--light);">Achieve a certain number of things before you're allowed to believe in yourself.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;border-bottom:1px solid var(--light);">Prove your worth to anyone, including yourself.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;border-bottom:1px solid var(--light);">Be without doubt in order to move forward.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;">Have it all figured out first.</div>
+    </div>
+
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">What actually builds self-belief</div>
+    <div style="display:grid;gap:0.6rem;margin-bottom:1.8rem;">
+      <div style="border:1px solid #e8e8e5;padding:0.9rem 1rem;">
+        <div style="font-family:'Lora',serif;font-size:0.88rem;margin-bottom:0.4rem;">Keeping promises to yourself</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;">Every time you do what you said you'd do, even something small, your inner self registers it. You become someone you can count on.</div>
+      </div>
+      <div style="border:1px solid #e8e8e5;padding:0.9rem 1rem;">
+        <div style="font-family:'Lora',serif;font-size:0.88rem;margin-bottom:0.4rem;">Trying things before you feel ready</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;">Confidence comes after action, not before. You don't wait until you believe in yourself to try. You try, and that's how you start to believe.</div>
+      </div>
+      <div style="border:1px solid #e8e8e5;padding:0.9rem 1rem;">
+        <div style="font-family:'Lora',serif;font-size:0.88rem;margin-bottom:0.4rem;">Noticing what you've already done</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;">Your brain is wired to forget your wins and remember your failures. You have to actively remind yourself of your own story.</div>
+      </div>
+      <div style="border:1px solid #e8e8e5;padding:0.9rem 1rem;">
+        <div style="font-family:'Lora',serif;font-size:0.88rem;margin-bottom:0.4rem;">Talking to yourself like someone you love</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;">The voice in your head shapes what you believe about yourself more than any achievement ever could.</div>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid var(--light);padding-top:1.2rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">What does believing in yourself mean to you?</div>
+      <textarea id="bel-foundation-notes" placeholder="Write freely… what would it feel like, look like, sound like if you truly believed in yourself?" style="width:100%;min-height:80px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;" onblur="belFoundationAutoSave()"></textarea>
+      <div id="bel-foundation-list" style="margin-top:1rem;"></div>
+    </div>
+  </div>
+
+  <!-- EVIDENCE panel -->
+  <div id="belpanel-evidence" style="display:none;">
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">You don't need a list of achievements to believe in yourself. But collecting evidence of who you are helps your brain catch up to the truth.</div>
+
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Evidence isn't only big things</div>
+    <div style="display:grid;gap:0.3rem;margin-bottom:1.8rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;border-bottom:1px solid var(--light);">You showed up when you didn't feel like it.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;border-bottom:1px solid var(--light);">You got through something that felt impossible.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;border-bottom:1px solid var(--light);">You chose yourself in a moment when you used to erase yourself.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;border-bottom:1px solid var(--light);">You kept going even when no one was watching.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;">You tried something new even though it scared you.</div>
+    </div>
+
+    <!-- Evidence log -->
+    <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Add a piece of evidence</div>
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;">Big or small. What's something you did that proves you are more capable than you think?</div>
+    <div style="margin-bottom:1.2rem;">
+      <textarea id="bel-evidence-input" placeholder="e.g. I started something I was scared of. I kept going after a hard week. I said no when I meant no…" style="width:100%;min-height:60px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;" onblur="belEvidenceAutoSave()"></textarea>
+    </div>
+    <div id="bel-evidence-list"></div>
+  </div>
+
+  <!-- AFTER FAILURE panel -->
+  <div id="belpanel-failure" style="display:none;">
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:1.2rem;">When things don't go the way you hoped</div>
+
+    <div style="border:1px solid #0a0a0a;padding:1rem 1.2rem;margin-bottom:1.5rem;">
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:1rem;color:var(--black);line-height:1.8;">Failure is not proof that you can't. It's proof that you tried. And trying is exactly what self-belief looks like in practice.</div>
+    </div>
+
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">What to do right after a failure</div>
+    <div style="display:grid;gap:0.6rem;margin-bottom:1.8rem;">
+      <div style="border:1px solid #e8e8e5;padding:0.9rem 1rem;">
+        <div style="font-family:'Lora',serif;font-size:0.88rem;margin-bottom:0.4rem;">1. Feel it without making it mean everything</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;">Disappointment is real. Let yourself feel it. But there's a difference between "that didn't work" and "I am a failure." One is a fact. The other is a story.</div>
+      </div>
+      <div style="border:1px solid #e8e8e5;padding:0.9rem 1rem;">
+        <div style="font-family:'Lora',serif;font-size:0.88rem;margin-bottom:0.4rem;">2. Separate what happened from who you are</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;">You are not your results. A bad outcome doesn't rewrite your character, your effort, or your worth. Those stay.</div>
+      </div>
+      <div style="border:1px solid #e8e8e5;padding:0.9rem 1rem;">
+        <div style="font-family:'Lora',serif;font-size:0.88rem;margin-bottom:0.4rem;">3. Ask what it taught you, not what it proved</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;">Instead of "what does this say about me?" ask "what does this show me about what I can do differently?" One shrinks you. The other grows you.</div>
+      </div>
+      <div style="border:1px solid #e8e8e5;padding:0.9rem 1rem;">
+        <div style="font-family:'Lora',serif;font-size:0.88rem;margin-bottom:0.4rem;">4. Remind yourself of your evidence</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;">Go back to your Evidence tab. Read what you wrote. One failure doesn't erase all of that. Your track record is still yours.</div>
+      </div>
+      <div style="border:1px solid #e8e8e5;padding:0.9rem 1rem;">
+        <div style="font-family:'Lora',serif;font-size:0.88rem;margin-bottom:0.4rem;">5. Choose to keep going anyway</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;">This is the moment self-belief is actually built. Not in the wins, but in the decision to try again after losing. That decision is yours alone.</div>
+      </div>
+    </div>
+
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Things to say to yourself after a failure</div>
+    <div style="display:grid;gap:0.5rem;margin-bottom:1.8rem;">
+      <div style="background:#fafaf8;padding:0.8rem 1rem;border-left:2px solid #f9e4a8;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;">"I tried. That already took courage."</div>
+      </div>
+      <div style="background:#fafaf8;padding:0.8rem 1rem;border-left:2px solid #f9e4a8;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;">"This is one moment, not my whole story."</div>
+      </div>
+      <div style="background:#fafaf8;padding:0.8rem 1rem;border-left:2px solid #f9e4a8;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;">"I am still here. That counts for something."</div>
+      </div>
+      <div style="background:#fafaf8;padding:0.8rem 1rem;border-left:2px solid #f9e4a8;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;">"What can I learn from this that makes me better?"</div>
+      </div>
+      <div style="background:#fafaf8;padding:0.8rem 1rem;border-left:2px solid #f9e4a8;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;">"I don't have to feel confident right now. I just have to keep going."</div>
+      </div>
+    </div>
+
+    <!-- Failure reflection log -->
+    <div style="border-top:1px solid var(--light);padding-top:1.2rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;">Process a failure</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;">Write out what happened, how you feel, what it taught you, and what you're choosing to do next.</div>
+      <textarea id="bel-failure-input" placeholder="What happened? How do I feel? What did it teach me? What am I choosing next?…" style="width:100%;min-height:80px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;" onblur="belFailureAutoSave()"></textarea>
+      <div id="bel-failure-list" style="margin-top:1rem;"></div>
+    </div>
   </div>
 </div>
 
@@ -6740,6 +6879,137 @@ function rfmRenderCompare() {
   el.innerHTML = html;
 }
 
+// ===== BELIEVE TAB =====
+var _believeInited = false;
+
+function believeInnerTab(tab) {
+  ['foundation','evidence','failure'].forEach(function(t) {
+    document.getElementById('belpanel-' + t).style.display = t === tab ? 'block' : 'none';
+    document.getElementById('beltab-' + t).classList.toggle('active', t === tab);
+  });
+  if (tab === 'evidence') belRenderEvidence();
+  if (tab === 'failure') belRenderFailure();
+}
+
+function initBelieve() {
+  believeInnerTab('foundation');
+  belRenderFoundation();
+}
+
+function belFoundationAutoSave() {
+  var input = document.getElementById('bel-foundation-notes');
+  var text = input.value.trim();
+  if (!text) return;
+  var items = JSON.parse(localStorage.getItem('bel_foundation') || '[]');
+  items.unshift({ text: text, date: new Date().toISOString() });
+  localStorage.setItem('bel_foundation', JSON.stringify(items));
+  input.value = '';
+  belRenderFoundation();
+}
+
+function belRenderFoundation() {
+  var items = JSON.parse(localStorage.getItem('bel_foundation') || '[]');
+  var el = document.getElementById('bel-foundation-list');
+  if (!el) return;
+  if (!items.length) { el.innerHTML = ''; return; }
+  el.innerHTML = items.map(function(e, i) {
+    var d = new Date(e.date);
+    var isToday = new Date().toDateString() === d.toDateString(); var label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + (isToday ? ' — Today' : '') + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    return '<div style="border:1px solid #e8e8e5;padding:0.8rem 1rem;margin-bottom:0.6rem;border-left:3px solid #d4b8f9;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + label + '</div>' +
+      '<button onclick="belFoundationDelete(' + i + ')" style="border:none;background:none;cursor:pointer;font-size:0.9rem;color:#ccc;padding:0;line-height:1;">×</button>' +
+      '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;white-space:pre-wrap;">' + e.text + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function belFoundationDelete(idx) {
+  var items = JSON.parse(localStorage.getItem('bel_foundation') || '[]');
+  items.splice(idx, 1);
+  localStorage.setItem('bel_foundation', JSON.stringify(items));
+  belRenderFoundation();
+}
+
+function belNoteSave(key) {}
+
+function belEvidenceAutoSave() {
+  var input = document.getElementById('bel-evidence-input');
+  var text = input.value.trim();
+  if (!text) return;
+  var items = JSON.parse(localStorage.getItem('bel_evidence') || '[]');
+  items.unshift({ text: text, date: new Date().toISOString() });
+  localStorage.setItem('bel_evidence', JSON.stringify(items));
+  input.value = '';
+  belRenderEvidence();
+}
+
+function belEvidenceAdd() { belEvidenceAutoSave(); }
+
+function belEvidenceDelete(idx) {
+  var items = JSON.parse(localStorage.getItem('bel_evidence') || '[]');
+  items.splice(idx, 1);
+  localStorage.setItem('bel_evidence', JSON.stringify(items));
+  belRenderEvidence();
+}
+
+function belRenderEvidence() {
+  var items = JSON.parse(localStorage.getItem('bel_evidence') || '[]');
+  var el = document.getElementById('bel-evidence-list');
+  if (!el) return;
+  if (!items.length) { el.innerHTML = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);padding:0.6rem 0;">Nothing here yet. Add your first piece of evidence above.</div>'; return; }
+  el.innerHTML = items.map(function(e, i) {
+    var d = new Date(e.date);
+    var isToday = new Date().toDateString() === d.toDateString(); var label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + (isToday ? ' — Today' : '') + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    return '<div style="border:1px solid #e8e8e5;padding:0.8rem 1rem;margin-bottom:0.6rem;border-left:3px solid #b8f0c8;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + label + '</div>' +
+      '<button onclick="belEvidenceDelete(' + i + ')" style="border:none;background:none;cursor:pointer;font-size:0.9rem;color:#ccc;padding:0;line-height:1;">×</button>' +
+      '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;white-space:pre-wrap;">' + e.text + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function belFailureAutoSave() {
+  var input = document.getElementById('bel-failure-input');
+  var text = input.value.trim();
+  if (!text) return;
+  var items = JSON.parse(localStorage.getItem('bel_failure') || '[]');
+  items.unshift({ text: text, date: new Date().toISOString() });
+  localStorage.setItem('bel_failure', JSON.stringify(items));
+  input.value = '';
+  belRenderFailure();
+}
+
+function belFailureAdd() { belFailureAutoSave(); }
+
+function belFailureDelete(idx) {
+  var items = JSON.parse(localStorage.getItem('bel_failure') || '[]');
+  items.splice(idx, 1);
+  localStorage.setItem('bel_failure', JSON.stringify(items));
+  belRenderFailure();
+}
+
+function belRenderFailure() {
+  var items = JSON.parse(localStorage.getItem('bel_failure') || '[]');
+  var el = document.getElementById('bel-failure-list');
+  if (!el) return;
+  if (!items.length) { el.innerHTML = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);padding:0.6rem 0;">Nothing saved yet.</div>'; return; }
+  el.innerHTML = items.map(function(e, i) {
+    var d = new Date(e.date);
+    var isToday = new Date().toDateString() === d.toDateString(); var label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + (isToday ? ' — Today' : '') + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    return '<div style="border:1px solid #e8e8e5;padding:0.8rem 1rem;margin-bottom:0.6rem;border-left:3px solid #f9e4a8;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + label + '</div>' +
+      '<button onclick="belFailureDelete(' + i + ')" style="border:none;background:none;cursor:pointer;font-size:0.9rem;color:#ccc;padding:0;line-height:1;">×</button>' +
+      '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;white-space:pre-wrap;">' + e.text + '</div>' +
+      '</div>';
+  }).join('');
+}
+
 // ===== ASSERTIVE TAB =====
 var _assertiveInited = false;
 
@@ -6827,7 +7097,7 @@ function assRenderLog() {
   if (!logs.length) { el.innerHTML = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);padding:0.8rem 0;">No moments logged yet. Start with today.</div>'; return; }
   el.innerHTML = logs.map(function(e, i) {
     var d = new Date(e.date);
-    var label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    var isToday = new Date().toDateString() === d.toDateString(); var label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + (isToday ? ' — Today' : '') + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     return '<div style="border:1px solid #e8e8e5;padding:0.8rem 1rem;margin-bottom:0.6rem;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
       '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + label + '</div>' +
