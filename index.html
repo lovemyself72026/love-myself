@@ -16,10 +16,16 @@
 <script>
   window._rawLS = localStorage.setItem.bind(localStorage);
   const DB_URL = 'https://lovemyselfapp-default-rtdb.firebaseio.com/my-love-myself-data';
-  const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items','whoi_history','my_books','habits_data','cali_log','wia2'];
+  const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items',
+    'whoi_history','my_books','habit_tracker','cali_log','wia2','wia2aff','wia2q','wia2wq',
+    'hlb','hlr','ass_checkin','ass_log','ass_entries_asking','ass_entries_giving',
+    'bel_foundation','bel_evidence','bel_failure','belief_beliefs',
+    'balance_data','that_girl_data','vision_items','ritual_state','user_rituals'];
+  const SYNC_PREFIXES = ['ass_entries_','ass_notes_','jesus_','bc_','rfm_'];
 
   window.syncToCloud = async function(key, value) {
-    if (!SYNC_KEYS.includes(key)) return;
+    const shouldSync = SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
+    if (!shouldSync) return;
     try {
       await fetch(`${DB_URL}/${key}.json`, {
         method: 'PUT',
@@ -29,6 +35,20 @@
     } catch(e) {}
   };
 
+  // Intercept ALL localStorage.setItem calls to auto-push to Firebase
+  localStorage.setItem = function(key, value) {
+    window._rawLS(key, value);
+    const shouldSync = SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
+    if (shouldSync) {
+      try {
+        const parsed = JSON.parse(value);
+        window.syncToCloud(key, parsed);
+      } catch(e) {
+        window.syncToCloud(key, value);
+      }
+    }
+  };
+
   window.pullFromCloud = async function(showMsg) {
     try {
       const res = await fetch(`${DB_URL}.json`);
@@ -36,9 +56,7 @@
       const data = await res.json();
       if (!data) { if(showMsg) alert('No data found yet.'); return; }
       let changed = false;
-      SYNC_KEYS.forEach(function(k) {
-        if (data[k] === undefined) return;
-        // Handle both raw and wrapped {data, ts} format
+      Object.keys(data).forEach(function(k) {
         let value = data[k];
         if (value && typeof value === 'object' && value.data !== undefined && value.ts !== undefined) {
           value = value.data;
@@ -59,7 +77,7 @@
 
   window.addEventListener('load', function() {
     setTimeout(function(){ window.pullFromCloud(false); }, 1500);
-    setInterval(function(){ window.pullFromCloud(false); }, 5000);
+    setInterval(function(){ window.pullFromCloud(false); }, 30000);
   });
 </script>
 
@@ -2307,6 +2325,26 @@ function reloadAllData() {
   const ap = JSON.parse(localStorage.getItem('all_planner_data') || '{}'); allPlannerData = (ap && typeof ap === 'object' && !Array.isArray(ap)) ? ap : {};
   const cl = JSON.parse(localStorage.getItem('cali_log') || '{}'); caliLog = (cl && typeof cl === 'object') ? cl : {};
   renderWins(); renderSavedAffirmations(); renderVentEntries(); renderDimensionBoards(); renderWhoiGrid(); renderBooks(); renderAnalytics();
+  // Reload habits
+  if (typeof renderHabits === 'function') renderHabits();
+  if (typeof renderHabitStrips === 'function') renderHabitStrips();
+  // Reload wia / Me section
+  if (typeof rfmRender === 'function') rfmRender();
+  if (typeof assRenderLog === 'function') assRenderLog();
+  if (typeof assRenderEntries === 'function') { assRenderEntries('asking'); assRenderEntries('giving'); }
+  if (typeof renderBelieveSection === 'function') renderBelieveSection();
+  // Reload Jesus
+  if (typeof jesusRender === 'function') jesusRender();
+  if (typeof jesusRenderPray === 'function') jesusRenderPray();
+  if (typeof jesusRenderStudy === 'function') jesusRenderStudy();
+  // Reload Vision
+  if (typeof tgRenderAll === 'function') tgRenderAll();
+  if (typeof renderWhoiDay === 'function') renderWhoiDay();
+  // Reload Balance
+  if (typeof renderBalanceQuestions === 'function') renderBalanceQuestions();
+  if (typeof renderRelationshipQuestions === 'function') renderRelationshipQuestions();
+  // Reload calisthenics
+  if (typeof renderCaliLog === 'function') renderCaliLog();
 }
 
 renderAnalytics();
