@@ -300,7 +300,7 @@
       <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
         <div onclick="showSection('me');setTimeout(()=>showMeTab('whiam'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Who I Am</div>
         <div onclick="showSection('me');setTimeout(()=>showMeTab('balance'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Balance</div>
-        <div onclick="showSection('me');setTimeout(()=>showMeTab('rightforme'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Right For Me</div>
+        <div onclick="showSection('me');setTimeout(()=>showMeTab('rightforme'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">M For Me</div>
       </div>
     </div>
 
@@ -548,7 +548,7 @@
       <button class="balance-sub-tab active" id="metab-who" onclick="showMeJournalTab('whiam')">Who I Am</button>
       <button class="balance-sub-tab" id="metab-ass" onclick="showMeJournalTab('assertive')">Assertive</button>
       <button class="balance-sub-tab" id="metab-bel" onclick="showMeJournalTab('believe')">Believe</button>
-      <button class="balance-sub-tab" id="metab-rfm" onclick="showMeJournalTab('rightforme')">Right For Me</button>
+      <button class="balance-sub-tab" id="metab-rfm" onclick="showMeJournalTab('rightforme')">M For Me</button>
     </div>
   </div>
     <!-- Books sub-section -->
@@ -3151,7 +3151,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <button class="journal-tab active" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
     <button class="journal-tab" onclick="showMeTab('assertive')" id="metab-assertive">Assertive</button>
     <button class="journal-tab" onclick="showMeTab('believe')" id="metab-believe">Believe</button>
-    <button class="journal-tab" onclick="showMeTab('rightforme')" id="metab-rightforme">Right For Me</button>
+    <button class="journal-tab" onclick="showMeTab('rightforme')" id="metab-rightforme">M For Me</button>
   </div>
 
   <!-- ME SUB-SECTIONS -->
@@ -3733,7 +3733,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 <style>
-  /* ── Right For Me ── */
+  /* ── M For Me ── */
   .rfm-inner-tab { font-family:'Nunito',sans-serif; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; color:var(--gray); border:none; background:none; padding:0.5rem 1rem 0.6rem; border-bottom:2px solid transparent; transition:color 0.2s,border-color 0.2s; white-space:nowrap; flex:1; text-align:center; font-weight:300; }
   .rfm-inner-tab.active, .rfm-inner-tab:hover { color:var(--black); border-bottom-color:var(--black); }
   .rfm-value-row { display:flex; align-items:center; justify-content:space-between; padding:1.2rem 0; border-bottom:1px solid var(--light); gap:1rem; }
