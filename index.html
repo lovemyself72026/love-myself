@@ -144,11 +144,11 @@
     .nav-tab { font-size: 0.82rem; letter-spacing: 0.01em; white-space: nowrap; }
     .section { padding: 1.2rem 0.9rem 5rem; }
     h1 { font-size: 1.5rem; }
-    h2 { font-size: 1.05rem; margin-bottom: 0.8rem; }
-    .subtitle { margin-bottom: 1.2rem; font-size: 0.72rem; }
+    h2 { font-size: 0.95rem; margin-bottom: 0.6rem; }
+    .subtitle { margin-bottom: 0.8rem; font-size: 0.65rem; }
     .affirmation-card { padding: 1rem; }
     .affirmation-text { font-size: 0.98rem; }
-    .mirror-section { padding: 1.2rem 0.9rem; }
+    .mirror-section { padding: 1rem; }
     .mirror-prompt { font-size: 0.95rem; }
     .ritual-label { font-size: 0.95rem; }
     .counter-label { font-size: 0.9rem; }
@@ -163,6 +163,21 @@
     .scale-wrap { padding: 0.8rem; }
     textarea { font-size: 0.9rem; }
     .balance-side-grid { grid-template-columns: 1fr !important; }
+    /* Calendars — shrink cells */
+    .wia-calendar, .wia-cal-label { gap: 2px; }
+    /* Op buttons — wrap */
+    .op-btn { font-size: 0.65rem; padding: 0.35rem 0.55rem; }
+    /* Bar wrap shrink */
+    .wia-bar-wrap { width: 50px; }
+    /* Large inline paddings */
+    .mirror-section { padding: 1rem !important; }
+    /* Wins input border box */
+    [style*="padding:2rem"] { padding: 1rem !important; }
+    [style*="padding: 2rem"] { padding: 1rem !important; }
+    [style*="padding:2.5rem"] { padding: 1rem !important; }
+    [style*="padding: 2.5rem"] { padding: 1rem !important; }
+    [style*="padding:1.5rem 1.5rem"] { padding: 1rem !important; }
+    /* General font bumps for readability */
     [style*="font-size:0.6rem"], [style*="font-size: 0.6rem"] { font-size: 0.67rem !important; }
     [style*="font-size:0.65rem"], [style*="font-size: 0.65rem"] { font-size: 0.7rem !important; }
     [style*="font-size:0.7rem"], [style*="font-size: 0.7rem"] { font-size: 0.75rem !important; }
@@ -171,12 +186,17 @@
     [style*="font-size:0.82rem"], [style*="font-size: 0.82rem"] { font-size: 0.87rem !important; }
     [style*="font-size:0.88rem"], [style*="font-size: 0.88rem"] { font-size: 0.92rem !important; }
     [style*="font-size:0.95rem"], [style*="font-size: 0.95rem"] { font-size: 0.97rem !important; }
+    /* Prevent any element from overflowing */
+    .section * { max-width: 100%; box-sizing: border-box; }
+    img, svg { max-width: 100%; }
   }
   @media (max-width: 600px) {
     .books-vent-grid { grid-template-columns: 1fr !important; }
     #planner-grid { grid-template-columns: 1fr !important; }
     .vision-items-grid { grid-template-columns: 1fr 1fr !important; }
     #balanceQuestions, #relationshipQuestions { font-size: 0.82rem; }
+    /* Stack op-btn rows on small screens */
+    .op-btn { font-size: 0.68rem; padding: 0.35rem 0.6rem; }
   }
 
   /* Balance & Relationships */
