@@ -23,16 +23,31 @@
     'balance_data','that_girl_data','vision_items','ritual_state','user_rituals'];
   const SYNC_PREFIXES = ['ass_entries_','ass_notes_','jesus_','bc_','rfm_'];
 
+  function setSyncStatus(state, msg) {
+    var el = document.getElementById('sync-status');
+    if (!el) return;
+    var colors = { ok: '#888', error: '#c0392b', syncing: '#888' };
+    var icons = { ok: '✓ synced', error: '⚠ sync error', syncing: '↻ syncing…' };
+    el.style.color = colors[state] || '#888';
+    el.title = msg || '';
+    el.textContent = icons[state] || '';
+  }
+
   window.syncToCloud = async function(key, value) {
     const shouldSync = SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
     if (!shouldSync) return;
     try {
-      await fetch(`${DB_URL}/${key}.json`, {
+      const res = await fetch(DB_URL + '/' + key + '.json', {
         method: 'PUT',
         body: JSON.stringify(value),
         headers: {'Content-Type': 'application/json'}
       });
-    } catch(e) {}
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      setSyncStatus('ok', 'Last saved: ' + new Date().toLocaleTimeString());
+    } catch(e) {
+      console.error('[Sync] Push failed for key "' + key + '":', e.message);
+      setSyncStatus('error', 'Push failed: ' + e.message + '. Check your internet connection.');
+    }
   };
 
   // Intercept ALL localStorage.setItem calls to auto-push to Firebase
@@ -40,6 +55,7 @@
     window._rawLS(key, value);
     const shouldSync = SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
     if (shouldSync) {
+      setSyncStatus('syncing', '');
       try {
         const parsed = JSON.parse(value);
         window.syncToCloud(key, parsed);
@@ -50,11 +66,15 @@
   };
 
   window.pullFromCloud = async function(showMsg) {
+    if (showMsg) setSyncStatus('syncing', '');
     try {
-      const res = await fetch(`${DB_URL}.json`);
+      const res = await fetch(DB_URL + '.json');
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      if (!data) { if(showMsg) alert('No data found yet.'); return; }
+      if (!data) {
+        if (showMsg) { setSyncStatus('ok', 'No cloud data yet'); alert('No data found in cloud yet.'); }
+        return;
+      }
       let changed = false;
       Object.keys(data).forEach(function(k) {
         let value = data[k];
@@ -69,10 +89,37 @@
         }
       });
       if (changed && typeof reloadAllData === 'function') reloadAllData();
+      setSyncStatus('ok', 'Last synced: ' + new Date().toLocaleTimeString());
       if (showMsg) alert('✅ Synced! 🤍');
     } catch(e) {
+      console.error('[Sync] Pull failed:', e.message);
+      setSyncStatus('error', 'Pull failed: ' + e.message);
       if (showMsg) alert('❌ Sync failed: ' + e.message);
     }
+  };
+
+  // Push ALL local sync keys to cloud (force full backup)
+  window.pushAllToCloud = async function() {
+    setSyncStatus('syncing', '');
+    let count = 0;
+    for (var i = 0; i < SYNC_KEYS.length; i++) {
+      var k = SYNC_KEYS[i];
+      var val = localStorage.getItem(k);
+      if (val !== null) {
+        try { await window.syncToCloud(k, JSON.parse(val)); } catch(e) { await window.syncToCloud(k, val); }
+        count++;
+      }
+    }
+    // Also push any keys matching prefixes
+    for (var j = 0; j < localStorage.length; j++) {
+      var key = localStorage.key(j);
+      if (SYNC_PREFIXES.some(function(p){ return key.startsWith(p); })) {
+        var v = localStorage.getItem(key);
+        if (v !== null) { try { await window.syncToCloud(key, JSON.parse(v)); } catch(e) { await window.syncToCloud(key, v); } count++; }
+      }
+    }
+    setSyncStatus('ok', 'Full push done: ' + count + ' keys at ' + new Date().toLocaleTimeString());
+    alert('✅ Pushed ' + count + ' items to cloud! 🤍');
   };
 
   window.addEventListener('load', function() {
@@ -329,7 +376,14 @@
 <body>
 
 <nav>
-  <div class="logo">love myself</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+    <div class="logo">love myself</div>
+    <div style="display:flex;align-items:center;gap:0.6rem;">
+      <span id="sync-status" title="" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.08em;color:#888;cursor:default;"></span>
+      <button onclick="window.pullFromCloud(true)" title="Pull latest from cloud" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:#888;padding:0.3rem 0.7rem;cursor:pointer;">↓ pull</button>
+      <button onclick="window.pushAllToCloud()" title="Push all local data to cloud" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:#888;padding:0.3rem 0.7rem;cursor:pointer;">↑ push</button>
+    </div>
+  </div>
   <div class="nav-tabs">
     <button class="nav-tab" onclick="showSection('jesus')">Jesus Christ</button>
     <button class="nav-tab active" onclick="showSection('home')">Home</button>
