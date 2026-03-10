@@ -33,20 +33,34 @@
     el.textContent = icons[state] || '';
   }
 
+  const PROXY = 'https://corsproxy.io/?';
+
+  async function safeFetch(url, options) {
+    try {
+      const res = await fetch(url, options);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res;
+    } catch(e) {
+      // Fallback to CORS proxy
+      const proxied = await fetch(PROXY + encodeURIComponent(url), options);
+      if (!proxied.ok) throw new Error('HTTP ' + proxied.status);
+      return proxied;
+    }
+  }
+
   window.syncToCloud = async function(key, value) {
     const shouldSync = SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
     if (!shouldSync) return;
     try {
-      const res = await fetch(DB_URL + '/' + key + '.json', {
+      await safeFetch(DB_URL + '/' + key + '.json', {
         method: 'PUT',
         body: JSON.stringify(value),
         headers: {'Content-Type': 'application/json'}
       });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
       setSyncStatus('ok', 'Last saved: ' + new Date().toLocaleTimeString());
     } catch(e) {
       console.error('[Sync] Push failed for key "' + key + '":', e.message);
-      setSyncStatus('error', 'Push failed: ' + e.message + '. Check your internet connection.');
+      setSyncStatus('error', 'Push failed: ' + e.message);
     }
   };
 
@@ -103,8 +117,7 @@
     if (!confirm('This will replace ALL local data with your cloud data and reload the app. Continue?')) return;
     setSyncStatus('syncing', '');
     try {
-      const res = await fetch(DB_URL + '.json');
-      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const res = await safeFetch(DB_URL + '.json');
       const data = await res.json();
       if (!data) { alert('No cloud data found.'); return; }
       // Clear all existing local data first
@@ -125,28 +138,41 @@
     }
   };
 
-  // Push ALL local sync keys to cloud (force full backup)
+  // Push ALL local sync keys to cloud in one single request
   window.pushAllToCloud = async function() {
     setSyncStatus('syncing', '');
-    let count = 0;
+    var payload = {};
+    var count = 0;
+    // Collect all SYNC_KEYS
     for (var i = 0; i < SYNC_KEYS.length; i++) {
       var k = SYNC_KEYS[i];
       var val = localStorage.getItem(k);
       if (val !== null) {
-        try { await window.syncToCloud(k, JSON.parse(val)); } catch(e) { await window.syncToCloud(k, val); }
+        try { payload[k] = JSON.parse(val); } catch(e) { payload[k] = val; }
         count++;
       }
     }
-    // Also push any keys matching prefixes
+    // Collect prefix keys
     for (var j = 0; j < localStorage.length; j++) {
       var key = localStorage.key(j);
       if (SYNC_PREFIXES.some(function(p){ return key.startsWith(p); })) {
         var v = localStorage.getItem(key);
-        if (v !== null) { try { await window.syncToCloud(key, JSON.parse(v)); } catch(e) { await window.syncToCloud(key, v); } count++; }
+        if (v !== null) { try { payload[key] = JSON.parse(v); } catch(e) { payload[key] = v; } count++; }
       }
     }
-    setSyncStatus('ok', 'Full push done: ' + count + ' keys at ' + new Date().toLocaleTimeString());
-    alert('✅ Pushed ' + count + ' items to cloud! 🤍');
+    try {
+      const res = await fetch(DB_URL + '.json', {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+        headers: {'Content-Type': 'application/json'}
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      setSyncStatus('ok', 'Full push done: ' + count + ' keys at ' + new Date().toLocaleTimeString());
+      alert('✅ Pushed ' + count + ' items to cloud! 🤍');
+    } catch(e) {
+      setSyncStatus('error', 'Push failed: ' + e.message);
+      alert('❌ Push failed: ' + e.message);
+    }
   };
 
   window.addEventListener('load', function() {
