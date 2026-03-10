@@ -285,13 +285,9 @@
     <div class="home-card" style="cursor:default;">
       <div class="home-card-title">Schedule</div>
       <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
-        <div onclick="showSection('schedule');setTimeout(()=>document.getElementById('ps-schedule')&&document.getElementById('ps-schedule').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Schedule</div>
-        <div onclick="showSection('schedule');setTimeout(()=>document.getElementById('ps-todo')&&document.getElementById('ps-todo').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">To Do</div>
-        <div onclick="showSection('schedule');setTimeout(()=>document.getElementById('ps-mood')&&document.getElementById('ps-mood').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Mood</div>
-        <div onclick="showSection('schedule');setTimeout(()=>document.getElementById('ps-sleep')&&document.getElementById('ps-sleep').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Sleep</div>
-        <div onclick="showSection('schedule');setTimeout(()=>document.getElementById('ps-water')&&document.getElementById('ps-water').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Water</div>
-        <div onclick="showSection('schedule');setTimeout(()=>document.getElementById('ps-meals')&&document.getElementById('ps-meals').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Meals</div>
-        <div onclick="showSection('schedule');setTimeout(()=>document.getElementById('ps-notes')&&document.getElementById('ps-notes').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Notes</div>
+        <div onclick="goToScheduleItem('ps-schedule')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Schedule</div>
+        <div onclick="goToScheduleItem('ps-todo')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">To Do</div>
+        <div onclick="goToScheduleItem('ps-mood')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Mood</div>
       </div>
     </div>
 
@@ -338,6 +334,26 @@
   <h1>My vision board.</h1>
   <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0.5rem 0 2rem;line-height:1.6;">Build a vision board for every area of your life 🤍</div>
   <div id="dimension-boards"></div>
+
+  <!-- That Girl Vision -->
+  <hr style="margin:2.5rem 0;">
+  <div class="subtitle" style="margin-bottom:0.5rem;">She's already in you</div>
+  <h2 style="margin-bottom:0.5rem;">What it looks like to be that girl.</h2>
+  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.2rem;line-height:1.6;">Paint a picture of her, how she moves, feels, lives, shows up 🤍</div>
+
+  <div style="display:flex;align-items:center;gap:0.5rem;border-bottom:1px solid #c8c8c5;padding-bottom:0.4rem;margin-bottom:0.8rem;">
+    <select id="tg-category" style="border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;cursor:pointer;padding:0.3rem 0;flex-shrink:0;">
+      <option value="morning">Morning</option>
+      <option value="looks">Looks</option>
+      <option value="health">Health</option>
+      <option value="mindset">Mindset</option>
+      <option value="time">Time</option>
+      <option value="relationships">Relationships</option>
+      <option value="feeling">Feeling</option>
+    </select>
+    <input id="tg-main-input" type="text" placeholder="e.g. she rises early, makes her bed…" onkeydown="if(event.key==='Enter')tgAddMain()" onblur="tgAddMain()" style="flex:1;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+  </div>
+  <div id="tg-all-list" style="margin-bottom:1.5rem;"></div>
 
   <!-- Who I Am -->
   <hr style="margin:2.5rem 0;">
@@ -421,7 +437,6 @@
         <span class="mood-btn" onclick="toggleMood(this,'😴')">😴</span>
         <span class="mood-btn" onclick="toggleMood(this,'😐')">😐</span>
         <span class="mood-btn" onclick="toggleMood(this,'🥺')">🥺</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😤')">😤</span>
         <span class="mood-btn" onclick="toggleMood(this,'😭')">😭</span>
         <span class="mood-btn" onclick="toggleMood(this,'🤩')">🤩</span>
         <span class="mood-btn" onclick="toggleMood(this,'😌')">😌</span>
@@ -434,6 +449,17 @@
         <span class="mood-btn" onclick="toggleMood(this,'🔥')">🔥</span>
         <span class="mood-btn" onclick="toggleMood(this,'😞')">😞</span>
         <span class="mood-btn" onclick="toggleMood(this,'🥹')">🥹</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😂')">😂</span>
+        <span class="mood-btn" onclick="toggleMood(this,'🤭')">🤭</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😒')">😒</span>
+        <span class="mood-btn" onclick="toggleMood(this,'🙃')">🙃</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😑')">😑</span>
+        <span class="mood-btn" onclick="toggleMood(this,'🤔')">🤔</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😅')">😅</span>
+        <span class="mood-btn" onclick="toggleMood(this,'🫠')">🫠</span>
+        <span class="mood-btn" onclick="toggleMood(this,'🫶')">🫶</span>
+        <span class="mood-btn" onclick="toggleMood(this,'🥴')">🥴</span>
+        <span class="mood-btn" onclick="toggleMood(this,'😩')">😩</span>
       </div>
     </div>
 
@@ -515,46 +541,31 @@
 
   <!-- Belief sub-section -->
   <div id="jsub-belief">
-    <!-- Belief Change (below books) -->
     <div>
       <div class="subtitle">Rewire your mind</div>
       <h2 style="margin-bottom:0.3rem;">Change your belief.</h2>
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1.2rem;line-height:1.6;">Simple. Daily. It works over time.</div>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Simple. Daily. It works over time.</div>
 
-      <!-- Date nav -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
-        <button onclick="changeBeliefDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
-        <span id="belief-date-picker-label" onclick="document.getElementById('belief-date-picker').showPicker?document.getElementById('belief-date-picker').showPicker():document.getElementById('belief-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="belief-date-picker" onchange="loadBeliefDay()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
-        <button onclick="changeBeliefDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
-      </div>
-
-      <div style="margin-bottom:1.5rem;">
-        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">I used to believe</div>
-        <input type="text" id="belief-old" placeholder="write it here..." oninput="syncBelief()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--black);outline:none;padding:0.5rem 0;margin-bottom:1rem;">
-        <div id="belief-arrow" style="text-align:center;font-size:1rem;color:var(--gray);margin:-0.3rem 0 0.8rem;opacity:0;transition:opacity 0.3s;">↓</div>
-        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Now I'm choosing to believe</div>
-        <input type="text" id="belief-new" placeholder="write the new one..." oninput="syncBelief()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--black);outline:none;padding:0.5rem 0;">
-      </div>
-
-      <div style="margin-bottom:1.5rem;">
-        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Do this today</div>
-        <div id="belief-checks"></div>
-      </div>
-
-      <div>
-        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Reflect</div>
-        <div id="belief-qcard" style="border:1px solid #c8c8c5;padding:1.5rem;">
-          <div id="belief-qtext" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;line-height:1.6;margin-bottom:1rem;"></div>
-          <textarea id="belief-qans" placeholder="your answer..." oninput="saveBeliefAns()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);resize:none;outline:none;padding:0.4rem 0;min-height:60px;line-height:1.6;"></textarea>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1rem;">
-            <div id="belief-dots" style="display:flex;gap:5px;"></div>
-            <div style="display:flex;gap:0.4rem;">
-              <button id="belief-prev" onclick="beliefGo(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;color:var(--gray);">←</button>
-              <button id="belief-next" onclick="beliefGo(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;color:var(--gray);">→</button>
-            </div>
+      <div style="border:1px solid #c8c8c5;padding:1.2rem;margin-bottom:1.5rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Now I choose to believe</div>
+        <input type="text" id="belief-new" placeholder="e.g. I am enough, always." onkeydown="if(event.key==='Enter')document.getElementById('belief-old').focus()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:0.9rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">I used to believe</div>
+        <input type="text" id="belief-old" placeholder="e.g. I'm not good enough…" onkeydown="if(event.key==='Enter')beliefSaveNew()" onblur="beliefSaveNew()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <span style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">Color</span>
+          <div style="display:flex;gap:0.4rem;">
+            <button class="belief-color-opt selected" data-color="#f9a8c9" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;flex-shrink:0;"></button>
+            <button class="belief-color-opt" data-color="#a8d8f0" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
+            <button class="belief-color-opt" data-color="#b8f0c8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
+            <button class="belief-color-opt" data-color="#f9e4a8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
+            <button class="belief-color-opt" data-color="#d4b8f9" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
+            <button class="belief-color-opt" data-color="#f9c8a8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
+            <button class="belief-color-opt" data-color="#c8e8c8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#c8e8c8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
           </div>
         </div>
       </div>
+
+      <div id="belief-list"></div>
     </div>
   </div>
 
@@ -570,8 +581,7 @@
         <span id="vent-date-picker-label" onclick="document.getElementById('vent-date-picker').showPicker?document.getElementById('vent-date-picker').showPicker():document.getElementById('vent-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="vent-date-picker" onchange="loadVentDay()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
         <button onclick="changeVentDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
       </div>
-      <textarea id="vent-input" placeholder="Let it all out here..." rows="8" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.5rem 0;margin-bottom:1rem;min-height:150px;"></textarea>
-      <button class="btn fill" style="width:100%;text-align:center;" onclick="saveVent()">Save</button>
+      <textarea id="vent-input" placeholder="Let it all out here..." rows="8" oninput="saveVentAuto()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.5rem 0;margin-bottom:1rem;min-height:150px;"></textarea>
       <div id="vent-entries" style="margin-top:1rem;"></div>
     </div>
 
@@ -698,8 +708,17 @@ function showSection(id){
   window.scrollTo(0,0);
   if (id === 'home') renderAnalytics();
   if (id === 'schedule') { initScheduleDatePicker(); loadPlannerDay(); }
+  if (id === 'vision') { loadThatGirl(); }
   if (id === 'me') initMeSection();
   if (id === 'jesus' && typeof jesusInit === 'function') jesusInit();
+}
+
+function goToScheduleItem(elId) {
+  showSection('schedule');
+  setTimeout(function() {
+    var el = document.getElementById(elId);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 120);
 }
 
 function showJournalTab(tab) {
@@ -707,6 +726,9 @@ function showJournalTab(tab) {
     document.getElementById('jsub-' + t).style.display = t === tab ? 'block' : 'none';
     document.getElementById('jtab-' + t).classList.toggle('active', t === tab);
   });
+  if (tab === 'belief') {
+    beliefRenderAll();
+  }
   window.scrollTo(0,0);
 }
 
@@ -1074,6 +1096,71 @@ whoiStyle.textContent = `
 `;
 document.head.appendChild(whoiStyle);
 
+// That Girl — per-field, saves on Enter or blur
+var tgData = JSON.parse(localStorage.getItem('that_girl_data') || '{}');
+
+function tgSaveToDB() {
+  localStorage.setItem('that_girl_data', JSON.stringify(tgData));
+  if (typeof syncToCloud === 'function') syncToCloud('that_girl_data', tgData);
+}
+
+function tgAddMain() {
+  var cat = document.getElementById('tg-category');
+  var input = document.getElementById('tg-main-input');
+  if (!cat || !input) return;
+  var key = cat.value;
+  var val = input.value.trim();
+  if (!val) return;
+  if (!tgData[key]) tgData[key] = [];
+  var now = new Date();
+  var time = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    + ' · ' + now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  tgData[key].push({ id: Date.now(), text: val, time: time });
+  input.value = '';
+  tgSaveToDB();
+  tgRenderAll();
+}
+
+function tgRemove(key, id) {
+  if (!tgData[key]) return;
+  tgData[key] = tgData[key].filter(function(e) { return e.id !== id; });
+  tgSaveToDB();
+  tgRenderAll();
+}
+
+var TG_LABELS = { morning:'Morning', looks:'Looks', health:'Health', mindset:'Mindset', time:'Time', relationships:'Relationships', feeling:'Feeling' };
+
+function tgRenderAll() {
+  var el = document.getElementById('tg-all-list');
+  if (!el) return;
+  var keys = ['morning','looks','health','mindset','time','relationships','feeling'];
+  var html = '';
+  keys.forEach(function(key) {
+    var entries = tgData[key] || [];
+    if (!entries.length) return;
+    html += '<div style="margin-bottom:0.6rem;">'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.2rem;">' + TG_LABELS[key] + '</div>';
+    entries.forEach(function(e) {
+      html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:0.25rem 0;border-bottom:1px solid var(--light);">'
+        + '<div style="flex:1;">'
+        + '<span style="font-family:\'Nunito\',sans-serif;font-size:1rem;font-weight:300;color:var(--black);">' + e.text.replace(/</g,'&lt;') + '</span>'
+        + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;color:var(--gray);margin-left:0.5rem;">' + e.time + '</span>'
+        + '</div>'
+        + '<button onclick="tgRemove(\'' + key + '\',' + e.id + ')" style="font-size:0.6rem;color:var(--gray);border:none;background:none;cursor:pointer;flex-shrink:0;padding:0 0 0 0.5rem;">✕</button>'
+        + '</div>';
+    });
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function tgRenderList(key) { tgRenderAll(); }
+
+function loadThatGirl() { tgRenderAll(); }
+function saveThatGirl() {}
+function tgAdd(key) {}
+function tgToggle(key) {}
+
 let whoiItems = JSON.parse(localStorage.getItem('whoi_history') || '[]');
 if (!Array.isArray(whoiItems)) whoiItems = [];
 let whoiType = 'word';
@@ -1385,16 +1472,50 @@ function renderSchedule() {
     '5:30 PM','6:00 PM','6:30 PM','7:00 PM','7:30 PM',
     '8:00 PM','8:30 PM','9:00 PM'
   ];
+
+  // Default permanent items per slot
+  const DEFAULTS = {
+    '4:00_AM': ['Wake up :) Good Morning :)'],
+    '4:05_AM': ['Smell fresh air'],
+    '4:10_AM': ['Fix Bed', 'Wash Face'],
+    '4:20_AM': ['Brush Teeth', 'Drink Water'],
+    '4:30_AM': ['Calisthenics'],
+    '5:00_AM': ['Take a bath'],
+    '5:15_AM': ['Make Breakfast'],
+    '5:30_AM': ['Talk to God - Read Bible, Pray, Journal, Meditate God\'s Word'],
+    '6:00_AM': ['Eat Breakfast', 'Bath', 'Clothed'],
+    '11:00_AM': ['Cook Lunch'],
+    '12:30_PM': ['Eat Lunch'],
+    '5:30_PM': ['Cook Dinner'],
+    '7:00_PM': ['Eat Dinner', 'Read Book'],
+    '7:30_PM': ['Talk to People'],
+    '8:00_PM': ['Studying Calisthenics and how to perform the right form of exercises'],
+    '8:30_PM': ['Journal'],
+    '9:00_PM': ['Sleep'],
+  };
+
   el.innerHTML = slots.map(slot => {
     const key = slot.replace(/\s/g,'_');
     const entry = schedule[key] || {};
-    // Support both old single-string format and new multi-entry array format
-    let items = [];
-    if (Array.isArray(entry.items)) items = entry.items;
-    else if (typeof entry === 'string' && entry) items = [{id: key+'_0', text: entry, done: false}];
-    else if (entry.text) items = [{id: key+'_0', text: entry.text, done: entry.done||false}];
+    let userItems = [];
+    if (Array.isArray(entry.items)) userItems = entry.items;
+    else if (typeof entry === 'string' && entry) userItems = [{id: key+'_0', text: entry, done: false}];
+    else if (entry.text) userItems = [{id: key+'_0', text: entry.text, done: entry.done||false}];
 
-    const itemsHtml = items.map((item, i) =>
+    const defaults = DEFAULTS[key] || [];
+    const defaultChecked = entry.defaultDone || {};
+
+    const defaultHtml = defaults.map((text, di) => {
+      const done = defaultChecked[di] || false;
+      return '<div style="display:flex;align-items:center;gap:0.3rem;padding:0.1rem 0;">' +
+        '<div onclick="toggleDefaultItem(\'' + key + '\',' + di + ')" style="width:12px;height:12px;border:1px solid ' + (done?'var(--black)':'#c8c8c5') + ';background:' + (done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">' +
+          (done?'<svg width="7" height="5" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="white" stroke-width="1.5"/></svg>':'') +
+        '</div>' +
+        '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;' + (done?'color:var(--gray);text-decoration:line-through;':'') + '">' + text + '</span>' +
+      '</div>';
+    }).join('');
+
+    const itemsHtml = userItems.map((item, i) =>
       '<div style="display:flex;align-items:center;gap:0.3rem;padding:0.1rem 0;">' +
         '<div onclick="toggleScheduleItem(\'' + key + '\',' + i + ')" style="width:12px;height:12px;border:1px solid ' + (item.done?'var(--black)':'#c8c8c5') + ';background:' + (item.done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">' +
           (item.done?'<svg width="7" height="5" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="white" stroke-width="1.5"/></svg>':'') +
@@ -1406,11 +1527,12 @@ function renderSchedule() {
 
     return '<div class="time-label" style="padding-top:0.35rem;">' + slot + '</div>' +
       '<div style="padding:0.1rem 0 0.3rem;" onclick="var i=this.querySelector(\'.time-input\');if(i){i.style.display=\'block\';i.focus();}">' +
+        defaultHtml +
         itemsHtml +
         '<input class="time-input" data-key="' + key + '" placeholder="" ' +
           'onkeydown="if(event.key===\'Enter\'){event.preventDefault();addScheduleItem(\'' + key + '\',this);}" ' +
           'onblur="if(!this.value)this.style.display=\'none\';" ' +
-          'style="width:100%;margin-top:' + (items.length?'0.2rem':'0') + ';display:' + (items.length?'none':'block') + ';">' +
+          'style="width:100%;margin-top:' + (defaults.length||userItems.length?'0.2rem':'0') + ';display:' + (defaults.length||userItems.length?'none':'block') + ';">' +
       '</div>';
   }).join('');
 }
@@ -1447,6 +1569,17 @@ function addScheduleItem(key, input) {
     '<button onclick="removeScheduleItem(\'' + key + '\',' + (items.length-1) + ')" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;flex-shrink:0;padding:0;">✕</button>';
   row.insertBefore(div, input);
   saveScheduleFast();
+}
+
+function toggleDefaultItem(key, di) {
+  const dayKey = getDateKey();
+  if (!allPlannerData[dayKey]) allPlannerData[dayKey] = {};
+  if (!allPlannerData[dayKey].schedule) allPlannerData[dayKey].schedule = {};
+  if (!allPlannerData[dayKey].schedule[key]) allPlannerData[dayKey].schedule[key] = {};
+  if (!allPlannerData[dayKey].schedule[key].defaultDone) allPlannerData[dayKey].schedule[key].defaultDone = {};
+  allPlannerData[dayKey].schedule[key].defaultDone[di] = !allPlannerData[dayKey].schedule[key].defaultDone[di];
+  saveScheduleFast();
+  renderSchedule();
 }
 
 function toggleScheduleItem(key, idx) {
@@ -1771,6 +1904,31 @@ function changeVentDate(dir) {
 function loadVentDay() {
   updateDateLabel('vent-date-picker');
   renderVentEntries();
+  const dateKey = getVentDateKey();
+  const existing = ventEntries.find(e => e.dateKey === dateKey && e._auto);
+  const el = document.getElementById('vent-input');
+  if (el) el.value = existing ? existing.text : '';
+}
+
+var _ventAutoTimer = null;
+function saveVentAuto() {
+  clearTimeout(_ventAutoTimer);
+  _ventAutoTimer = setTimeout(function() {
+    const text = document.getElementById('vent-input').value.trim();
+    if (!text) return;
+    const dateKey = getVentDateKey();
+    // update existing entry for this date/session if exists, else create new
+    const existing = ventEntries.find(e => e.dateKey === dateKey && e._auto);
+    if (existing) {
+      existing.text = text;
+      existing.date = new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+    } else {
+      ventEntries.unshift({ id: Date.now(), dateKey, _auto: true, date: new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}), text });
+    }
+    localStorage.setItem('vent_entries', JSON.stringify(ventEntries));
+    if (typeof syncToCloud === 'function') syncToCloud('vent_entries', ventEntries);
+    renderVentEntries();
+  }, 1000);
 }
 
 function saveVent() {
@@ -2614,135 +2772,281 @@ function setDatePickerValue(pickerId, isoVal) {
   if (dp) { dp.value = isoVal; updateDateLabel(pickerId); }
 }
 // ─────────────────────────────────────────────────────────────
-let beliefData = JSON.parse(localStorage.getItem('belief_data') || '{"j":{},"c":{},"o":"","n":""}');
-let beliefQi = +localStorage.getItem('belief_qi') || 0;
-function saveBeliefData() { localStorage.setItem('belief_data', JSON.stringify(beliefData)); if(typeof syncToCloud==='function')syncToCloud('belief_data', beliefData); }
+// ── BELIEF TRACKER ──────────────────────────────────────────────
+var beliefBeliefs = JSON.parse(localStorage.getItem('belief_beliefs') || '[]');
+var beliefSelectedColor = '#f9a8c9';
+var beliefWeekOffsets = {};
+var beliefCalOffsets = {};
 
-function getBeliefDateKey() {
-  const dp = document.getElementById('belief-date-picker');
-  if (dp && dp.value) return dp.value;
-  return new Date().toISOString().split('T')[0];
+function saveBeliefBeliefs() {
+  localStorage.setItem('belief_beliefs', JSON.stringify(beliefBeliefs));
 }
 
-function changeBeliefDate(dir) {
-  const dp = document.getElementById('belief-date-picker');
-  if (!dp) return;
-  const d = new Date(dp.value || new Date().toISOString().split('T')[0]);
-  d.setDate(d.getDate() + dir);
-  dp.value = d.toISOString().split('T')[0];
-  updateDateLabel('belief-date-picker');
-  loadBeliefDay();
+function beliefPickColor(btn) {
+  document.querySelectorAll('.belief-color-opt').forEach(function(b){ b.style.border='2px solid transparent'; });
+  btn.style.border = '2px solid #0a0a0a';
+  beliefSelectedColor = btn.getAttribute('data-color');
 }
 
-function loadBeliefDay() {
-  updateDateLabel('belief-date-picker');
-  renderBeliefChecks();
-  renderBeliefQ();
+function beliefSaveNew() {
+  var oldVal = document.getElementById('belief-old').value.trim();
+  var newVal = document.getElementById('belief-new').value.trim();
+  if (!oldVal || !newVal) return;
+  beliefBeliefs.push({ id: 'b' + Date.now(), old: oldVal, new: newVal, color: beliefSelectedColor, done: {} });
+  saveBeliefBeliefs();
+  document.getElementById('belief-old').value = '';
+  document.getElementById('belief-new').value = '';
+  beliefRenderAll();
 }
 
-const beliefItems = [
-  'Say the new belief out loud',
-  'Notice when the old belief shows up, just observe it',
-  'Do one thing the new belief would do',
-  'Write one piece of evidence that supports the new belief'
-];
-const beliefQs = [
-  'Write the belief in one sentence. When did you first feel this way?',
-  'Where did it come from? A person, an experience, a moment?',
-  'What would you lose if this belief were gone?',
-  'What evidence exists that contradicts this belief?',
-  'If a friend believed this about themselves, what would you tell them?',
-  'What would life look like if the new belief were completely true?',
-  'What triggered the old belief recently? What did you feel?',
-  'What small action today proves the new belief is real?'
-];
-
-function syncBelief() {
-  beliefData.o = document.getElementById('belief-old').value;
-  beliefData.n = document.getElementById('belief-new').value;
-  document.getElementById('belief-arrow').style.opacity = (beliefData.o && beliefData.n) ? '1' : '0';
-  saveBeliefData();
+function beliefDeleteBelief(id) {
+  beliefBeliefs = beliefBeliefs.filter(function(b){ return b.id !== id; });
+  saveBeliefBeliefs();
+  beliefRenderAll();
 }
 
-function renderBeliefChecks() {
-  const dateKey = getBeliefDateKey();
-  const tc = (beliefData.c && beliefData.c[dateKey]) || {};
-  const el = document.getElementById('belief-checks');
+function beliefToggleDay(id, dateStr) {
+  var b = beliefBeliefs.find(function(x){ return x.id === id; });
+  if (!b) return;
+  if (!b.done) b.done = {};
+  b.done[dateStr] = !b.done[dateStr];
+  saveBeliefBeliefs();
+  beliefRenderStrip(id);
+}
+
+function beliefWeekShift(id, dir) {
+  beliefWeekOffsets[id] = (beliefWeekOffsets[id] || 0) + dir;
+  beliefRenderStrip(id);
+}
+
+function beliefCalToggle(id) {
+  var popup = document.getElementById('bfcal-popup-' + id);
+  if (!popup) return;
+  if (popup.style.display === 'none') {
+    beliefCalOffsets[id] = 0;
+    popup.style.display = 'block';
+    beliefRenderCal(id);
+  } else {
+    popup.style.display = 'none';
+  }
+}
+
+function beliefCalShift(id, dir) {
+  beliefCalOffsets[id] = (beliefCalOffsets[id] || 0) + dir;
+  beliefRenderCal(id);
+}
+
+function beliefRenderCal(id) {
+  var b = beliefBeliefs.find(function(x){ return x.id === id; });
+  if (!b) return;
+  var grid = document.getElementById('bfcal-grid-' + id);
+  var lbl  = document.getElementById('bfcal-label-' + id);
+  if (!grid || !lbl) return;
+  var now = new Date();
+  var base = new Date(now.getFullYear(), now.getMonth() + (beliefCalOffsets[id] || 0), 1);
+  var year = base.getFullYear(), month = base.getMonth();
+  var todayStr = now.toISOString().split('T')[0];
+  lbl.textContent = base.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  var firstDow = (new Date(year, month, 1).getDay() + 6) % 7;
+  var daysInMonth = new Date(year, month + 1, 0).getDate();
+  var cells = [];
+  for (var i = 0; i < firstDow; i++) cells.push(null);
+  for (var d = 1; d <= daysInMonth; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+  var dayNames = ['M','T','W','T','F','S','S'];
+  var html = '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px;">'
+    + dayNames.map(function(n){ return '<div style="text-align:center;font-family:Nunito,sans-serif;font-size:0.55rem;color:var(--gray);">' + n + '</div>'; }).join('') + '</div>';
+  for (var w = 0; w < cells.length / 7; w++) {
+    html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px;">';
+    for (var ci = 0; ci < 7; ci++) {
+      var day = cells[w * 7 + ci];
+      if (!day) { html += '<div></div>'; continue; }
+      var mm = String(month+1).padStart(2,'0'), dd = String(day).padStart(2,'0');
+      var ds = year + '-' + mm + '-' + dd;
+      var isToday = ds === todayStr, isFuture = ds > todayStr;
+      var done = b.done && b.done[ds];
+      var bg = done ? b.color : (isToday ? 'var(--black)' : 'transparent');
+      var border = done ? b.color : (isToday ? 'var(--black)' : '#c8c8c5');
+      var color = (isToday || done) ? 'var(--white)' : 'var(--gray)';
+      html += '<div style="display:flex;align-items:center;justify-content:center;border:1px solid ' + border + ';background:' + bg + ';aspect-ratio:1;opacity:' + (isFuture?'0.3':'1') + ';cursor:' + (isFuture?'default':'pointer') + ';"'
+        + (isFuture ? '' : ' onclick="beliefToggleDay(\'' + id + '\',\'' + ds + '\')"')
+        + '><span style="font-family:Nunito,sans-serif;font-size:0.52rem;color:' + color + ';">' + day + '</span></div>';
+    }
+    html += '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function beliefGetWeekDates(offset) {
+  var now = new Date();
+  var dow = (now.getDay() + 6) % 7;
+  var mon = new Date(now); mon.setDate(now.getDate() - dow + offset * 7);
+  var days = [];
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(mon); d.setDate(mon.getDate() + i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  return days;
+}
+
+function beliefGetStreak(b) {
+  var today = new Date().toISOString().split('T')[0];
+  var streak = 0, d = new Date(), checked = false;
+  while (true) {
+    var key = d.toISOString().split('T')[0];
+    if (b.done && b.done[key]) { streak++; checked = true; d.setDate(d.getDate()-1); }
+    else if (!checked && key === today) { d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+function beliefGetTotal(b) {
+  if (!b.done) return 0;
+  return Object.values(b.done).filter(Boolean).length;
+}
+
+function beliefRenderStrip(id) {
+  var b = beliefBeliefs.find(function(x){ return x.id === id; });
+  if (!b) return;
+  var offset = beliefWeekOffsets[id] || 0;
+  var days = beliefGetWeekDates(offset);
+  var todayStr = new Date().toISOString().split('T')[0];
+  var dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  var lbl = document.getElementById('blbl-' + id);
+  if (lbl) {
+    if (offset === 0) {
+      var now = new Date();
+      var dn = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      lbl.textContent = dn[now.getDay()] + ', ' + now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' — Today';
+    } else {
+      var f = new Date(days[0]+'T00:00:00'), la = new Date(days[6]+'T00:00:00');
+      lbl.textContent = f.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' – ' + la.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    }
+  }
+
+  var strip = document.getElementById('bstrip-' + id);
+  if (!strip) return;
+  strip.innerHTML = days.map(function(date, i) {
+    var isToday = date === todayStr;
+    var isFuture = date > todayStr;
+    var done = b.done && b.done[date];
+    var col = isToday ? 'var(--black)' : 'var(--gray)';
+    var fw = isToday ? '400' : '300';
+    var boxBg = done ? b.color : 'transparent';
+    var boxBorder = done ? b.color : (isToday ? 'var(--black)' : '#c8c8c5');
+    var sz = isToday ? '22px' : '18px';
+    var inc = 'beliefToggleDay(\'' + id + '\',\'' + date + '\')';
+    return '<div style="text-align:center;opacity:' + (isFuture?'0.4':'1') + ';">'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:' + col + ';font-weight:' + fw + ';">' + dayNames[i] + '</div>'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.7rem;font-weight:' + fw + ';color:' + col + ';margin-top:0.1rem;">' + new Date(date+'T00:00:00').getDate() + '</div>'
+      + '<div style="display:flex;justify-content:center;align-items:center;margin-top:2px;"' + (isFuture ? '' : ' onclick="' + inc + '"') + '>'
+      + '<div style="width:' + sz + ';height:' + sz + ';border:1px solid ' + boxBorder + ';background:' + boxBg + ';cursor:' + (isFuture?'default':'pointer') + ';display:flex;align-items:center;justify-content:center;transition:all 0.15s;">'
+      + (done ? '<span style="font-family:Nunito,sans-serif;font-size:0.58rem;font-weight:700;color:var(--white);line-height:1;">✓</span>'
+              : (isToday ? '<span style="font-family:Nunito,sans-serif;font-size:0.58rem;font-weight:700;color:var(--black);line-height:1;">+</span>' : ''))
+      + '</div></div></div>';
+  }).join('');
+
+  var srow = document.getElementById('bstreak-' + id);
+  if (srow) {
+    var s = beliefGetStreak(b), t = beliefGetTotal(b);
+    srow.textContent = (s > 0 ? '🔥 ' + s + ' day streak  ·  ' : '') + t + ' day' + (t !== 1 ? 's' : '') + ' total';
+  }
+
+  // re-render cal if open
+  var calPopup = document.getElementById('bfcal-popup-' + id);
+  if (calPopup && calPopup.style.display !== 'none') beliefRenderCal(id);
+}
+
+function beliefRenderAll() {
+  var el = document.getElementById('belief-list');
   if (!el) return;
-  el.innerHTML = beliefItems.map((t, i) => `
-    <div onclick="toggleBeliefCheck(${i})" style="display:flex;align-items:center;gap:0.8rem;padding:0.6rem 0;border-bottom:1px solid var(--light);cursor:pointer;">
-      <div style="width:16px;height:16px;border:1px solid #c8c8c5;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;background:${tc[i]?'var(--black)':'none'};border-color:${tc[i]?'var(--black)':'#c8c8c5'};color:${tc[i]?'var(--white)':'transparent'};">✓</div>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:300;${tc[i]?'color:var(--gray);text-decoration:line-through;':''}">${t}</div>
-    </div>`).join('');
+  if (!beliefBeliefs.length) {
+    el.innerHTML = '<div style="font-family:Lora,serif;font-style:italic;font-size:0.88rem;color:var(--gray);padding:0.5rem 0;">No beliefs yet. Add one above.</div>';
+    return;
+  }
+  el.innerHTML = beliefBeliefs.map(function(b) {
+    return '<div style="margin-bottom:2rem;">'
+      // week nav + calendar btn
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;">'
+      + '<button onclick="beliefWeekShift(\'' + b.id + '\',-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8249;</button>'
+      + '<div style="display:flex;align-items:center;gap:0.5rem;">'
+      + '<div id="blbl-' + b.id + '" style="font-family:Lora,serif;font-style:italic;font-size:0.95rem;color:var(--black);"></div>'
+      + '<div style="position:relative;">'
+      + '<button id="bfcal-btn-' + b.id + '" onclick="beliefCalToggle(\'' + b.id + '\')" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></button>'
+      + '<div id="bfcal-popup-' + b.id + '" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.6rem;z-index:1000;width:min(70vw,220px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">'
+      + '<button onclick="beliefCalShift(\'' + b.id + '\',-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>'
+      + '<div id="bfcal-label-' + b.id + '" style="font-family:Nunito,sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>'
+      + '<button onclick="beliefCalShift(\'' + b.id + '\',1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>'
+      + '</div>'
+      + '<div id="bfcal-grid-' + b.id + '"></div>'
+      + '</div></div></div>'
+      + '<button onclick="beliefWeekShift(\'' + b.id + '\',1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8250;</button>'
+      + '</div>'
+      // day strip
+      + '<div id="bstrip-' + b.id + '" style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;margin-bottom:1.2rem;"></div>'
+      // streak
+      + '<div id="bstreak-' + b.id + '" style="font-family:Nunito,sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:1rem;"></div>'
+      // belief label row
+      + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;margin-bottom:0.8rem;">'
+      + '<div style="display:flex;gap:0.6rem;align-items:flex-start;flex:1;">'
+      + '<div style="width:4px;min-height:44px;background:' + b.color + ';flex-shrink:0;margin-top:2px;"></div>'
+      + '<div>'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.1rem;">Now I choose to believe</div>'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);margin-bottom:0.4rem;">' + b.new.replace(/</g,'&lt;') + '</div>'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.1rem;">I used to believe</div>'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:300;color:var(--gray);text-decoration:line-through;">' + b.old.replace(/</g,'&lt;') + '</div>'
+      + '</div></div>'
+      + '<button onclick="beliefDeleteBelief(\'' + b.id + '\')" style="font-family:Nunito,sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;border:none;background:none;cursor:pointer;color:var(--gray);padding:0;flex-shrink:0;">remove</button>'
+      + '</div>'
+      + '<hr style="border:none;border-top:1px solid var(--light);margin:0;">'
+      + '</div>';
+  }).join('');
+  beliefBeliefs.forEach(function(b){ beliefRenderStrip(b.id); });
+
+  // close cal on outside click
+  document.querySelectorAll('[id^="bfcal-popup-"]').forEach(function(popup) {
+    popup._outsideHandler && document.removeEventListener('click', popup._outsideHandler);
+    popup._outsideHandler = function(e) {
+      var id = popup.id.replace('bfcal-popup-','');
+      var btn = document.getElementById('bfcal-btn-' + id);
+      if (popup.style.display !== 'none' && !popup.contains(e.target) && !(btn && btn.contains(e.target))) {
+        popup.style.display = 'none';
+      }
+    };
+    document.addEventListener('click', popup._outsideHandler);
+  });
 }
 
-function toggleBeliefCheck(i) {
-  const dateKey = getBeliefDateKey();
-  if (!beliefData.c) beliefData.c = {};
-  if (!beliefData.c[dateKey]) beliefData.c[dateKey] = {};
-  beliefData.c[dateKey][i] = !beliefData.c[dateKey][i];
-  saveBeliefData(); renderBeliefChecks();
-}
-
-function renderBeliefQ() {
-  const dateKey = getBeliefDateKey();
-  const dayJ = (beliefData.j && beliefData.j[dateKey]) || {};
-  const qtEl = document.getElementById('belief-qtext');
-  const qaEl = document.getElementById('belief-qans');
-  const dotsEl = document.getElementById('belief-dots');
-  if (!qtEl) return;
-  qtEl.textContent = beliefQs[beliefQi];
-  qaEl.value = dayJ[beliefQi] || '';
-  document.getElementById('belief-prev').disabled = beliefQi === 0;
-  document.getElementById('belief-next').disabled = beliefQi === beliefQs.length - 1;
-  dotsEl.innerHTML = beliefQs.map((_,i) => `
-    <div onclick="beliefJump(${i})" style="width:6px;height:6px;border-radius:50%;background:${dayJ[i]?'var(--black)':i===beliefQi?'var(--gray)':'#e8e8e5'};cursor:pointer;transition:background 0.2s;"></div>`).join('');
-}
-
-function saveBeliefAns() {
-  const dateKey = getBeliefDateKey();
-  if (!beliefData.j) beliefData.j = {};
-  if (!beliefData.j[dateKey]) beliefData.j[dateKey] = {};
-  beliefData.j[dateKey][beliefQi] = document.getElementById('belief-qans').value;
-  saveBeliefData(); renderBeliefQ();
-}
-
-function beliefGo(dir) {
-  beliefQi = Math.max(0, Math.min(beliefQs.length - 1, beliefQi + dir));
-  localStorage.setItem('belief_qi', beliefQi);
-  renderBeliefQ();
-}
-
-function beliefJump(i) {
-  beliefQi = i;
-  localStorage.setItem('belief_qi', beliefQi);
-  renderBeliefQ();
-}
+// stubs
+function saveBeliefData() {}
+function syncBelief() {}
+function getBeliefDateKey() { return new Date().toISOString().split('T')[0]; }
+function changeBeliefDate() {}
+function loadBeliefDay() { beliefRenderAll(); }
+function renderBeliefCal() {}
+function renderBeliefChecks() {}
+function toggleBeliefCheck() {}
+function renderBeliefQ() {}
+function saveBeliefAns() {}
+function saveBeliefLifeChange() {}
+function beliefGo() {}
+function beliefJump() {}
 
 window.addEventListener('DOMContentLoaded', function() {
-  const oldEl = document.getElementById('belief-old');
-  const newEl = document.getElementById('belief-new');
-  if (oldEl) oldEl.value = beliefData.o || '';
-  if (newEl) newEl.value = beliefData.n || '';
-  if (beliefData.o && beliefData.n) {
-    const arrow = document.getElementById('belief-arrow');
-    if (arrow) arrow.style.opacity = '1';
-  }
   // Init date pickers
   const today = new Date().toISOString().split('T')[0];
-  const bdp = document.getElementById('belief-date-picker');
-  if (bdp && !bdp.value) bdp.value = today;
   const whoiDp = document.getElementById('whoi-date-picker');
   if (whoiDp && !whoiDp.value) whoiDp.value = today;
-  // init wins + vent labels
   const winsDp = document.getElementById('wins-date-picker');
   if (winsDp && !winsDp.value) winsDp.value = today;
   const ventDp = document.getElementById('vent-date-picker');
   if (ventDp && !ventDp.value) ventDp.value = today;
-  ['wins-date-picker','vent-date-picker','belief-date-picker','whoi-date-picker'].forEach(updateDateLabel);
+  ['wins-date-picker','vent-date-picker','whoi-date-picker'].forEach(updateDateLabel);
 
-  renderBeliefChecks();
-  renderBeliefQ();
+  beliefRenderAll();
 });
 </script>
 
@@ -3126,7 +3430,7 @@ window.addEventListener('DOMContentLoaded', function() {
       <button id="bctab-face"  onclick="showBodycareTab('face')"  class="journal-tab active">Face</button>
       <button id="bctab-ears"  onclick="showBodycareTab('ears')"  class="journal-tab">Ears</button>
       <button id="bctab-hair"  onclick="showBodycareTab('hair')"  class="journal-tab">Hair & Body</button>
-      <button id="bctab-skin"  onclick="showBodycareTab('skin')"  class="journal-tab">Skin</button>
+      <button id="bctab-teeth" onclick="showBodycareTab('teeth')" class="journal-tab">Teeth</button>
       <button id="bctab-nails" onclick="showBodycareTab('nails')" class="journal-tab">Nails</button>
     </div>
 
@@ -3141,7 +3445,7 @@ window.addEventListener('DOMContentLoaded', function() {
             <div id="face-habits-week-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);"></div>
             <div style="position:relative;">
               <button id="bccal-btn-face" onclick="bcCalToggle('face')" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></button>
-              <div id="bccal-popup-face" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:1rem;z-index:1000;width:min(80vw,280px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+              <div id="bccal-popup-face" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.6rem;z-index:1000;width:min(70vw,220px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
                   <button onclick="bcCalShift('face',-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
                   <div id="bccal-label-face" style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
@@ -3186,7 +3490,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <div id="bc-hair-week-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);"></div>
           <div style="position:relative;">
             <button id="bccal-btn-hair" onclick="bcCalToggle('hair')" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></button>
-            <div id="bccal-popup-hair" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:1rem;z-index:1000;width:min(80vw,280px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+            <div id="bccal-popup-hair" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.6rem;z-index:1000;width:min(70vw,220px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
                 <button onclick="bcCalShift('hair',-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
                 <div id="bccal-label-hair" style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
@@ -3218,40 +3522,41 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <!-- Skin -->
-    <div id="bcpanel-skin" style="display:none;">
+    <!-- Teeth -->
+    <div id="bcpanel-teeth" style="display:none;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;">
-        <button onclick="bcWeekShift('skin',-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8249;</button>
+        <button onclick="bcWeekShift('teeth',-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8249;</button>
         <div style="display:flex;align-items:center;gap:0.5rem;">
-          <div id="bc-skin-week-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);"></div>
+          <div id="bc-teeth-week-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);"></div>
           <div style="position:relative;">
-            <button id="bccal-btn-skin" onclick="bcCalToggle('skin')" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></button>
-            <div id="bccal-popup-skin" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:1rem;z-index:1000;width:min(80vw,280px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+            <button id="bccal-btn-teeth" onclick="bcCalToggle('teeth')" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></button>
+            <div id="bccal-popup-teeth" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.6rem;z-index:1000;width:min(70vw,220px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
-                <button onclick="bcCalShift('skin',-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
-                <div id="bccal-label-skin" style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
-                <button onclick="bcCalShift('skin',1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+                <button onclick="bcCalShift('teeth',-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
+                <div id="bccal-label-teeth" style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+                <button onclick="bcCalShift('teeth',1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
               </div>
-              <div id="bccal-grid-skin"></div>
+              <div id="bccal-grid-teeth"></div>
             </div>
           </div>
         </div>
-        <button onclick="bcWeekShift('skin',1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8250;</button>
+        <button onclick="bcWeekShift('teeth',1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8250;</button>
       </div>
-      <div id="bc-skin-day-strip" style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;margin-bottom:1.2rem;"></div>
-      <div id="bc-skin-list"></div>
+      <div id="bc-teeth-day-strip" style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;margin-bottom:1.2rem;"></div>
+      <div id="bc-teeth-list"></div>
       <div style="margin-top:1.2rem;border-top:1px solid var(--light);padding-top:1rem;">
         <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Add a habit</div>
         <div style="display:flex;gap:0.5rem;align-items:center;">
-          <input id="bc-skin-input" type="text" placeholder="e.g. moisturise, SPF, serum…" onkeydown="if(event.key==='Enter')bcAdd('skin')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-          <button onclick="bcAdd('skin')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
+          <input id="bc-teeth-input" type="text" placeholder="e.g. brush, floss, mouthwash, whiten…" onkeydown="if(event.key==='Enter')bcAdd('teeth')" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <button onclick="bcAdd('teeth')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
         </div>
-        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;" id="bc-skin-colors">
-          <button class="bc-color-opt skin selected" data-cat="skin" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;"></button>
-          <button class="bc-color-opt skin" data-cat="skin" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt skin" data-cat="skin" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt skin" data-cat="skin" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt skin" data-cat="skin" data-color="#d4b8f9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt skin" data-cat="skin" data-color="#f9c8a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;"></button>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;" id="bc-teeth-colors">
+          <button class="bc-color-opt teeth selected" data-cat="teeth" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;"></button>
+          <button class="bc-color-opt teeth" data-cat="teeth" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt teeth" data-cat="teeth" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt teeth" data-cat="teeth" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt teeth" data-cat="teeth" data-color="#d4b8f9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;"></button>
+          <button class="bc-color-opt teeth" data-cat="teeth" data-color="#f9c8a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;"></button>
         </div>
       </div>
     </div>
@@ -3264,7 +3569,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <div id="bc-ears-week-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);"></div>
           <div style="position:relative;">
             <button id="bccal-btn-ears" onclick="bcCalToggle('ears')" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></button>
-            <div id="bccal-popup-ears" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:1rem;z-index:1000;width:min(80vw,280px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+            <div id="bccal-popup-ears" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.6rem;z-index:1000;width:min(70vw,220px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
                 <button onclick="bcCalShift('ears',-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
                 <div id="bccal-label-ears" style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
@@ -3303,7 +3608,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <div id="bc-nails-week-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);"></div>
           <div style="position:relative;">
             <button id="bccal-btn-nails" onclick="bcCalToggle('nails')" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></button>
-            <div id="bccal-popup-nails" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:1rem;z-index:1000;width:min(80vw,280px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+            <div id="bccal-popup-nails" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.6rem;z-index:1000;width:min(70vw,220px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
                 <button onclick="bcCalShift('nails',-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
                 <div id="bccal-label-nails" style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
@@ -4309,21 +4614,21 @@ var bodycareData = { face: [], hair: [], skin: [], ears: [], nails: [] };
 
 function bodycareLoad() {}
 function bodycareSave() {}
-function bodycareRender() { bcLoad(); ['hair','skin','ears','nails'].forEach(function(c){ bcRender(c); }); }
+function bodycareRender() { bcLoad(); ['hair','teeth','ears','nails'].forEach(function(c){ bcRender(c); }); }
 function bodycareAdd(cat) {}
 function bodycareDelete(cat, i) {}
 
 // ── BODYCARE HABIT TRACKER (hair/skin/ears/nails) ────────────
 var BC_KEY = 'bc_habits_data';
 var bcData = {};
-var bcWeekOffsets = { hair:0, skin:0, ears:0, nails:0 };
-var bcSelectedColors = { hair:'#f9a8c9', skin:'#f9a8c9', ears:'#f9a8c9', nails:'#f9a8c9' };
+var bcWeekOffsets = { hair:0, teeth:0, ears:0, nails:0 };
+var bcSelectedColors = { hair:'#f9a8c9', teeth:'#f9a8c9', ears:'#f9a8c9', nails:'#f9a8c9' };
 var _bcPressTimer = null;
 var _bcPressTriggered = false;
 
 function bcLoad() {
   try { var d = localStorage.getItem(BC_KEY); if (d) bcData = JSON.parse(d); } catch(e) {}
-  ['hair','skin','ears','nails'].forEach(function(cat) {
+  ['hair','teeth','ears','nails'].forEach(function(cat) {
     if (!bcData[cat]) bcData[cat] = { habits:[], log:{} };
     if (!bcData[cat].habits) bcData[cat].habits = [];
     if (!bcData[cat].log) bcData[cat].log = {};
@@ -4336,7 +4641,7 @@ function bcSave() {
 }
 
 function showBodycareTab(tab) {
-  ['face','hair','skin','ears','nails'].forEach(function(t) {
+  ['face','hair','teeth','ears','nails'].forEach(function(t) {
     var panel = document.getElementById('bcpanel-'+t);
     var btn   = document.getElementById('bctab-'+t);
     if (!panel || !btn) return;
@@ -4344,7 +4649,7 @@ function showBodycareTab(tab) {
     btn.classList.toggle('active', t === tab);
   });
   if (tab === 'face') faceHabitsRender();
-  else if (['hair','skin','ears','nails'].indexOf(tab) !== -1) bcRender(tab);
+  else if (['hair','teeth','ears','nails'].indexOf(tab) !== -1) bcRender(tab);
 }
 
 function bcGetWeekDates(offset) {
@@ -4440,7 +4745,7 @@ function hexToRgba(hex, alpha) {
 
 
 // ── BODYCARE POPUP CALENDAR ──────────────────────────────────
-var bcCalOffsets = { face:0, hair:0, skin:0, ears:0, nails:0 };
+var bcCalOffsets = { face:0, hair:0, teeth:0, ears:0, nails:0 };
 
 function bcCalToggle(cat) {
   var popup = document.getElementById('bccal-popup-' + cat);
@@ -4458,7 +4763,7 @@ function bcCalToggle(cat) {
 }
 
 document.addEventListener('click', function(e) {
-  ['face','hair','skin','ears','nails'].forEach(function(cat) {
+  ['face','hair','teeth','ears','nails'].forEach(function(cat) {
     var popup = document.getElementById('bccal-popup-' + cat);
     if (!popup || popup.style.display === 'none') return;
     var btn = document.getElementById('bccal-btn-' + cat);
@@ -4530,16 +4835,9 @@ function bcCalRender(cat) {
       var doneHabits = habits.filter(function(h){ return getHabitCount(h.id, ds) > 0; });
       var totalCount = doneHabits.reduce(function(sum, h){ return sum + getHabitCount(h.id, ds); }, 0);
 
-      // Build colored dot strip (one dot per done habit, using its color)
+      // Build colored dot strip (one dot per done habit only)
       var dots = doneHabits.map(function(h) {
-        var cnt = getHabitCount(h.id, ds);
-        // Show up to 3 dots per habit (for multiple counts)
-        var n = Math.min(cnt, 3);
-        var d2 = '';
-        for (var x = 0; x < n; x++) {
-          d2 += '<div style="width:6px;height:6px;border-radius:50%;background:' + h.color + ';flex-shrink:0;"></div>';
-        }
-        return d2;
+        return '<div style="width:6px;height:6px;border-radius:50%;background:' + h.color + ';flex-shrink:0;"></div>';
       }).join('');
 
       var border = isToday ? 'var(--black)' : (doneHabits.length > 0 ? '#c8c8c5' : '#c8c8c5');
