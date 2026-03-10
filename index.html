@@ -129,10 +129,9 @@
   .counter-btn { width: 30px; height: 30px; border: 1px solid #c8c8c5; background: none; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: background 0.15s, color 0.15s; font-family: 'Nunito', sans-serif; }
   .counter-btn:hover { background: var(--black); color: var(--white); }
   .counter-num { font-family: 'Nunito', sans-serif; font-size: 1rem; min-width: 24px; text-align: center; }
-  .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid #c8c8c5; margin-bottom: 2rem; }
+  .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-left: 1px solid #c8c8c5; border-top: 1px solid #c8c8c5; margin-bottom: 2rem; }
   .home-card { background: var(--white); padding: 1.2rem 1.5rem; cursor: pointer; transition: background 0.2s; display: flex; flex-direction: column; justify-content: flex-start; border-right: 1px solid #c8c8c5; border-bottom: 1px solid #c8c8c5; }
-  .home-card:nth-child(even) { border-right: none; }
-  .home-card:hover, .home-card:active { background: var(--light); }
+  .home-card:nth-child(even) { }
   .home-card:hover, .home-card:active { background: var(--light); }
   .home-card-title { font-family: 'Nunito', sans-serif; font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.6rem; color: var(--gray); }
   .home-card-text { font-size: 1.1rem; font-weight: 300; }
@@ -251,7 +250,7 @@
 
     <div class="home-card" style="cursor:default;">
       <div class="home-card-title">Jesus Christ</div>
-      <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
+      <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
         <div onclick="showSection('jesus');setTimeout(()=>showJesusTab('whoisjesus'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Jesus Christ</div>
         <div onclick="showSection('jesus');setTimeout(()=>showJesusTab('prayer'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Prayer</div>
         <div onclick="showSection('jesus');setTimeout(()=>showJesusTab('action'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Today's Action</div>
@@ -261,7 +260,7 @@
 
     <div class="home-card" style="cursor:default;">
       <div class="home-card-title">Journal</div>
-      <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
+      <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
         <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('belief'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Belief</div>
         <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('vent'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Journal</div>
         <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('books'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Books</div>
@@ -271,7 +270,7 @@
 
     <div class="home-card" style="cursor:default;">
       <div class="home-card-title">Vision Board</div>
-      <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
+      <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
         <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-spiritual')&&document.getElementById('dim-spiritual').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Spiritual</div>
         <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-social')&&document.getElementById('dim-social').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Social</div>
         <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-physical')&&document.getElementById('dim-physical').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Physical</div>
@@ -284,16 +283,21 @@
 
     <div class="home-card" style="cursor:default;">
       <div class="home-card-title">Schedule</div>
-      <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
+      <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
         <div onclick="goToScheduleItem('ps-schedule')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Schedule</div>
         <div onclick="goToScheduleItem('ps-todo')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">To Do</div>
+        <div onclick="goToScheduleItem('ps-notes')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Notes</div>
+        <div onclick="goToScheduleItem('ps-tomorrow')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">For Tomorrow</div>
+        <div onclick="goToScheduleItem('ps-goal')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Today's Goal</div>
+        <div onclick="goToScheduleItem('ps-ibelieve')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">I Believe…</div>
         <div onclick="goToScheduleItem('ps-mood')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Mood</div>
+        <div id="home-sched-preview" style="margin-top:0.5rem;"></div>
       </div>
     </div>
 
     <div class="home-card" style="cursor:default;">
       <div class="home-card-title">Me</div>
-      <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
+      <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
         <div onclick="showSection('me');setTimeout(()=>showMeTab('whiam'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Who I Am</div>
         <div onclick="showSection('me');setTimeout(()=>showMeTab('balance'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Balance</div>
         <div onclick="showSection('me');setTimeout(()=>showMeTab('rightforme'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Right For Me</div>
@@ -302,7 +306,7 @@
 
     <div class="home-card" style="cursor:default;">
       <div class="home-card-title">Habits</div>
-      <div style="display:flex;flex-direction:column;margin-top:0.3rem;">
+      <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
         <div onclick="showSection('habits');setTimeout(()=>showHabitsTab('calisthenics'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Calisthenics</div>
         <div onclick="showSection('habits');setTimeout(()=>showHabitsTab('daily'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Daily</div>
         <div onclick="showSection('habits');setTimeout(()=>showHabitsTab('bodycare'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Body Care</div>
@@ -474,6 +478,30 @@
     <div id="ps-schedule" style="border:1px solid #c8c8c5;padding:0.8rem;">
       <div class="planner-label">Schedule</div>
       <div style="display:grid;grid-template-columns:auto 1fr;gap:0 0.4rem;margin-top:0.5rem;" id="schedule-time-rows"></div>
+    </div>
+
+    <!-- Notes -->
+    <div id="ps-notes" style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div class="planner-label">Notes</div>
+      <textarea id="sched-notes" rows="3" placeholder="Anything on your mind today…" oninput="schedAutoSave()" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
+    </div>
+
+    <!-- For Tomorrow -->
+    <div id="ps-tomorrow" style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div class="planner-label">For Tomorrow</div>
+      <textarea id="sched-tomorrow" rows="3" placeholder="What do you want to prepare or remember for tomorrow?" oninput="schedAutoSave()" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
+    </div>
+
+    <!-- Today's Goal -->
+    <div id="ps-goal" style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div class="planner-label">Today's Goal</div>
+      <textarea id="sched-goal" rows="2" placeholder="My one big goal for today is…" oninput="schedAutoSave()" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
+    </div>
+
+    <!-- I Believe -->
+    <div id="ps-ibelieve" style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div class="planner-label">I Believe…</div>
+      <textarea id="sched-ibelieve" rows="2" placeholder="Today I believe…" oninput="schedAutoSave()" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
     </div>
 
   </div>
@@ -1537,6 +1565,36 @@ function renderSchedule() {
   }).join('');
 }
 
+var _schedAutoTimer = null;
+function schedAutoSave() {
+  clearTimeout(_schedAutoTimer);
+  _schedAutoTimer = setTimeout(function() {
+    const key = getDateKey();
+    if (!allPlannerData[key]) allPlannerData[key] = {};
+    const d = allPlannerData[key];
+    d.schedNotes = document.getElementById('sched-notes')?.value || '';
+    d.schedTomorrow = document.getElementById('sched-tomorrow')?.value || '';
+    d.schedGoal = document.getElementById('sched-goal')?.value || '';
+    d.schedBelieve = document.getElementById('sched-ibelieve')?.value || '';
+    localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData));
+    if (typeof syncToCloud === 'function') syncToCloud('all_planner_data', allPlannerData);
+    renderHomeSchedulePreview();
+  }, 600);
+}
+
+function renderHomeSchedulePreview() {
+  const el = document.getElementById('home-sched-preview');
+  if (!el) return;
+  const today = new Date().toISOString().split('T')[0];
+  const d = allPlannerData[today] || {};
+  let html = '';
+  if (d.schedGoal) html += '<div style="padding:0.35rem 0;border-bottom:1px solid var(--light);"><span style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">Goal · </span><span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);">' + d.schedGoal.replace(/</g,'&lt;') + '</span></div>';
+  if (d.schedBelieve) html += '<div style="padding:0.35rem 0;border-bottom:1px solid var(--light);"><span style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">Believe · </span><span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);font-style:italic;">' + d.schedBelieve.replace(/</g,'&lt;') + '</span></div>';
+  if (d.schedNotes) html += '<div style="padding:0.35rem 0;border-bottom:1px solid var(--light);"><span style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">Notes · </span><span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);">' + d.schedNotes.replace(/</g,'&lt;') + '</span></div>';
+  if (d.schedTomorrow) html += '<div style="padding:0.35rem 0;"><span style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">Tomorrow · </span><span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);">' + d.schedTomorrow.replace(/</g,'&lt;') + '</span></div>';
+  el.innerHTML = html;
+}
+
 var _scheduleSaveTimer = null;
 function saveScheduleFast() {
   clearTimeout(_scheduleSaveTimer);
@@ -1790,6 +1848,10 @@ function savePlannerDay() {
   d.bibleVerse = document.getElementById('bible-verse')?.value || '';
   d.bibleRef = document.getElementById('bible-ref')?.value || '';
   d.notesList = plannerNotes;
+  d.schedNotes = document.getElementById('sched-notes')?.value || '';
+  d.schedTomorrow = document.getElementById('sched-tomorrow')?.value || '';
+  d.schedGoal = document.getElementById('sched-goal')?.value || '';
+  d.schedBelieve = document.getElementById('sched-ibelieve')?.value || '';
 
   // todos & goals
   d.todos = plannerTodos;
@@ -1829,6 +1891,11 @@ function loadPlannerDay() {
   if (document.getElementById('bible-ref')) document.getElementById('bible-ref').value = d.bibleRef||'';
   plannerNotes = d.notesList || [];
   renderNotes();
+  if (document.getElementById('sched-notes')) document.getElementById('sched-notes').value = d.schedNotes||'';
+  if (document.getElementById('sched-tomorrow')) document.getElementById('sched-tomorrow').value = d.schedTomorrow||'';
+  if (document.getElementById('sched-goal')) document.getElementById('sched-goal').value = d.schedGoal||'';
+  if (document.getElementById('sched-ibelieve')) document.getElementById('sched-ibelieve').value = d.schedBelieve||'';
+  renderHomeSchedulePreview();
 
   // todos & goals
   plannerTodos = d.todos || [];
@@ -2525,7 +2592,7 @@ document.head.appendChild(manifestLink);
   });
 
 function showMeTab(tab) {
-  ['balance','whiam','rightforme'].forEach(function(t) {
+  ['balance','whiam','rightforme','assertive'].forEach(function(t) {
     document.getElementById('mesub-' + t).style.display = t === tab ? 'block' : 'none';
     document.getElementById('metab-' + t).classList.toggle('active', t === tab);
   });
@@ -2536,6 +2603,7 @@ function showMeTab(tab) {
   }
   if (tab === 'whiam') initWhiAm();
   if (tab === 'rightforme') rfmRender();
+  if (tab === 'assertive') initAssertive();
 }
 
 function initMeSection() {
@@ -3047,6 +3115,7 @@ window.addEventListener('DOMContentLoaded', function() {
   ['wins-date-picker','vent-date-picker','whoi-date-picker'].forEach(updateDateLabel);
 
   beliefRenderAll();
+  renderHomeSchedulePreview();
 });
 </script>
 
@@ -3055,8 +3124,9 @@ window.addEventListener('DOMContentLoaded', function() {
   <!-- Journal-style sub-tabs -->
   <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;">
     <button class="journal-tab active" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
-    <button class="journal-tab" onclick="showMeTab('balance')" id="metab-balance">Balance</button>
+    <button class="journal-tab" onclick="showMeTab('assertive')" id="metab-assertive">Assertive</button>
     <button class="journal-tab" onclick="showMeTab('rightforme')" id="metab-rightforme">Right For Me</button>
+    <button class="journal-tab" onclick="showMeTab('balance')" id="metab-balance">Balance</button>
   </div>
 
   <!-- BALANCE sub-section -->
@@ -3376,6 +3446,166 @@ window.addEventListener('DOMContentLoaded', function() {
   <div id="rfm-person-detail" style="display:none;">
     <button class="rfm-back" onclick="rfmCloseDetail()">← Back</button>
     <div id="rfm-detail-content"></div>
+  </div>
+</div>
+
+<!-- ASSERTIVE SECTION -->
+<div id="mesub-assertive" style="display:none;">
+  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">Ask for what you need. Give what you can. Stay yourself.</div>
+
+  <!-- Inner tabs -->
+  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+    <button class="balance-sub-tab active" onclick="assertiveInnerTab('understand')" id="asstab-understand">Understand</button>
+    <button class="balance-sub-tab" onclick="assertiveInnerTab('asking')" id="asstab-asking">Asking</button>
+    <button class="balance-sub-tab" onclick="assertiveInnerTab('giving')" id="asstab-giving">Giving</button>
+    <button class="balance-sub-tab" onclick="assertiveInnerTab('practice')" id="asstab-practice">Practice</button>
+  </div>
+
+  <!-- UNDERSTAND panel -->
+  <div id="asspanel-understand">
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:1.2rem;">The three styles</div>
+
+    <div style="display:grid;gap:0.8rem;margin-bottom:1.8rem;">
+      <!-- Passive -->
+      <div style="border:1px solid #e8e8e5;padding:1rem 1.2rem;">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.5rem;">
+          <div style="width:8px;height:8px;background:#c8c8c5;border-radius:50%;flex-shrink:0;"></div>
+          <div style="font-family:'Lora',serif;font-size:0.95rem;">Passive</div>
+        </div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;margin-bottom:0.6rem;">You stay silent about what you need to avoid conflict or to keep the peace. Your feelings get buried. Others can't know what you want if you never say it.</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:#aaa;font-style:italic;line-height:1.5;">Sounds like: "It's fine, don't worry about it." · "No no you pick." · "I don't mind." (when you do)</div>
+      </div>
+
+      <!-- Aggressive -->
+      <div style="border:1px solid #e8e8e5;padding:1rem 1.2rem;">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.5rem;">
+          <div style="width:8px;height:8px;background:#f9a8a8;border-radius:50%;flex-shrink:0;"></div>
+          <div style="font-family:'Lora',serif;font-size:0.95rem;">Aggressive</div>
+        </div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;margin-bottom:0.6rem;">You push your needs in a way that disregards the other person. It may get results short-term but damages trust and connection.</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:#aaa;font-style:italic;line-height:1.5;">Sounds like: "You always do this." · "Why can't you just" · demanding, blaming, raising your voice.</div>
+      </div>
+
+      <!-- Assertive -->
+      <div style="border:1px solid #0a0a0a;padding:1rem 1.2rem;">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.5rem;">
+          <div style="width:8px;height:8px;background:#b8f0c8;border-radius:50%;flex-shrink:0;"></div>
+          <div style="font-family:'Lora',serif;font-size:0.95rem;">Assertive ✦</div>
+        </div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;margin-bottom:0.6rem;">You express your needs clearly and kindly. You respect yourself <em>and</em> the other person. You can say no without guilt, and yes without resentment.</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:#aaa;font-style:italic;line-height:1.5;">Sounds like: "I feel ___ when ___, and I need ___." · "I can't do that, but I can ___." · "That doesn't work for me."</div>
+      </div>
+    </div>
+
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Why it's worth learning</div>
+    <div style="display:grid;gap:0.4rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.6rem 0;border-bottom:1px solid var(--light);">You stop abandoning yourself to manage other people's feelings.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.6rem 0;border-bottom:1px solid var(--light);">Your relationships get more real people know where you actually stand.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.6rem 0;border-bottom:1px solid var(--light);">Resentment has less room to build up.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.6rem 0;">You model healthy communication for everyone around you.</div>
+    </div>
+  </div>
+
+  <!-- ASKING panel -->
+  <div id="asspanel-asking" style="display:none;">
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:1.2rem;">How to ask for what you need</div>
+
+    <!-- Formula -->
+    <div style="border:1px solid #e8e8e5;padding:1rem 1.2rem;margin-bottom:1.5rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">The formula</div>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:1rem;color:var(--black);line-height:1.8;">
+        "When <span style="text-decoration:underline;text-underline-offset:3px;">[situation]</span>, I feel <span style="text-decoration:underline;text-underline-offset:3px;">[emotion]</span>, because I need <span style="text-decoration:underline;text-underline-offset:3px;">[need]</span>. Would you be willing to <span style="text-decoration:underline;text-underline-offset:3px;">[request]</span>?"
+      </div>
+    </div>
+
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Real examples</div>
+    <div style="display:grid;gap:0.6rem;margin-bottom:1.8rem;">
+      <div style="background:#fafaf8;padding:0.8rem 1rem;border-left:2px solid #b8f0c8;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);line-height:1.6;">"When plans change last minute, I feel anxious because I need some predictability. Could you let me know at least a day ahead when you can?"</div>
+      </div>
+      <div style="background:#fafaf8;padding:0.8rem 1rem;border-left:2px solid #b8f0c8;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);line-height:1.6;">"I've been feeling really overwhelmed. I need some alone time tonight not because of you, just to recharge."</div>
+      </div>
+      <div style="background:#fafaf8;padding:0.8rem 1rem;border-left:2px solid #b8f0c8;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);line-height:1.6;">"That comment hurt a bit. I know you didn't mean it that way, but I'd love it if we could talk about it."</div>
+      </div>
+    </div>
+
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Things to remember</div>
+    <div style="display:grid;gap:0.3rem;margin-bottom:1.8rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;border-bottom:1px solid var(--light);">You're allowed to have needs. Needs aren't demands.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;border-bottom:1px solid var(--light);">Say "I feel" not "you make me feel" it keeps it yours.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;border-bottom:1px solid var(--light);">Be specific about what you're asking for. Vague asks get vague responses.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;">Their reaction is theirs. You're responsible for how you ask, not how they respond.</div>
+    </div>
+
+    <!-- Phrase builder -->
+    <div style="border-top:1px solid var(--light);padding-top:1.2rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Save a phrase you want to use</div>
+      <textarea id="ass-asking-notes" placeholder="Write out something you need to say to someone… practice the words here first." style="width:100%;min-height:80px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;" oninput="assNotesave('asking')"></textarea>
+    </div>
+  </div>
+
+  <!-- GIVING panel -->
+  <div id="asspanel-giving" style="display:none;">
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:1.2rem;">How to give to others without losing yourself</div>
+
+    <div style="border:1px solid #e8e8e5;padding:1rem 1.2rem;margin-bottom:1.5rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">The key idea</div>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);line-height:1.7;">Giving from fullness is love. Giving from fear of what happens if you don't is people-pleasing.</div>
+    </div>
+
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Assertive giving looks like</div>
+    <div style="display:grid;gap:0.3rem;margin-bottom:1.8rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;border-bottom:1px solid var(--light);">Saying yes because you <em>want</em> to, not to avoid guilt.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;border-bottom:1px solid var(--light);">Saying no with warmth "I can't this time, but I care about you."</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;border-bottom:1px solid var(--light);">Offering what you genuinely have energy, time, attention without overextending.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;border-bottom:1px solid var(--light);">Checking in with yourself first: <em>Do I actually have capacity for this right now?</em></div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;padding:0.5rem 0;">Not over-explaining or apologizing for your limits.</div>
+    </div>
+
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Ways to say no kindly</div>
+    <div style="display:grid;gap:0.6rem;margin-bottom:1.8rem;">
+      <div style="background:#fafaf8;padding:0.8rem 1rem;border-left:2px solid #d4b8f9;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);line-height:1.6;">"I really wish I could I just don't have the bandwidth right now."</div>
+      </div>
+      <div style="background:#fafaf8;padding:0.8rem 1rem;border-left:2px solid #d4b8f9;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);line-height:1.6;">"That's not something I can commit to, but I appreciate you asking."</div>
+      </div>
+      <div style="background:#fafaf8;padding:0.8rem 1rem;border-left:2px solid #d4b8f9;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);line-height:1.6;">"I can't do [that], but I can do [this] would that help?"</div>
+      </div>
+      <div style="background:#fafaf8;padding:0.8rem 1rem;border-left:2px solid #d4b8f9;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);line-height:1.6;">"No, but I love you." (sometimes that's enough)</div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div style="border-top:1px solid var(--light);padding-top:1.2rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Reflect what do I tend to over-give in?</div>
+      <textarea id="ass-giving-notes" placeholder="Where do you give too much? Time? Emotional energy? Saying yes when you mean no?…" style="width:100%;min-height:80px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;" oninput="assNotesave('giving')"></textarea>
+    </div>
+  </div>
+
+  <!-- PRACTICE panel -->
+  <div id="asspanel-practice" style="display:none;">
+    <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:1.2rem;">Daily practice</div>
+
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Assertiveness is a muscle. You build it with small, real moments not big confrontations.</div>
+
+    <!-- Check-in prompts -->
+    <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Daily check-in</div>
+    <div id="ass-checkin-list" style="margin-bottom:1.5rem;"></div>
+
+    <!-- Situation log -->
+    <div style="border-top:1px solid var(--light);padding-top:1.2rem;margin-bottom:1rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;">Log a moment</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;">Did you speak up today? Stay silent when you wanted to say something? Give more than you had?</div>
+      <textarea id="ass-log-input" placeholder="What happened, how did you handle it, what would you do differently…" style="width:100%;min-height:70px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;"></textarea>
+      <button onclick="assLogAdd()" style="margin-top:0.6rem;background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1.2rem;cursor:pointer;">Save</button>
+    </div>
+
+    <div id="ass-log-entries"></div>
   </div>
 </div>
 
@@ -6508,6 +6738,104 @@ function rfmRenderCompare() {
   }
   html += '<div class="rfm-verdict" style="margin-top:1.5rem;">' + note + '</div>';
   el.innerHTML = html;
+}
+
+// ===== ASSERTIVE TAB =====
+var _assertiveInited = false;
+
+function assertiveInnerTab(tab) {
+  ['understand','asking','giving','practice'].forEach(function(t) {
+    document.getElementById('asspanel-' + t).style.display = t === tab ? 'block' : 'none';
+    document.getElementById('asstab-' + t).classList.toggle('active', t === tab);
+  });
+  if (tab === 'practice') assRenderLog();
+}
+
+function initAssertive() {
+  if (_assertiveInited) { assRestoreNotes(); return; }
+  _assertiveInited = true;
+  assertiveInnerTab('understand');
+  var checkins = [
+    'Did I say what I actually needed today?',
+    "Did I agree to something I didn't want to do?",
+    'Did I avoid a conversation I should have had?',
+    'Did I give from fullness — or from fear?',
+    'Was there a moment I stood up for myself?'
+  ];
+  var today = new Date().toISOString().slice(0,10);
+  var saved = JSON.parse(localStorage.getItem('ass_checkin') || '{}');
+  var todayData = saved[today] || {};
+  var html = '';
+  checkins.forEach(function(q, i) {
+    var checked = todayData[i] === true;
+    html += '<div style="display:flex;align-items:flex-start;gap:0.8rem;padding:0.6rem 0;border-bottom:1px solid var(--light);">';
+    html += '<button onclick="assCheckinToggle(' + i + ')" id="ass-ci-' + i + '" style="flex-shrink:0;width:18px;height:18px;border:1px solid ' + (checked ? 'var(--black)' : '#c8c8c5') + ';background:' + (checked ? 'var(--black)' : 'transparent') + ';cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">';
+    if (checked) html += '<svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2"><polyline points="2,6 5,9 10,3"/></svg>';
+    html += '</button>';
+    html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.5;">' + q + '</div>';
+    html += '</div>';
+  });
+  document.getElementById('ass-checkin-list').innerHTML = html;
+  assRestoreNotes();
+}
+
+function assCheckinToggle(idx) {
+  var today = new Date().toISOString().slice(0,10);
+  var saved = JSON.parse(localStorage.getItem('ass_checkin') || '{}');
+  if (!saved[today]) saved[today] = {};
+  saved[today][idx] = !saved[today][idx];
+  localStorage.setItem('ass_checkin', JSON.stringify(saved));
+  _assertiveInited = false;
+  initAssertive();
+  assertiveInnerTab('practice');
+}
+
+function assNotesave(key) {
+  var val = document.getElementById('ass-' + key + '-notes').value;
+  localStorage.setItem('ass_notes_' + key, val);
+}
+
+function assRestoreNotes() {
+  ['asking','giving'].forEach(function(k) {
+    var el = document.getElementById('ass-' + k + '-notes');
+    if (el) el.value = localStorage.getItem('ass_notes_' + k) || '';
+  });
+}
+
+function assLogAdd() {
+  var input = document.getElementById('ass-log-input');
+  var text = input.value.trim();
+  if (!text) return;
+  var logs = JSON.parse(localStorage.getItem('ass_log') || '[]');
+  logs.unshift({ text: text, date: new Date().toISOString() });
+  localStorage.setItem('ass_log', JSON.stringify(logs));
+  input.value = '';
+  assRenderLog();
+}
+
+function assLogDelete(idx) {
+  var logs = JSON.parse(localStorage.getItem('ass_log') || '[]');
+  logs.splice(idx, 1);
+  localStorage.setItem('ass_log', JSON.stringify(logs));
+  assRenderLog();
+}
+
+function assRenderLog() {
+  var logs = JSON.parse(localStorage.getItem('ass_log') || '[]');
+  var el = document.getElementById('ass-log-entries');
+  if (!el) return;
+  if (!logs.length) { el.innerHTML = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);padding:0.8rem 0;">No moments logged yet. Start with today.</div>'; return; }
+  el.innerHTML = logs.map(function(e, i) {
+    var d = new Date(e.date);
+    var label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return '<div style="border:1px solid #e8e8e5;padding:0.8rem 1rem;margin-bottom:0.6rem;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + label + '</div>' +
+      '<button onclick="assLogDelete(' + i + ')" style="border:none;background:none;cursor:pointer;font-size:0.9rem;color:#ccc;padding:0;line-height:1;">×</button>' +
+      '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;white-space:pre-wrap;">' + e.text + '</div>' +
+      '</div>';
+  }).join('');
 }
 </script>
 
