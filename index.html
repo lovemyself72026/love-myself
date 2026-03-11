@@ -3983,20 +3983,18 @@ window.addEventListener('DOMContentLoaded', function() {
 
       <div style="border-top:1px solid var(--light);padding-top:1.2rem;">
         <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Add a face habit</div>
-        <div style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;">
-          <input id="face-habit-name-input" type="text" placeholder="e.g. moisturise, SPF, cleanse…" onkeydown="if(event.key==='Enter')faceHabitsAdd()" style="flex:1;min-width:140px;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-          <div style="display:flex;gap:0.3rem;align-items:center;vertical-align:middle;">
-            <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);">Color</span>
-            <div style="display:flex;gap:0.3rem;align-items:center;vertical-align:middle;">
-              <button class="face-habit-color-opt selected" data-color="#f9a8c9" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid transparent;box-shadow:0 0 0 2px #0a0a0a;cursor:pointer;"></button>
-              <button class="face-habit-color-opt" data-color="#a8d8f0" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
-              <button class="face-habit-color-opt" data-color="#b8f0c8" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
-              <button class="face-habit-color-opt" data-color="#f9e4a8" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
-              <button class="face-habit-color-opt" data-color="#d4b8f9" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;"></button>
-              <button class="face-habit-color-opt" data-color="#f9c8a8" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;"></button>
-            </div>
+        <input id="face-habit-name-input" type="text" placeholder="e.g. moisturise, SPF, cleanse…" onkeydown="if(event.key==='Enter')faceHabitsAdd()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;">
+          <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);">Color</span>
+          <div style="display:flex;gap:0.3rem;align-items:center;">
+            <div class="face-habit-color-opt selected" data-color="#f9a8c9" onclick="faceHabitPickColor(this)" style="width:20px;height:20px;background:#f9a8c9;cursor:pointer;opacity:1;flex-shrink:0;"></div>
+            <div class="face-habit-color-opt" data-color="#a8d8f0" onclick="faceHabitPickColor(this)" style="width:20px;height:20px;background:#a8d8f0;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+            <div class="face-habit-color-opt" data-color="#b8f0c8" onclick="faceHabitPickColor(this)" style="width:20px;height:20px;background:#b8f0c8;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+            <div class="face-habit-color-opt" data-color="#f9e4a8" onclick="faceHabitPickColor(this)" style="width:20px;height:20px;background:#f9e4a8;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+            <div class="face-habit-color-opt" data-color="#d4b8f9" onclick="faceHabitPickColor(this)" style="width:20px;height:20px;background:#d4b8f9;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+            <div class="face-habit-color-opt" data-color="#f9c8a8" onclick="faceHabitPickColor(this)" style="width:20px;height:20px;background:#f9c8a8;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
           </div>
-          <button onclick="faceHabitsAdd()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
+          <button onclick="faceHabitsAdd()" style="margin-left:auto;background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
         </div>
       </div>
 
@@ -4031,12 +4029,12 @@ window.addEventListener('DOMContentLoaded', function() {
           <button onclick="bcAdd('hair')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
         </div>
         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;align-items:center;" id="bc-hair-colors">
-          <button class="bc-color-opt hair selected" data-cat="hair" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid transparent;box-shadow:0 0 0 2px #0a0a0a;cursor:pointer;"></button>
-          <button class="bc-color-opt hair" data-cat="hair" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt hair" data-cat="hair" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt hair" data-cat="hair" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt hair" data-cat="hair" data-color="#d4b8f9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt hair" data-cat="hair" data-color="#f9c8a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;"></button>
+          <div class="bc-color-opt hair selected" data-cat="hair" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#f9a8c9;cursor:pointer;opacity:1;flex-shrink:0;"></div>
+          <div class="bc-color-opt hair" data-cat="hair" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#a8d8f0;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt hair" data-cat="hair" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#b8f0c8;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt hair" data-cat="hair" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#f9e4a8;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt hair" data-cat="hair" data-color="#d4b8f9" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#d4b8f9;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt hair" data-cat="hair" data-color="#f9c8a8" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#f9c8a8;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
         </div>
       </div>
     </div>
@@ -4071,12 +4069,12 @@ window.addEventListener('DOMContentLoaded', function() {
           <button onclick="bcAdd('teeth')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
         </div>
         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;align-items:center;" id="bc-teeth-colors">
-          <button class="bc-color-opt teeth selected" data-cat="teeth" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid transparent;box-shadow:0 0 0 2px #0a0a0a;cursor:pointer;"></button>
-          <button class="bc-color-opt teeth" data-cat="teeth" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt teeth" data-cat="teeth" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt teeth" data-cat="teeth" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt teeth" data-cat="teeth" data-color="#d4b8f9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt teeth" data-cat="teeth" data-color="#f9c8a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;"></button>
+          <div class="bc-color-opt teeth selected" data-cat="teeth" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#f9a8c9;cursor:pointer;opacity:1;flex-shrink:0;"></div>
+          <div class="bc-color-opt teeth" data-cat="teeth" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#a8d8f0;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt teeth" data-cat="teeth" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#b8f0c8;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt teeth" data-cat="teeth" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#f9e4a8;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt teeth" data-cat="teeth" data-color="#d4b8f9" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#d4b8f9;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt teeth" data-cat="teeth" data-color="#f9c8a8" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#f9c8a8;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
         </div>
       </div>
     </div>
@@ -4110,12 +4108,12 @@ window.addEventListener('DOMContentLoaded', function() {
           <button onclick="bcAdd('ears')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
         </div>
         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;align-items:center;" id="bc-ears-colors">
-          <button class="bc-color-opt ears selected" data-cat="ears" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid transparent;box-shadow:0 0 0 2px #0a0a0a;cursor:pointer;"></button>
-          <button class="bc-color-opt ears" data-cat="ears" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt ears" data-cat="ears" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt ears" data-cat="ears" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt ears" data-cat="ears" data-color="#d4b8f9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt ears" data-cat="ears" data-color="#f9c8a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;"></button>
+          <div class="bc-color-opt ears selected" data-cat="ears" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#f9a8c9;cursor:pointer;opacity:1;flex-shrink:0;"></div>
+          <div class="bc-color-opt ears" data-cat="ears" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#a8d8f0;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt ears" data-cat="ears" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#b8f0c8;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt ears" data-cat="ears" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#f9e4a8;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt ears" data-cat="ears" data-color="#d4b8f9" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#d4b8f9;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt ears" data-cat="ears" data-color="#f9c8a8" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#f9c8a8;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
         </div>
       </div>
     </div>
@@ -4149,12 +4147,12 @@ window.addEventListener('DOMContentLoaded', function() {
           <button onclick="bcAdd('nails')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
         </div>
         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;align-items:center;" id="bc-nails-colors">
-          <button class="bc-color-opt nails selected" data-cat="nails" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid transparent;box-shadow:0 0 0 2px #0a0a0a;cursor:pointer;"></button>
-          <button class="bc-color-opt nails" data-cat="nails" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt nails" data-cat="nails" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt nails" data-cat="nails" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt nails" data-cat="nails" data-color="#d4b8f9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;"></button>
-          <button class="bc-color-opt nails" data-cat="nails" data-color="#f9c8a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;"></button>
+          <div class="bc-color-opt nails selected" data-cat="nails" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#f9a8c9;cursor:pointer;opacity:1;flex-shrink:0;"></div>
+          <div class="bc-color-opt nails" data-cat="nails" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#a8d8f0;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt nails" data-cat="nails" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#b8f0c8;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt nails" data-cat="nails" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#f9e4a8;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt nails" data-cat="nails" data-color="#d4b8f9" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#d4b8f9;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
+          <div class="bc-color-opt nails" data-cat="nails" data-color="#f9c8a8" onclick="bcPickColor(this)" style="width:20px;height:20px;background:#f9c8a8;cursor:pointer;opacity:0.4;flex-shrink:0;"></div>
         </div>
       </div>
     </div>
@@ -5548,8 +5546,8 @@ function bcDelete(cat, id) {
 
 function bcPickColor(btn) {
   var cat = btn.getAttribute('data-cat');
-  document.querySelectorAll('.bc-color-opt.'+cat).forEach(function(b){ b.style.border='2px solid transparent'; b.style.boxShadow='none'; });
-  btn.style.border = '2px solid transparent'; btn.style.boxShadow = '0 0 0 2px var(--black)';
+  document.querySelectorAll('.bc-color-opt.'+cat).forEach(function(b){ b.style.opacity='0.4'; });
+  btn.style.opacity = '1';
   bcSelectedColors[cat] = btn.getAttribute('data-color');
 }
 
@@ -5772,8 +5770,8 @@ function faceHabitsDelete(id) {
 }
 
 function faceHabitPickColor(btn) {
-  document.querySelectorAll('.face-habit-color-opt').forEach(function(b){ b.style.border='2px solid transparent'; b.style.boxShadow='none'; });
-  btn.style.border = '2px solid transparent'; btn.style.boxShadow = '0 0 0 2px var(--black)';
+  document.querySelectorAll('.face-habit-color-opt').forEach(function(b){ b.style.opacity='0.4'; });
+  btn.style.opacity = '1';
   faceHabitsSelectedColor = btn.getAttribute('data-color');
 }
 
