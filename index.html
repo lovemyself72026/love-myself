@@ -2212,10 +2212,14 @@ function reloadAllData() {
   whoiItems = JSON.parse(localStorage.getItem('whoi_history') || '[]'); if (!Array.isArray(whoiItems)) whoiItems = [];
   visionItems = JSON.parse(localStorage.getItem('vision_items') || '[]'); if (!Array.isArray(visionItems)) visionItems = [];
   beliefBeliefs = JSON.parse(localStorage.getItem('belief_beliefs') || '[]'); if (!Array.isArray(beliefBeliefs)) beliefBeliefs = [];
+  userRituals = JSON.parse(localStorage.getItem('user_rituals') || '[]'); if (!Array.isArray(userRituals)) userRituals = [];
+  ritualState = JSON.parse(localStorage.getItem('ritual_state') || '{}');
+  tgData = JSON.parse(localStorage.getItem('that_girl_data') || '{}');
   const di = JSON.parse(localStorage.getItem('dimension_items') || '{}'); dimensionItems = (di && typeof di === 'object' && !Array.isArray(di)) ? di : {};
   const ap = JSON.parse(localStorage.getItem('all_planner_data') || '{}'); allPlannerData = (ap && typeof ap === 'object' && !Array.isArray(ap)) ? ap : {};
   const cl = JSON.parse(localStorage.getItem('cali_log') || '{}'); caliLog = (cl && typeof cl === 'object') ? cl : {};
   const ht = JSON.parse(localStorage.getItem('habit_tracker') || '{}'); habitTracker = (ht && typeof ht === 'object') ? ht : {};
+  const bd = JSON.parse(localStorage.getItem('balance_data') || '{}'); if (typeof balanceData !== 'undefined') balanceData = bd;
   WIA = JSON.parse(localStorage.getItem('wia2') || '{"j":{},"c":{},"traits":[],"values":[],"name":"","wj":{}}');
   wiaQi = parseInt(localStorage.getItem('wia2q') || '0');
   wiaWqi = parseInt(localStorage.getItem('wia2wq') || '0');
@@ -2245,6 +2249,8 @@ function reloadAllData() {
   // Vision
   if (typeof tgRenderAll === 'function') tgRenderAll();
   if (typeof renderWhoiDay === 'function') renderWhoiDay();
+  if (typeof renderRituals === 'function') renderRituals();
+  if (typeof initRituals === 'function') initRituals();
   // Body care
   if (typeof bcLoad === 'function') bcLoad();
   if (typeof faceHabitsLoad === 'function') faceHabitsLoad();
