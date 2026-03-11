@@ -13,18 +13,9 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400&family=Nunito:wght@200;300;400&display=swap" rel="stylesheet">
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getDatabase, ref, set, get, onValue, update } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-
-  const firebaseConfig = {
-    databaseURL: 'https://lovemyselfapp-default-rtdb.firebaseio.com'
-  };
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const DB_REF = ref(db, 'my-love-myself-data');
-
+<script>
   window._rawLS = localStorage.setItem.bind(localStorage);
+  const DB_URL = 'https://lovemyselfapp-default-rtdb.firebaseio.com/my-love-myself-data';
   const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items',
     'whoi_history','my_books','habit_tracker','cali_log','wia2','wia2aff','wia2q','wia2wq',
     'hlb','hlr','ass_checkin','ass_log','ass_entries_asking','ass_entries_giving',
@@ -32,137 +23,62 @@
     'balance_data','that_girl_data','vision_items','ritual_state','user_rituals'];
   const SYNC_PREFIXES = ['ass_entries_','ass_notes_','jesus_','bc_','rfm_'];
 
-  function setSyncStatus(state, msg) {
-    var el = document.getElementById('sync-status');
-    if (!el) return;
-    var colors = { ok: '#888', error: '#c0392b', syncing: '#888' };
-    var icons = { ok: '✓ synced', error: '⚠ sync error', syncing: '↻ syncing…' };
-    el.style.color = colors[state] || '#888';
-    el.title = msg || '';
-    el.textContent = icons[state] || '';
-  }
+  window.syncToCloud = async function(key, value) {
+    const shouldSync = SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
+    if (!shouldSync) return;
+    try {
+      await fetch(`${DB_URL}/${key}.json`, {
+        method: 'PUT',
+        body: JSON.stringify(value),
+        headers: {'Content-Type': 'application/json'}
+      });
+    } catch(e) {}
+  };
 
-  function shouldSync(key) {
-    return SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
-  }
-
-  var _initialSyncDone = false;
-
-  function applyCloudData(data, isInitial) {
-    if (!data) return;
-    let changed = false;
-    Object.keys(data).forEach(function(k) {
-      const incoming = JSON.stringify(data[k]);
-      if (localStorage.getItem(k) !== incoming) {
-        window._rawLS(k, incoming);
-        changed = true;
-      }
-    });
-    if (changed || isInitial) {
-      function tryReload() {
-        if (typeof window.reloadAllData === 'function') {
-          window.reloadAllData();
-        } else {
-          setTimeout(tryReload, 200);
-        }
-      }
-      setTimeout(tryReload, isInitial ? 800 : 100);
-    }
-  }
-
-  // Real-time listener — updates instantly when other device writes
-  onValue(DB_REF, function(snapshot) {
-    const data = snapshot.val();
-    if (data) {
-      applyCloudData(data, !_initialSyncDone);
-      _initialSyncDone = true;
-      setSyncStatus('ok', 'Live synced: ' + new Date().toLocaleTimeString());
-    }
-  }, function(err) {
-    setSyncStatus('error', 'Live sync error: ' + err.message);
-  });
-
-  // Intercept localStorage writes and push to Firebase instantly
+  // Intercept ALL localStorage.setItem calls to auto-push to Firebase
   localStorage.setItem = function(key, value) {
     window._rawLS(key, value);
-    if (!shouldSync(key)) return;
-    setSyncStatus('syncing', '');
-    try {
-      const parsed = JSON.parse(value);
-      var patch = {};
-      patch[key] = parsed;
-      update(DB_REF, patch)
-        .then(function(){ setSyncStatus('ok', 'Saved: ' + new Date().toLocaleTimeString()); })
-        .catch(function(e){ setSyncStatus('error', 'Save failed: ' + e.message); });
-    } catch(e) {
-      var patch2 = {};
-      patch2[key] = value;
-      update(DB_REF, patch2)
-        .then(function(){ setSyncStatus('ok', 'Saved: ' + new Date().toLocaleTimeString()); })
-        .catch(function(e2){ setSyncStatus('error', 'Save failed: ' + e2.message); });
-    }
-  };
-
-  // Manual push all — keep for safety
-  window.pushAllToCloud = async function() {
-    setSyncStatus('syncing', '');
-    var payload = {};
-    var count = 0;
-    for (var i = 0; i < SYNC_KEYS.length; i++) {
-      var k = SYNC_KEYS[i];
-      var val = localStorage.getItem(k);
-      if (val !== null) { try { payload[k] = JSON.parse(val); } catch(e) { payload[k] = val; } count++; }
-    }
-    for (var j = 0; j < localStorage.length; j++) {
-      var key = localStorage.key(j);
-      if (SYNC_PREFIXES.some(function(p){ return key.startsWith(p); })) {
-        var v = localStorage.getItem(key);
-        if (v !== null) { try { payload[key] = JSON.parse(v); } catch(e) { payload[key] = v; } count++; }
+    const shouldSync = SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
+    if (shouldSync) {
+      try {
+        const parsed = JSON.parse(value);
+        window.syncToCloud(key, parsed);
+      } catch(e) {
+        window.syncToCloud(key, value);
       }
     }
-    try {
-      await update(DB_REF, payload);
-      setSyncStatus('ok', 'Pushed ' + count + ' items at ' + new Date().toLocaleTimeString());
-      alert('✅ Pushed ' + count + ' items to cloud! 🤍');
-    } catch(e) {
-      setSyncStatus('error', 'Push failed: ' + e.message);
-      alert('❌ Push failed: ' + e.message);
-    }
   };
 
-  // Manual pull all
   window.pullFromCloud = async function(showMsg) {
-    setSyncStatus('syncing', '');
     try {
-      const snapshot = await get(DB_REF);
-      const data = snapshot.val();
-      if (!data) { if (showMsg) alert('No cloud data found.'); return; }
-      applyCloudData(data);
-      setSyncStatus('ok', 'Pulled at ' + new Date().toLocaleTimeString());
+      const res = await fetch(`${DB_URL}.json`);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      if (!data) { if(showMsg) alert('No data found yet.'); return; }
+      let changed = false;
+      Object.keys(data).forEach(function(k) {
+        let value = data[k];
+        if (value && typeof value === 'object' && value.data !== undefined && value.ts !== undefined) {
+          value = value.data;
+        }
+        const incoming = JSON.stringify(value);
+        const current = localStorage.getItem(k);
+        if (current !== incoming) {
+          window._rawLS(k, incoming);
+          changed = true;
+        }
+      });
+      if (changed && typeof reloadAllData === 'function') reloadAllData();
       if (showMsg) alert('✅ Synced! 🤍');
     } catch(e) {
-      setSyncStatus('error', 'Pull failed: ' + e.message);
-      if (showMsg) alert('❌ Pull failed: ' + e.message);
+      if (showMsg) alert('❌ Sync failed: ' + e.message);
     }
   };
 
-  // Force restore
-  window.forceRestoreFromCloud = async function() {
-    if (!confirm('This will replace ALL local data with your cloud data and reload the app. Continue?')) return;
-    setSyncStatus('syncing', '');
-    try {
-      const snapshot = await get(DB_REF);
-      const data = snapshot.val();
-      if (!data) { alert('No cloud data found.'); return; }
-      localStorage.clear();
-      Object.keys(data).forEach(function(k) { window._rawLS(k, JSON.stringify(data[k])); });
-      alert('✅ Restored! Reloading… 🤍');
-      location.reload();
-    } catch(e) {
-      setSyncStatus('error', 'Restore failed: ' + e.message);
-      alert('❌ Restore failed: ' + e.message);
-    }
-  };
+  window.addEventListener('load', function() {
+    setTimeout(function(){ window.pullFromCloud(false); }, 1500);
+    setInterval(function(){ window.pullFromCloud(false); }, 30000);
+  });
 </script>
 
 <!-- Cloudinary image upload — outside module so it's globally accessible -->
@@ -349,7 +265,7 @@
   .journal-tab.active, .journal-tab:hover { color:var(--black); border-bottom-color:var(--black); }
 
   .vision-items-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.4rem; margin-top:1rem; }
-  /* ── Who I Am ── */
+  /* -- Who I Am -- */
   .wia-tabs { display:flex; gap:0; background:transparent; border:1px solid #c8c8c5; padding:0; margin-top:0.5rem; margin-bottom:1.5rem; }
   .wia-tab { flex:1; text-align:center; padding:7px 6px; border-radius:0; border:none; border-right:1px solid #c8c8c5; background:transparent; font-family:'Nunito',sans-serif; font-size:0.6rem; font-weight:300; color:var(--gray); cursor:pointer; transition:all 0.2s; text-transform:uppercase; letter-spacing:0.12em; }
   .wia-tab:last-child { border-right:none; }
@@ -413,22 +329,14 @@
 <body>
 
 <nav>
-  <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-    <div class="logo">love myself</div>
-    <div style="display:flex;align-items:center;gap:0.6rem;">
-      <span id="sync-status" title="" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.08em;color:#888;cursor:default;"></span>
-      <button onclick="window.pullFromCloud(true)" title="Pull latest from cloud" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:#888;padding:0.3rem 0.7rem;cursor:pointer;">↓ pull</button>
-      <button onclick="window.pushAllToCloud()" title="Push all local data to cloud" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:#888;padding:0.3rem 0.7rem;cursor:pointer;">↑ push</button>
-      <button onclick="window.forceRestoreFromCloud()" title="Wipe local data and restore everything from cloud" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:#c0392b;padding:0.3rem 0.7rem;cursor:pointer;">⟳ restore</button>
-    </div>
-  </div>
+  <div class="logo">love myself</div>
   <div class="nav-tabs">
     <button class="nav-tab" onclick="showSection('jesus')">Jesus Christ</button>
     <button class="nav-tab active" onclick="showSection('home')">Home</button>
     <button class="nav-tab" onclick="showSection('vision')">Vision</button>
     <button class="nav-tab" onclick="showSection('schedule')">Schedule</button>
     <button class="nav-tab" onclick="showSection('affirmations');showJBWTab('wins')">Journal</button>
-    <button class="nav-tab" onclick="showSection('me');setTimeout(()=>initMeSection(),100)">Me</button>
+    <button class="nav-tab" onclick="showSection('me')">Me</button>
   </div>
 </nav>
 
@@ -479,7 +387,7 @@
         <div onclick="goToScheduleItem('ps-notes')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Notes</div>
         <div onclick="goToScheduleItem('ps-tomorrow')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">For Tomorrow</div>
         <div onclick="goToScheduleItem('ps-goal')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Today's Goal</div>
-        <div onclick="goToScheduleItem('ps-ibelieve')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">I Believe…</div>
+        <div onclick="goToScheduleItem('ps-ibelieve')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">I Believe</div>
         <div onclick="goToScheduleItem('ps-mood')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Mood</div>
         <div id="home-sched-preview" style="margin-top:0.5rem;"></div>
       </div>
@@ -690,7 +598,7 @@
 
     <!-- I Believe -->
     <div id="ps-ibelieve" style="border:1px solid #c8c8c5;padding:0.8rem;">
-      <div class="planner-label">I Believe…</div>
+      <div class="planner-label">I Believe</div>
       <textarea id="sched-ibelieve" rows="2" placeholder="Today I believe…" oninput="schedAutoSave()" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
     </div>
 
@@ -726,14 +634,30 @@
     </div>
   </div>
 
-  <!-- Sub-tabs -->
+  <!-- Journal sub-tabs -->
   <div id="journal-tabs" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-    <button class="balance-sub-tab active" onclick="showJBWTab('wins')" id="jbwtab-wins">Wins</button>
-    <button class="balance-sub-tab" onclick="showJBWTab('vent')" id="jbwtab-vent">Journal</button>
-    <button class="balance-sub-tab" onclick="showJBWTab('books')" id="jbwtab-books">Books</button>
-    <button class="balance-sub-tab" onclick="showJBWTab('belief')" id="jbwtab-belief">Belief</button>
+    <button class="journal-tab active" onclick="showJournalTab('mejournal')" id="jtab-mejournal">Me</button>
+    <button class="journal-tab" onclick="showJournalTab('journalbookswins')" id="jtab-journalbookswins">Wins</button>
   </div>
-  <div id="jsub-journalbookswins">
+
+    <!-- Me sub-section (mirrors home Me card links) -->
+  <div id="jsub-mejournal" style="display:none;">
+    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+      <button class="balance-sub-tab active" id="metab-who" onclick="showMeJournalTab('whiam')">Who I Am</button>
+      <button class="balance-sub-tab" id="metab-ass" onclick="showMeJournalTab('assertive')">Assertive</button>
+      <button class="balance-sub-tab" id="metab-bel" onclick="showMeJournalTab('believe')">Believe</button>
+      <button class="balance-sub-tab" id="metab-rfm" onclick="showMeJournalTab('rightforme')">Right For Me</button>
+    </div>
+  </div>
+    <!-- Books sub-section -->
+  <!-- Combined Wins / Journal / Books tab -->
+  <div id="jsub-journalbookswins" style="display:none;">
+    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+      <button class="balance-sub-tab active" onclick="showJBWTab('wins')" id="jbwtab-wins">Wins</button>
+      <button class="balance-sub-tab" onclick="showJBWTab('vent')" id="jbwtab-vent">Journal</button>
+      <button class="balance-sub-tab" onclick="showJBWTab('books')" id="jbwtab-books">Books</button>
+      <button class="balance-sub-tab" onclick="showJBWTab('belief')" id="jbwtab-belief">Belief</button>
+    </div>
 
     <div id="jsub-wins">
       <div style="margin-bottom:2rem;">
@@ -748,10 +672,6 @@
           <div style="font-family:'Lora',serif;font-style:italic;font-size:1.05rem;margin-bottom:1rem;">Add a win — big or small, they all count</div>
           <input id="win-input" placeholder="e.g. I got out of bed today" onkeydown="if(event.key==='Enter')addWin()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1.2rem;">
           <button class="btn fill" onclick="addWin()">Add win</button>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;">
-          <span id="wins-total" style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
-          <button id="wins-all-btn" onclick="toggleWinsAll()" style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;border:none;background:none;color:var(--gray);cursor:pointer;text-decoration:underline;">Show all wins</button>
         </div>
         <div id="wins-list"></div>
       </div>
@@ -953,16 +873,11 @@ function showJBWTab(tab) {
     var btn = document.getElementById('jbwtab-' + t);
     if (btn) btn.classList.toggle('active', t === tab);
   });
-  if (tab === 'wins') { renderWins(); }
-  if (tab === 'vent') { renderVentEntries(); }
-  if (tab === 'books') { renderBooks(); }
-  if (tab === 'belief') { beliefRenderAll(); }
+  if (tab === 'wins') renderWins();
+  if (tab === 'vent') renderVentEntries();
+  if (tab === 'books') renderBooks();
+  if (tab === 'belief') beliefRenderAll();
 }
-
-// Auto-show wins on load
-window.addEventListener('DOMContentLoaded', function() {
-  if (document.getElementById('jsub-wins')) showJBWTab('wins');
-});
 
 let shuffled = [...affirmations].sort(() => Math.random() - 0.5);
 var affIndex = 0;
@@ -983,7 +898,6 @@ function saveAffirmation(){
 }
 
 function renderSavedAffirmations(){
-  savedAffirmations = JSON.parse(localStorage.getItem('saved_affirmations')||'[]');
   const el=document.getElementById('saved-affirmations');
   if(!el) return;
   if(!savedAffirmations.length){el.innerHTML='';return;}
@@ -1178,35 +1092,20 @@ function deleteWin(id) {
   renderWins();
 }
 
-var winsShowAll = false;
-function toggleWinsAll() {
-  winsShowAll = !winsShowAll;
-  var btn = document.getElementById('wins-all-btn');
-  if (btn) btn.textContent = winsShowAll ? 'Show today only' : 'Show all wins';
-  renderWins();
-}
 function renderWins() {
   const el = document.getElementById('wins-list');
   if (!el) return;
-  wins = JSON.parse(localStorage.getItem('my_wins') || '[]');
-  if (!Array.isArray(wins)) wins = [];
-  var displayWins;
-  if (winsShowAll) {
-    displayWins = wins.slice().sort(function(a,b){ return (b.id||0)-(a.id||0); });
-  } else {
-    const dateKey = getWinsDateKey();
-    displayWins = wins.filter(w => w.dateKey === dateKey || (!w.dateKey && w.date && w.date.includes(new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}))));
-  }
-  var totalEl = document.getElementById('wins-total');
-  if (totalEl) totalEl.textContent = wins.length + ' total wins';
-  if (!displayWins.length) {
-    el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;">' + (winsShowAll ? 'No wins yet — add your first one 🤍' : 'No wins for this day yet — try Show all wins') + '</p>';
+  const dateKey = getWinsDateKey();
+  const dayWins = wins.filter(w => w.dateKey === dateKey || (!w.dateKey && w.date && w.date.includes(new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}))));
+
+  if (!dayWins.length) {
+    el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;">No wins for this day yet 🤍</p>';
     return;
   }
-  el.innerHTML = displayWins.map(w => `
+  el.innerHTML = dayWins.map(w => `
     <div class="journal-entry">
       <button onclick="deleteWin(${w.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.3rem;">remove</button>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);margin-bottom:0.3rem;">${w.date || ''}</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);margin-bottom:0.3rem;">${w.date ? w.date.split(' · ').slice(1).join(' · ') : ''}</div>
       <div class="journal-content">${w.text}</div>
     </div>`).join('');
 }
@@ -1573,7 +1472,7 @@ function changeScheduleDay(dir) {
   renderSchedCal();
 }
 
-// ── Schedule Calendar ────────────────────────────────────────
+// -- Schedule Calendar ----------------------------------------
 var schedCalOffset = 0;
 
 function toggleSchedCal() {
@@ -2244,7 +2143,6 @@ function clearVentInput() {
 }
 
 function renderVentEntries() {
-  ventEntries = JSON.parse(localStorage.getItem('vent_entries') || '[]');
   const el = document.getElementById('vent-entries');
   if (!el) return;
   const dateKey = getVentDateKey();
@@ -2423,7 +2321,7 @@ if (!localStorage.getItem('data_cleared_v1')) {
 }
 
 
-window.reloadAllData = function reloadAllData() {
+function reloadAllData() {
   const w = JSON.parse(localStorage.getItem('my_wins') || '[]'); wins = Array.isArray(w) ? w : [];
   const sa = JSON.parse(localStorage.getItem('saved_affirmations') || '[]'); savedAffirmations = Array.isArray(sa) ? sa : [];
   const ve = JSON.parse(localStorage.getItem('vent_entries') || '[]'); ventEntries = Array.isArray(ve) ? ve : [];
@@ -2432,22 +2330,11 @@ window.reloadAllData = function reloadAllData() {
   const b = JSON.parse(localStorage.getItem('my_books') || '[]'); books = Array.isArray(b) ? b : [];
   const ap = JSON.parse(localStorage.getItem('all_planner_data') || '{}'); allPlannerData = (ap && typeof ap === 'object' && !Array.isArray(ap)) ? ap : {};
   const cl = JSON.parse(localStorage.getItem('cali_log') || '{}'); caliLog = (cl && typeof cl === 'object') ? cl : {};
-  // Reload WIA (Me section) variables
-  try {
-    WIA = JSON.parse(localStorage.getItem('wia2') || '{"j":{},"c":{},"traits":[],"values":[],"name":"","wj":{}}');
-    if (!WIA.traits) WIA.traits = []; if (!WIA.values) WIA.values = [];
-    if (!WIA.j) WIA.j = {}; if (!WIA.c) WIA.c = {}; if (!WIA.wj) WIA.wj = {};
-    if (!WIA.name) WIA.name = ''; if (!WIA.notes) WIA.notes = {};
-    _wiaInited = false;
-  } catch(e) {}
-  // Reload Balance variable
-  try { B = JSON.parse(localStorage.getItem('hlb') || '{}'); if (!B.history) B.history = {}; if (!B.answers) B.answers = {}; } catch(e) {}
   renderWins(); renderSavedAffirmations(); renderVentEntries(); renderDimensionBoards(); renderWhoiGrid(); renderBooks(); renderAnalytics();
   // Reload habits
   if (typeof renderHabits === 'function') renderHabits();
   if (typeof renderHabitStrips === 'function') renderHabitStrips();
   // Reload wia / Me section
-  if (typeof wiaRender === 'function') wiaRender();
   if (typeof rfmRender === 'function') rfmRender();
   if (typeof assRenderLog === 'function') assRenderLog();
   if (typeof assRenderEntries === 'function') { assRenderEntries('asking'); assRenderEntries('giving'); }
@@ -2468,7 +2355,7 @@ window.reloadAllData = function reloadAllData() {
 
 renderAnalytics();
 
-// ── Analytics Calendar (popup) ───────────────────────────────
+// -- Analytics Calendar (popup) -------------------------------
 var analyticsCalOffset = 0;
 
 function toggleAnalyticsCal() {
@@ -2683,7 +2570,7 @@ manifestLink.rel = 'manifest';
 manifestLink.href = manifestUrl;
 document.head.appendChild(manifestLink);
 
-// ── Balance & Relationships ────────────────────────────────
+// -- Balance & Relationships --------------------------------
 
   var storage = { getItem: function(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }, setItem: function(k,v) { try { localStorage.setItem(k,v); } catch(e) {} } };
 
@@ -2862,8 +2749,8 @@ function showMeTab(tab) {
   });
   if (tab === 'whiam') { initWhiAm(); }
   if (tab === 'balance') { showMeTab('whiam'); setTimeout(function(){ wiaTab('balance'); initBalanceDatePicker(); renderBalanceQuestions(); renderRelationshipQuestions(); }, 50); return; }
-  if (tab === 'assertive') { initAssertive(); assRenderLog(); assRenderEntries('asking'); assRenderEntries('giving'); }
-  if (tab === 'believe') { initBelieve(); belRenderFoundation(); belRenderEvidence(); belRenderFailure(); }
+  if (tab === 'assertive') initAssertive();
+  if (tab === 'believe') initBelieve();
   if (tab === 'rightforme') rfmRender();
 }
 
@@ -3086,7 +2973,7 @@ appleIcon.rel = 'apple-touch-icon';
 appleIcon.href = generateIcon(180);
 document.head.appendChild(appleIcon);
 
-// ── Pretty date labels ────────────────────────────────────────
+// -- Pretty date labels ----------------------------------------
 function updateDateLabel(pickerId) {
   const dp = document.getElementById(pickerId);
   const label = document.getElementById(pickerId + '-label');
@@ -3100,8 +2987,8 @@ function setDatePickerValue(pickerId, isoVal) {
   const dp = document.getElementById(pickerId);
   if (dp) { dp.value = isoVal; updateDateLabel(pickerId); }
 }
-// ─────────────────────────────────────────────────────────────
-// ── BELIEF TRACKER ──────────────────────────────────────────────
+// -------------------------------------------------------------
+// -- BELIEF TRACKER ----------------------------------------------
 var beliefBeliefs = JSON.parse(localStorage.getItem('belief_beliefs') || '[]');
 var beliefSelectedColor = '#f9a8c9';
 var beliefWeekOffsets = {};
@@ -3289,7 +3176,6 @@ function beliefRenderStrip(id) {
 }
 
 function beliefRenderAll() {
-  beliefBeliefs = JSON.parse(localStorage.getItem('belief_beliefs') || '[]');
   var el = document.getElementById('belief-list');
   if (!el) return;
   if (!beliefBeliefs.length) {
@@ -3376,17 +3262,7 @@ window.addEventListener('DOMContentLoaded', function() {
   if (ventDp && !ventDp.value) ventDp.value = today;
   ['wins-date-picker','vent-date-picker','whoi-date-picker'].forEach(updateDateLabel);
 
-  // Render everything on load so data shows without needing to click first
   beliefRenderAll();
-  renderWins();
-  renderVentEntries();
-  renderSavedAffirmations();
-  renderBooks();
-  beliefRenderAll();
-  initWhiAm();
-  rfmRender();
-  initAssertive();
-  initBelieve();
   renderHomeSchedulePreview();
 });
 </script>
@@ -3980,7 +3856,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 <style>
-  /* ── Right For Me ── */
+  /* -- Right For Me -- */
   .rfm-inner-tab { font-family:'Nunito',sans-serif; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; color:var(--gray); border:none; background:none; padding:0.5rem 1rem 0.6rem; border-bottom:2px solid transparent; transition:color 0.2s,border-color 0.2s; white-space:nowrap; flex:1; text-align:center; font-weight:300; }
   .rfm-inner-tab.active, .rfm-inner-tab:hover { color:var(--black); border-bottom-color:var(--black); }
   .rfm-value-row { display:flex; align-items:center; justify-content:space-between; padding:1.2rem 0; border-bottom:1px solid var(--light); gap:1rem; }
@@ -4112,7 +3988,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <div style="display:flex;gap:0.3rem;align-items:center;">
             <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);">Color</span>
             <div style="display:flex;gap:0.3rem;">
-              <button class="face-habit-color-opt selected" data-color="#f9a8c9" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;"></button>
+              <button class="face-habit-color-opt selected" data-color="#f9a8c9" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid transparent;outline:2px solid #0a0a0a;cursor:pointer;"></button>
               <button class="face-habit-color-opt" data-color="#a8d8f0" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
               <button class="face-habit-color-opt" data-color="#b8f0c8" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
               <button class="face-habit-color-opt" data-color="#f9e4a8" onclick="faceHabitPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
@@ -4155,7 +4031,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <button onclick="bcAdd('hair')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
         </div>
         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;" id="bc-hair-colors">
-          <button class="bc-color-opt hair selected" data-cat="hair" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;"></button>
+          <button class="bc-color-opt hair selected" data-cat="hair" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid transparent;outline:2px solid #0a0a0a;cursor:pointer;"></button>
           <button class="bc-color-opt hair" data-cat="hair" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
           <button class="bc-color-opt hair" data-cat="hair" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
           <button class="bc-color-opt hair" data-cat="hair" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
@@ -4195,7 +4071,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <button onclick="bcAdd('teeth')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
         </div>
         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;" id="bc-teeth-colors">
-          <button class="bc-color-opt teeth selected" data-cat="teeth" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;"></button>
+          <button class="bc-color-opt teeth selected" data-cat="teeth" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid transparent;outline:2px solid #0a0a0a;cursor:pointer;"></button>
           <button class="bc-color-opt teeth" data-cat="teeth" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
           <button class="bc-color-opt teeth" data-cat="teeth" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
           <button class="bc-color-opt teeth" data-cat="teeth" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
@@ -4234,7 +4110,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <button onclick="bcAdd('ears')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
         </div>
         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;" id="bc-ears-colors">
-          <button class="bc-color-opt ears selected" data-cat="ears" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;"></button>
+          <button class="bc-color-opt ears selected" data-cat="ears" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid transparent;outline:2px solid #0a0a0a;cursor:pointer;"></button>
           <button class="bc-color-opt ears" data-cat="ears" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
           <button class="bc-color-opt ears" data-cat="ears" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
           <button class="bc-color-opt ears" data-cat="ears" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
@@ -4273,7 +4149,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <button onclick="bcAdd('nails')" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1rem;cursor:pointer;">Add</button>
         </div>
         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;" id="bc-nails-colors">
-          <button class="bc-color-opt nails selected" data-cat="nails" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;"></button>
+          <button class="bc-color-opt nails selected" data-cat="nails" data-color="#f9a8c9" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9a8c9;border:2px solid transparent;outline:2px solid #0a0a0a;cursor:pointer;"></button>
           <button class="bc-color-opt nails" data-cat="nails" data-color="#a8d8f0" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;"></button>
           <button class="bc-color-opt nails" data-cat="nails" data-color="#b8f0c8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;"></button>
           <button class="bc-color-opt nails" data-cat="nails" data-color="#f9e4a8" onclick="bcPickColor(this)" style="width:16px;height:16px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;"></button>
@@ -4689,7 +4565,7 @@ window.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <script>
-// ── JESUS CHRIST ─────────────────────────────────────────────
+// -- JESUS CHRIST ---------------------------------------------
 var JESUS_KEY = 'jesus_data';
 var jesusCurrentDate = new Date().toISOString().split('T')[0];
 var jesusCalOffset = 0;
@@ -4832,7 +4708,7 @@ function showJesusTab(tab) {
   if (tab === 'study') { showJesusStudyTab('howto'); }
 }
 
-// ── PRAYER: THINGS ───────────────────────────────────────────
+// -- PRAYER: THINGS -------------------------------------------
 function jesusSavePrayThing() {
   var inp = document.getElementById('jesus-pray-things-input');
   var text = inp.value.trim(); if (!text) return;
@@ -4849,7 +4725,7 @@ function jesusDeletePrayThing(id) {
   jesusSave(); jesusRender('prayer');
 }
 
-// ── PRAYER: PEOPLE ───────────────────────────────────────────
+// -- PRAYER: PEOPLE -------------------------------------------
 function jesusSavePrayPerson() {
   var inp = document.getElementById('jesus-pray-people-input');
   var text = inp.value.trim(); if (!text) return;
@@ -4866,7 +4742,7 @@ function jesusDeletePrayPerson(id) {
   jesusSave(); jesusRender('prayer');
 }
 
-// ── VERSE ────────────────────────────────────────────────────
+// -- VERSE ----------------------------------------------------
 function jesusSaveVerse() {
   var text = document.getElementById('jesus-verse-text').value.trim();
   var ref  = document.getElementById('jesus-verse-ref').value.trim();
@@ -4881,7 +4757,7 @@ function jesusDeleteVerse(id) {
   jesusSave(); jesusRender('verse');
 }
 
-// ── WHAT GOD SAID ────────────────────────────────────────────
+// -- WHAT GOD SAID --------------------------------------------
 function jesusSaveGodSaid() {
   var body = document.getElementById('jesus-godsaid-body').value.trim();
   if (!body) return;
@@ -5088,7 +4964,7 @@ function jesusDeleteRepent(id) {
   jesusSave(); jesusRender('action');
 }
 
-// ── RENDER ───────────────────────────────────────────────────
+// -- RENDER ---------------------------------------------------
 function jesusRenderCheckList(items, toggleFn, deleteFn) {
   if (!items || !items.length) return '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">Nothing added yet.</div>';
   return items.map(function(x) {
@@ -5140,7 +5016,7 @@ function jesusRender(tab) {
 </script>
 <script>
 
-// ── HABITS TAB CONTROLLER ────────────────────────────────────
+// -- HABITS TAB CONTROLLER ------------------------------------
 function habitsInit() {
   bodycareLoad();
   showHabitsTab('calisthenics');
@@ -5158,7 +5034,7 @@ function showHabitsTab(tab) {
   if (tab === 'daily') dailyLoad();
 }
 
-// ── DAILY ────────────────────────────────────────────────────
+// -- DAILY ----------------------------------------------------
 var DAILY_KEY = 'daily_data';
 var dailyData = {};
 
@@ -5253,7 +5129,7 @@ function dailyRemoveMeal(meal, i) {
   dailyRenderMeals();
 }
 
-// ── BODY CARE ────────────────────────────────────────────────
+// -- BODY CARE ------------------------------------------------
 var bodycareData = { face: [], hair: [], skin: [], ears: [], nails: [] };
 
 function bodycareLoad() {}
@@ -5262,7 +5138,7 @@ function bodycareRender() { bcLoad(); ['hair','teeth','ears','nails'].forEach(fu
 function bodycareAdd(cat) {}
 function bodycareDelete(cat, i) {}
 
-// ── BODYCARE HABIT TRACKER (hair/skin/ears/nails) ────────────
+// -- BODYCARE HABIT TRACKER (hair/skin/ears/nails) ------------
 var BC_KEY = 'bc_habits_data';
 var bcData = {};
 var bcWeekOffsets = { hair:0, teeth:0, ears:0, nails:0 };
@@ -5328,7 +5204,7 @@ function bcStreak(cat, id, todayStr) {
 }
 
 
-// ── MONTH CALENDAR HELPER ────────────────────────────────────
+// -- MONTH CALENDAR HELPER ------------------------------------
 function buildMonthCal(getCountFn, habitId, color) {
   var now = new Date();
   var y = now.getFullYear(), m = now.getMonth();
@@ -5388,7 +5264,7 @@ function hexToRgba(hex, alpha) {
 }
 
 
-// ── BODYCARE POPUP CALENDAR ──────────────────────────────────
+// -- BODYCARE POPUP CALENDAR ----------------------------------
 var bcCalOffsets = { face:0, hair:0, teeth:0, ears:0, nails:0 };
 
 function bcCalToggle(cat) {
@@ -5572,16 +5448,13 @@ function bcRender(cat) {
       var pu  = "bcPointerUp(event,\'" + cat + "\',\'" + h.id + "\',\'" + date + "\')";
 
       if (isToday) {
-        return '<div style="display:flex;justify-content:center;align-items:center;" onclick="'+inc+'" oncontextmenu="'+dec+'" onpointerdown="'+pd+'" onpointerup="'+pu+'" onpointercancel="bcPointerCancel()">'
-          + '<div style="width:22px;height:22px;border:1px solid '+(filled?h.color:'#c8c8c5')+';background:'+(filled?h.color:'transparent')+';cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">'
-            + '<span style="font-family:Nunito,sans-serif;font-size:0.58rem;font-weight:700;color:var(--black);line-height:1;">' + (count > 0 ? count : '+') + '</span>'
+        return '<div style="display:flex;justify-content:center;align-items:center;">'
+          + '<div style="width:18px;height:18px;border:1px solid '+(filled?h.color:'#c8c8c5')+';background:'+(filled?h.color:'transparent')+';display:flex;align-items:center;justify-content:center;transition:all 0.15s;">'
+            + '<span style="font-family:Nunito,sans-serif;font-size:0.48rem;font-weight:700;color:var(--black);line-height:1;">' + (count > 0 ? count : '') + '</span>'
           + '</div></div>';
       }
-      return '<div style="display:flex;justify-content:center;align-items:center;cursor:'+(isFuture?'default':'pointer')+';margin:0 auto;"'
-        + (!isFuture ? ' onclick="'+inc+'" oncontextmenu="'+dec+'" onpointerdown="'+pd+'" onpointerup="'+pu+'" onpointercancel="bcPointerCancel()"' : '')
-        + '><div style="width:18px;height:18px;border:1px solid '+(filled?h.color:'#c8c8c5')+';background:'+(filled?h.color:'transparent')+';display:flex;align-items:center;justify-content:center;transition:all 0.15s;'+(isFuture?'opacity:0.3;':'')+'">'
-          + (count > 0 ? '<span style="font-family:Nunito,sans-serif;font-size:0.48rem;font-weight:700;color:var(--black);line-height:1;">'+count+'</span>' : '')
-        + '</div></div>';
+      // Past and future: no square shown (empty cell)
+      if (!isToday) return '<div></div>';
     }).join('');
 
     var streak = bcStreak(cat, h.id, todayStr);
@@ -5592,18 +5465,29 @@ function bcRender(cat) {
           + '<div style="width:8px;height:8px;background:'+h.color+';flex-shrink:0;"></div>'
           + '<span style="font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:300;">'+h.name+'</span>'
         + '</div>'
-        + '<div style="display:flex;align-items:center;gap:0.8rem;">'
-          + (todayCount > 0 ? '<span style="font-family:Nunito,sans-serif;font-size:0.6rem;color:var(--gray);">'+todayCount+'x today</span>' : '')
-          + (streak > 0 ? '<span style="font-family:Nunito,sans-serif;font-size:0.6rem;color:var(--gray);">'+streak+' day streak</span>' : '')
-          + '<button onclick="bcDelete(\'' + cat + '\',\'' + h.id + '\')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;line-height:1;padding:0;">&times;</button>'
+        + '<div style="display:flex;align-items:center;gap:0.4rem;">'
+          + '<button onclick="bcDecrement(\''+cat+'\',\''+h.id+'\',\''+todayStr+'\')" style="width:24px;height:24px;border:1px solid #c8c8c5;background:none;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;color:var(--gray);padding:0;">−</button>'
+          + '<span style="font-family:Nunito,sans-serif;font-size:0.75rem;min-width:16px;text-align:center;color:var(--black);">'+todayCount+'</span>'
+          + '<button onclick="bcIncrement(\''+cat+'\',\''+h.id+'\',\''+todayStr+'\')" style="width:24px;height:24px;border:1px solid #c8c8c5;background:none;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;color:var(--black);padding:0;">+</button>'
+          + (streak > 0 ? '<span style="font-family:Nunito,sans-serif;font-size:0.6rem;color:var(--gray);margin-left:0.3rem;">'+streak+'d</span>' : '')
+          + '<button onclick="bcDelete(\''+cat+'\',\''+h.id+'\')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;line-height:1;padding:0;margin-left:0.2rem;">&times;</button>'
         + '</div>'
       + '</div>'
       + '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;">' + dotRow + '</div>'
-      + '<div style="font-family:Nunito,sans-serif;font-size:0.65rem;color:var(--gray);margin-top:0.25rem;text-align:right;">tap + · hold −</div>'
       + '</div>';
   }).join('');
 }
 
+function bcToggle(cat, id, date) {
+  var todayStr = new Date().toISOString().split('T')[0];
+  if (date > todayStr) return;
+  bcLoad();
+  if (!bcData[cat].log) bcData[cat].log = {};
+  if (!bcData[cat].log[date]) bcData[cat].log[date] = {};
+  bcData[cat].log[date][id] = bcData[cat].log[date][id] > 0 ? 0 : 1;
+  bcSave();
+  bcRender(cat);
+}
 function bcIncrement(cat, id, date) {
   var todayStr = new Date().toISOString().split('T')[0];
   if (date > todayStr) return;
@@ -5664,8 +5548,8 @@ function bcDelete(cat, id) {
 
 function bcPickColor(btn) {
   var cat = btn.getAttribute('data-cat');
-  document.querySelectorAll('.bc-color-opt.'+cat).forEach(function(b){ b.style.border='2px solid transparent'; });
-  btn.style.border = '2px solid var(--black)';
+  document.querySelectorAll('.bc-color-opt.'+cat).forEach(function(b){ b.style.border='2px solid transparent'; b.style.outline='none'; });
+  btn.style.border = '2px solid transparent'; btn.style.outline = '2px solid var(--black)';
   bcSelectedColors[cat] = btn.getAttribute('data-color');
 }
 
@@ -5676,7 +5560,7 @@ function bcWeekShift(cat, dir) {
 }
 
 
-// ── FACE HABIT TRACKER ───────────────────────────────────────
+// -- FACE HABIT TRACKER ---------------------------------------
 var FACE_HABITS_KEY = 'face_habits_data';
 var faceHabitsData = { habits: [], log: {} };
 var faceHabitsWeekOffset = 0;
@@ -5769,23 +5653,16 @@ function faceHabitsRender() {
       var isToday  = date === todayStr;
       var filled = count > 0;
 
-      // Today cell: show stepper − count +
+      // Today cell
       if (isToday) {
-        return '<div style="display:flex;justify-content:center;align-items:center;" onclick="faceHabitsIncrement(\'' + h.id + '\',\'' + date + '\')" oncontextmenu="faceHabitsDecrementEvt(event,\'' + h.id + '\',\'' + date + '\')" onpointerdown="faceHabitsPointerDown(event,\'' + h.id + '\',\'' + date + '\')" onpointerup="faceHabitsPointerUp(event,\'' + h.id + '\',\'' + date + '\')" onpointercancel="faceHabitsPointerCancel()" onpointerdown="faceHabitsPointerDown(event,\'' + h.id + '\',\'' + date + '\')" onpointerup="faceHabitsPointerUp(event,\'' + h.id + '\',\'' + date + '\')" onpointercancel="faceHabitsPointerCancel()">'
-          + '<div style="width:22px;height:22px;border:1px solid ' + (filled ? h.color : '#c8c8c5') + ';background:' + (filled ? h.color : 'transparent') + ';cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">'
-            + '<span style="font-family:Nunito,sans-serif;font-size:0.58rem;font-weight:700;color:var(--black);line-height:1;">' + (count > 0 ? count : '+') + '</span>'
-          + '</div>'
-          + '</div>';
+        return '<div style="display:flex;justify-content:center;align-items:center;">'
+          + '<div style="width:18px;height:18px;border:1px solid ' + (filled ? h.color : '#c8c8c5') + ';background:' + (filled ? h.color : 'transparent') + ';display:flex;align-items:center;justify-content:center;transition:all 0.15s;">'
+            + '<span style="font-family:Nunito,sans-serif;font-size:0.48rem;font-weight:700;color:var(--black);line-height:1;">' + (count > 0 ? count : '') + '</span>'
+          + '</div></div>';
       }
 
-      // Past cells: tap to add, right-click to remove
-      return '<div style="display:flex;justify-content:center;align-items:center;cursor:' + (isFuture ? 'default' : 'pointer') + ';"'
-        + (!isFuture ? ' onclick="faceHabitsIncrement(\'' + h.id + '\',\'' + date + '\')" oncontextmenu="faceHabitsDecrementEvt(event,\'' + h.id + '\',\'' + date + '\')" onpointerdown="faceHabitsPointerDown(event,\'' + h.id + '\',\'' + date + '\')" onpointerup="faceHabitsPointerUp(event,\'' + h.id + '\',\'' + date + '\')" onpointercancel="faceHabitsPointerCancel()"' : '')
-        + '>'
-        + '<div style="width:18px;height:18px;border:1px solid ' + (filled ? h.color : '#c8c8c5') + ';background:' + (filled ? h.color : 'transparent') + ';display:flex;align-items:center;justify-content:center;transition:all 0.15s;' + (isFuture ? 'opacity:0.3;' : '') + '">'
-          + (count > 0 ? '<span style="font-family:Nunito,sans-serif;font-size:0.48rem;font-weight:700;color:var(--black);line-height:1;">' + count + '</span>' : '')
-        + '</div>'
-        + '</div>';
+      // Past and future: no square
+      if (!isToday) return '<div></div>';
     }).join('');
 
     var streak = faceHabitsStreak(h.id, todayStr);
@@ -5796,18 +5673,28 @@ function faceHabitsRender() {
           + '<div style="width:8px;height:8px;background:' + h.color + ';flex-shrink:0;"></div>'
           + '<span style="font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:300;">' + h.name + '</span>'
         + '</div>'
-        + '<div style="display:flex;align-items:center;gap:0.8rem;">'
-          + (todayCount > 0 ? '<span style="font-family:Nunito,sans-serif;font-size:0.6rem;color:var(--gray);">' + todayCount + 'x today</span>' : '')
-          + (streak > 0 ? '<span style="font-family:Nunito,sans-serif;font-size:0.6rem;color:var(--gray);letter-spacing:0.06em;">' + streak + ' day streak</span>' : '')
-          + '<button onclick="faceHabitsDelete(\'' + h.id + '\')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;line-height:1;padding:0;">&times;</button>'
+        + '<div style="display:flex;align-items:center;gap:0.4rem;">'
+          + '<button onclick="faceHabitsDecrement(\'' + h.id + '\',\'' + todayStr + '\')" style="width:24px;height:24px;border:1px solid #c8c8c5;background:none;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;color:var(--gray);padding:0;">-</button>'
+          + '<span style="font-family:Nunito,sans-serif;font-size:0.75rem;min-width:16px;text-align:center;color:var(--black);">' + todayCount + '</span>'
+          + '<button onclick="faceHabitsIncrement(\'' + h.id + '\',\'' + todayStr + '\')" style="width:24px;height:24px;border:1px solid #c8c8c5;background:none;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;color:var(--black);padding:0;">+</button>'
+          + (streak > 0 ? '<span style="font-family:Nunito,sans-serif;font-size:0.6rem;color:var(--gray);margin-left:0.3rem;">' + streak + 'd</span>' : '')
+          + '<button onclick="faceHabitsDelete(\'' + h.id + '\')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;line-height:1;padding:0;margin-left:0.2rem;">&times;</button>'
         + '</div>'
       + '</div>'
       + '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;">' + dotRow + '</div>'
-      + '<div style="font-family:Nunito,sans-serif;font-size:0.65rem;color:var(--gray);margin-top:0.25rem;text-align:right;">tap + · hold −</div>'
       + '</div>';
   }).join('');
 }
 
+function faceHabitsToggle(id, date) {
+  var todayStr = new Date().toISOString().split('T')[0];
+  if (date > todayStr) return;
+  faceHabitsLoad();
+  if (!faceHabitsData.log[date]) faceHabitsData.log[date] = {};
+  faceHabitsData.log[date][id] = faceHabitsData.log[date][id] > 0 ? 0 : 1;
+  faceHabitsSave();
+  faceHabitsRender();
+}
 function faceHabitsIncrement(id, date) {
   var todayStr = new Date().toISOString().split('T')[0];
   if (date > todayStr) return;
@@ -5885,8 +5772,8 @@ function faceHabitsDelete(id) {
 }
 
 function faceHabitPickColor(btn) {
-  document.querySelectorAll('.face-habit-color-opt').forEach(function(b){ b.style.border='2px solid transparent'; });
-  btn.style.border = '2px solid var(--black)';
+  document.querySelectorAll('.face-habit-color-opt').forEach(function(b){ b.style.border='2px solid transparent'; b.style.outline='none'; });
+  btn.style.border = '2px solid transparent'; btn.style.outline = '2px solid var(--black)';
   faceHabitsSelectedColor = btn.getAttribute('data-color');
 }
 
@@ -5895,7 +5782,7 @@ function faceHabitsWeekShift(dir) {
   faceHabitsRender();
 }
 
-// ── CALISTHENICS FOR BEGINNER ────────────────────────────────
+// -- CALISTHENICS FOR BEGINNER --------------------------------
 var caliWeek = 1;
 var caliLog = JSON.parse(localStorage.getItem('cali_log') || '{}');
 
@@ -6340,24 +6227,14 @@ function wiaTab(id) {
 }
 
 function initWhiAm() {
-  // Always reload WIA from localStorage so synced data shows up
-  WIA = JSON.parse(localStorage.getItem('wia2') || '{"j":{},"c":{},"traits":[],"values":[],"name":"","wj":{}}');
-  if (!WIA.traits) WIA.traits = [];
-  if (!WIA.values) WIA.values = [];
-  if (!WIA.j) WIA.j = {};
-  if (!WIA.c) WIA.c = {};
-  if (!WIA.wj) WIA.wj = {};
-  if (!WIA.name) WIA.name = '';
-  if (!WIA.notes) WIA.notes = {};
+  if (_wiaInited) return;
+  _wiaInited = true;
   var ni = document.getElementById('wiaNameInput');
   if (ni) ni.value = WIA.name;
-  if (!_wiaInited) {
-    _wiaInited = true;
-    document.getElementById('wiaValueInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddValue(); });
-    document.getElementById('wiaTraitInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddTrait(); });
-    document.getElementById('wiaQAns').addEventListener('input', function() { WIA.j[wiaQi] = this.value; wiaSave(); wiaRenderQ(); });
-    document.getElementById('wiaWQAns').addEventListener('input', function() { WIA.wj[wiaWqi] = this.value; wiaSave(); wiaRenderWQ(); });
-  }
+  document.getElementById('wiaValueInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddValue(); });
+  document.getElementById('wiaTraitInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddTrait(); });
+  document.getElementById('wiaQAns').addEventListener('input', function() { WIA.j[wiaQi] = this.value; wiaSave(); wiaRenderQ(); });
+  document.getElementById('wiaWQAns').addEventListener('input', function() { WIA.wj[wiaWqi] = this.value; wiaSave(); wiaRenderWQ(); });
   wiaRenderValues(); wiaRenderTraits(); wiaUpdateCard();
   wiaRenderQ();
   document.getElementById('wiaAffText').textContent = wiaAffs[wiaAffIdx];
@@ -6393,7 +6270,6 @@ function wiaAddValue() {
 }
 function wiaDelValue(i) { WIA.values.splice(i,1); wiaSave(); wiaRenderValues(); }
 function wiaRenderTraits() {
-  // Filter out empty traits and save cleaned version
   var cleaned = WIA.traits.filter(function(t){ return t && t.trim(); });
   if (cleaned.length !== WIA.traits.length) { WIA.traits = cleaned; wiaSave(); }
   var el = document.getElementById('wiaTraitsList');
@@ -6634,7 +6510,7 @@ function wiaJumpW(i) { wiaWqi = i; localStorage.setItem('wia2wq', wiaWqi); wiaRe
 
 
 <script>
-// ── RIGHT FOR ME ──────────────────────────────────────────────
+// -- RIGHT FOR ME ----------------------------------------------
 var RFM_KEY = 'rfm_data';
 var rfmData = { values: [], people: [] };
 
@@ -6751,7 +6627,7 @@ function rfmRender() {
   rfmInitTypeSelectors();
 }
 
-// ── VALUES ──
+// -- VALUES --
 function rfmRenderValues() {
   var list = document.getElementById('rfm-values-list');
   if (!list) return;
@@ -6836,7 +6712,7 @@ function rfmDelValue(i) {
   rfmSave(); rfmRenderValues(); rfmRenderSuggestions();
 }
 
-// ── PEOPLE ──
+// -- PEOPLE --
 function rfmRenderPeople() {
   var list = document.getElementById('rfm-people-list');
   if (!list) return;
@@ -7009,8 +6885,8 @@ function rfmInnerTab(tab) {
   if (tab === 'compare') rfmRenderCompare();
 }
 
-// ── PERSONALITY TYPES (MBTI) ──
-// ── OBJECTIVE PERSONALITY TYPE SYSTEM ──
+// -- PERSONALITY TYPES (MBTI) --
+// -- OBJECTIVE PERSONALITY TYPE SYSTEM --
 var opCoins = { od: null, sn: null, ft: null, a1: null, a2: null };
 var opAnimalOpposites = { P:'S', S:'P', B:'C', C:'B' };
 
