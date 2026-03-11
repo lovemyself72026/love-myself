@@ -20,7 +20,8 @@
     'whoi_history','my_books','habit_tracker','cali_log','wia2','wia2aff','wia2q','wia2wq',
     'hlb','hlr','ass_checkin','ass_log','ass_entries_asking','ass_entries_giving',
     'bel_foundation','bel_evidence','bel_failure','belief_beliefs',
-    'balance_data','that_girl_data','vision_items','ritual_state','user_rituals'];
+    'balance_data','that_girl_data','vision_items','ritual_state','user_rituals',
+    'bc_habits_data','face_habits_data'];
   const SYNC_PREFIXES = ['ass_entries_','ass_notes_','jesus_','bc_','rfm_'];
 
   window.syncToCloud = async function(key, value) {
@@ -2350,6 +2351,11 @@ function reloadAllData() {
   // Reload Balance
   if (typeof renderBalanceQuestions === 'function') renderBalanceQuestions();
   if (typeof renderRelationshipQuestions === 'function') renderRelationshipQuestions();
+  // Reload body care data from localStorage before rendering
+  if (typeof bcLoad === 'function') { bcLoad(); }
+  if (typeof faceHabitsLoad === 'function') { faceHabitsLoad(); }
+  if (typeof bodycareRender === 'function') bodycareRender();
+  if (typeof faceHabitsRender === 'function') faceHabitsRender();
   // Reload calisthenics
   if (typeof renderCaliLog === 'function') renderCaliLog();
   // Reload text inputs for currently visible section
@@ -3019,7 +3025,8 @@ function beliefSaveNew() {
   var oldVal = document.getElementById('belief-old').value.trim();
   var newVal = document.getElementById('belief-new').value.trim();
   if (!oldVal || !newVal) return;
-  beliefBeliefs.push({ id: 'b' + Date.now(), old: oldVal, new: newVal, color: beliefSelectedColor, done: {} });
+  var now = new Date(); var ts = now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  beliefBeliefs.push({ id: 'b' + Date.now(), old: oldVal, new: newVal, color: beliefSelectedColor, done: {}, createdAt: ts });
   saveBeliefBeliefs();
   document.getElementById('belief-old').value = '';
   document.getElementById('belief-new').value = '';
@@ -3223,6 +3230,7 @@ function beliefRenderAll() {
       + '<div>'
       + '<div style="font-family:Nunito,sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.1rem;">Now I choose to believe</div>'
       + '<div style="font-family:Nunito,sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);margin-bottom:0.4rem;">' + b.new.replace(/</g,'&lt;') + '</div>'
+      + (b.createdAt ? '<div style="font-family:Nunito,sans-serif;font-size:0.6rem;color:var(--gray);margin-bottom:0.4rem;">' + b.createdAt + '</div>' : '')
       + '<div style="font-family:Nunito,sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.1rem;">I used to believe</div>'
       + '<div style="font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:300;color:var(--gray);text-decoration:line-through;">' + b.old.replace(/</g,'&lt;') + '</div>'
       + '</div></div>'
