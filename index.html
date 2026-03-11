@@ -46,7 +46,9 @@
     return SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
   }
 
-  function applyCloudData(data) {
+  var _initialSyncDone = false;
+
+  function applyCloudData(data, isInitial) {
     if (!data) return;
     let changed = false;
     Object.keys(data).forEach(function(k) {
@@ -56,14 +58,24 @@
         changed = true;
       }
     });
-    if (changed && typeof reloadAllData === 'function') reloadAllData();
+    if (changed || isInitial) {
+      function tryReload() {
+        if (typeof window.reloadAllData === 'function') {
+          window.reloadAllData();
+        } else {
+          setTimeout(tryReload, 200);
+        }
+      }
+      setTimeout(tryReload, isInitial ? 800 : 100);
+    }
   }
 
-  // Real-time listener — phone updates instantly when laptop writes
+  // Real-time listener — updates instantly when other device writes
   onValue(DB_REF, function(snapshot) {
     const data = snapshot.val();
     if (data) {
-      applyCloudData(data);
+      applyCloudData(data, !_initialSyncDone);
+      _initialSyncDone = true;
       setSyncStatus('ok', 'Live synced: ' + new Date().toLocaleTimeString());
     }
   }, function(err) {
@@ -415,7 +427,8 @@
     <button class="nav-tab active" onclick="showSection('home')">Home</button>
     <button class="nav-tab" onclick="showSection('vision')">Vision</button>
     <button class="nav-tab" onclick="showSection('schedule')">Schedule</button>
-    <button class="nav-tab" onclick="showSection('affirmations');setTimeout(()=>showJournalTab('mejournal'),100)">Me</button>
+    <button class="nav-tab" onclick="showSection('affirmations');showJBWTab('wins')">Journal</button>
+    <button class="nav-tab" onclick="showSection('me');setTimeout(()=>initMeSection(),100)">Me</button>
   </div>
 </nav>
 
@@ -713,30 +726,14 @@
     </div>
   </div>
 
-  <!-- Journal sub-tabs -->
+  <!-- Sub-tabs -->
   <div id="journal-tabs" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-    <button class="journal-tab active" onclick="showJournalTab('mejournal')" id="jtab-mejournal">Me</button>
-    <button class="journal-tab" onclick="showJournalTab('journalbookswins')" id="jtab-journalbookswins">Wins</button>
+    <button class="balance-sub-tab active" onclick="showJBWTab('wins')" id="jbwtab-wins">Wins</button>
+    <button class="balance-sub-tab" onclick="showJBWTab('vent')" id="jbwtab-vent">Journal</button>
+    <button class="balance-sub-tab" onclick="showJBWTab('books')" id="jbwtab-books">Books</button>
+    <button class="balance-sub-tab" onclick="showJBWTab('belief')" id="jbwtab-belief">Belief</button>
   </div>
-
-    <!-- Me sub-section (mirrors home Me card links) -->
-  <div id="jsub-mejournal" style="display:none;">
-    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-      <button class="balance-sub-tab active" id="metab-who" onclick="showMeJournalTab('whiam')">Who I Am</button>
-      <button class="balance-sub-tab" id="metab-ass" onclick="showMeJournalTab('assertive')">Assertive</button>
-      <button class="balance-sub-tab" id="metab-bel" onclick="showMeJournalTab('believe')">Believe</button>
-      <button class="balance-sub-tab" id="metab-rfm" onclick="showMeJournalTab('rightforme')">Right For Me</button>
-    </div>
-  </div>
-    <!-- Books sub-section -->
-  <!-- Combined Wins / Journal / Books tab -->
-  <div id="jsub-journalbookswins" style="display:none;">
-    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-      <button class="balance-sub-tab active" onclick="showJBWTab('wins')" id="jbwtab-wins">Wins</button>
-      <button class="balance-sub-tab" onclick="showJBWTab('vent')" id="jbwtab-vent">Journal</button>
-      <button class="balance-sub-tab" onclick="showJBWTab('books')" id="jbwtab-books">Books</button>
-      <button class="balance-sub-tab" onclick="showJBWTab('belief')" id="jbwtab-belief">Belief</button>
-    </div>
+  <div id="jsub-journalbookswins">
 
     <div id="jsub-wins">
       <div style="margin-bottom:2rem;">
@@ -751,6 +748,10 @@
           <div style="font-family:'Lora',serif;font-style:italic;font-size:1.05rem;margin-bottom:1rem;">Add a win — big or small, they all count</div>
           <input id="win-input" placeholder="e.g. I got out of bed today" onkeydown="if(event.key==='Enter')addWin()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1.2rem;">
           <button class="btn fill" onclick="addWin()">Add win</button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;">
+          <span id="wins-total" style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
+          <button id="wins-all-btn" onclick="toggleWinsAll()" style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;border:none;background:none;color:var(--gray);cursor:pointer;text-decoration:underline;">Show all wins</button>
         </div>
         <div id="wins-list"></div>
       </div>
@@ -913,14 +914,15 @@ function showSection(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  const map=['jesus','home','vision','schedule','affirmations'];
+  const map=['jesus','home','vision','schedule','affirmations','journal','me'];
   const navTab = document.querySelectorAll('.nav-tab')[map.indexOf(id)];
   if (navTab) navTab.classList.add('active');
   window.scrollTo(0,0);
   if (id === 'home') renderAnalytics();
   if (id === 'schedule') { initScheduleDatePicker(); loadPlannerDay(); }
   if (id === 'vision') { loadThatGirl(); }
-  if (id === 'me') initMeSection();
+  if (id === 'me') { initMeSection(); initWhiAm(); }
+  if (id === 'affirmations') { showJBWTab('wins'); }
   if (id === 'jesus' && typeof jesusInit === 'function') jesusInit();
 }
 
@@ -946,12 +948,21 @@ function showJournalTab(tab) {
 
 function showJBWTab(tab) {
   ['wins','vent','books','belief'].forEach(t => {
-    document.getElementById('jsub-' + t).style.display = t === tab ? 'block' : 'none';
+    var el = document.getElementById('jsub-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
     var btn = document.getElementById('jbwtab-' + t);
     if (btn) btn.classList.toggle('active', t === tab);
   });
-  if (tab === 'belief') beliefRenderAll();
+  if (tab === 'wins') { renderWins(); }
+  if (tab === 'vent') { renderVentEntries(); }
+  if (tab === 'books') { renderBooks(); }
+  if (tab === 'belief') { beliefRenderAll(); }
 }
+
+// Auto-show wins on load
+window.addEventListener('DOMContentLoaded', function() {
+  if (document.getElementById('jsub-wins')) showJBWTab('wins');
+});
 
 let shuffled = [...affirmations].sort(() => Math.random() - 0.5);
 var affIndex = 0;
@@ -972,6 +983,7 @@ function saveAffirmation(){
 }
 
 function renderSavedAffirmations(){
+  savedAffirmations = JSON.parse(localStorage.getItem('saved_affirmations')||'[]');
   const el=document.getElementById('saved-affirmations');
   if(!el) return;
   if(!savedAffirmations.length){el.innerHTML='';return;}
@@ -1166,20 +1178,35 @@ function deleteWin(id) {
   renderWins();
 }
 
+var winsShowAll = false;
+function toggleWinsAll() {
+  winsShowAll = !winsShowAll;
+  var btn = document.getElementById('wins-all-btn');
+  if (btn) btn.textContent = winsShowAll ? 'Show today only' : 'Show all wins';
+  renderWins();
+}
 function renderWins() {
   const el = document.getElementById('wins-list');
   if (!el) return;
-  const dateKey = getWinsDateKey();
-  const dayWins = wins.filter(w => w.dateKey === dateKey || (!w.dateKey && w.date && w.date.includes(new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}))));
-
-  if (!dayWins.length) {
-    el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;">No wins for this day yet 🤍</p>';
+  wins = JSON.parse(localStorage.getItem('my_wins') || '[]');
+  if (!Array.isArray(wins)) wins = [];
+  var displayWins;
+  if (winsShowAll) {
+    displayWins = wins.slice().sort(function(a,b){ return (b.id||0)-(a.id||0); });
+  } else {
+    const dateKey = getWinsDateKey();
+    displayWins = wins.filter(w => w.dateKey === dateKey || (!w.dateKey && w.date && w.date.includes(new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}))));
+  }
+  var totalEl = document.getElementById('wins-total');
+  if (totalEl) totalEl.textContent = wins.length + ' total wins';
+  if (!displayWins.length) {
+    el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;">' + (winsShowAll ? 'No wins yet — add your first one 🤍' : 'No wins for this day yet — try Show all wins') + '</p>';
     return;
   }
-  el.innerHTML = dayWins.map(w => `
+  el.innerHTML = displayWins.map(w => `
     <div class="journal-entry">
       <button onclick="deleteWin(${w.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.3rem;">remove</button>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);margin-bottom:0.3rem;">${w.date ? w.date.split(' · ').slice(1).join(' · ') : ''}</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);margin-bottom:0.3rem;">${w.date || ''}</div>
       <div class="journal-content">${w.text}</div>
     </div>`).join('');
 }
@@ -2217,6 +2244,7 @@ function clearVentInput() {
 }
 
 function renderVentEntries() {
+  ventEntries = JSON.parse(localStorage.getItem('vent_entries') || '[]');
   const el = document.getElementById('vent-entries');
   if (!el) return;
   const dateKey = getVentDateKey();
@@ -2395,7 +2423,7 @@ if (!localStorage.getItem('data_cleared_v1')) {
 }
 
 
-function reloadAllData() {
+window.reloadAllData = function reloadAllData() {
   const w = JSON.parse(localStorage.getItem('my_wins') || '[]'); wins = Array.isArray(w) ? w : [];
   const sa = JSON.parse(localStorage.getItem('saved_affirmations') || '[]'); savedAffirmations = Array.isArray(sa) ? sa : [];
   const ve = JSON.parse(localStorage.getItem('vent_entries') || '[]'); ventEntries = Array.isArray(ve) ? ve : [];
@@ -2404,11 +2432,22 @@ function reloadAllData() {
   const b = JSON.parse(localStorage.getItem('my_books') || '[]'); books = Array.isArray(b) ? b : [];
   const ap = JSON.parse(localStorage.getItem('all_planner_data') || '{}'); allPlannerData = (ap && typeof ap === 'object' && !Array.isArray(ap)) ? ap : {};
   const cl = JSON.parse(localStorage.getItem('cali_log') || '{}'); caliLog = (cl && typeof cl === 'object') ? cl : {};
+  // Reload WIA (Me section) variables
+  try {
+    WIA = JSON.parse(localStorage.getItem('wia2') || '{"j":{},"c":{},"traits":[],"values":[],"name":"","wj":{}}');
+    if (!WIA.traits) WIA.traits = []; if (!WIA.values) WIA.values = [];
+    if (!WIA.j) WIA.j = {}; if (!WIA.c) WIA.c = {}; if (!WIA.wj) WIA.wj = {};
+    if (!WIA.name) WIA.name = ''; if (!WIA.notes) WIA.notes = {};
+    _wiaInited = false;
+  } catch(e) {}
+  // Reload Balance variable
+  try { B = JSON.parse(localStorage.getItem('hlb') || '{}'); if (!B.history) B.history = {}; if (!B.answers) B.answers = {}; } catch(e) {}
   renderWins(); renderSavedAffirmations(); renderVentEntries(); renderDimensionBoards(); renderWhoiGrid(); renderBooks(); renderAnalytics();
   // Reload habits
   if (typeof renderHabits === 'function') renderHabits();
   if (typeof renderHabitStrips === 'function') renderHabitStrips();
   // Reload wia / Me section
+  if (typeof wiaRender === 'function') wiaRender();
   if (typeof rfmRender === 'function') rfmRender();
   if (typeof assRenderLog === 'function') assRenderLog();
   if (typeof assRenderEntries === 'function') { assRenderEntries('asking'); assRenderEntries('giving'); }
@@ -2823,8 +2862,8 @@ function showMeTab(tab) {
   });
   if (tab === 'whiam') { initWhiAm(); }
   if (tab === 'balance') { showMeTab('whiam'); setTimeout(function(){ wiaTab('balance'); initBalanceDatePicker(); renderBalanceQuestions(); renderRelationshipQuestions(); }, 50); return; }
-  if (tab === 'assertive') initAssertive();
-  if (tab === 'believe') initBelieve();
+  if (tab === 'assertive') { initAssertive(); assRenderLog(); assRenderEntries('asking'); assRenderEntries('giving'); }
+  if (tab === 'believe') { initBelieve(); belRenderFoundation(); belRenderEvidence(); belRenderFailure(); }
   if (tab === 'rightforme') rfmRender();
 }
 
@@ -3250,6 +3289,7 @@ function beliefRenderStrip(id) {
 }
 
 function beliefRenderAll() {
+  beliefBeliefs = JSON.parse(localStorage.getItem('belief_beliefs') || '[]');
   var el = document.getElementById('belief-list');
   if (!el) return;
   if (!beliefBeliefs.length) {
@@ -3336,7 +3376,17 @@ window.addEventListener('DOMContentLoaded', function() {
   if (ventDp && !ventDp.value) ventDp.value = today;
   ['wins-date-picker','vent-date-picker','whoi-date-picker'].forEach(updateDateLabel);
 
+  // Render everything on load so data shows without needing to click first
   beliefRenderAll();
+  renderWins();
+  renderVentEntries();
+  renderSavedAffirmations();
+  renderBooks();
+  beliefRenderAll();
+  initWhiAm();
+  rfmRender();
+  initAssertive();
+  initBelieve();
   renderHomeSchedulePreview();
 });
 </script>
@@ -3367,7 +3417,7 @@ window.addEventListener('DOMContentLoaded', function() {
       <div class="wia-identity-card" style="margin-bottom:0.6rem;">
         <div class="wia-id-label">I am</div>
         <div class="wia-id-name" id="wiaIdName">...</div>
-        <div class="wia-id-traits" id="wiaIdTraits"><span class="wia-trait-tag empty">your traits appear here</span></div>
+        <div class="wia-id-traits" id="wiaIdTraits"></div>
       </div>
       <div style="margin-bottom:0.5rem;">
         <div class="subtitle" style="margin-bottom:0.2rem;">How you see yourself</div>
@@ -6290,14 +6340,24 @@ function wiaTab(id) {
 }
 
 function initWhiAm() {
-  if (_wiaInited) return;
-  _wiaInited = true;
+  // Always reload WIA from localStorage so synced data shows up
+  WIA = JSON.parse(localStorage.getItem('wia2') || '{"j":{},"c":{},"traits":[],"values":[],"name":"","wj":{}}');
+  if (!WIA.traits) WIA.traits = [];
+  if (!WIA.values) WIA.values = [];
+  if (!WIA.j) WIA.j = {};
+  if (!WIA.c) WIA.c = {};
+  if (!WIA.wj) WIA.wj = {};
+  if (!WIA.name) WIA.name = '';
+  if (!WIA.notes) WIA.notes = {};
   var ni = document.getElementById('wiaNameInput');
   if (ni) ni.value = WIA.name;
-  document.getElementById('wiaValueInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddValue(); });
-  document.getElementById('wiaTraitInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddTrait(); });
-  document.getElementById('wiaQAns').addEventListener('input', function() { WIA.j[wiaQi] = this.value; wiaSave(); wiaRenderQ(); });
-  document.getElementById('wiaWQAns').addEventListener('input', function() { WIA.wj[wiaWqi] = this.value; wiaSave(); wiaRenderWQ(); });
+  if (!_wiaInited) {
+    _wiaInited = true;
+    document.getElementById('wiaValueInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddValue(); });
+    document.getElementById('wiaTraitInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddTrait(); });
+    document.getElementById('wiaQAns').addEventListener('input', function() { WIA.j[wiaQi] = this.value; wiaSave(); wiaRenderQ(); });
+    document.getElementById('wiaWQAns').addEventListener('input', function() { WIA.wj[wiaWqi] = this.value; wiaSave(); wiaRenderWQ(); });
+  }
   wiaRenderValues(); wiaRenderTraits(); wiaUpdateCard();
   wiaRenderQ();
   document.getElementById('wiaAffText').textContent = wiaAffs[wiaAffIdx];
@@ -6307,17 +6367,22 @@ function initWhiAm() {
 
 // IDENTITY
 function wiaUpdateCard() {
-  WIA.name = (document.getElementById('wiaNameInput') || {}).value || WIA.name;
+  var nameEl = document.getElementById('wiaNameInput');
+  WIA.name = nameEl ? nameEl.value : WIA.name;
   wiaSave();
-  document.getElementById('wiaIdName').textContent = WIA.name || '...';
-  var all = WIA.traits.concat(WIA.values);
+  document.getElementById('wiaIdName').textContent = WIA.name || '';
+  var all = WIA.traits.concat(WIA.values).filter(function(t){ return t && t.trim(); });
   document.getElementById('wiaIdTraits').innerHTML = all.length
-    ? all.map(function(t) { return '<span class="wia-trait-tag">' + t + '</span>'; }).join('')
-    : '<span class="wia-trait-tag empty">your traits appear here</span>';
+    ? all.map(function(t) { return '<span class="wia-trait-tag">' + t.trim() + '</span>'; }).join('')
+    : '';
 }
 function wiaRenderValues() {
-  document.getElementById('wiaValuesList').innerHTML = WIA.values.map(function(v, i) {
-    return '<div class="wia-tag">' + v + '<button onclick="wiaDelValue(' + i + ')">×</button></div>';
+  var cleaned = WIA.values.filter(function(v){ return v && v.trim(); });
+  if (cleaned.length !== WIA.values.length) { WIA.values = cleaned; wiaSave(); }
+  var el = document.getElementById('wiaValuesList');
+  if (!el) return;
+  el.innerHTML = WIA.values.map(function(v, i) {
+    return '<div class="wia-tag">' + v.trim() + '<button onclick="wiaDelValue(' + i + ')">×</button></div>';
   }).join('');
   wiaUpdateCard();
 }
@@ -6328,8 +6393,13 @@ function wiaAddValue() {
 }
 function wiaDelValue(i) { WIA.values.splice(i,1); wiaSave(); wiaRenderValues(); }
 function wiaRenderTraits() {
-  document.getElementById('wiaTraitsList').innerHTML = WIA.traits.map(function(t, i) {
-    return '<div class="wia-tag">' + t + '<button onclick="wiaDelTrait(' + i + ')">×</button></div>';
+  // Filter out empty traits and save cleaned version
+  var cleaned = WIA.traits.filter(function(t){ return t && t.trim(); });
+  if (cleaned.length !== WIA.traits.length) { WIA.traits = cleaned; wiaSave(); }
+  var el = document.getElementById('wiaTraitsList');
+  if (!el) return;
+  el.innerHTML = WIA.traits.map(function(t, i) {
+    return '<div class="wia-tag">' + t.trim() + '<button onclick="wiaDelTrait(' + i + ')">×</button></div>';
   }).join('');
   wiaUpdateCard();
 }
