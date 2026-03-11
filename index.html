@@ -84,7 +84,8 @@
 
   window.addEventListener('load', function() {
     setTimeout(function(){ window.pullFromCloud(false); }, 500);
-    setInterval(function(){ window.pullFromCloud(false); }, 30000);
+    // Poll every 3 seconds for near real-time sync
+    setInterval(function(){ window.pullFromCloud(false); }, 3000);
   });
 
   // Pull immediately when user switches back to this tab or app
@@ -94,6 +95,13 @@
   window.addEventListener('focus', function() {
     window.pullFromCloud(false);
   });
+
+  // After every push, pull after a short delay so other devices get it fast
+  var _origSyncToCloud = window.syncToCloud;
+  window.syncToCloud = async function(key, value) {
+    await _origSyncToCloud(key, value);
+    setTimeout(function(){ window.pullFromCloud(false); }, 800);
+  };
 </script>
 
 <!-- Cloudinary image upload — outside module so it's globally accessible -->
