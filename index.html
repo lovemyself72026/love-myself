@@ -84,7 +84,15 @@
 
   window.addEventListener('load', function() {
     setTimeout(function(){ window.pullFromCloud(false); }, 500);
-    setInterval(function(){ window.pullFromCloud(false); }, 1000);
+    setInterval(function(){ window.pullFromCloud(false); }, 30000);
+  });
+
+  // Pull immediately when user switches back to this tab or app
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') window.pullFromCloud(false);
+  });
+  window.addEventListener('focus', function() {
+    window.pullFromCloud(false);
   });
 </script>
 
@@ -426,14 +434,7 @@
   <h2 style="margin-bottom:1.5rem;">Analytics.</h2>
   <div id="home-analytics"></div>
 
-  <hr style="margin:2rem 0;">
-  <div style="display:flex;gap:0.5rem;justify-content:center;align-items:center;">
-    <button onclick="pullFromCloud(true)" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;color:var(--gray);">↻ Sync</button>
-    <button onclick="exportData()" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;color:var(--gray);">Export</button>
-    <button onclick="document.getElementById('import-file').click()" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.4rem 0.9rem;color:var(--gray);">Import</button>
-    <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(this)">
-  </div>
-  <div id="import-msg" style="font-family:'Nunito',sans-serif;font-size:0.62rem;color:var(--gray);letter-spacing:0.08em;margin-top:0.4rem;text-align:center;"></div>
+
 </div>
 
 
