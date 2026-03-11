@@ -77,7 +77,7 @@
 
   window.addEventListener('load', function() {
     setTimeout(function(){ window.pullFromCloud(false); }, 1500);
-    setInterval(function(){ window.pullFromCloud(false); }, 3000);
+    setInterval(function(){ window.pullFromCloud(false); }, 5000);
   });
 </script>
 
@@ -2352,6 +2352,16 @@ function reloadAllData() {
   if (typeof renderRelationshipQuestions === 'function') renderRelationshipQuestions();
   // Reload calisthenics
   if (typeof renderCaliLog === 'function') renderCaliLog();
+  // Reload text inputs for currently visible section
+  if (typeof loadPlannerDay === 'function') loadPlannerDay();
+  if (typeof loadVentDay === 'function') loadVentDay();
+  if (typeof loadWinsDay === 'function') loadWinsDay();
+  if (typeof bodycareRender === 'function') bodycareRender();
+  if (typeof faceHabitsRender === 'function') faceHabitsRender();
+  if (typeof wiaRenderTraits === 'function') wiaRenderTraits();
+  if (typeof wiaRenderValues === 'function') wiaRenderValues();
+  if (typeof wiaUpdateCard === 'function') wiaUpdateCard();
+  if (typeof beliefRenderAll === 'function') beliefRenderAll();
 }
 
 renderAnalytics();
