@@ -21,7 +21,7 @@
     'hlb','hlr','ass_checkin','ass_log','ass_entries_asking','ass_entries_giving',
     'bel_foundation','bel_evidence','bel_failure','belief_beliefs',
     'balance_data','that_girl_data','vision_items','ritual_state','user_rituals',
-    'bc_habits_data','face_habits_data'];
+    'bc_habits_data','face_habits_data','daily_data','rfm_data','jesus_data'];
   const SYNC_PREFIXES = ['ass_entries_','ass_notes_','jesus_','bc_','rfm_'];
 
   window.syncToCloud = async function(key, value) {
@@ -337,7 +337,6 @@
     <button class="nav-tab active" onclick="showSection('home')">Home</button>
     <button class="nav-tab" onclick="showSection('vision')">Vision</button>
     <button class="nav-tab" onclick="showSection('schedule')">Schedule</button>
-    <button class="nav-tab" onclick="showSection('affirmations');showJBWTab('wins')">Journal</button>
     <button class="nav-tab" onclick="showSection('me')">Me</button>
   </div>
 </nav>
@@ -361,10 +360,10 @@
     <div class="home-card" style="cursor:default;">
       <div class="home-card-title">Journal</div>
       <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
-        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('belief'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Belief</div>
-        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('vent'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Journal</div>
-        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('books'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Books</div>
-        <div onclick="showSection('affirmations');setTimeout(()=>showJournalTab('wins'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Wins</div>
+        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Belief</div>
+        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Journal</div>
+        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Books</div>
+        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Wins</div>
       </div>
     </div>
 
@@ -624,125 +623,7 @@
 
 </div>
 
-<div class="section" id="affirmations">
 
-  <!-- Celebration overlay -->
-  <div id="book-celebrate" style="display:none;position:fixed;inset:0;z-index:999;pointer-events:none;">
-    <canvas id="confetti-canvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
-    <div id="book-toast" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--black);color:var(--white);padding:1.5rem 2rem;text-align:center;min-width:220px;opacity:0;transition:opacity 0.3s;">
-      <div style="font-size:1.8rem;margin-bottom:0.5rem;">🎉</div>
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:1.1rem;margin-bottom:0.2rem;" id="toast-title"></div>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#aaa;">Added to your reading list 🤍</div>
-    </div>
-  </div>
-
-  <!-- Journal sub-tabs -->
-  <div id="journal-tabs" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-    <button class="journal-tab active" onclick="showJournalTab('mejournal')" id="jtab-mejournal">Me</button>
-    <button class="journal-tab" onclick="showJournalTab('journalbookswins')" id="jtab-journalbookswins">Wins</button>
-  </div>
-
-    <!-- Me sub-section (mirrors home Me card links) -->
-  <div id="jsub-mejournal" style="display:none;">
-    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-      <button class="balance-sub-tab active" id="metab-who" onclick="showMeJournalTab('whiam')">Who I Am</button>
-      <button class="balance-sub-tab" id="metab-ass" onclick="showMeJournalTab('assertive')">Assertive</button>
-      <button class="balance-sub-tab" id="metab-bel" onclick="showMeJournalTab('believe')">Believe</button>
-      <button class="balance-sub-tab" id="metab-rfm" onclick="showMeJournalTab('rightforme')">Right For Me</button>
-    </div>
-  </div>
-    <!-- Books sub-section -->
-  <!-- Combined Wins / Journal / Books tab -->
-  <div id="jsub-journalbookswins" style="display:none;">
-    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-      <button class="balance-sub-tab active" onclick="showJBWTab('wins')" id="jbwtab-wins">Wins</button>
-      <button class="balance-sub-tab" onclick="showJBWTab('vent')" id="jbwtab-vent">Journal</button>
-      <button class="balance-sub-tab" onclick="showJBWTab('books')" id="jbwtab-books">Books</button>
-      <button class="balance-sub-tab" onclick="showJBWTab('belief')" id="jbwtab-belief">Belief</button>
-    </div>
-
-    <div id="jsub-wins">
-      <div style="margin-bottom:2rem;">
-        <div class="subtitle">Celebrate myself</div>
-        <h2 style="margin-bottom:1rem;">My wins.</h2>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-          <button onclick="changeWinsDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
-          <span id="wins-date-picker-label" onclick="document.getElementById('wins-date-picker').showPicker?document.getElementById('wins-date-picker').showPicker():document.getElementById('wins-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="wins-date-picker" onchange="loadWinsDay()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
-          <button onclick="changeWinsDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
-        </div>
-        <div style="border:1px solid #c8c8c5;padding:2rem;margin-bottom:1.5rem;">
-          <div style="font-family:'Lora',serif;font-style:italic;font-size:1.05rem;margin-bottom:1rem;">Add a win — big or small, they all count</div>
-          <input id="win-input" placeholder="e.g. I got out of bed today" onkeydown="if(event.key==='Enter')addWin()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1.2rem;">
-          <button class="btn fill" onclick="addWin()">Add win</button>
-        </div>
-        <div id="wins-list"></div>
-      </div>
-    </div>
-
-    <div id="jsub-vent" style="display:none;">
-      <div>
-        <div id="vent-section" class="subtitle" style="margin-bottom:0.5rem;">Let it all out</div>
-        <h2 style="margin-bottom:1rem;">Journal.</h2>
-        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Your safe space. No judgment 🤍</div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-          <button onclick="changeVentDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
-          <span id="vent-date-picker-label" onclick="document.getElementById('vent-date-picker').showPicker?document.getElementById('vent-date-picker').showPicker():document.getElementById('vent-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="vent-date-picker" onchange="loadVentDay()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
-          <button onclick="changeVentDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
-        </div>
-        <textarea id="vent-input" placeholder="Let it all out here..." rows="8" oninput="saveVentAuto()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.5rem 0;margin-bottom:1rem;min-height:150px;"></textarea>
-        <div id="vent-entries" style="margin-top:1rem;"></div>
-      </div>
-    </div>
-
-    <div id="jsub-books" style="display:none;">
-      <div>
-        <div class="subtitle">My reading list</div>
-        <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:1rem;">
-          <h2 style="margin:0;">Books I've read.</h2>
-          <span id="books-count" style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
-        </div>
-        <div style="border:1px solid #c8c8c5;padding:1.5rem;margin-bottom:1rem;">
-          <input id="book-input" placeholder="Book title..." onkeydown="if(event.key==='Enter')addBook()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
-          <input id="book-author" placeholder="Author (optional)" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:1rem;">
-          <button class="btn fill" onclick="addBook()">Add book</button>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-          <button onclick="changeBooksMonth(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
-          <span id="books-month-label" style="font-family:'Nunito',sans-serif;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
-          <button onclick="changeBooksMonth(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
-        </div>
-        <div id="books-list"></div>
-      </div>
-    </div>
-    <div id="jsub-belief" style="display:none;">
-      <div>
-        <div class="subtitle">Rewire your mind</div>
-        <h2 style="margin-bottom:0.3rem;">Change your belief.</h2>
-        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Simple. Daily. It works over time.</div>
-        <div style="border:1px solid #c8c8c5;padding:1.2rem;margin-bottom:1.5rem;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Now I choose to believe</div>
-          <input type="text" id="belief-new" placeholder="e.g. I am enough, always." onkeydown="if(event.key==='Enter')document.getElementById('belief-old').focus()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:0.9rem;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">I used to believe</div>
-          <input type="text" id="belief-old" placeholder="e.g. I'm not good enough…" onkeydown="if(event.key==='Enter')beliefSaveNew()" onblur="beliefSaveNew()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1rem;">
-          <div style="display:flex;align-items:center;gap:0.5rem;">
-            <span style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">Color</span>
-            <div style="display:flex;gap:0.4rem;">
-              <button class="belief-color-opt selected" data-color="#f9a8c9" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;flex-shrink:0;"></button>
-              <button class="belief-color-opt" data-color="#a8d8f0" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
-              <button class="belief-color-opt" data-color="#b8f0c8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
-              <button class="belief-color-opt" data-color="#f9e4a8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
-              <button class="belief-color-opt" data-color="#d4b8f9" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
-              <button class="belief-color-opt" data-color="#f9c8a8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
-              <button class="belief-color-opt" data-color="#c8e8c8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#c8e8c8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
-            </div>
-          </div>
-        </div>
-        <div id="belief-list"></div>
-      </div>
-    </div>
-  </div><!-- end jsub-journalbookswins -->
-
-</div>
 
 
 
@@ -836,7 +717,7 @@ function showSection(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  const map=['jesus','home','vision','schedule','affirmations','journal','me'];
+  const map=['jesus','home','vision','schedule','me','journal','me'];
   const navTab = document.querySelectorAll('.nav-tab')[map.indexOf(id)];
   if (navTab) navTab.classList.add('active');
   window.scrollTo(0,0);
@@ -844,7 +725,7 @@ function showSection(id){
   if (id === 'schedule') { initScheduleDatePicker(); loadPlannerDay(); }
   if (id === 'vision') { loadThatGirl(); }
   if (id === 'me') { initMeSection(); initWhiAm(); }
-  if (id === 'affirmations') { showJBWTab('wins'); }
+  if (id === 'me') { showMeMainTab('me'); }
   if (id === 'jesus' && typeof jesusInit === 'function') jesusInit();
 }
 
@@ -869,16 +750,15 @@ function showJournalTab(tab) {
 }
 
 function showJBWTab(tab) {
-  ['wins','vent','books','belief'].forEach(t => {
-    var el = document.getElementById('jsub-' + t);
-    if (el) el.style.display = t === tab ? 'block' : 'none';
-    var btn = document.getElementById('jbwtab-' + t);
-    if (btn) btn.classList.toggle('active', t === tab);
-  });
-  if (tab === 'wins') renderWins();
-  if (tab === 'vent') renderVentEntries();
-  if (tab === 'books') renderBooks();
-  if (tab === 'belief') beliefRenderAll();
+  // All panels are always visible (scrollable) — just trigger renders
+  renderWins();
+  renderVentEntries();
+  renderBooks();
+  beliefRenderAll();
+  window.scrollTo(0,0);
+  // Scroll to the relevant section if called directly
+  var target = document.getElementById('jsub-' + tab);
+  if (target) setTimeout(function(){ target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 80);
 }
 
 let shuffled = [...affirmations].sort(() => Math.random() - 0.5);
@@ -1107,7 +987,7 @@ function renderWins() {
   el.innerHTML = dayWins.map(w => `
     <div class="journal-entry">
       <button onclick="deleteWin(${w.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.3rem;">remove</button>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);margin-bottom:0.3rem;">${w.date ? w.date.split(' · ').slice(1).join(' · ') : ''}</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);margin-bottom:0.3rem;">${w.date || ''}</div>
       <div class="journal-content">${w.text}</div>
     </div>`).join('');
 }
@@ -2153,7 +2033,7 @@ function renderVentEntries() {
   el.innerHTML = dayEntries.map(e => `
     <div class="journal-entry">
       <button onclick="deleteVentEntry(${e.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.4rem;">remove</button>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);margin-bottom:0.3rem;">${e.date ? e.date.split(' · ').pop() : ''}</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);margin-bottom:0.3rem;">${e.date || ''}</div>
       <div class="journal-content">${e.text.replace(/\n/g,'<br>')}</div>
     </div>`).join('');
 }
@@ -2324,50 +2204,61 @@ if (!localStorage.getItem('data_cleared_v1')) {
 
 
 function reloadAllData() {
-  const w = JSON.parse(localStorage.getItem('my_wins') || '[]'); wins = Array.isArray(w) ? w : [];
-  const sa = JSON.parse(localStorage.getItem('saved_affirmations') || '[]'); savedAffirmations = Array.isArray(sa) ? sa : [];
-  const ve = JSON.parse(localStorage.getItem('vent_entries') || '[]'); ventEntries = Array.isArray(ve) ? ve : [];
+  // Re-read ALL in-memory variables from localStorage before rendering
+  wins = JSON.parse(localStorage.getItem('my_wins') || '[]'); if (!Array.isArray(wins)) wins = [];
+  savedAffirmations = JSON.parse(localStorage.getItem('saved_affirmations') || '[]'); if (!Array.isArray(savedAffirmations)) savedAffirmations = [];
+  ventEntries = JSON.parse(localStorage.getItem('vent_entries') || '[]'); if (!Array.isArray(ventEntries)) ventEntries = [];
+  books = JSON.parse(localStorage.getItem('my_books') || '[]'); if (!Array.isArray(books)) books = [];
+  whoiItems = JSON.parse(localStorage.getItem('whoi_history') || '[]'); if (!Array.isArray(whoiItems)) whoiItems = [];
+  visionItems = JSON.parse(localStorage.getItem('vision_items') || '[]'); if (!Array.isArray(visionItems)) visionItems = [];
+  beliefBeliefs = JSON.parse(localStorage.getItem('belief_beliefs') || '[]'); if (!Array.isArray(beliefBeliefs)) beliefBeliefs = [];
   const di = JSON.parse(localStorage.getItem('dimension_items') || '{}'); dimensionItems = (di && typeof di === 'object' && !Array.isArray(di)) ? di : {};
-  const wi = JSON.parse(localStorage.getItem('whoi_history') || '[]'); whoiItems = Array.isArray(wi) ? wi : [];
-  const b = JSON.parse(localStorage.getItem('my_books') || '[]'); books = Array.isArray(b) ? b : [];
   const ap = JSON.parse(localStorage.getItem('all_planner_data') || '{}'); allPlannerData = (ap && typeof ap === 'object' && !Array.isArray(ap)) ? ap : {};
   const cl = JSON.parse(localStorage.getItem('cali_log') || '{}'); caliLog = (cl && typeof cl === 'object') ? cl : {};
+  const ht = JSON.parse(localStorage.getItem('habit_tracker') || '{}'); habitTracker = (ht && typeof ht === 'object') ? ht : {};
+  WIA = JSON.parse(localStorage.getItem('wia2') || '{"j":{},"c":{},"traits":[],"values":[],"name":"","wj":{}}');
+  wiaQi = parseInt(localStorage.getItem('wia2q') || '0');
+  wiaWqi = parseInt(localStorage.getItem('wia2wq') || '0');
+  wiaAffIdx = parseInt(localStorage.getItem('wia2aff') || '0');
+
+  // Render everything
   renderWins(); renderSavedAffirmations(); renderVentEntries(); renderDimensionBoards(); renderWhoiGrid(); renderBooks(); renderAnalytics();
-  // Reload habits
+  if (typeof beliefRenderAll === 'function') beliefRenderAll();
+  // Habits
   if (typeof renderHabits === 'function') renderHabits();
   if (typeof renderHabitStrips === 'function') renderHabitStrips();
-  // Reload wia / Me section
+  // Me section
   if (typeof rfmRender === 'function') rfmRender();
   if (typeof assRenderLog === 'function') assRenderLog();
   if (typeof assRenderEntries === 'function') { assRenderEntries('asking'); assRenderEntries('giving'); }
   if (typeof renderBelieveSection === 'function') renderBelieveSection();
-  // Reload Jesus
-  if (typeof jesusRender === 'function') jesusRender();
-  if (typeof jesusRenderPray === 'function') jesusRenderPray();
-  if (typeof jesusRenderStudy === 'function') jesusRenderStudy();
-  // Reload Vision
-  if (typeof tgRenderAll === 'function') tgRenderAll();
-  if (typeof renderWhoiDay === 'function') renderWhoiDay();
-  // Reload Balance
-  if (typeof renderBalanceQuestions === 'function') renderBalanceQuestions();
-  if (typeof renderRelationshipQuestions === 'function') renderRelationshipQuestions();
-  // Reload body care data from localStorage before rendering
-  if (typeof bcLoad === 'function') { bcLoad(); }
-  if (typeof faceHabitsLoad === 'function') { faceHabitsLoad(); }
-  if (typeof bodycareRender === 'function') bodycareRender();
-  if (typeof faceHabitsRender === 'function') faceHabitsRender();
-  // Reload calisthenics
-  if (typeof renderCaliLog === 'function') renderCaliLog();
-  // Reload text inputs for currently visible section
-  if (typeof loadPlannerDay === 'function') loadPlannerDay();
-  if (typeof loadVentDay === 'function') loadVentDay();
-  if (typeof loadWinsDay === 'function') loadWinsDay();
-  if (typeof bodycareRender === 'function') bodycareRender();
-  if (typeof faceHabitsRender === 'function') faceHabitsRender();
   if (typeof wiaRenderTraits === 'function') wiaRenderTraits();
   if (typeof wiaRenderValues === 'function') wiaRenderValues();
   if (typeof wiaUpdateCard === 'function') wiaUpdateCard();
-  if (typeof beliefRenderAll === 'function') beliefRenderAll();
+  // Balance
+  if (typeof renderBalanceQuestions === 'function') renderBalanceQuestions();
+  if (typeof renderRelationshipQuestions === 'function') renderRelationshipQuestions();
+  // Jesus
+  if (typeof jesusRender === 'function') jesusRender();
+  if (typeof jesusRenderPray === 'function') jesusRenderPray();
+  if (typeof jesusRenderStudy === 'function') jesusRenderStudy();
+  // Vision
+  if (typeof tgRenderAll === 'function') tgRenderAll();
+  if (typeof renderWhoiDay === 'function') renderWhoiDay();
+  // Body care
+  if (typeof bcLoad === 'function') bcLoad();
+  if (typeof faceHabitsLoad === 'function') faceHabitsLoad();
+  if (typeof bodycareRender === 'function') bodycareRender();
+  if (typeof faceHabitsRender === 'function') faceHabitsRender();
+  // Calisthenics
+  if (typeof renderCaliLog === 'function') renderCaliLog();
+  // Daily nutrition
+  if (typeof dailyLoad === 'function') dailyLoad();
+  if (typeof dailyRenderMeals === 'function') dailyRenderMeals();
+  // Text inputs for currently visible section
+  if (typeof loadPlannerDay === 'function') loadPlannerDay();
+  if (typeof loadVentDay === 'function') loadVentDay();
+  if (typeof loadWinsDay === 'function') loadWinsDay();
 }
 
 renderAnalytics();
@@ -2755,6 +2646,17 @@ function showMeJournalTab(tab) {
   });
   showSection('me');
   setTimeout(function(){ showMeTab(tab); }, 100);
+}
+
+function showMeMainTab(tab) {
+  ['me','journal'].forEach(function(t) {
+    var el = document.getElementById('memainsub-' + t);
+    var btn = document.getElementById('memaintab-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  if (tab === 'journal') { renderWins(); renderVentEntries(); renderBooks(); beliefRenderAll(); window.scrollTo(0,0); }
+  if (tab === 'me') showMeTab('whiam');
 }
 
 function showMeTab(tab) {
@@ -3286,10 +3188,18 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<div class="section" id="me" style="padding-top:1.5rem;">
+<div class="section" id="me" style="padding-top:0.5rem;">
 
-  <!-- Journal-style sub-tabs -->
+  <!-- Top 2 tabs: Me | Journal -->
   <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;">
+    <button class="balance-sub-tab active" onclick="showMeMainTab('me')" id="memaintab-me">Me</button>
+    <button class="balance-sub-tab" onclick="showMeMainTab('journal')" id="memaintab-journal">Journal</button>
+  </div>
+
+  <!-- ME CONTENT -->
+  <div id="memainsub-me">
+  <!-- Me sub-tabs -->
+  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:2rem;">
     <button class="balance-sub-tab active" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
     <button class="balance-sub-tab" onclick="showMeTab('assertive')" id="metab-assertive">Assertive</button>
     <button class="balance-sub-tab" onclick="showMeTab('believe')" id="metab-believe">Believe</button>
@@ -3917,6 +3827,104 @@ window.addEventListener('DOMContentLoaded', function() {
 <!-- BELIEVE SECTION -->
 
 <!-- ASSERTIVE SECTION -->
+
+  </div><!-- end memainsub-me -->
+
+  <!-- JOURNAL content -->
+  <div id="memainsub-journal" style="display:none;margin-top:0;padding-top:0;">
+
+    <!-- BELIEF -->
+    <div id="jsub-belief" style="margin-top:1rem;">
+      <div class="subtitle" style="margin-bottom:0.2rem;">Rewire your mind</div>
+      <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
+        <h2 style="margin:0;">Change your belief.</h2>
+      </div>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Simple. Daily. It works over time.</div>
+      <div style="border:1px solid #c8c8c5;padding:1.5rem;margin-bottom:1.5rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Now I choose to believe</div>
+        <input type="text" id="belief-new" placeholder="e.g. I am enough, always." onkeydown="if(event.key==='Enter')document.getElementById('belief-old').focus()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:0.9rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">I used to believe</div>
+        <input type="text" id="belief-old" placeholder="e.g. I'm not good enough…" onkeydown="if(event.key==='Enter')beliefSaveNew()" onblur="beliefSaveNew()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <span style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">Color</span>
+          <div style="display:flex;gap:0.4rem;">
+            <button class="belief-color-opt selected" data-color="#f9a8c9" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;flex-shrink:0;"></button>
+            <button class="belief-color-opt" data-color="#a8d8f0" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
+            <button class="belief-color-opt" data-color="#b8f0c8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#b8f0c8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
+            <button class="belief-color-opt" data-color="#f9e4a8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#f9e4a8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
+            <button class="belief-color-opt" data-color="#d4b8f9" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#d4b8f9;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
+            <button class="belief-color-opt" data-color="#f9c8a8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#f9c8a8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
+            <button class="belief-color-opt" data-color="#c8e8c8" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#c8e8c8;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
+          </div>
+        </div>
+      </div>
+      <div id="belief-list"></div>
+    </div>
+
+    <hr style="margin:1rem 0">
+
+    <!-- WINS -->
+    <div id="jsub-wins">
+      <div class="subtitle" style="margin-bottom:0.2rem;">Celebrate myself</div>
+      <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
+        <h2 style="margin:0;">My wins.</h2>
+      </div>
+      <div style="border:1px solid #c8c8c5;padding:1.5rem;margin-bottom:1rem;">
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:1.05rem;margin-bottom:1rem;">Add a win — big or small, they all count</div>
+        <input id="win-input" placeholder="e.g. I got out of bed today" onkeydown="if(event.key==='Enter')addWin()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1.2rem;">
+        <button class="btn fill" onclick="addWin()">Add win</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <button onclick="changeWinsDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
+        <span id="wins-date-picker-label" onclick="document.getElementById('wins-date-picker').showPicker?document.getElementById('wins-date-picker').showPicker():document.getElementById('wins-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="wins-date-picker" onchange="loadWinsDay()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
+        <button onclick="changeWinsDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
+      </div>
+      <div id="wins-list"></div>
+    </div>
+
+    <hr style="margin:1rem 0">
+
+    <!-- JOURNAL -->
+    <div id="jsub-vent">
+      <div id="vent-section" class="subtitle" style="margin-bottom:0.2rem;">Let it all out</div>
+      <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
+        <h2 style="margin:0;">Journal.</h2>
+      </div>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Your safe space. No judgment 🤍</div>
+      <div style="border:1px solid #c8c8c5;padding:1.5rem;margin-bottom:1rem;">
+        <textarea id="vent-input" placeholder="Let it all out here..." rows="8" oninput="saveVentAuto()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.5rem 0;margin-bottom:0;min-height:150px;"></textarea>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <button onclick="changeVentDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
+        <span id="vent-date-picker-label" onclick="document.getElementById('vent-date-picker').showPicker?document.getElementById('vent-date-picker').showPicker():document.getElementById('vent-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="vent-date-picker" onchange="loadVentDay()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
+        <button onclick="changeVentDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
+      </div>
+      <div id="vent-entries"></div>
+    </div>
+
+    <hr style="margin:1rem 0">
+
+    <!-- BOOKS -->
+    <div id="jsub-books">
+      <div class="subtitle" style="margin-bottom:0.2rem;">My reading list</div>
+      <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
+        <h2 style="margin:0;">Books I've read.</h2>
+        <span id="books-count" style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
+      </div>
+      <div style="border:1px solid #c8c8c5;padding:1.5rem;margin-bottom:1rem;">
+        <input id="book-input" placeholder="Book title..." onkeydown="if(event.key==='Enter')addBook()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
+        <input id="book-author" placeholder="Author (optional)" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:1rem;">
+        <button class="btn fill" onclick="addBook()">Add book</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <button onclick="changeBooksMonth(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
+        <span id="books-month-label" style="font-family:'Nunito',sans-serif;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
+        <button onclick="changeBooksMonth(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
+      </div>
+      <div id="books-list"></div>
+    </div>
+
+  </div><!-- end memainsub-journal -->
 
 </div>
 
