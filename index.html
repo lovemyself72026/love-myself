@@ -77,6 +77,7 @@
       var incoming = JSON.stringify(data[k]);
       var existing = localStorage.getItem(k);
       if (existing !== incoming) {
+        if (k === 'that_girl_data' && window._tgLastSave && (Date.now() - window._tgLastSave < 10000)) return;
         window._rawLS(k, incoming);
         try {
           var inStripped = JSON.stringify(_stripMeta(data[k]));
