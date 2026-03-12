@@ -4735,8 +4735,16 @@ var jesusCalOffset = 0;
 var jesusData = {};
 
 function jesusGetDay(date) {
-  if (!jesusData[date]) jesusData[date] = { prayThings: [], prayPeople: [], verses: [], godsaid: [], actions: [] };
-  return jesusData[date];
+  if (!jesusData[date]) jesusData[date] = {};
+  var d = jesusData[date];
+  if (!d.prayThings) d.prayThings = [];
+  if (!d.prayPeople) d.prayPeople = [];
+  if (!d.verses)     d.verses     = [];
+  if (!d.godsaid)    d.godsaid    = [];
+  if (!d.actions)    d.actions    = [];
+  if (!d.forgive)    d.forgive    = [];
+  if (!d.repent)     d.repent     = [];
+  return d;
 }
 
 function jesusLoad() {
@@ -5150,7 +5158,6 @@ function jesusRenderCheckList(items, toggleFn, deleteFn) {
 }
 
 function jesusRender(tab) {
-  jesusLoad();
   var day = jesusGetDay(jesusCurrentDate);
 
   function _dateLabel(iso) {
