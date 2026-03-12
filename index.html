@@ -60,6 +60,7 @@
     if (!data) return;
     var changed = false;
     var jesusChanged = false;
+    var tgChanged = false;
 
     // Strip savedAt from comparison so timestamp differences don't trigger re-renders
     function _stripMeta(obj) {
@@ -83,6 +84,7 @@
           if (inStripped !== exStripped) {
             changed = true;
             if (k === 'jesus_data') jesusChanged = true;
+            if (k === 'that_girl_data') tgChanged = true;
           }
         } catch(e) { changed = true; }
       }
@@ -109,6 +111,14 @@
             return '<div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;"><div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + dl + '</div><button onclick="jesusDeleteGodSaid('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">\u00d7</button></div><div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;white-space:pre-wrap;">' + x.body + '</div></div>';
           }).join('') : '';
         }
+      } catch(e) {}
+    }
+
+    if (tgChanged) {
+      try {
+        var _tgf = localStorage.getItem('that_girl_data');
+        if (_tgf) { tgData = JSON.parse(_tgf); if (typeof tgData !== 'object' || Array.isArray(tgData)) tgData = {}; }
+        if (typeof tgRenderAll === 'function') tgRenderAll(true);
       } catch(e) {}
     }
 
@@ -171,6 +181,7 @@
     if (id === 'schedule' && typeof loadPlannerDay === 'function') loadPlannerDay();
     if (id === 'home' && typeof renderAnalytics === 'function') renderAnalytics();
     if (id === 'vision' && typeof renderDimensionBoards === 'function') renderDimensionBoards();
+    if (id === 'vision' && typeof tgRenderAll === 'function') tgRenderAll();
     if (id === 'me' && typeof rfmRender === 'function') rfmRender();
     if (id === 'jesus' && typeof jesusLoad === 'function') {
       jesusLoad();
