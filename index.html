@@ -1324,8 +1324,8 @@ document.head.appendChild(whoiStyle);
 var tgData = JSON.parse(localStorage.getItem('that_girl_data') || '{}');
 
 function tgSaveToDB() {
-  localStorage.setItem('that_girl_data', JSON.stringify(tgData));
-  if (typeof syncToCloud === 'function') syncToCloud('that_girl_data', tgData);
+  window._rawLS('that_girl_data', JSON.stringify(tgData));
+  if (typeof window.syncToCloud === 'function') window.syncToCloud('that_girl_data', tgData);
 }
 
 function tgAddMain() {
@@ -4836,7 +4836,7 @@ function jesusLoad() {
 }
 
 function jesusSave() {
-  localStorage.setItem(JESUS_KEY, JSON.stringify(jesusData));
+  window._rawLS(JESUS_KEY, JSON.stringify(jesusData));
   if (window.syncToCloud) window.syncToCloud(JESUS_KEY, jesusData);
 }
 
