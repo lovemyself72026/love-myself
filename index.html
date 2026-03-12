@@ -1350,7 +1350,16 @@ function tgRemove(key, id) {
   var el = document.getElementById('tg-all-list');
   if (el) el.innerHTML = '';
   if (tgData[key]) tgData[key] = tgData[key].filter(function(e) { return String(e.id) !== String(id); });
-  tgSaveToDB();
+  // Write to localStorage
+  window._rawLS('that_girl_data', JSON.stringify(tgData));
+  // Push directly to Firebase — don't rely on syncToCloud or _isSyncing
+  var _pushData = JSON.parse(JSON.stringify(tgData));
+  fetch('https://lovemyselfapp-default-rtdb.firebaseio.com/my-love-myself-data/that_girl_data.json', {
+    method: 'PUT',
+    body: JSON.stringify(_pushData),
+    headers: {'Content-Type': 'application/json'},
+    keepalive: true
+  }).catch(function(){});
   tgRenderAll(true);
 }
 
