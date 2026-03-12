@@ -29,7 +29,7 @@
     return SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
   }
 
-  var _lastPush = 0;
+  var _lastPush = Date.now();
 
   // Push a single key to Firebase via REST
   window.syncToCloud = function(key, value) {
@@ -90,17 +90,20 @@
     }
   }
 
+
+
   // One-off pull
+  var _syncErrorLogged = false;
   window.pullFromCloud = function(showMsg) {
     fetch(DB_URL + '.json')
       .then(function(r){ return r.json(); })
       .then(function(data){
-        console.log('[SYNC] pullFromCloud got data:', data ? Object.keys(data) : null);
+        _syncErrorLogged = false;
         _applyCloudData(data);
         if (showMsg) alert('✅ Synced! 🤍');
       })
       .catch(function(e){
-        console.log('[SYNC] pullFromCloud error:', e.message);
+        _syncErrorLogged = true;
         if (showMsg) alert('❌ Sync failed: ' + e.message);
       });
   };
@@ -118,21 +121,57 @@
     if (id === 'jesus' && typeof jesusRender === 'function') jesusRender();
   }
 
+  // Real-time streaming via Firebase SSE — instant sync across devices
+  var _sseSource = null;
+  function _startSSE() {
+    if (_sseSource) { _sseSource.close(); _sseSource = null; }
+    try {
+      _sseSource = new EventSource(DB_URL + '.json?stream=true&timeout=60000');
+      _sseSource.addEventListener('put', function(e) {
+        try {
+          var msg = JSON.parse(e.data);
+          // msg.path === '/' means full snapshot, msg.path === '/key' means single key update
+          var data = msg.data;
+          if (!data) return;
+          if (msg.path === '/') {
+            _applyCloudData(data);
+          } else {
+            // Single key update — e.g. path = '/all_planner_data'
+            var key = msg.path.replace(/^\//, '');
+            var patch = {};
+            patch[key] = data;
+            _applyCloudData(patch);
+          }
+        } catch(err) {}
+      });
+      _sseSource.addEventListener('patch', function(e) {
+        try {
+          var msg = JSON.parse(e.data);
+          if (msg && msg.data) _applyCloudData(msg.data);
+        } catch(err) {}
+      });
+      _sseSource.onerror = function() {
+        // On error, back off and reconnect after 3s
+        if (_sseSource) { _sseSource.close(); _sseSource = null; }
+        setTimeout(_startSSE, 3000);
+      };
+    } catch(err) {}
+  }
+
   window.addEventListener('load', function() {
-    // Initial pull on load
+    // Initial pull on load, then start streaming
     setTimeout(function(){
       window.pullFromCloud(false);
+      _startSSE();
     }, 800);
-    // Poll every 5 seconds for changes from other devices
-    setInterval(function() {
-      console.log('[SYNC] polling... _lastPush was', Date.now() - _lastPush, 'ms ago');
-      if (Date.now() - _lastPush > 3000) window.pullFromCloud(false);
-    }, 5000);
   });
 
-  // Also pull on tab focus
+  // Also pull + restart stream on tab focus
   document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'visible') window.pullFromCloud(false);
+    if (document.visibilityState === 'visible') {
+      window.pullFromCloud(false);
+      _startSSE();
+    }
   });
 </script>
 
@@ -769,7 +808,7 @@ function showSection(id){
   if (navTab) navTab.classList.add('active');
   window.scrollTo(0,0);
   // Remember which section we're on so refresh returns here
-  try { sessionStorage.setItem('last_section', id); } catch(e) {}
+  try { localStorage.setItem('last_section', id); } catch(e) {}
   if (id === 'home') renderAnalytics();
   if (id === 'schedule') { initScheduleDatePicker(); loadPlannerDay(); }
   if (id === 'vision') { loadThatGirl(); }
@@ -781,7 +820,7 @@ function showSection(id){
 // Restore last section on page load (so refresh doesn't kick you to Home)
 window.addEventListener('DOMContentLoaded', function() {
   try {
-    var last = sessionStorage.getItem('last_section');
+    var last = localStorage.getItem('last_section');
     if (last && document.getElementById(last)) {
       showSection(last);
     }
