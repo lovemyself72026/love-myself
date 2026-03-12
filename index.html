@@ -152,7 +152,41 @@
       jesusLoad();
       var activeJesusTab = document.querySelector('.journal-tab.active[id^="jtab-"]');
       var jtab = activeJesusTab ? activeJesusTab.id.replace('jtab-','') : null;
-      if (jtab === 'prayer' && typeof jesusRender === 'function') jesusRender('prayer');
+      if (jtab === 'prayer' && typeof jesusRender === 'function') {
+        // Re-render all prayer sublists from fresh jesusData
+        var day = jesusGetDay(jesusCurrentDate);
+        var tEl = document.getElementById('jesus-pray-things-list');
+        if (tEl) tEl.innerHTML = jesusRenderCheckList(day.prayThings, 'jesusTogglePrayThing', 'jesusDeletePrayThing');
+        var pEl = document.getElementById('jesus-pray-people-list');
+        if (pEl) pEl.innerHTML = jesusRenderCheckList(day.prayPeople, 'jesusTogglePrayPerson', 'jesusDeletePrayPerson');
+        var vEl = document.getElementById('jesus-verse-list');
+        if (vEl) {
+          vEl.innerHTML = (day.verses && day.verses.length) ? day.verses.map(function(v) {
+            var dl = v.date ? (function(){ var d=new Date(v.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
+            return '<div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">' +
+              '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
+                '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + dl + '</div>' +
+                '<button onclick="jesusDeleteVerse('+v.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">\u00d7</button>' +
+              '</div>' +
+              '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.82rem;line-height:1.7;">' + v.text + '</div>' +
+              (v.ref ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;color:var(--gray);margin-top:0.3rem;letter-spacing:0.06em;">' + v.ref + '</div>' : '') +
+            '</div>';
+          }).join('') : '';
+        }
+        var gEl = document.getElementById('jesus-godsaid-list');
+        if (gEl) {
+          gEl.innerHTML = (day.godsaid && day.godsaid.length) ? day.godsaid.map(function(x) {
+            var dl = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
+            return '<div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">' +
+              '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
+                '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + dl + '</div>' +
+                '<button onclick="jesusDeleteGodSaid('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">\u00d7</button>' +
+              '</div>' +
+              '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;white-space:pre-wrap;">' + x.body + '</div>' +
+            '</div>';
+          }).join('') : '';
+        }
+      }
       if (jtab === 'action') {
         var activJA = document.querySelector('#jatab-action.active, #jatab-forgive.active, #jatab-repent.active');
         var curJA = activJA ? activJA.id.replace('jatab-','') : 'action';
@@ -4937,6 +4971,7 @@ function jesusDeleteVerse(id) {
 // -- WHAT GOD SAID --------------------------------------------
 var _godSaidTimer = null;
 function jesusGodSaidTyping() {
+  if (window._isSyncing) return;
   clearTimeout(_godSaidTimer);
   var status = document.getElementById('jesus-godsaid-status');
   if (status) status.textContent = 'Saving…';
