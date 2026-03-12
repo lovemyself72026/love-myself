@@ -5051,14 +5051,14 @@ function jesusSaveStudyNote() {
   document.getElementById('jesus-study-note').value = '';
   var status = document.getElementById('jesus-study-note-status');
   if (status) { status.textContent = 'Saved'; setTimeout(function(){ status.textContent = ''; }, 2000); }
-  jesusSave(); jesusRenderStudyNotes();
+  jesusSave(); jesusRenderStudyNotes(true);
 }
 function jesusDeleteStudyNote(id) {
   jesusData.studyNotes = (jesusData.studyNotes||[]).filter(function(x){ return x.id!==id; });
-  jesusSave(); jesusRenderStudyNotes();
+  jesusSave(); jesusRenderStudyNotes(true);
 }
-function jesusRenderStudyNotes() {
-  jesusLoad();
+function jesusRenderStudyNotes(skipLoad) {
+  if (!skipLoad) jesusLoad();
   var el = document.getElementById('jesus-study-notes-list'); if (!el) return;
   var items = jesusData.studyNotes || [];
   if (!items.length) { el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">No notes yet.</div>'; return; }
@@ -5079,18 +5079,18 @@ function jesusSaveStudyQuestion() {
   var text = inp.value.trim(); if (!text) return;
   if (!jesusData.studyQuestions) jesusData.studyQuestions = [];
   jesusData.studyQuestions.unshift({ id: Date.now(), text: text, answered: false, date: new Date().toISOString() });
-  inp.value = ''; jesusSave(); jesusRenderStudyQuestions();
+  inp.value = ''; jesusSave(); jesusRenderStudyQuestions(true);
 }
 function jesusToggleStudyQuestion(id) {
   jesusData.studyQuestions = (jesusData.studyQuestions||[]).map(function(x){ return x.id===id?{...x,answered:!x.answered}:x; });
-  jesusSave(); jesusRenderStudyQuestions();
+  jesusSave(); jesusRenderStudyQuestions(true);
 }
 function jesusDeleteStudyQuestion(id) {
   jesusData.studyQuestions = (jesusData.studyQuestions||[]).filter(function(x){ return x.id!==id; });
-  jesusSave(); jesusRenderStudyQuestions();
+  jesusSave(); jesusRenderStudyQuestions(true);
 }
-function jesusRenderStudyQuestions() {
-  jesusLoad();
+function jesusRenderStudyQuestions(skipLoad) {
+  if (!skipLoad) jesusLoad();
   var el = document.getElementById('jesus-study-questions-list'); if (!el) return;
   var items = jesusData.studyQuestions || [];
   if (!items.length) { el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">No questions yet.</div>'; return; }
