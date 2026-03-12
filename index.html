@@ -16,6 +16,7 @@
 <script>
   window._rawLS = localStorage.setItem.bind(localStorage);
   const DB_URL = 'https://lovemyselfapp-default-rtdb.firebaseio.com/my-love-myself-data';
+
   const SYNC_KEYS = ['all_planner_data','my_wins','saved_affirmations','vent_entries','dimension_items',
     'whoi_history','my_books','habit_tracker','cali_log','wia2','wia2aff','wia2q','wia2wq',
     'hlb','hlr','ass_checkin','ass_log','ass_entries_asking','ass_entries_giving',
@@ -24,84 +25,96 @@
     'bc_habits_data','face_habits_data','daily_data','rfm_data','jesus_data'];
   const SYNC_PREFIXES = ['ass_entries_','ass_notes_','jesus_','bc_','rfm_'];
 
+  function _shouldSync(key) {
+    return SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
+  }
+
   var _lastPush = 0;
-  window.syncToCloud = async function(key, value) {
-    const shouldSync = SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
-    if (!shouldSync) return;
+
+  // Push a single key to Firebase via REST
+  window.syncToCloud = function(key, value) {
+    if (!_shouldSync(key)) return;
     _lastPush = Date.now();
-    try {
-      await fetch(`${DB_URL}/${key}.json`, {
-        method: 'PUT',
-        body: JSON.stringify(value),
-        headers: {'Content-Type': 'application/json'},
-        keepalive: true
-      });
-    } catch(e) {}
+    fetch(DB_URL + '/' + key + '.json', {
+      method: 'PUT',
+      body: JSON.stringify(value),
+      headers: {'Content-Type': 'application/json'},
+      keepalive: true
+    }).catch(function(){});
   };
 
   // Intercept ALL localStorage.setItem calls to auto-push to Firebase
   localStorage.setItem = function(key, value) {
     window._rawLS(key, value);
-    const shouldSync = SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
-    if (shouldSync) {
+    if (_shouldSync(key)) {
       _lastPush = Date.now();
-      try {
-        const parsed = JSON.parse(value);
-        window.syncToCloud(key, parsed);
-      } catch(e) {
-        window.syncToCloud(key, value);
-      }
+      try { window.syncToCloud(key, JSON.parse(value)); }
+      catch(e) { window.syncToCloud(key, value); }
     }
   };
 
-  window.pullFromCloud = async function(showMsg) {
-    // Don't pull right after a push — let the push settle first
-    if (!showMsg && (Date.now() - _lastPush) < 2000) return;
-    try {
-      const res = await fetch(`${DB_URL}.json`);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      if (!data) { if(showMsg) alert('No data found yet.'); return; }
-      let changed = false;
-      Object.keys(data).forEach(function(k) {
-        let value = data[k];
-        if (value && typeof value === 'object' && value.data !== undefined && value.ts !== undefined) {
-          value = value.data;
-        }
-        const incoming = JSON.stringify(value);
-        const current = localStorage.getItem(k);
-        if (current !== incoming) {
-          window._rawLS(k, incoming);
-          changed = true;
-        }
-      });
-      if (changed && typeof reloadAllData === 'function') reloadAllData();
-      if (showMsg) alert('✅ Synced! 🤍');
-    } catch(e) {
-      if (showMsg) alert('❌ Sync failed: ' + e.message);
-    }
+  // Apply incoming cloud data to localStorage and re-render
+  function _applyCloudData(data) {
+    if (!data) return;
+    var changed = false;
+    Object.keys(data).forEach(function(k) {
+      var incoming = JSON.stringify(data[k]);
+      if (localStorage.getItem(k) !== incoming) {
+        window._rawLS(k, incoming);
+        changed = true;
+      }
+    });
+    if (changed && typeof reloadAllData === 'function') reloadAllData();
+  }
+
+  // One-off pull
+  window.pullFromCloud = function(showMsg) {
+    fetch(DB_URL + '.json')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        _applyCloudData(data);
+        if (showMsg) alert('✅ Synced! 🤍');
+      })
+      .catch(function(e){ if (showMsg) alert('❌ Sync failed: ' + e.message); });
   };
+
+  // Real-time Server-Sent Events stream from Firebase
+  function _startStream() {
+    var es = new EventSource(DB_URL + '.json?stream=1&accept=text/event-stream');
+    es.addEventListener('put', function(e) {
+      if (Date.now() - _lastPush < 2000) return; // ignore echo of own push
+      try {
+        var msg = JSON.parse(e.data);
+        var data = msg.path === '/' ? msg.data : null;
+        if (data) _applyCloudData(data);
+      } catch(err) {}
+    });
+    es.addEventListener('patch', function(e) {
+      if (Date.now() - _lastPush < 2000) return;
+      try {
+        var msg = JSON.parse(e.data);
+        if (msg.data) _applyCloudData(msg.data);
+      } catch(err) {}
+    });
+    es.onerror = function() {
+      es.close();
+      // Reconnect after 3 seconds
+      setTimeout(_startStream, 3000);
+    };
+  }
 
   window.addEventListener('load', function() {
-    setTimeout(function(){ window.pullFromCloud(false); }, 500);
-    // Poll every 3 seconds for near real-time sync
-    setInterval(function(){ window.pullFromCloud(false); }, 3000);
+    // Initial pull then start real-time stream
+    setTimeout(function(){
+      window.pullFromCloud(false);
+      _startStream();
+    }, 800);
   });
 
-  // Pull immediately when user switches back to this tab or app
+  // Also pull on tab focus
   document.addEventListener('visibilitychange', function() {
     if (document.visibilityState === 'visible') window.pullFromCloud(false);
   });
-  window.addEventListener('focus', function() {
-    window.pullFromCloud(false);
-  });
-
-  // After every push, pull after a short delay so other devices get it fast
-  var _origSyncToCloud = window.syncToCloud;
-  window.syncToCloud = async function(key, value) {
-    await _origSyncToCloud(key, value);
-    setTimeout(function(){ window.pullFromCloud(false); }, 800);
-  };
 </script>
 
 <!-- Cloudinary image upload — outside module so it's globally accessible -->
