@@ -152,7 +152,12 @@
       jesusLoad();
       var activeJesusTab = document.querySelector('.journal-tab.active[id^="jtab-"]');
       var jtab = activeJesusTab ? activeJesusTab.id.replace('jtab-','') : null;
-      if (jtab && typeof jesusRender === 'function') jesusRender(jtab);
+      if (jtab === 'prayer' && typeof jesusRender === 'function') jesusRender('prayer');
+      if (jtab === 'action') {
+        var activJA = document.querySelector('#jatab-action.active, #jatab-forgive.active, #jatab-repent.active');
+        var curJA = activJA ? activJA.id.replace('jatab-','') : 'action';
+        if (typeof showJesusActionTab === 'function') showJesusActionTab(curJA, true);
+      }
       if (typeof jesusRenderHeIs === 'function') jesusRenderHeIs();
     }
     if (id === 'habits' && typeof renderHabits === 'function') renderHabits();
@@ -4495,7 +4500,8 @@ window.addEventListener('DOMContentLoaded', function() {
     <div id="jpwsub-godsaid" style="display:none;">
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">What did God speak to you today?</div>
       <div id="jesus-godsaid-list" style="margin-bottom:1rem;"></div>
-      <textarea id="jesus-godsaid-body" placeholder="What God said today…" rows="4" onblur="jesusSaveGodSaid()" style="width:100%;border:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.8rem;box-sizing:border-box;"></textarea>
+      <textarea id="jesus-godsaid-body" placeholder="What God said today…" rows="4" style="width:100%;border:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.8rem;box-sizing:border-box;margin-bottom:0.6rem;"></textarea>
+      <button onclick="jesusSaveGodSaid()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.5rem 1.2rem;cursor:pointer;">Save</button>
     </div>
 
   </div>
@@ -5030,13 +5036,14 @@ function showJesusWordTab(tab) {
   jesusRender('prayer');
 }
 
-function showJesusActionTab(tab) {
+function showJesusActionTab(tab, skipLoad) {
   ['action','forgive','repent'].forEach(function(t) {
     var sub = document.getElementById('jasub-'+t);
     if (sub) sub.style.display = t===tab?'block':'none';
     var btn = document.getElementById('jatab-'+t);
     if (btn) btn.classList.toggle('active', t===tab);
   });
+  if (!skipLoad) jesusLoad();
   var day = jesusGetDay(jesusCurrentDate);
   if (tab==='action') { var el=document.getElementById('jesus-action-list'); if(el) el.innerHTML=jesusRenderCheckList(day.actions,'jesusToggleAction','jesusDeleteAction'); }
   if (tab==='forgive') { var fl=document.getElementById('jesus-forgive-list'); if(fl) fl.innerHTML=jesusRenderCheckList(day.forgive||[],'jesusToggleForgive','jesusDeleteForgive'); }
@@ -5090,7 +5097,7 @@ function jesusRenderHeIs() {
 function jesusSaveAction() {
   var inp = document.getElementById('jesus-action-input');
   var text = inp.value.trim(); if (!text) return;
-  jesusGetDay(jesusCurrentDate).actions.push({ id: Date.now(), text: text, done: false });
+  jesusGetDay(jesusCurrentDate).actions.push({ id: Date.now(), text: text, done: false, date: new Date().toISOString() });
   inp.value = ''; jesusSave(); jesusRender('action');
 }
 function jesusToggleAction(id) {
@@ -5105,39 +5112,33 @@ function jesusDeleteAction(id) {
 function jesusSaveForgive() {
   var inp = document.getElementById('jesus-forgive-input');
   var text = inp.value.trim(); if (!text) return;
-  var day = jesusGetDay(jesusCurrentDate);
-  if (!day.forgive) day.forgive = [];
-  day.forgive.push({ id: Date.now(), text: text, done: false });
+  jesusGetDay(jesusCurrentDate).forgive.push({ id: Date.now(), text: text, done: false, date: new Date().toISOString() });
   inp.value = ''; jesusSave(); jesusRender('action');
 }
 function jesusToggleForgive(id) {
   var day = jesusGetDay(jesusCurrentDate);
-  if (!day.forgive) day.forgive = [];
   day.forgive = day.forgive.map(function(x){ return x.id===id?{...x,done:!x.done}:x; });
   jesusSave(); jesusRender('action');
 }
 function jesusDeleteForgive(id) {
   var day = jesusGetDay(jesusCurrentDate);
-  day.forgive = (day.forgive||[]).filter(function(x){ return x.id!==id; });
+  day.forgive = day.forgive.filter(function(x){ return x.id!==id; });
   jesusSave(); jesusRender('action');
 }
 function jesusSaveRepent() {
   var inp = document.getElementById('jesus-repent-input');
   var text = inp.value.trim(); if (!text) return;
-  var day = jesusGetDay(jesusCurrentDate);
-  if (!day.repent) day.repent = [];
-  day.repent.push({ id: Date.now(), text: text, done: false });
+  jesusGetDay(jesusCurrentDate).repent.push({ id: Date.now(), text: text, done: false, date: new Date().toISOString() });
   inp.value = ''; jesusSave(); jesusRender('action');
 }
 function jesusToggleRepent(id) {
   var day = jesusGetDay(jesusCurrentDate);
-  if (!day.repent) day.repent = [];
   day.repent = day.repent.map(function(x){ return x.id===id?{...x,done:!x.done}:x; });
   jesusSave(); jesusRender('action');
 }
 function jesusDeleteRepent(id) {
   var day = jesusGetDay(jesusCurrentDate);
-  day.repent = (day.repent||[]).filter(function(x){ return x.id!==id; });
+  day.repent = day.repent.filter(function(x){ return x.id!==id; });
   jesusSave(); jesusRender('action');
 }
 
@@ -5204,7 +5205,7 @@ function jesusRender(tab) {
   if (tab === 'action') {
     var activJA = document.querySelector('#jatab-action.active, #jatab-forgive.active, #jatab-repent.active');
     var curJA = activJA ? activJA.id.replace('jatab-','') : 'action';
-    showJesusActionTab(curJA);
+    showJesusActionTab(curJA, true);
   }
 }
 </script>
