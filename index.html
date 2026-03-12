@@ -192,6 +192,10 @@
         var curJA = activJA ? activJA.id.replace('jatab-','') : 'action';
         if (typeof showJesusActionTab === 'function') showJesusActionTab(curJA, true);
       }
+      if (jtab === 'study') {
+        if (typeof jesusRenderStudyNotes === 'function') jesusRenderStudyNotes();
+        if (typeof jesusRenderStudyQuestions === 'function') jesusRenderStudyQuestions();
+      }
       if (typeof jesusRenderHeIs === 'function') jesusRenderHeIs();
     }
     if (id === 'habits' && typeof renderHabits === 'function') renderHabits();
@@ -4647,8 +4651,8 @@ window.addEventListener('DOMContentLoaded', function() {
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">What stood out to you in your study today?</div>
       <div id="jesus-study-notes-list" style="margin-bottom:1rem;"></div>
       <input id="jesus-study-passage" placeholder="Passage e.g. Romans 8:1–4" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);outline:none;padding:0.3rem 0;margin-bottom:0.5rem;box-sizing:border-box;">
-      <textarea id="jesus-study-note" placeholder="What did you observe, learn, or feel called to apply?" rows="4" style="width:100%;border:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.8rem;box-sizing:border-box;margin-bottom:0.7rem;"></textarea>
-      <button onclick="jesusSaveStudyNote()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.5rem 1.2rem;cursor:pointer;">Save</button>
+      <textarea id="jesus-study-note" placeholder="What did you observe, learn, or feel called to apply?" rows="4" oninput="jesusStudyNoteTyping()" style="width:100%;border:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.8rem;box-sizing:border-box;"></textarea>
+      <div id="jesus-study-note-status" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:#bbb;margin-top:0.4rem;min-height:1em;"></div>
     </div>
 
     <!-- Questions -->
@@ -5004,14 +5008,24 @@ function showJesusStudyTab(tab) {
   if (tab==='notes') jesusRenderStudyNotes();
   if (tab==='questions') jesusRenderStudyQuestions();
 }
+var _studyNoteTimer = null;
+function jesusStudyNoteTyping() {
+  if (window._isSyncing) return;
+  clearTimeout(_studyNoteTimer);
+  var status = document.getElementById('jesus-study-note-status');
+  if (status) status.textContent = 'Saving…';
+  _studyNoteTimer = setTimeout(function() { jesusSaveStudyNote(); }, 1000);
+}
 function jesusSaveStudyNote() {
-  var passage = document.getElementById('jesus-study-passage').value.trim();
-  var note = document.getElementById('jesus-study-note').value.trim();
+  var passage = document.getElementById('jesus-study-passage') ? document.getElementById('jesus-study-passage').value.trim() : '';
+  var note = document.getElementById('jesus-study-note') ? document.getElementById('jesus-study-note').value.trim() : '';
   if (!note) return;
   if (!jesusData.studyNotes) jesusData.studyNotes = [];
-  jesusData.studyNotes.unshift({ id: Date.now(), passage: passage, note: note, date: jesusCurrentDate });
+  jesusData.studyNotes.unshift({ id: Date.now(), passage: passage, note: note, date: new Date().toISOString() });
   document.getElementById('jesus-study-passage').value = '';
   document.getElementById('jesus-study-note').value = '';
+  var status = document.getElementById('jesus-study-note-status');
+  if (status) { status.textContent = 'Saved'; setTimeout(function(){ status.textContent = ''; }, 2000); }
   jesusSave(); jesusRenderStudyNotes();
 }
 function jesusDeleteStudyNote(id) {
@@ -5023,21 +5037,22 @@ function jesusRenderStudyNotes() {
   var items = jesusData.studyNotes || [];
   if (!items.length) { el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">No notes yet.</div>'; return; }
   el.innerHTML = items.map(function(x) {
+    var dl = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
     return '<div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">' +
-      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;">' +
-        '<div style="flex:1;">' +
-          (x.passage ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;letter-spacing:0.08em;color:var(--gray);margin-bottom:0.3rem;">' + x.passage + '</div>' : '') +
-          '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;white-space:pre-wrap;">' + x.note + '</div>' +
-        '</div>' +
-        '<button onclick="jesusDeleteStudyNote('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">×</button>' +
-      '</div></div>';
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + dl + '</div>' +
+        '<button onclick="jesusDeleteStudyNote('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">\u00d7</button>' +
+      '</div>' +
+      (x.passage ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;letter-spacing:0.08em;color:var(--gray);margin-bottom:0.3rem;">' + x.passage + '</div>' : '') +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;white-space:pre-wrap;">' + x.note + '</div>' +
+    '</div>';
   }).join('');
 }
 function jesusSaveStudyQuestion() {
   var inp = document.getElementById('jesus-study-question-input');
   var text = inp.value.trim(); if (!text) return;
   if (!jesusData.studyQuestions) jesusData.studyQuestions = [];
-  jesusData.studyQuestions.unshift({ id: Date.now(), text: text, answered: false });
+  jesusData.studyQuestions.unshift({ id: Date.now(), text: text, answered: false, date: new Date().toISOString() });
   inp.value = ''; jesusSave(); jesusRenderStudyQuestions();
 }
 function jesusToggleStudyQuestion(id) {
@@ -5053,10 +5068,14 @@ function jesusRenderStudyQuestions() {
   var items = jesusData.studyQuestions || [];
   if (!items.length) { el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">No questions yet.</div>'; return; }
   el.innerHTML = items.map(function(x) {
-    return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;border-bottom:1px solid #f0f0ee;">' +
-      '<div onclick="jesusToggleStudyQuestion('+x.id+')" style="width:14px;height:14px;border:1px solid '+(x.answered?'var(--black)':'#c8c8c5')+';background:'+(x.answered?'var(--black)':'transparent')+';cursor:pointer;flex-shrink:0;"></div>' +
-      '<div style="flex:1;font-family:\'Lora\',serif;font-style:italic;font-size:0.85rem;color:var(--black);'+(x.answered?'text-decoration:line-through;color:var(--gray);':'')+'">'+x.text+'</div>' +
-      '<button onclick="jesusDeleteStudyQuestion('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;">×</button>' +
+    var dl = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
+    return '<div style="padding:0.5rem 0;border-bottom:1px solid #f0f0ee;">' +
+      '<div style="display:flex;align-items:center;gap:0.6rem;">' +
+        '<div onclick="jesusToggleStudyQuestion('+x.id+')" style="width:14px;height:14px;border:1px solid '+(x.answered?'var(--black)':'#c8c8c5')+';background:'+(x.answered?'var(--black)':'transparent')+';cursor:pointer;flex-shrink:0;"></div>' +
+        '<div style="flex:1;font-family:\'Lora\',serif;font-style:italic;font-size:0.85rem;color:var(--black);'+(x.answered?'text-decoration:line-through;color:var(--gray);':'')+'">'+x.text+'</div>' +
+        '<button onclick="jesusDeleteStudyQuestion('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;">\u00d7</button>' +
+      '</div>' +
+      (dl ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:#bbb;margin-top:0.2rem;padding-left:20px;">' + dl + '</div>' : '') +
     '</div>';
   }).join('');
 }
