@@ -66,8 +66,7 @@
         changed = true;
       }
     });
-    if (!changed || _isSyncing) { console.log('[SYNC] skipping reload — changed:', changed, '_isSyncing:', _isSyncing); return; }
-    console.log('[SYNC] applying changes, calling reloadAllData...');
+    if (!changed || _isSyncing) return;
 
     // Don't clobber the field the user is actively typing in,
     // but update everything else instantly.
@@ -77,12 +76,10 @@
     function _doReload() {
       if (_isSyncing) return;
       _isSyncing = true;
-      console.log('[SYNC] _doReload running reloadAllData');
       try {
         if (typeof reloadAllData === 'function') reloadAllData();
-        else console.log('[SYNC] reloadAllData not found!');
         if (typeof _reloadActiveSection === 'function') _reloadActiveSection();
-      } catch(e) { console.log('[SYNC] _doReload error:', e); }
+      } catch(e) {}
       _isSyncing = false;
     }
 
@@ -136,60 +133,33 @@
     if (id === 'jesus' && typeof jesusRender === 'function') jesusRender();
   }
 
-  // Real-time streaming via Firebase SSE — instant sync across devices
-  var _sseSource = null;
-  function _startSSE() {
-    if (_sseSource) { _sseSource.close(); _sseSource = null; }
-    try {
-      _sseSource = new EventSource(DB_URL + '.json?stream=true&timeout=60000');
-      _sseSource.addEventListener('put', function(e) {
-        try {
-          var msg = JSON.parse(e.data);
-          console.log('[SSE put] path:', msg.path, 'keys:', msg.data ? Object.keys(msg.data).slice(0,5) : null);
-          // msg.path === '/' means full snapshot, msg.path === '/key' means single key update
-          var data = msg.data;
-          if (!data) return;
-          if (msg.path === '/') {
-            _applyCloudData(data);
-          } else {
-            // Single key update — e.g. path = '/all_planner_data'
-            var key = msg.path.replace(/^\//, '');
-            var patch = {};
-            patch[key] = data;
-            _applyCloudData(patch);
-          }
-        } catch(err) { console.log('[SSE put error]', err); }
-      });
-      _sseSource.addEventListener('patch', function(e) {
-        try {
-          var msg = JSON.parse(e.data);
-          console.log('[SSE patch]', msg);
-          if (msg && msg.data) _applyCloudData(msg.data);
-        } catch(err) { console.log('[SSE patch error]', err); }
-      });
-      _sseSource.onopen = function() { console.log('[SSE] connected'); };
-      _sseSource.onerror = function(e) {
-        console.log('[SSE] error, reconnecting...', e);
-        // On error, back off and reconnect after 3s
-        if (_sseSource) { _sseSource.close(); _sseSource = null; }
-        setTimeout(_startSSE, 3000);
-      };
-    } catch(err) {}
+  // Fast polling every 2 seconds — reliable cross-device sync via Firebase REST
+  var _pollTimer = null;
+  function _startPolling() {
+    clearInterval(_pollTimer);
+    _pollTimer = setInterval(function() {
+      window.pullFromCloud(false);
+    }, 2000);
   }
 
   window.addEventListener('load', function() {
-    // Initial pull on load, then start streaming
     setTimeout(function(){
       window.pullFromCloud(false);
-      _startSSE();
+      _startPolling();
     }, 800);
   });
 
-  // Also pull + restart stream on tab focus
+  // Restart polling when tab comes back into focus
   document.addEventListener('visibilitychange', function() {
     if (document.visibilityState === 'visible') {
       window.pullFromCloud(false);
-      _startSSE();
+      _startPolling();
+    } else {
+      // Slow down when tab is hidden to save resources
+      clearInterval(_pollTimer);
+      _pollTimer = setInterval(function() {
+        window.pullFromCloud(false);
+      }, 30000);
     }
   });
 </script>
