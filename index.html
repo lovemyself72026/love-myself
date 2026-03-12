@@ -74,20 +74,17 @@
     Object.keys(data).forEach(function(k) {
       var incoming = JSON.stringify(data[k]);
       var existing = localStorage.getItem(k);
-      // Write the raw incoming value to localStorage always (keeps savedAt fresh)
       if (existing !== incoming) {
         window._rawLS(k, incoming);
-        // But only flag as changed if meaningful content differs
         try {
           var inStripped = JSON.stringify(_stripMeta(data[k]));
           var exStripped = JSON.stringify(_stripMeta(JSON.parse(existing || 'null')));
-          if (inStripped !== exStripped) changed = true;
-        } catch(e) {
-          changed = true;
-        }
+          if (inStripped !== exStripped) { console.log('[SYNC] real change in key:', k); changed = true; }
+        } catch(e) { changed = true; }
       }
     });
 
+    console.log('[SYNC] _applyCloudData done — changed:', changed, '_isSyncing:', _isSyncing);
     if (!changed || _isSyncing) return;
 
     // Don't clobber the field the user is actively typing in,
@@ -98,10 +95,12 @@
     function _doReload() {
       if (_isSyncing) return;
       _isSyncing = true;
+      console.log('[SYNC] calling reloadAllData...');
       try {
         if (typeof reloadAllData === 'function') reloadAllData();
         if (typeof _reloadActiveSection === 'function') _reloadActiveSection();
-      } catch(e) {}
+        console.log('[SYNC] reloadAllData done');
+      } catch(e) { console.log('[SYNC] reloadAllData error:', e); }
       _isSyncing = false;
     }
 
@@ -133,11 +132,13 @@
     fetch(DB_URL + '.json')
       .then(function(r){ return r.json(); })
       .then(function(data){
+        console.log('[SYNC] pulled from Firebase, keys:', data ? Object.keys(data).length : 0);
         _syncErrorLogged = false;
         _applyCloudData(data);
         if (showMsg) alert('✅ Synced! 🤍');
       })
       .catch(function(e){
+        console.log('[SYNC] fetch error:', e.message);
         _syncErrorLogged = true;
         if (showMsg) alert('❌ Sync failed: ' + e.message);
       });
