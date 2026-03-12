@@ -77,7 +77,6 @@
       var incoming = JSON.stringify(data[k]);
       var existing = localStorage.getItem(k);
       if (existing !== incoming) {
-        if (k === 'that_girl_data' && window._tgLastSave && (Date.now() - window._tgLastSave < 15000)) return;
         window._rawLS(k, incoming);
         try {
           var inStripped = JSON.stringify(_stripMeta(data[k]));
@@ -117,10 +116,8 @@
 
     if (tgChanged) {
       try {
-        if (!window._tgLastSave || (Date.now() - window._tgLastSave > 15000)) {
-          var _tgf = localStorage.getItem('that_girl_data');
-          if (_tgf) { tgData = JSON.parse(_tgf); if (typeof tgData !== 'object' || Array.isArray(tgData)) tgData = {}; }
-        }
+        var _tgf = localStorage.getItem('that_girl_data');
+        if (_tgf) { tgData = JSON.parse(_tgf); if (typeof tgData !== 'object' || Array.isArray(tgData)) tgData = {}; }
         if (typeof tgRenderAll === 'function') tgRenderAll(true);
       } catch(e) {}
     }
@@ -184,7 +181,7 @@
     if (id === 'schedule' && typeof loadPlannerDay === 'function') loadPlannerDay();
     if (id === 'home' && typeof renderAnalytics === 'function') renderAnalytics();
     if (id === 'vision' && typeof renderDimensionBoards === 'function') renderDimensionBoards();
-    if (id === 'vision' && typeof tgRenderAll === 'function' && (!window._tgLastSave || Date.now() - window._tgLastSave > 15000)) tgRenderAll();
+    if (id === 'vision' && typeof tgRenderAll === 'function' ) tgRenderAll();
     if (id === 'me' && typeof rfmRender === 'function') rfmRender();
     if (id === 'jesus' && typeof jesusLoad === 'function') {
       jesusLoad();
@@ -1360,7 +1357,7 @@ function tgRemove(key, id) {
 var TG_LABELS = { morning:'Morning', looks:'Looks', health:'Health', mindset:'Mindset', time:'Time', relationships:'Relationships', feeling:'Feeling' };
 
 function tgRenderAll(skipLoad) {
-  if (!skipLoad && (!window._tgLastSave || (Date.now() - window._tgLastSave > 15000))) {
+  if (!skipLoad) {
     try { var _f=localStorage.getItem('that_girl_data'); if(_f){ tgData=JSON.parse(_f); if(typeof tgData!=='object'||Array.isArray(tgData)) tgData={}; } } catch(e) {}
   }
   var el = document.getElementById('tg-all-list');
@@ -2423,9 +2420,7 @@ function reloadAllData() {
   beliefBeliefs = JSON.parse(localStorage.getItem('belief_beliefs') || '[]'); if (!Array.isArray(beliefBeliefs)) beliefBeliefs = [];
   userRituals = JSON.parse(localStorage.getItem('user_rituals') || '[]'); if (!Array.isArray(userRituals)) userRituals = [];
   ritualState = JSON.parse(localStorage.getItem('ritual_state') || '{}');
-  if (!window._tgLastSave || (Date.now() - window._tgLastSave > 15000)) {
-    tgData = JSON.parse(localStorage.getItem('that_girl_data') || '{}');
-  }
+  tgData = JSON.parse(localStorage.getItem('that_girl_data') || '{}');
   const di = JSON.parse(localStorage.getItem('dimension_items') || '{}'); dimensionItems = (di && typeof di === 'object' && !Array.isArray(di)) ? di : {};
   const ap = JSON.parse(localStorage.getItem('all_planner_data') || '{}'); allPlannerData = (ap && typeof ap === 'object' && !Array.isArray(ap)) ? ap : {};
   const cl = JSON.parse(localStorage.getItem('cali_log') || '{}'); caliLog = (cl && typeof cl === 'object') ? cl : {};
@@ -2460,7 +2455,7 @@ function reloadAllData() {
   if (typeof jesusRenderStudyNotes === 'function') jesusRenderStudyNotes();
   if (typeof jesusRenderStudyQuestions === 'function') jesusRenderStudyQuestions();
   // Vision
-  if (typeof tgRenderAll === 'function' && (!window._tgLastSave || Date.now() - window._tgLastSave > 15000)) tgRenderAll();
+  if (typeof tgRenderAll === 'function' ) tgRenderAll();
   if (typeof renderWhoiDay === 'function') renderWhoiDay();
   if (typeof renderRituals === 'function') renderRituals();
   if (typeof initRituals === 'function') initRituals();
