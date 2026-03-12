@@ -149,6 +149,8 @@
     if (id === 'vision' && typeof renderDimensionBoards === 'function') renderDimensionBoards();
     if (id === 'me' && typeof rfmRender === 'function') rfmRender();
     if (id === 'jesus' && typeof jesusRender === 'function') jesusRender();
+    if (id === 'habits' && typeof renderHabits === 'function') renderHabits();
+    if (id === 'journal' && typeof loadVentDay === 'function') loadVentDay();
   }
 
   // Fast polling every 2 seconds — reliable cross-device sync via Firebase REST
@@ -2376,7 +2378,6 @@ function reloadAllData() {
   if (typeof renderCaliLog === 'function') renderCaliLog();
   // Daily nutrition
   if (typeof dailyLoad === 'function') dailyLoad();
-  if (typeof dailyRenderMeals === 'function') dailyRenderMeals();
   // Text inputs for currently visible section — skip if user is actively typing in them
   var _af = document.activeElement;
   var _isTyping = _af && (_af.tagName === 'TEXTAREA' || _af.tagName === 'INPUT') && _af.value.length > 0;
@@ -6399,7 +6400,7 @@ function initWhiAm() {
 function wiaUpdateCard() {
   var nameEl = document.getElementById('wiaNameInput');
   WIA.name = nameEl ? nameEl.value : WIA.name;
-  wiaSave();
+  // Don't save here — wiaUpdateCard is called from render functions during sync
   document.getElementById('wiaIdName').textContent = WIA.name || '';
   var all = WIA.traits.concat(WIA.values).filter(function(t){ return t && t.trim(); });
   document.getElementById('wiaIdTraits').innerHTML = all.length
@@ -6409,7 +6410,7 @@ function wiaUpdateCard() {
 function wiaRenderValues() {
   try { var _f=localStorage.getItem('wia2'); if(_f){ WIA=JSON.parse(_f); if(!WIA.values) WIA.values=[]; if(!WIA.traits) WIA.traits=[]; } } catch(e) {}
   var cleaned = WIA.values.filter(function(v){ return v && v.trim(); });
-  if (cleaned.length !== WIA.values.length) { WIA.values = cleaned; wiaSave(); }
+  if (cleaned.length !== WIA.values.length) { WIA.values = cleaned; } // no save during render
   var el = document.getElementById('wiaValuesList');
   if (!el) return;
   el.innerHTML = WIA.values.map(function(v, i) {
@@ -6426,7 +6427,7 @@ function wiaDelValue(i) { WIA.values.splice(i,1); wiaSave(); wiaRenderValues(); 
 function wiaRenderTraits() {
   try { var _f=localStorage.getItem('wia2'); if(_f){ WIA=JSON.parse(_f); if(!WIA.traits) WIA.traits=[]; } } catch(e) {}
   var cleaned = WIA.traits.filter(function(t){ return t && t.trim(); });
-  if (cleaned.length !== WIA.traits.length) { WIA.traits = cleaned; wiaSave(); }
+  if (cleaned.length !== WIA.traits.length) { WIA.traits = cleaned; } // no save during render
   var el = document.getElementById('wiaTraitsList');
   if (!el) return;
   el.innerHTML = WIA.traits.map(function(t, i) {
