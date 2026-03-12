@@ -1350,7 +1350,12 @@ function tgAddMain() {
 }
 
 function tgRemove(key, id) {
+  // Immediately wipe the DOM so nothing can ghost it back visually
+  var el = document.getElementById('tg-all-list');
+  if (el) el.innerHTML = '';
+  // Remove from memory
   if (tgData[key]) tgData[key] = tgData[key].filter(function(e) { return e.id !== id; });
+  // Save and re-render from memory
   tgSaveToDB();
   tgRenderAll(true);
 }
@@ -1358,7 +1363,9 @@ function tgRemove(key, id) {
 var TG_LABELS = { morning:'Morning', looks:'Looks', health:'Health', mindset:'Mindset', time:'Time', relationships:'Relationships', feeling:'Feeling' };
 
 function tgRenderAll(skipLoad) {
-  if (!skipLoad) { try { var _f=localStorage.getItem('that_girl_data'); if(_f){ tgData=JSON.parse(_f); if(typeof tgData!=='object'||Array.isArray(tgData)) tgData={}; } } catch(e) {} }
+  if (!skipLoad && (!window._tgLastSave || (Date.now() - window._tgLastSave > 10000))) {
+    try { var _f=localStorage.getItem('that_girl_data'); if(_f){ tgData=JSON.parse(_f); if(typeof tgData!=='object'||Array.isArray(tgData)) tgData={}; } } catch(e) {}
+  }
   var el = document.getElementById('tg-all-list');
   if (!el) return;
   var keys = ['morning','looks','health','mindset','time','relationships','feeling'];
