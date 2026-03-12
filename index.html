@@ -46,7 +46,7 @@
   // Intercept ALL localStorage.setItem calls to auto-push to Firebase
   localStorage.setItem = function(key, value) {
     window._rawLS(key, value);
-    if (_shouldSync(key)) {
+    if (_shouldSync(key) && !_isSyncing) {
       _lastPush = Date.now();
       try { window.syncToCloud(key, JSON.parse(value)); }
       catch(e) { window.syncToCloud(key, value); }
@@ -54,6 +54,8 @@
   };
 
   // Apply incoming cloud data to localStorage and re-render
+  var _isSyncing = false;
+
   function _applyCloudData(data) {
     if (!data) { console.log('[SYNC] _applyCloudData: no data'); return; }
     var changed = false;
@@ -66,20 +68,22 @@
       }
     });
     console.log('[SYNC] _applyCloudData changed:', changed);
-    if (changed && typeof reloadAllData === 'function') {
+    if (changed && typeof reloadAllData === 'function' && !_isSyncing) {
       var active = document.activeElement;
       var isTyping = active && (active.tagName === 'TEXTAREA' || active.tagName === 'INPUT') && active.value.length > 0;
       console.log('[SYNC] isTyping:', isTyping, '— calling reloadAllData');
       if (!isTyping) {
-        reloadAllData();
-        if (typeof _reloadActiveSection === 'function') _reloadActiveSection();
+        _isSyncing = true;
+        try { reloadAllData(); if (typeof _reloadActiveSection === 'function') _reloadActiveSection(); } catch(e) { console.log('[SYNC] reloadAllData error:', e.message); }
+        _isSyncing = false;
       } else {
         clearTimeout(window._pendingReload);
         window._pendingReload = setTimeout(function() {
           var stillTyping = document.activeElement && (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT');
-          if (!stillTyping) {
-            reloadAllData();
-            if (typeof _reloadActiveSection === 'function') _reloadActiveSection();
+          if (!stillTyping && !_isSyncing) {
+            _isSyncing = true;
+            try { reloadAllData(); if (typeof _reloadActiveSection === 'function') _reloadActiveSection(); } catch(e) {}
+            _isSyncing = false;
           }
         }, 3000);
       }
