@@ -4500,8 +4500,8 @@ window.addEventListener('DOMContentLoaded', function() {
     <div id="jpwsub-godsaid" style="display:none;">
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">What did God speak to you today?</div>
       <div id="jesus-godsaid-list" style="margin-bottom:1rem;"></div>
-      <textarea id="jesus-godsaid-body" placeholder="What God said today…" rows="4" style="width:100%;border:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.8rem;box-sizing:border-box;margin-bottom:0.6rem;"></textarea>
-      <button onclick="jesusSaveGodSaid()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.5rem 1.2rem;cursor:pointer;">Save</button>
+      <textarea id="jesus-godsaid-body" placeholder="What God said today…" rows="4" oninput="jesusGodSaidTyping()" style="width:100%;border:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.8rem;box-sizing:border-box;"></textarea>
+      <div id="jesus-godsaid-status" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:#bbb;margin-top:0.4rem;min-height:1em;"></div>
     </div>
 
   </div>
@@ -4935,12 +4935,23 @@ function jesusDeleteVerse(id) {
 }
 
 // -- WHAT GOD SAID --------------------------------------------
+var _godSaidTimer = null;
+function jesusGodSaidTyping() {
+  clearTimeout(_godSaidTimer);
+  var status = document.getElementById('jesus-godsaid-status');
+  if (status) status.textContent = 'Saving…';
+  _godSaidTimer = setTimeout(function() {
+    jesusSaveGodSaid();
+  }, 1000);
+}
 function jesusSaveGodSaid() {
   var el = document.getElementById('jesus-godsaid-body');
   var body = el ? el.value.trim() : '';
   if (!body) return;
   jesusGetDay(jesusCurrentDate).godsaid.unshift({ id: Date.now(), body: body, date: new Date().toISOString() });
   if (el) el.value = '';
+  var status = document.getElementById('jesus-godsaid-status');
+  if (status) { status.textContent = 'Saved'; setTimeout(function(){ status.textContent = ''; }, 2000); }
   jesusSave(); jesusRender('prayer');
 }
 function jesusDeleteGodSaid(id) {
