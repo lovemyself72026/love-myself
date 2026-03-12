@@ -116,8 +116,10 @@
 
     if (tgChanged) {
       try {
-        var _tgf = localStorage.getItem('that_girl_data');
-        if (_tgf) { tgData = JSON.parse(_tgf); if (typeof tgData !== 'object' || Array.isArray(tgData)) tgData = {}; }
+        if (!window._tgLastSave || (Date.now() - window._tgLastSave > 10000)) {
+          var _tgf = localStorage.getItem('that_girl_data');
+          if (_tgf) { tgData = JSON.parse(_tgf); if (typeof tgData !== 'object' || Array.isArray(tgData)) tgData = {}; }
+        }
         if (typeof tgRenderAll === 'function') tgRenderAll(true);
       } catch(e) {}
     }
@@ -1324,6 +1326,7 @@ document.head.appendChild(whoiStyle);
 var tgData = JSON.parse(localStorage.getItem('that_girl_data') || '{}');
 
 function tgSaveToDB() {
+  window._tgLastSave = Date.now();
   window._rawLS('that_girl_data', JSON.stringify(tgData));
   if (typeof window.syncToCloud === 'function') window.syncToCloud('that_girl_data', tgData);
 }
@@ -2415,7 +2418,9 @@ function reloadAllData() {
   beliefBeliefs = JSON.parse(localStorage.getItem('belief_beliefs') || '[]'); if (!Array.isArray(beliefBeliefs)) beliefBeliefs = [];
   userRituals = JSON.parse(localStorage.getItem('user_rituals') || '[]'); if (!Array.isArray(userRituals)) userRituals = [];
   ritualState = JSON.parse(localStorage.getItem('ritual_state') || '{}');
-  tgData = JSON.parse(localStorage.getItem('that_girl_data') || '{}');
+  if (!window._tgLastSave || (Date.now() - window._tgLastSave > 10000)) {
+    tgData = JSON.parse(localStorage.getItem('that_girl_data') || '{}');
+  }
   const di = JSON.parse(localStorage.getItem('dimension_items') || '{}'); dimensionItems = (di && typeof di === 'object' && !Array.isArray(di)) ? di : {};
   const ap = JSON.parse(localStorage.getItem('all_planner_data') || '{}'); allPlannerData = (ap && typeof ap === 'object' && !Array.isArray(ap)) ? ap : {};
   const cl = JSON.parse(localStorage.getItem('cali_log') || '{}'); caliLog = (cl && typeof cl === 'object') ? cl : {};
