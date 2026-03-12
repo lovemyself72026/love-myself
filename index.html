@@ -55,18 +55,21 @@
 
   // Apply incoming cloud data to localStorage and re-render
   function _applyCloudData(data) {
-    if (!data) return;
+    if (!data) { console.log('[SYNC] _applyCloudData: no data'); return; }
     var changed = false;
     Object.keys(data).forEach(function(k) {
       var incoming = JSON.stringify(data[k]);
       if (localStorage.getItem(k) !== incoming) {
         window._rawLS(k, incoming);
         changed = true;
+        console.log('[SYNC] updated key:', k);
       }
     });
+    console.log('[SYNC] _applyCloudData changed:', changed);
     if (changed && typeof reloadAllData === 'function') {
       var active = document.activeElement;
       var isTyping = active && (active.tagName === 'TEXTAREA' || active.tagName === 'INPUT') && active.value.length > 0;
+      console.log('[SYNC] isTyping:', isTyping, '— calling reloadAllData');
       if (!isTyping) {
         reloadAllData();
         if (typeof _reloadActiveSection === 'function') _reloadActiveSection();
@@ -88,10 +91,14 @@
     fetch(DB_URL + '.json')
       .then(function(r){ return r.json(); })
       .then(function(data){
+        console.log('[SYNC] pullFromCloud got data:', data ? Object.keys(data) : null);
         _applyCloudData(data);
         if (showMsg) alert('✅ Synced! 🤍');
       })
-      .catch(function(e){ if (showMsg) alert('❌ Sync failed: ' + e.message); });
+      .catch(function(e){
+        console.log('[SYNC] pullFromCloud error:', e.message);
+        if (showMsg) alert('❌ Sync failed: ' + e.message);
+      });
   };
 
   // Force re-render the currently visible section after a cloud pull
@@ -99,6 +106,7 @@
     var active = document.querySelector('.section.active');
     if (!active) return;
     var id = active.id;
+    console.log('[SYNC] _reloadActiveSection:', id);
     if (id === 'schedule' && typeof loadPlannerDay === 'function') loadPlannerDay();
     if (id === 'home' && typeof renderAnalytics === 'function') renderAnalytics();
     if (id === 'vision' && typeof renderDimensionBoards === 'function') renderDimensionBoards();
@@ -113,6 +121,7 @@
     }, 800);
     // Poll every 5 seconds for changes from other devices
     setInterval(function() {
+      console.log('[SYNC] polling... _lastPush was', Date.now() - _lastPush, 'ms ago');
       if (Date.now() - _lastPush > 3000) window.pullFromCloud(false);
     }, 5000);
   });
