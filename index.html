@@ -3353,7 +3353,7 @@ window.addEventListener('DOMContentLoaded', function() {
       </div>
       <div style="margin-bottom:0.5rem;">
         <div class="subtitle" style="margin-bottom:0.2rem;">How you see yourself</div>
-        <input type="text" id="wiaNameInput" placeholder="e.g. a person who..." oninput="wiaUpdateCard()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.2rem 0;">
+        <input type="text" id="wiaNameInput" placeholder="e.g. a person who..." oninput="wiaUpdateCardAndSave()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.2rem 0;">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.5rem;">
         <div>
@@ -6399,13 +6399,29 @@ function initWhiAm() {
 // IDENTITY
 function wiaUpdateCard() {
   var nameEl = document.getElementById('wiaNameInput');
-  WIA.name = nameEl ? nameEl.value : WIA.name;
-  // Don't save here — wiaUpdateCard is called from render functions during sync
-  document.getElementById('wiaIdName').textContent = WIA.name || '';
-  var all = WIA.traits.concat(WIA.values).filter(function(t){ return t && t.trim(); });
-  document.getElementById('wiaIdTraits').innerHTML = all.length
-    ? all.map(function(t) { return '<span class="wia-trait-tag">' + t.trim() + '</span>'; }).join('')
-    : '';
+  // If input is focused (user typing), read from input; otherwise restore from data
+  if (nameEl) {
+    if (document.activeElement === nameEl) {
+      WIA.name = nameEl.value;
+    } else {
+      nameEl.value = WIA.name || '';
+    }
+  }
+  var nameDisp = document.getElementById('wiaIdName');
+  if (nameDisp) nameDisp.textContent = WIA.name || '';
+  var traitsEl = document.getElementById('wiaIdTraits');
+  if (traitsEl) {
+    var all = WIA.traits.concat(WIA.values).filter(function(t){ return t && t.trim(); });
+    traitsEl.innerHTML = all.length
+      ? all.map(function(t) { return '<span class="wia-trait-tag">' + t.trim() + '</span>'; }).join('')
+      : '';
+  }
+}
+function wiaUpdateCardAndSave() {
+  var nameEl = document.getElementById('wiaNameInput');
+  if (nameEl) WIA.name = nameEl.value;
+  wiaUpdateCard();
+  wiaSave();
 }
 function wiaRenderValues() {
   try { var _f=localStorage.getItem('wia2'); if(_f){ WIA=JSON.parse(_f); if(!WIA.values) WIA.values=[]; if(!WIA.traits) WIA.traits=[]; } } catch(e) {}
