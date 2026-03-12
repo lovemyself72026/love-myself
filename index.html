@@ -59,13 +59,35 @@
   function _applyCloudData(data) {
     if (!data) return;
     var changed = false;
+
+    // Strip savedAt from comparison so timestamp differences don't trigger re-renders
+    function _stripMeta(obj) {
+      if (!obj || typeof obj !== 'object') return obj;
+      var out = {};
+      Object.keys(obj).forEach(function(k) {
+        if (k === 'savedAt') return;
+        out[k] = (obj[k] && typeof obj[k] === 'object') ? _stripMeta(obj[k]) : obj[k];
+      });
+      return out;
+    }
+
     Object.keys(data).forEach(function(k) {
       var incoming = JSON.stringify(data[k]);
-      if (localStorage.getItem(k) !== incoming) {
+      var existing = localStorage.getItem(k);
+      // Write the raw incoming value to localStorage always (keeps savedAt fresh)
+      if (existing !== incoming) {
         window._rawLS(k, incoming);
-        changed = true;
+        // But only flag as changed if meaningful content differs
+        try {
+          var inStripped = JSON.stringify(_stripMeta(data[k]));
+          var exStripped = JSON.stringify(_stripMeta(JSON.parse(existing || 'null')));
+          if (inStripped !== exStripped) changed = true;
+        } catch(e) {
+          changed = true;
+        }
       }
     });
+
     if (!changed || _isSyncing) return;
 
     // Don't clobber the field the user is actively typing in,
