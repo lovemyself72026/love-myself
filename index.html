@@ -79,12 +79,11 @@
         try {
           var inStripped = JSON.stringify(_stripMeta(data[k]));
           var exStripped = JSON.stringify(_stripMeta(JSON.parse(existing || 'null')));
-          if (inStripped !== exStripped) { console.log('[SYNC] real change in key:', k); changed = true; }
+          if (inStripped !== exStripped) { changed = true; }
         } catch(e) { changed = true; }
       }
     });
 
-    console.log('[SYNC] _applyCloudData done — changed:', changed, '_isSyncing:', _isSyncing);
     if (!changed || _isSyncing) return;
 
     // Don't clobber the field the user is actively typing in,
@@ -95,12 +94,10 @@
     function _doReload() {
       if (_isSyncing) return;
       _isSyncing = true;
-      console.log('[SYNC] calling reloadAllData...');
       try {
         if (typeof reloadAllData === 'function') reloadAllData();
         if (typeof _reloadActiveSection === 'function') _reloadActiveSection();
-        console.log('[SYNC] reloadAllData done');
-      } catch(e) { console.log('[SYNC] reloadAllData error:', e); }
+      } catch(e) {}
       _isSyncing = false;
     }
 
@@ -132,13 +129,11 @@
     fetch(DB_URL + '.json')
       .then(function(r){ return r.json(); })
       .then(function(data){
-        console.log('[SYNC] pulled from Firebase, keys:', data ? Object.keys(data).length : 0);
         _syncErrorLogged = false;
         _applyCloudData(data);
         if (showMsg) alert('✅ Synced! 🤍');
       })
       .catch(function(e){
-        console.log('[SYNC] fetch error:', e.message);
         _syncErrorLogged = true;
         if (showMsg) alert('❌ Sync failed: ' + e.message);
       });
@@ -5262,7 +5257,6 @@ function dailyAddMeal(meal) {
 }
 
 function dailyRenderMeals() {
-  dailyLoad();
   var today = dailyGetToday();
   ['breakfast','lunch','dinner'].forEach(function(meal) {
     var el = document.getElementById('daily-meal-'+meal+'-list');
