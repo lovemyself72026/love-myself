@@ -148,12 +148,20 @@
     if (id === 'home' && typeof renderAnalytics === 'function') renderAnalytics();
     if (id === 'vision' && typeof renderDimensionBoards === 'function') renderDimensionBoards();
     if (id === 'me' && typeof rfmRender === 'function') rfmRender();
-    if (id === 'jesus' && typeof jesusRender === 'function') jesusRender();
+    if (id === 'jesus' && typeof jesusLoad === 'function') {
+      jesusLoad();
+      if (typeof jesusRender === 'function') {
+        var activeJesusTab = document.querySelector('.journal-tab.active[id^="jtab-"]');
+        var jtab = activeJesusTab ? activeJesusTab.id.replace('jtab-','') : null;
+        if (jtab) jesusRender(jtab);
+      }
+      if (typeof jesusRenderHeIs === 'function') jesusRenderHeIs();
+    }
     if (id === 'habits' && typeof renderHabits === 'function') renderHabits();
     if (id === 'journal' && typeof loadVentDay === 'function') loadVentDay();
   }
 
-  // Fast polling every 2 seconds — reliable cross-device sync via Firebase REST
+  // Fast polling every 2 seconds reliable cross-device sync via Firebase REST
   var _pollTimer = null;
   function _startPolling() {
     clearInterval(_pollTimer);
@@ -184,7 +192,7 @@
   });
 </script>
 
-<!-- Cloudinary image upload — outside module so it's globally accessible -->
+<!-- Cloudinary image upload outside module so it's globally accessible -->
 <script>
   window.uploadImageToCloud = async function(file) {
     const formData = new FormData();
@@ -303,9 +311,9 @@
     #vision [style*="font-size:0.95rem"] { font-size: 0.78rem !important; margin-bottom: 0.8rem; }
     /* All tab bars scroll on mobile */
     div[style*="display:flex;gap:0;border-bottom"] { overflow-x: auto !important; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; }
-    /* Calendars — shrink cells */
+    /* Calendars shrink cells */
     .wia-calendar, .wia-cal-label { gap: 2px; }
-    /* Op buttons — wrap */
+    /* Op buttons wrap */
     .op-btn { font-size: 0.65rem; padding: 0.35rem 0.55rem; }
     /* Bar wrap shrink */
     .wia-bar-wrap { width: 50px; }
@@ -857,7 +865,7 @@ function showJournalTab(tab) {
 }
 
 function showJBWTab(tab) {
-  // All panels are always visible (scrollable) — just trigger renders
+  // All panels are always visible (scrollable) just trigger renders
   renderWins();
   renderVentEntries();
   renderBooks();
@@ -1236,7 +1244,7 @@ whoiStyle.textContent = `
 `;
 document.head.appendChild(whoiStyle);
 
-// That Girl — per-field, saves on Enter or blur
+// That Girl per-field, saves on Enter or blur
 var tgData = JSON.parse(localStorage.getItem('that_girl_data') || '{}');
 
 function tgSaveToDB() {
@@ -1448,7 +1456,7 @@ function updateDayLabel() {
   const d = new Date(currentScheduleDate + 'T00:00:00');
   const today = new Date().toISOString().split('T')[0];
   let label = d.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
-  if (currentScheduleDate === today) label += ' — Today';
+  if (currentScheduleDate === today) label += ' Today';
   const el = document.getElementById('schedule-day-label');
   if (el) el.textContent = label;
 }
@@ -2361,8 +2369,9 @@ function reloadAllData() {
   if (typeof renderBalanceQuestions === 'function') renderBalanceQuestions();
   if (typeof renderRelationshipQuestions === 'function') renderRelationshipQuestions();
   // Jesus
-  if (typeof jesusRender === 'function') jesusRender();
+  if (typeof jesusLoad === 'function') jesusLoad();
   if (typeof jesusRenderPray === 'function') jesusRenderPray();
+  if (typeof jesusRenderHeIs === 'function') jesusRenderHeIs();
   if (typeof jesusRenderStudy === 'function') jesusRenderStudy();
   // Vision
   if (typeof tgRenderAll === 'function') tgRenderAll();
@@ -2378,7 +2387,7 @@ function reloadAllData() {
   if (typeof renderCaliLog === 'function') renderCaliLog();
   // Daily nutrition
   if (typeof dailyLoad === 'function') dailyLoad();
-  // Text inputs for currently visible section — skip if user is actively typing in them
+  // Text inputs for currently visible section skip if user is actively typing in them
   var _af = document.activeElement;
   var _isTyping = _af && (_af.tagName === 'TEXTAREA' || _af.tagName === 'INPUT') && _af.value.length > 0;
   if (typeof loadPlannerDay === 'function' && !_isTyping) loadPlannerDay();
@@ -2494,7 +2503,7 @@ function copyScheduleToDay() {
   const sourceKey = currentScheduleDate;
   const source = allPlannerData[sourceKey] || {};
   if (!allPlannerData[target]) allPlannerData[target] = {};
-  // Copy schedule, goals, todos, bible verse — but reset done states so they can be edited fresh
+  // Copy schedule, goals, todos, bible verse but reset done states so they can be edited fresh
   if (source.schedule) {
     allPlannerData[target].schedule = {};
     Object.entries(source.schedule).forEach(([k, v]) => {
@@ -2543,7 +2552,7 @@ function importData(input) {
       renderWins(); renderSavedAffirmations(); renderVentEntries(); renderDimensionBoards(); renderWhoiGrid(); renderBooks(); renderAnalytics(); loadPlannerDay();
     } catch(err) {
       const msg = document.getElementById('import-msg');
-      if (msg) msg.textContent = 'Invalid file — please use a valid backup.';
+      if (msg) msg.textContent = 'Invalid file please use a valid backup.';
     }
   };
   reader.readAsText(file);
@@ -3181,7 +3190,7 @@ function beliefRenderStrip(id) {
     if (offset === 0) {
       var now = new Date();
       var dn = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-      lbl.textContent = dn[now.getDay()] + ', ' + now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' — Today';
+      lbl.textContent = dn[now.getDay()] + ', ' + now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' Today';
     } else {
       var f = new Date(days[0]+'T00:00:00'), la = new Date(days[6]+'T00:00:00');
       lbl.textContent = f.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' – ' + la.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
@@ -3997,7 +4006,7 @@ window.addEventListener('DOMContentLoaded', function() {
         <h2 style="margin:0;">My wins.</h2>
       </div>
       <div style="border:1px solid #c8c8c5;padding:1.5rem;margin-bottom:1rem;">
-        <div style="font-family:'Lora',serif;font-style:italic;font-size:1.05rem;margin-bottom:1rem;">Add a win — big or small, they all count</div>
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:1.05rem;margin-bottom:1rem;">Add a win big or small, they all count</div>
         <input id="win-input" placeholder="e.g. I got out of bed today" onkeydown="if(event.key==='Enter')addWin()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1.2rem;">
         <button class="btn fill" onclick="addWin()">Add win</button>
       </div>
@@ -4620,85 +4629,91 @@ window.addEventListener('DOMContentLoaded', function() {
 
     <!-- Inner sub-tabs -->
     <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-      <button class="journal-tab active" id="jctab-whois" onclick="showJesusChristTab('whois')">Who He Is</button>
-      <button class="journal-tab" id="jctab-habits" onclick="showJesusChristTab('habits')">His Habits</button>
+      <button class="journal-tab active" id="jctab-habits" onclick="showJesusChristTab('habits')">His Daily Life</button>
       <button class="journal-tab" id="jctab-heis" onclick="showJesusChristTab('heis')">He Is...</button>
     </div>
 
-    <!-- Who He Is -->
-    <div id="jcsub-whois">
-      <div style="display:flex;flex-direction:column;margin-bottom:1.5rem;">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Son of God</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 3:16</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Word Made Flesh</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 1:14</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Saviour</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Luke 19:10</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Lord & King</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Philippians 2:9–11</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Great High Priest</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Hebrews 4:14–15</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Way, the Truth, the Life</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 14:6</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Resurrection and the Life</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 11:25</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Lamb of God</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 1:29</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Immanuel, God With Us</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Matthew 1:23</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Good Shepherd</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 10:11</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Light of the World</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 8:12</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Alpha and Omega</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Revelation 22:13</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">The Bread of Life</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 6:35</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Prince of Peace</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Isaiah 9:6</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Faithful & True</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Revelation 19:11</span></div>
-      </div>
-    </div>
-
-    <!-- His Habits -->
-    <div id="jcsub-habits" style="display:none;">
-      <div style="display:flex;flex-direction:column;margin-bottom:2rem;">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Prayer</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Luke 5:16, Mark 1:35</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Scripture</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Matthew 4:4, Luke 4:16</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Solitude & Rest</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Mark 6:31, Matthew 8:24</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Community</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 15:15, Luke 8:1</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Serving Others</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Mark 10:45, John 13:5</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Fasting</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">Matthew 4:2</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.55rem 0;gap:1rem;"><span style="font-family:'Lora',serif;font-size:0.95rem;font-style:italic;">Obedience to the Father</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);white-space:nowrap;">John 5:19, Luke 22:42</span></div>
-      </div>
-
-      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);margin-bottom:1.2rem;">His Daily Rhythm</div>
-
+    <!-- His Daily Life 4am–9pm -->
+    <div id="jcsub-habits">
       <div style="display:flex;flex-direction:column;gap:0;">
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">Early Morning</div>
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">4:00 AM</div>
           <div>
             <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He rose before dawn to pray alone</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Before the crowds came, before the demands of the day, Jesus was already with the Father. He withdrew to isolated places: a mountain, a garden, the wilderness: and spent the early hours in prayer. This was not occasional. It was His rhythm. (Mark 1:35, Luke 6:12)</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Before the world was awake, Jesus was already with the Father. He withdrew to isolated places a mountain, a garden, the wilderness and spent these hours in deep prayer. This was not occasional. It was His rhythm. (Mark 1:35, Luke 6:12)</div>
           </div>
         </div>
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">Morning</div>
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">6:00 AM</div>
           <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He taught, healed, and engaged with people</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Jesus was deeply present with people. He taught in synagogues and on hillsides, healed those who came to Him, and engaged with everyone: the religious, the outcast, the children, the desperate. He was never in a hurry, yet He was always purposeful. (Luke 4:16, Matthew 9:35)</div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He meditated on Scripture</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Jesus knew the Word deeply He quoted it under pressure, He taught it with authority, He lived it. The Scriptures were not just read but lived out in every moment of His day. (Matthew 4:4, Luke 4:16–17)</div>
           </div>
         </div>
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">Midday</div>
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">7:00 AM</div>
           <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He shared meals and walked with His disciples</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Much of Jesus' ministry happened around a table or on the road. He ate with tax collectors and sinners, fed thousands, and used everyday moments: a meal, a journey, a well: to speak life into people. He was fully human: He got hungry, tired, and sat down to rest. (Luke 19:5, John 4:6, John 6:11)</div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He gathered with His disciples</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Jesus walked closely with the twelve. He called them to be with Him not just to watch, but to be formed. Morning time together meant walking, talking, preparing hearts for the day ahead. (Luke 8:1, Mark 3:14)</div>
           </div>
         </div>
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">Evening</div>
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">9:00 AM</div>
           <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He gathered with His disciples and withdrew to rest</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Evenings were often for deeper conversation with the twelve: unpacking what had happened, answering their questions, preparing their hearts. After ministry He would withdraw, sometimes crossing the lake just to have space. He honoured rest and did not run on empty. (Mark 4:35, John 13–17)</div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He taught in synagogues and on hillsides</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Jesus was a teacher above all. He taught with authority not like the scribes and the people were amazed. His words landed because they came from the Father, not from study alone. (Matthew 5:1–2, Luke 4:31–32)</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">11:00 AM</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He healed and ministered to those in need</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Jesus was never too busy for one person. The blind, the lame, the leper, the grieving mother He stopped. He touched. He healed. Compassion was not a ministry strategy; it was who He was. (Matthew 9:35–36, Mark 1:40–42)</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">1:00 PM</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He shared meals with people</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Jesus ate with everyone tax collectors, sinners, Pharisees, friends. The table was His most consistent ministry space. He was fully human: He got hungry, He rested, He enjoyed the company of people. (Luke 19:5–6, John 6:11, Luke 7:34)</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">3:00 PM</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He walked and talked the road was His classroom</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Much of Jesus' discipleship happened while walking. On the road to Emmaus, on the way to Jairus' house, crossing the lake movement and conversation were inseparable. He used every moment to shape those around Him. (Luke 24:13–27, Mark 5:21–24)</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">5:00 PM</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He withdrew to be alone with the Father</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">After full days of ministry, Jesus would slip away. Not to scroll, not to numb to be replenished. Solitude was not emptiness for Him; it was where He refilled. He protected this time fiercely. (Luke 5:16, Mark 6:45–46)</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">7:00 PM</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He gathered with His disciples for deeper teaching</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Evenings were for the inner circle. Jesus unpacked parables, answered hard questions, prepared hearts. The upper room discourses the most intimate teaching He ever gave happened at night over a shared meal. (John 13–17, Mark 4:34)</div>
           </div>
         </div>
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">Always</div>
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">9:00 PM</div>
           <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He only did what He saw the Father doing</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">The thread through every part of His day was this: total surrender to the Father. He did not act on His own initiative. He listened, He obeyed, He moved in step with the Spirit. His whole life: morning to night: was one continuous act of dependence and love. (John 5:19, John 8:28)</div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He rested fully and without guilt</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Jesus slept. Even in a storm at sea, He was at peace in the boat. Rest was not laziness for Him it was trust. He had done what the Father gave Him to do that day. He closed His eyes, and that was enough. (Mark 4:38, Matthew 8:24)</div>
           </div>
         </div>
 
@@ -4855,7 +4870,7 @@ function showJesusTab(tab) {
     if (btn) btn.classList.toggle('active', t===tab);
   });
   jesusRender(tab);
-  if (tab === 'whoisjesus') { jesusRenderHeIs(); showJesusChristTab('whois'); }
+  if (tab === 'whoisjesus') { jesusRenderHeIs(); showJesusChristTab('habits'); }
   if (tab === 'prayer') { showJesusPrayWordTab('things'); }
   if (tab === 'study') { showJesusStudyTab('howto'); }
 }
@@ -5029,7 +5044,7 @@ function showJesusActionTab(tab) {
 }
 
 function showJesusChristTab(tab) {
-  ['whois','habits','heis'].forEach(function(t) {
+  ['habits','heis'].forEach(function(t) {
     var sub = document.getElementById('jcsub-'+t);
     if (sub) sub.style.display = t===tab?'block':'none';
     var btn = document.getElementById('jctab-'+t);
@@ -5043,7 +5058,7 @@ function jesusSaveHeIs() {
   var inp = document.getElementById('jesus-heis-input');
   var text = inp.value.trim(); if (!text) return;
   if (!jesusData.heIs) jesusData.heIs = [];
-  jesusData.heIs.unshift({ id: Date.now(), text: text });
+  jesusData.heIs.unshift({ id: Date.now(), text: text, date: new Date().toISOString() });
   inp.value = ''; jesusSave(); jesusRenderHeIs();
 }
 function jesusDeleteHeIs(id) {
@@ -5051,14 +5066,24 @@ function jesusDeleteHeIs(id) {
   jesusSave(); jesusRenderHeIs();
 }
 function jesusRenderHeIs() {
+  // Always reload from localStorage so synced data shows instantly
+  jesusLoad();
   var el = document.getElementById('jesus-heis-list');
   if (!el) return;
   var items = jesusData.heIs || [];
   if (!items.length) { el.innerHTML = ''; return; }
   el.innerHTML = items.map(function(x) {
-    return '<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #f0f0ee;gap:0.5rem;">' +
-      '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.88rem;line-height:1.6;flex:1;">He is ' + x.text + '</div>' +
-      '<button onclick="jesusDeleteHeIs('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;">×</button>' +
+    var dateStr = '';
+    if (x.date) {
+      var d = new Date(x.date);
+      dateStr = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    }
+    return '<div style="border:1px solid #e8e8e5;padding:0.8rem 1rem;margin-bottom:0.6rem;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
+        (dateStr ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + dateStr + '</div>' : '<div></div>') +
+        '<button onclick="jesusDeleteHeIs('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;">×</button>' +
+      '</div>' +
+      '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.88rem;line-height:1.6;">He is ' + x.text + '</div>' +
     '</div>';
   }).join('');
 }
@@ -5553,7 +5578,7 @@ function bcRender(cat) {
     if (isCurrentWeek) {
       var now = new Date();
       var dn = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-      lbl.textContent = dn[now.getDay()] + ', ' + now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' — Today';
+      lbl.textContent = dn[now.getDay()] + ', ' + now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' Today';
     } else {
       lbl.textContent = first.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' – ' + last.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     }
@@ -5765,7 +5790,7 @@ function faceHabitsRender() {
     if (isCurrentWeek) {
       var now = new Date();
       var dn = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-      label.textContent = dn[now.getDay()] + ', ' + now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' — Today';
+      label.textContent = dn[now.getDay()] + ', ' + now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' Today';
     } else {
       label.textContent = first.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' – ' + last.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     }
@@ -6241,7 +6266,7 @@ function caliFormatDate(val) {
   var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   var str = days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
-  if (d.getTime() === today.getTime()) str += ' — Today';
+  if (d.getTime() === today.getTime()) str += ' Today';
   return str;
 }
 
@@ -7252,7 +7277,7 @@ function belRenderFoundation() {
   if (!items.length) { el.innerHTML = ''; return; }
   el.innerHTML = items.map(function(e, i) {
     var d = new Date(e.date);
-    var isToday = new Date().toDateString() === d.toDateString(); var label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + (isToday ? ' — Today' : '') + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    var isToday = new Date().toDateString() === d.toDateString(); var label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + (isToday ? ' Today' : '') + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     return '<div style="border:1px solid #e8e8e5;padding:0.8rem 1rem;margin-bottom:0.6rem;border-left:3px solid #d4b8f9;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
       '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + label + '</div>' +
@@ -7299,7 +7324,7 @@ function belRenderEvidence() {
   if (!items.length) { el.innerHTML = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);padding:0.6rem 0;">Nothing here yet. Add your first piece of evidence above.</div>'; return; }
   el.innerHTML = items.map(function(e, i) {
     var d = new Date(e.date);
-    var isToday = new Date().toDateString() === d.toDateString(); var label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + (isToday ? ' — Today' : '') + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    var isToday = new Date().toDateString() === d.toDateString(); var label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + (isToday ? ' Today' : '') + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     return '<div style="border:1px solid #e8e8e5;padding:0.8rem 1rem;margin-bottom:0.6rem;border-left:3px solid #b8f0c8;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
       '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + label + '</div>' +
@@ -7337,7 +7362,7 @@ function belRenderFailure() {
   if (!items.length) { el.innerHTML = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);padding:0.6rem 0;">Nothing saved yet.</div>'; return; }
   el.innerHTML = items.map(function(e, i) {
     var d = new Date(e.date);
-    var isToday = new Date().toDateString() === d.toDateString(); var label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + (isToday ? ' — Today' : '') + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    var isToday = new Date().toDateString() === d.toDateString(); var label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + (isToday ? ' Today' : '') + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     return '<div style="border:1px solid #e8e8e5;padding:0.8rem 1rem;margin-bottom:0.6rem;border-left:3px solid #f9e4a8;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
       '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + label + '</div>' +
@@ -7464,7 +7489,7 @@ function assRenderLog() {
   if (!logs.length) { el.innerHTML = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);padding:0.8rem 0;">No moments logged yet. Start with today.</div>'; return; }
   el.innerHTML = logs.map(function(e, i) {
     var d = new Date(e.date);
-    var isToday = new Date().toDateString() === d.toDateString(); var label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + (isToday ? ' — Today' : '') + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    var isToday = new Date().toDateString() === d.toDateString(); var label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + (isToday ? ' Today' : '') + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     return '<div style="border:1px solid #e8e8e5;padding:0.8rem 1rem;margin-bottom:0.6rem;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
       '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + label + '</div>' +
