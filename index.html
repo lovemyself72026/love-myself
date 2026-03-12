@@ -64,7 +64,22 @@
         changed = true;
       }
     });
-    if (changed && typeof reloadAllData === 'function') reloadAllData();
+    if (changed && typeof reloadAllData === 'function') {
+      // Only reload if user isn't actively typing
+      var active = document.activeElement;
+      var isTyping = active && (active.tagName === 'TEXTAREA' || active.tagName === 'INPUT') && active.value.length > 0;
+      if (!isTyping) {
+        reloadAllData();
+      } else {
+        // Schedule a reload for when they stop typing (after 3 seconds of inactivity)
+        clearTimeout(window._pendingReload);
+        window._pendingReload = setTimeout(function() {
+          var stillActive = document.activeElement;
+          var stillTyping = stillActive && (stillActive.tagName === 'TEXTAREA' || stillActive.tagName === 'INPUT');
+          if (!stillTyping && typeof reloadAllData === 'function') reloadAllData();
+        }, 3000);
+      }
+    }
   }
 
   // One-off pull
@@ -2289,10 +2304,12 @@ function reloadAllData() {
   // Daily nutrition
   if (typeof dailyLoad === 'function') dailyLoad();
   if (typeof dailyRenderMeals === 'function') dailyRenderMeals();
-  // Text inputs for currently visible section
-  if (typeof loadPlannerDay === 'function') loadPlannerDay();
-  if (typeof loadVentDay === 'function') loadVentDay();
-  if (typeof loadWinsDay === 'function') loadWinsDay();
+  // Text inputs for currently visible section — skip if user is actively typing in them
+  var _af = document.activeElement;
+  var _isTyping = _af && (_af.tagName === 'TEXTAREA' || _af.tagName === 'INPUT') && _af.value.length > 0;
+  if (typeof loadPlannerDay === 'function' && !_isTyping) loadPlannerDay();
+  if (typeof loadVentDay === 'function' && !_isTyping) loadVentDay();
+  if (typeof loadWinsDay === 'function' && !_isTyping) loadWinsDay();
 }
 
 renderAnalytics();
