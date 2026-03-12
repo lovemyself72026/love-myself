@@ -100,8 +100,16 @@
       if (Date.now() - _lastPush < 2000) return; // ignore echo of own push
       try {
         var msg = JSON.parse(e.data);
-        var data = msg.path === '/' ? msg.data : null;
-        if (data) _applyCloudData(data);
+        if (msg.path === '/') {
+          // Full database update
+          if (msg.data) _applyCloudData(msg.data);
+        } else if (msg.path && msg.data !== undefined) {
+          // Single key update e.g. path="/all_planner_data"
+          var key = msg.path.replace(/^\//, '');
+          var patch = {};
+          patch[key] = msg.data;
+          _applyCloudData(patch);
+        }
       } catch(err) {}
     });
     es.addEventListener('patch', function(e) {
@@ -123,6 +131,10 @@
     setTimeout(function(){
       window.pullFromCloud(false);
       _startStream();
+      // Fallback: poll every 10 seconds in case stream misses anything
+      setInterval(function() {
+        if (Date.now() - _lastPush > 3000) window.pullFromCloud(false);
+      }, 10000);
     }, 800);
   });
 
