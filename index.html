@@ -1331,20 +1331,20 @@ function tgAddMain() {
   tgData[key].push({ id: Date.now(), text: val, time: time });
   input.value = '';
   tgSaveToDB();
-  tgRenderAll();
+  tgRenderAll(true);
 }
 
 function tgRemove(key, id) {
   if (!tgData[key]) return;
   tgData[key] = tgData[key].filter(function(e) { return e.id !== id; });
   tgSaveToDB();
-  tgRenderAll();
+  tgRenderAll(true);
 }
 
 var TG_LABELS = { morning:'Morning', looks:'Looks', health:'Health', mindset:'Mindset', time:'Time', relationships:'Relationships', feeling:'Feeling' };
 
-function tgRenderAll() {
-  try { var _f=localStorage.getItem('that_girl_data'); if(_f){ tgData=JSON.parse(_f); if(typeof tgData!=='object'||Array.isArray(tgData)) tgData={}; } } catch(e) {}
+function tgRenderAll(skipLoad) {
+  if (!skipLoad) { try { var _f=localStorage.getItem('that_girl_data'); if(_f){ tgData=JSON.parse(_f); if(typeof tgData!=='object'||Array.isArray(tgData)) tgData={}; } } catch(e) {} }
   var el = document.getElementById('tg-all-list');
   if (!el) return;
   var keys = ['morning','looks','health','mindset','time','relationships','feeling'];
