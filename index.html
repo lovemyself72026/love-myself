@@ -761,25 +761,29 @@
     <!-- Notes -->
     <div id="ps-notes" style="border:1px solid #c8c8c5;padding:0.8rem;">
       <div class="planner-label">Notes</div>
-      <textarea id="sched-notes" rows="3" placeholder="Anything on your mind today…" oninput="schedAutoSave()" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
+      <textarea id="sched-notes" rows="3" placeholder="Anything on your mind today…" oninput="schedAutoSave();schedUpdateTime('sched-notes-time')" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
+      <div id="sched-notes-time" style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);text-align:right;"></div>
     </div>
 
     <!-- For Tomorrow -->
     <div id="ps-tomorrow" style="border:1px solid #c8c8c5;padding:0.8rem;">
       <div class="planner-label">For Tomorrow</div>
-      <textarea id="sched-tomorrow" rows="3" placeholder="What do you want to prepare or remember for tomorrow?" oninput="schedAutoSave()" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
+      <textarea id="sched-tomorrow" rows="3" placeholder="What do you want to prepare or remember for tomorrow?" oninput="schedAutoSave();schedUpdateTime('sched-tomorrow-time')" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
+      <div id="sched-tomorrow-time" style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);text-align:right;"></div>
     </div>
 
     <!-- Today's Goal -->
     <div id="ps-goal" style="border:1px solid #c8c8c5;padding:0.8rem;">
       <div class="planner-label">Today's Goal</div>
-      <textarea id="sched-goal" rows="2" placeholder="My one big goal for today is…" oninput="schedAutoSave()" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
+      <textarea id="sched-goal" rows="2" placeholder="My one big goal for today is…" oninput="schedAutoSave();schedUpdateTime('sched-goal-time')" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
+      <div id="sched-goal-time" style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);text-align:right;"></div>
     </div>
 
     <!-- I Believe -->
     <div id="ps-ibelieve" style="border:1px solid #c8c8c5;padding:0.8rem;">
       <div class="planner-label">I Believe</div>
-      <textarea id="sched-ibelieve" rows="2" placeholder="Today I believe…" oninput="schedAutoSave()" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
+      <textarea id="sched-ibelieve" rows="2" placeholder="Today I believe…" oninput="schedAutoSave();schedUpdateTime('sched-ibelieve-time')" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
+      <div id="sched-ibelieve-time" style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);text-align:right;"></div>
     </div>
 
   </div>
@@ -1348,19 +1352,17 @@ function tgAddMain() {
 
 function tgRemove(key, id) {
   var el = document.getElementById('tg-all-list');
-  if (el) el.innerHTML = '';
+  if (el) el.innerHTML = '<div style="font-size:0.7rem;color:red;padding:0.5rem;">Deleting key='+key+' id='+id+' (type:'+typeof id+')...<br>Items before: '+(tgData[key]||[]).map(function(e){return e.id+'('+typeof e.id+')'}).join(', ')+'</div>';
   if (tgData[key]) tgData[key] = tgData[key].filter(function(e) { return String(e.id) !== String(id); });
-  // Write to localStorage
+  if (el) el.innerHTML += '<div style="font-size:0.7rem;color:green;padding:0.5rem;">Items after: '+(tgData[key]||[]).map(function(e){return e.id}).join(', ')+'</div>';
   window._rawLS('that_girl_data', JSON.stringify(tgData));
-  // Push directly to Firebase — don't rely on syncToCloud or _isSyncing
-  var _pushData = JSON.parse(JSON.stringify(tgData));
   fetch('https://lovemyselfapp-default-rtdb.firebaseio.com/my-love-myself-data/that_girl_data.json', {
     method: 'PUT',
-    body: JSON.stringify(_pushData),
+    body: JSON.stringify(tgData),
     headers: {'Content-Type': 'application/json'},
     keepalive: true
-  }).catch(function(){});
-  tgRenderAll(true);
+  }).then(function(r){ return r.json(); }).then(function(r){ console.log('Firebase response:', JSON.stringify(r)); }).catch(function(e){ console.log('Firebase error:', e); });
+  setTimeout(function(){ tgRenderAll(true); }, 100);
 }
 
 var TG_LABELS = { morning:'Morning', looks:'Looks', health:'Health', mindset:'Mindset', time:'Time', relationships:'Relationships', feeling:'Feeling' };
@@ -1781,6 +1783,13 @@ function renderSchedule() {
 }
 
 var _schedAutoTimer = null;
+function schedUpdateTime(elId) {
+  var el = document.getElementById(elId);
+  if (el) {
+    var now = new Date();
+    el.textContent = now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  }
+}
 function schedAutoSave() {
   clearTimeout(_schedAutoTimer);
   _schedAutoTimer = setTimeout(function() {
@@ -1791,8 +1800,8 @@ function schedAutoSave() {
     d.schedTomorrow = document.getElementById('sched-tomorrow')?.value || '';
     d.schedGoal = document.getElementById('sched-goal')?.value || '';
     d.schedBelieve = document.getElementById('sched-ibelieve')?.value || '';
-    localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData));
-    if (typeof syncToCloud === 'function') syncToCloud('all_planner_data', allPlannerData);
+    window._rawLS('all_planner_data', JSON.stringify(allPlannerData));
+    if (typeof window.syncToCloud === 'function') window.syncToCloud('all_planner_data', allPlannerData);
     renderHomeSchedulePreview();
   }, 600);
 }
@@ -1814,9 +1823,9 @@ var _scheduleSaveTimer = null;
 function saveScheduleFast() {
   clearTimeout(_scheduleSaveTimer);
   _scheduleSaveTimer = setTimeout(function() {
-    localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData));
-    if (typeof syncToCloud === 'function') syncToCloud('all_planner_data', allPlannerData);
-  }, 500);
+    window._rawLS('all_planner_data', JSON.stringify(allPlannerData));
+    if (typeof window.syncToCloud === 'function') window.syncToCloud('all_planner_data', allPlannerData);
+  }, 300);
 }
 
 function addScheduleItem(key, input) {
@@ -1883,7 +1892,7 @@ function saveMeal(meal) {
   const time = new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
   allPlannerData[key].mealEntries[meal].push({ id: Date.now(), text: val, time });
   document.getElementById('meal-' + meal).value = '';
-  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
+  window._rawLS('all_planner_data', JSON.stringify(allPlannerData)); if(typeof window.syncToCloud==='function') window.syncToCloud('all_planner_data',allPlannerData);
   renderMeals();
 }
 
@@ -1891,7 +1900,7 @@ function removeMealEntry(meal, id) {
   const key = getDateKey();
   if (!allPlannerData[key]?.mealEntries?.[meal]) return;
   allPlannerData[key].mealEntries[meal] = allPlannerData[key].mealEntries[meal].filter(e => e.id !== id);
-  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
+  window._rawLS('all_planner_data', JSON.stringify(allPlannerData)); if(typeof window.syncToCloud==='function') window.syncToCloud('all_planner_data',allPlannerData);
   renderMeals();
 }
 
@@ -2072,7 +2081,7 @@ function savePlannerDay() {
   d.todos = plannerTodos;
   d.goals = plannerGoals;
   d.savedAt = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
+  window._rawLS('all_planner_data', JSON.stringify(allPlannerData)); if(typeof window.syncToCloud==='function') window.syncToCloud('all_planner_data',allPlannerData);
   const btn = document.querySelector('[onclick="savePlannerDay()"]');
   if (btn) { btn.textContent = 'Saved ✓'; setTimeout(()=>btn.textContent='Save day',1500); }
   renderSchedCal();
@@ -2125,7 +2134,7 @@ function loadPlannerDay() {
 function resetSchedule() {
   if (!confirm('Clear everything for this day?')) return;
   delete allPlannerData[getDateKey()];
-  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
+  window._rawLS('all_planner_data', JSON.stringify(allPlannerData)); if(typeof window.syncToCloud==='function') window.syncToCloud('all_planner_data',allPlannerData);
   loadPlannerDay();
 }
 
@@ -2604,7 +2613,7 @@ function copyScheduleToDay() {
   if (source.todos) allPlannerData[target].todos = source.todos.map(t => ({...t, done: false}));
   if (source.bibleVerse) allPlannerData[target].bibleVerse = source.bibleVerse;
   if (source.bibleRef) allPlannerData[target].bibleRef = source.bibleRef;
-  localStorage.setItem('all_planner_data', JSON.stringify(allPlannerData)); if(typeof syncToCloud==='function')syncToCloud('all_planner_data',allPlannerData);
+  window._rawLS('all_planner_data', JSON.stringify(allPlannerData)); if(typeof window.syncToCloud==='function') window.syncToCloud('all_planner_data',allPlannerData);
   const msg = document.getElementById('copy-msg');
   msg.textContent = 'Copied! Navigate to that day to edit it 🤍';
   setTimeout(() => { msg.textContent = ''; document.getElementById('copy-schedule-box').style.display = 'none'; }, 2500);
