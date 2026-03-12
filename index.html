@@ -1334,8 +1334,11 @@ function tgAddMain() {
   tgRenderAll(true);
 }
 
+var _tgDeletedIds = {};
 function tgRemove(key, id) {
   if (!tgData[key]) return;
+  if (!_tgDeletedIds[key]) _tgDeletedIds[key] = new Set();
+  _tgDeletedIds[key].add(id);
   tgData[key] = tgData[key].filter(function(e) { return e.id !== id; });
   tgSaveToDB();
   tgRenderAll(true);
@@ -1350,7 +1353,7 @@ function tgRenderAll(skipLoad) {
   var keys = ['morning','looks','health','mindset','time','relationships','feeling'];
   var html = '';
   keys.forEach(function(key) {
-    var entries = tgData[key] || [];
+    var entries = (tgData[key] || []).filter(function(e) { return !(_tgDeletedIds[key] && _tgDeletedIds[key].has(e.id)); });
     if (!entries.length) return;
     html += '<div style="margin-bottom:0.6rem;">'
       + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.2rem;">' + TG_LABELS[key] + '</div>';
