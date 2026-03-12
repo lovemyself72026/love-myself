@@ -150,11 +150,9 @@
     if (id === 'me' && typeof rfmRender === 'function') rfmRender();
     if (id === 'jesus' && typeof jesusLoad === 'function') {
       jesusLoad();
-      if (typeof jesusRender === 'function') {
-        var activeJesusTab = document.querySelector('.journal-tab.active[id^="jtab-"]');
-        var jtab = activeJesusTab ? activeJesusTab.id.replace('jtab-','') : null;
-        if (jtab) jesusRender(jtab);
-      }
+      var activeJesusTab = document.querySelector('.journal-tab.active[id^="jtab-"]');
+      var jtab = activeJesusTab ? activeJesusTab.id.replace('jtab-','') : null;
+      if (jtab && typeof jesusRender === 'function') jesusRender(jtab);
       if (typeof jesusRenderHeIs === 'function') jesusRenderHeIs();
     }
     if (id === 'habits' && typeof renderHabits === 'function') renderHabits();
@@ -4489,17 +4487,15 @@ window.addEventListener('DOMContentLoaded', function() {
     <div id="jpwsub-verse" style="display:none;">
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">Save verses that speak to your heart.</div>
       <div id="jesus-verse-list" style="margin-bottom:1rem;"></div>
-      <input id="jesus-verse-text" placeholder="Type or paste a verse…" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.5rem;box-sizing:border-box;">
-      <input id="jesus-verse-ref" placeholder="Reference e.g. John 3:16" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);outline:none;padding:0.3rem 0;margin-bottom:0.7rem;box-sizing:border-box;">
-      <button onclick="jesusSaveVerse()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.5rem 1.2rem;cursor:pointer;">Save</button>
+      <input id="jesus-verse-text" placeholder="Type or paste a verse…" onkeydown="if(event.key==='Enter')jesusSaveVerse()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.5rem;box-sizing:border-box;">
+      <input id="jesus-verse-ref" placeholder="Reference e.g. John 3:16" onkeydown="if(event.key==='Enter')jesusSaveVerse()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);outline:none;padding:0.3rem 0;margin-bottom:0.7rem;box-sizing:border-box;">
     </div>
 
     <!-- What God Said -->
     <div id="jpwsub-godsaid" style="display:none;">
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">What did God speak to you today?</div>
       <div id="jesus-godsaid-list" style="margin-bottom:1rem;"></div>
-      <textarea id="jesus-godsaid-body" placeholder="What God said today…" rows="4" style="width:100%;border:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.8rem;box-sizing:border-box;margin-bottom:0.6rem;"></textarea>
-      <button onclick="jesusSaveGodSaid()" style="background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.5rem 1.2rem;cursor:pointer;">Save</button>
+      <textarea id="jesus-godsaid-body" placeholder="What God said today…" rows="4" onblur="jesusSaveGodSaid()" style="width:100%;border:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.8rem;box-sizing:border-box;"></textarea>
     </div>
 
   </div>
@@ -4879,7 +4875,7 @@ function showJesusTab(tab) {
 function jesusSavePrayThing() {
   var inp = document.getElementById('jesus-pray-things-input');
   var text = inp.value.trim(); if (!text) return;
-  jesusGetDay(jesusCurrentDate).prayThings.push({ id: Date.now(), text: text, done: false });
+  jesusGetDay(jesusCurrentDate).prayThings.push({ id: Date.now(), text: text, done: false, date: new Date().toISOString() });
   inp.value = ''; jesusSave(); jesusRender('prayer');
 }
 function jesusTogglePrayThing(id) {
@@ -4896,7 +4892,7 @@ function jesusDeletePrayThing(id) {
 function jesusSavePrayPerson() {
   var inp = document.getElementById('jesus-pray-people-input');
   var text = inp.value.trim(); if (!text) return;
-  jesusGetDay(jesusCurrentDate).prayPeople.push({ id: Date.now(), text: text, done: false });
+  jesusGetDay(jesusCurrentDate).prayPeople.push({ id: Date.now(), text: text, done: false, date: new Date().toISOString() });
   inp.value = ''; jesusSave(); jesusRender('prayer');
 }
 function jesusTogglePrayPerson(id) {
@@ -4914,27 +4910,28 @@ function jesusSaveVerse() {
   var text = document.getElementById('jesus-verse-text').value.trim();
   var ref  = document.getElementById('jesus-verse-ref').value.trim();
   if (!text) return;
-  jesusGetDay(jesusCurrentDate).verses.unshift({ id: Date.now(), text: text, ref: ref });
+  jesusGetDay(jesusCurrentDate).verses.unshift({ id: Date.now(), text: text, ref: ref, date: new Date().toISOString() });
   document.getElementById('jesus-verse-text').value = '';
   document.getElementById('jesus-verse-ref').value  = '';
-  jesusSave(); jesusRender('verse');
+  jesusSave(); jesusRender('prayer');
 }
 function jesusDeleteVerse(id) {
   jesusGetDay(jesusCurrentDate).verses = jesusGetDay(jesusCurrentDate).verses.filter(function(v){ return v.id!==id; });
-  jesusSave(); jesusRender('verse');
+  jesusSave(); jesusRender('prayer');
 }
 
 // -- WHAT GOD SAID --------------------------------------------
 function jesusSaveGodSaid() {
-  var body = document.getElementById('jesus-godsaid-body').value.trim();
+  var el = document.getElementById('jesus-godsaid-body');
+  var body = el ? el.value.trim() : '';
   if (!body) return;
-  jesusGetDay(jesusCurrentDate).godsaid.unshift({ id: Date.now(), body: body });
-  document.getElementById('jesus-godsaid-body').value = '';
-  jesusSave(); jesusRender('godsaid');
+  jesusGetDay(jesusCurrentDate).godsaid.unshift({ id: Date.now(), body: body, date: new Date().toISOString() });
+  if (el) el.value = '';
+  jesusSave(); jesusRender('prayer');
 }
 function jesusDeleteGodSaid(id) {
   jesusGetDay(jesusCurrentDate).godsaid = jesusGetDay(jesusCurrentDate).godsaid.filter(function(x){ return x.id!==id; });
-  jesusSave(); jesusRender('godsaid');
+  jesusSave(); jesusRender('prayer');
 }
 
 function showJesusStudyTab(tab) {
@@ -5156,32 +5153,45 @@ function jesusRenderCheckList(items, toggleFn, deleteFn) {
 function jesusRender(tab) {
   jesusLoad();
   var day = jesusGetDay(jesusCurrentDate);
+
+  function _dateLabel(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
+
   if (tab === 'prayer') {
     var things = document.getElementById('jesus-pray-things-list');
     var people = document.getElementById('jesus-pray-people-list');
     if (things) things.innerHTML = jesusRenderCheckList(day.prayThings||[], 'jesusTogglePrayThing', 'jesusDeletePrayThing');
     if (people) people.innerHTML = jesusRenderCheckList(day.prayPeople||[], 'jesusTogglePrayPerson', 'jesusDeletePrayPerson');
+
     var vel = document.getElementById('jesus-verse-list');
     if (vel) {
       if (!day.verses || !day.verses.length) { vel.innerHTML = ''; }
       else vel.innerHTML = day.verses.map(function(v) {
         return '<div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">' +
-          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;">' +
-            '<div style="flex:1;"><div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.82rem;line-height:1.7;">' + v.text + '</div>' +
-            (v.ref?'<div style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;color:var(--gray);margin-top:0.3rem;letter-spacing:0.06em;">— '+v.ref+'</div>':'') + '</div>' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
+            '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + _dateLabel(v.date) + '</div>' +
             '<button onclick="jesusDeleteVerse('+v.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">×</button>' +
-          '</div></div>';
+          '</div>' +
+          '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.82rem;line-height:1.7;">' + v.text + '</div>' +
+          (v.ref ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;color:var(--gray);margin-top:0.3rem;letter-spacing:0.06em;">' + v.ref + '</div>' : '') +
+        '</div>';
       }).join('');
     }
+
     var gel = document.getElementById('jesus-godsaid-list');
     if (gel) {
       if (!day.godsaid || !day.godsaid.length) { gel.innerHTML = ''; }
       else gel.innerHTML = day.godsaid.map(function(x) {
         return '<div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">' +
-          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;">' +
-            '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;white-space:pre-wrap;flex:1;">' + x.body + '</div>' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
+            '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + _dateLabel(x.date) + '</div>' +
             '<button onclick="jesusDeleteGodSaid('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">×</button>' +
-          '</div></div>';
+          '</div>' +
+          '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;white-space:pre-wrap;">' + x.body + '</div>' +
+        '</div>';
       }).join('');
     }
   }
