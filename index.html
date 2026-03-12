@@ -59,6 +59,7 @@
   function _applyCloudData(data) {
     if (!data) return;
     var changed = false;
+    var jesusChanged = false;
 
     // Strip savedAt from comparison so timestamp differences don't trigger re-renders
     function _stripMeta(obj) {
@@ -79,15 +80,40 @@
         try {
           var inStripped = JSON.stringify(_stripMeta(data[k]));
           var exStripped = JSON.stringify(_stripMeta(JSON.parse(existing || 'null')));
-          if (inStripped !== exStripped) { changed = true; }
+          if (inStripped !== exStripped) {
+            changed = true;
+            if (k === 'jesus_data') jesusChanged = true;
+          }
         } catch(e) { changed = true; }
       }
     });
 
-    if (!changed || _isSyncing) return;
+    if (!changed) return;
 
-    // Don't clobber the field the user is actively typing in,
-    // but update everything else instantly.
+    // Immediately re-render jesus lists as soon as data lands — don't wait for _isSyncing
+    if (jesusChanged) {
+      try {
+        if (typeof jesusRenderStudyNotes === 'function') jesusRenderStudyNotes();
+        if (typeof jesusRenderStudyQuestions === 'function') jesusRenderStudyQuestions();
+        if (typeof jesusRenderHeIs === 'function') jesusRenderHeIs();
+        // Also re-render prayer lists directly
+        if (typeof jesusGetDay === 'function' && typeof jesusCurrentDate !== 'undefined') {
+          var _day = jesusGetDay(jesusCurrentDate);
+          var _tEl = document.getElementById('jesus-pray-things-list');
+          if (_tEl && typeof jesusRenderCheckList === 'function') _tEl.innerHTML = jesusRenderCheckList(_day.prayThings, 'jesusTogglePrayThing', 'jesusDeletePrayThing');
+          var _pEl = document.getElementById('jesus-pray-people-list');
+          if (_pEl) _pEl.innerHTML = jesusRenderCheckList(_day.prayPeople, 'jesusTogglePrayPerson', 'jesusDeletePrayPerson');
+          var _gEl = document.getElementById('jesus-godsaid-list');
+          if (_gEl) _gEl.innerHTML = (_day.godsaid && _day.godsaid.length) ? _day.godsaid.map(function(x) {
+            var dl = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
+            return '<div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;"><div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + dl + '</div><button onclick="jesusDeleteGodSaid('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">\u00d7</button></div><div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;white-space:pre-wrap;">' + x.body + '</div></div>';
+          }).join('') : '';
+        }
+      } catch(e) {}
+    }
+
+    if (_isSyncing) return;
+
     var activeEl = document.activeElement;
     var typingEl = (activeEl && (activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'INPUT') && document.hasFocus()) ? activeEl : null;
 
@@ -104,8 +130,6 @@
     if (!typingEl) {
       _doReload();
     } else {
-      // Reload lists/cards immediately (won't touch the focused input),
-      // then wait 1.5s after user stops typing to do a final full reload.
       _doReload();
       clearTimeout(window._pendingReload);
       var _watchEl = typingEl;
@@ -208,7 +232,7 @@
     clearInterval(_pollTimer);
     _pollTimer = setInterval(function() {
       window.pullFromCloud(false);
-    }, 2000);
+    }, 1000);
   }
 
   window.addEventListener('load', function() {
