@@ -65,18 +65,19 @@
       }
     });
     if (changed && typeof reloadAllData === 'function') {
-      // Only reload if user isn't actively typing
       var active = document.activeElement;
       var isTyping = active && (active.tagName === 'TEXTAREA' || active.tagName === 'INPUT') && active.value.length > 0;
       if (!isTyping) {
         reloadAllData();
+        if (typeof _reloadActiveSection === 'function') _reloadActiveSection();
       } else {
-        // Schedule a reload for when they stop typing (after 3 seconds of inactivity)
         clearTimeout(window._pendingReload);
         window._pendingReload = setTimeout(function() {
-          var stillActive = document.activeElement;
-          var stillTyping = stillActive && (stillActive.tagName === 'TEXTAREA' || stillActive.tagName === 'INPUT');
-          if (!stillTyping && typeof reloadAllData === 'function') reloadAllData();
+          var stillTyping = document.activeElement && (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT');
+          if (!stillTyping) {
+            reloadAllData();
+            if (typeof _reloadActiveSection === 'function') _reloadActiveSection();
+          }
         }, 3000);
       }
     }
@@ -93,49 +94,27 @@
       .catch(function(e){ if (showMsg) alert('❌ Sync failed: ' + e.message); });
   };
 
-  // Real-time Server-Sent Events stream from Firebase
-  function _startStream() {
-    var es = new EventSource(DB_URL + '.json?stream=1&accept=text/event-stream');
-    es.addEventListener('put', function(e) {
-      if (Date.now() - _lastPush < 2000) return; // ignore echo of own push
-      try {
-        var msg = JSON.parse(e.data);
-        if (msg.path === '/') {
-          // Full database update
-          if (msg.data) _applyCloudData(msg.data);
-        } else if (msg.path && msg.data !== undefined) {
-          // Single key update e.g. path="/all_planner_data"
-          var key = msg.path.replace(/^\//, '');
-          var patch = {};
-          patch[key] = msg.data;
-          _applyCloudData(patch);
-        }
-      } catch(err) {}
-    });
-    es.addEventListener('patch', function(e) {
-      if (Date.now() - _lastPush < 2000) return;
-      try {
-        var msg = JSON.parse(e.data);
-        if (msg.data) _applyCloudData(msg.data);
-      } catch(err) {}
-    });
-    es.onerror = function() {
-      es.close();
-      // Reconnect after 3 seconds
-      setTimeout(_startStream, 3000);
-    };
+  // Force re-render the currently visible section after a cloud pull
+  function _reloadActiveSection() {
+    var active = document.querySelector('.section.active');
+    if (!active) return;
+    var id = active.id;
+    if (id === 'schedule' && typeof loadPlannerDay === 'function') loadPlannerDay();
+    if (id === 'home' && typeof renderAnalytics === 'function') renderAnalytics();
+    if (id === 'vision' && typeof renderDimensionBoards === 'function') renderDimensionBoards();
+    if (id === 'me' && typeof rfmRender === 'function') rfmRender();
+    if (id === 'jesus' && typeof jesusRender === 'function') jesusRender();
   }
 
   window.addEventListener('load', function() {
-    // Initial pull then start real-time stream
+    // Initial pull on load
     setTimeout(function(){
       window.pullFromCloud(false);
-      _startStream();
-      // Fallback: poll every 10 seconds in case stream misses anything
-      setInterval(function() {
-        if (Date.now() - _lastPush > 3000) window.pullFromCloud(false);
-      }, 10000);
     }, 800);
+    // Poll every 5 seconds for changes from other devices
+    setInterval(function() {
+      if (Date.now() - _lastPush > 3000) window.pullFromCloud(false);
+    }, 5000);
   });
 
   // Also pull on tab focus
@@ -847,6 +826,7 @@ function saveAffirmation(){
 }
 
 function renderSavedAffirmations(){
+  try { var _f=localStorage.getItem('saved_affirmations'); if(_f){ savedAffirmations=JSON.parse(_f); if(!Array.isArray(savedAffirmations)) savedAffirmations=[]; } } catch(e) {}
   const el=document.getElementById('saved-affirmations');
   if(!el) return;
   if(!savedAffirmations.length){el.innerHTML='';return;}
@@ -962,6 +942,7 @@ function deleteBook(id) {
 }
 
 function renderBooks() {
+  try { var _f=localStorage.getItem('my_books'); if(_f){ books=JSON.parse(_f); if(!Array.isArray(books)) books=[]; } } catch(e) {}
   const el = document.getElementById('books-list');
   if (!el) return;
   updateBooksMonthLabel();
@@ -1042,6 +1023,7 @@ function deleteWin(id) {
 }
 
 function renderWins() {
+  try { var fresh = localStorage.getItem('my_wins'); if (fresh) { wins = JSON.parse(fresh); if (!Array.isArray(wins)) wins = []; } } catch(e) {}
   const el = document.getElementById('wins-list');
   if (!el) return;
   const dateKey = getWinsDateKey();
@@ -1078,6 +1060,7 @@ let dimensionItems = JSON.parse(localStorage.getItem('dimension_items') || '{}')
 let activeDimType = {};
 
 function renderDimensionBoards() {
+  try { var _f=localStorage.getItem('dimension_items'); if(_f){ dimensionItems=JSON.parse(_f); if(typeof dimensionItems!=='object'||Array.isArray(dimensionItems)) dimensionItems={}; } } catch(e) {}
   const el = document.getElementById('dimension-boards');
   if (!el) return;
   el.innerHTML = lifeDimensions.map(d => {
@@ -1227,6 +1210,7 @@ function tgRemove(key, id) {
 var TG_LABELS = { morning:'Morning', looks:'Looks', health:'Health', mindset:'Mindset', time:'Time', relationships:'Relationships', feeling:'Feeling' };
 
 function tgRenderAll() {
+  try { var _f=localStorage.getItem('that_girl_data'); if(_f){ tgData=JSON.parse(_f); if(typeof tgData!=='object'||Array.isArray(tgData)) tgData={}; } } catch(e) {}
   var el = document.getElementById('tg-all-list');
   if (!el) return;
   var keys = ['morning','looks','health','mindset','time','relationships','feeling'];
@@ -1329,6 +1313,7 @@ function deleteWhoIEntry(id) {
 }
 
 function renderWhoiGrid() {
+  try { var _f=localStorage.getItem('whoi_history'); if(_f){ whoiItems=JSON.parse(_f); if(!Array.isArray(whoiItems)) whoiItems=[]; } } catch(e) {}
   const el = document.getElementById('whoi-grid');
   if (!el) return;
   // Init date picker
@@ -1387,7 +1372,11 @@ let allPlannerData = JSON.parse(localStorage.getItem('all_planner_data') || '{}'
 let currentScheduleDate = new Date().toISOString().split('T')[0];
 
 function getDateKey() { return currentScheduleDate; }
-function getPlannerDay() { return allPlannerData[getDateKey()] || {}; }
+function getPlannerDay() {
+  // Always read fresh from localStorage so cloud sync is reflected immediately
+  try { var fresh = localStorage.getItem('all_planner_data'); if (fresh) allPlannerData = JSON.parse(fresh); } catch(e) {}
+  return allPlannerData[getDateKey()] || {};
+}
 
 function initScheduleDatePicker() {
   updateDayLabel();
@@ -2092,6 +2081,7 @@ function clearVentInput() {
 }
 
 function renderVentEntries() {
+  try { var fresh = localStorage.getItem('vent_entries'); if (fresh) { ventEntries = JSON.parse(fresh); if (!Array.isArray(ventEntries)) ventEntries = []; } } catch(e) {}
   const el = document.getElementById('vent-entries');
   if (!el) return;
   const dateKey = getVentDateKey();
@@ -3172,6 +3162,7 @@ function beliefRenderStrip(id) {
 }
 
 function beliefRenderAll() {
+  try { var _f=localStorage.getItem('belief_beliefs'); if(_f){ beliefBeliefs=JSON.parse(_f); if(!Array.isArray(beliefBeliefs)) beliefBeliefs=[]; } } catch(e) {}
   var el = document.getElementById('belief-list');
   if (!el) return;
   if (!beliefBeliefs.length) {
@@ -5078,6 +5069,7 @@ function jesusRenderCheckList(items, toggleFn, deleteFn) {
 }
 
 function jesusRender(tab) {
+  jesusLoad();
   var day = jesusGetDay(jesusCurrentDate);
   if (tab === 'prayer') {
     var things = document.getElementById('jesus-pray-things-list');
@@ -5206,6 +5198,7 @@ function dailyAddMeal(meal) {
 }
 
 function dailyRenderMeals() {
+  dailyLoad();
   var today = dailyGetToday();
   ['breakfast','lunch','dinner'].forEach(function(meal) {
     var el = document.getElementById('daily-meal-'+meal+'-list');
@@ -6123,6 +6116,7 @@ function renderCaliTracker() {
 }
 
 function renderCalisthenics() {
+  try { var _f=localStorage.getItem('cali_log'); if(_f){ caliLog=JSON.parse(_f); if(typeof caliLog!=='object'||Array.isArray(caliLog)) caliLog={}; } } catch(e) {}
   renderCaliTracker();
   var weekBtns = document.getElementById('cali-week-btns');
   weekBtns.innerHTML = [1,2,3,4].map(function(w) {
@@ -6355,6 +6349,7 @@ function wiaUpdateCard() {
     : '';
 }
 function wiaRenderValues() {
+  try { var _f=localStorage.getItem('wia2'); if(_f){ WIA=JSON.parse(_f); if(!WIA.values) WIA.values=[]; if(!WIA.traits) WIA.traits=[]; } } catch(e) {}
   var cleaned = WIA.values.filter(function(v){ return v && v.trim(); });
   if (cleaned.length !== WIA.values.length) { WIA.values = cleaned; wiaSave(); }
   var el = document.getElementById('wiaValuesList');
@@ -6371,6 +6366,7 @@ function wiaAddValue() {
 }
 function wiaDelValue(i) { WIA.values.splice(i,1); wiaSave(); wiaRenderValues(); }
 function wiaRenderTraits() {
+  try { var _f=localStorage.getItem('wia2'); if(_f){ WIA=JSON.parse(_f); if(!WIA.traits) WIA.traits=[]; } } catch(e) {}
   var cleaned = WIA.traits.filter(function(t){ return t && t.trim(); });
   if (cleaned.length !== WIA.traits.length) { WIA.traits = cleaned; wiaSave(); }
   var el = document.getElementById('wiaTraitsList');
