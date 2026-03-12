@@ -1345,12 +1345,8 @@ function tgAddMain() {
   tgRenderAll(true);
 }
 
-var _tgDeletedIds = {};
 function tgRemove(key, id) {
-  if (!tgData[key]) return;
-  if (!_tgDeletedIds[key]) _tgDeletedIds[key] = new Set();
-  _tgDeletedIds[key].add(id);
-  tgData[key] = tgData[key].filter(function(e) { return e.id !== id; });
+  if (tgData[key]) tgData[key] = tgData[key].filter(function(e) { return e.id !== id; });
   tgSaveToDB();
   tgRenderAll(true);
 }
