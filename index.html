@@ -6424,9 +6424,9 @@ function wiaUpdateCardAndSave() {
   wiaSave();
 }
 function wiaRenderValues() {
-  try { var _f=localStorage.getItem('wia2'); if(_f){ WIA=JSON.parse(_f); if(!WIA.values) WIA.values=[]; if(!WIA.traits) WIA.traits=[]; } } catch(e) {}
+  try { var _f=localStorage.getItem('wia2'); if(_f){ WIA=JSON.parse(_f); if(!WIA.values) WIA.values=[]; if(!WIA.traits) WIA.traits=[]; if(!WIA.name) WIA.name=''; } } catch(e) {}
   var cleaned = WIA.values.filter(function(v){ return v && v.trim(); });
-  if (cleaned.length !== WIA.values.length) { WIA.values = cleaned; } // no save during render
+  if (cleaned.length !== WIA.values.length) { WIA.values = cleaned; }
   var el = document.getElementById('wiaValuesList');
   if (!el) return;
   el.innerHTML = WIA.values.map(function(v, i) {
@@ -6441,9 +6441,9 @@ function wiaAddValue() {
 }
 function wiaDelValue(i) { WIA.values.splice(i,1); wiaSave(); wiaRenderValues(); }
 function wiaRenderTraits() {
-  try { var _f=localStorage.getItem('wia2'); if(_f){ WIA=JSON.parse(_f); if(!WIA.traits) WIA.traits=[]; } } catch(e) {}
+  try { var _f=localStorage.getItem('wia2'); if(_f){ WIA=JSON.parse(_f); if(!WIA.traits) WIA.traits=[]; if(!WIA.name) WIA.name=''; } } catch(e) {}
   var cleaned = WIA.traits.filter(function(t){ return t && t.trim(); });
-  if (cleaned.length !== WIA.traits.length) { WIA.traits = cleaned; } // no save during render
+  if (cleaned.length !== WIA.traits.length) { WIA.traits = cleaned; }
   var el = document.getElementById('wiaTraitsList');
   if (!el) return;
   el.innerHTML = WIA.traits.map(function(t, i) {
