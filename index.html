@@ -764,6 +764,8 @@ function showSection(id){
   const navTab = document.querySelectorAll('.nav-tab')[map.indexOf(id)];
   if (navTab) navTab.classList.add('active');
   window.scrollTo(0,0);
+  // Remember which section we're on so refresh returns here
+  try { sessionStorage.setItem('last_section', id); } catch(e) {}
   if (id === 'home') renderAnalytics();
   if (id === 'schedule') { initScheduleDatePicker(); loadPlannerDay(); }
   if (id === 'vision') { loadThatGirl(); }
@@ -771,6 +773,16 @@ function showSection(id){
   if (id === 'me') { showMeMainTab('me'); }
   if (id === 'jesus' && typeof jesusInit === 'function') jesusInit();
 }
+
+// Restore last section on page load (so refresh doesn't kick you to Home)
+window.addEventListener('DOMContentLoaded', function() {
+  try {
+    var last = sessionStorage.getItem('last_section');
+    if (last && document.getElementById(last)) {
+      showSection(last);
+    }
+  } catch(e) {}
+});
 
 function goToScheduleItem(elId) {
   showSection('schedule');
