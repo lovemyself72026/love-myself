@@ -66,7 +66,8 @@
         changed = true;
       }
     });
-    if (!changed || _isSyncing) return;
+    if (!changed || _isSyncing) { console.log('[SYNC] skipping reload — changed:', changed, '_isSyncing:', _isSyncing); return; }
+    console.log('[SYNC] applying changes, calling reloadAllData...');
 
     // Don't clobber the field the user is actively typing in,
     // but update everything else instantly.
@@ -76,10 +77,12 @@
     function _doReload() {
       if (_isSyncing) return;
       _isSyncing = true;
+      console.log('[SYNC] _doReload running reloadAllData');
       try {
         if (typeof reloadAllData === 'function') reloadAllData();
+        else console.log('[SYNC] reloadAllData not found!');
         if (typeof _reloadActiveSection === 'function') _reloadActiveSection();
-      } catch(e) {}
+      } catch(e) { console.log('[SYNC] _doReload error:', e); }
       _isSyncing = false;
     }
 
@@ -142,6 +145,7 @@
       _sseSource.addEventListener('put', function(e) {
         try {
           var msg = JSON.parse(e.data);
+          console.log('[SSE put] path:', msg.path, 'keys:', msg.data ? Object.keys(msg.data).slice(0,5) : null);
           // msg.path === '/' means full snapshot, msg.path === '/key' means single key update
           var data = msg.data;
           if (!data) return;
@@ -154,15 +158,18 @@
             patch[key] = data;
             _applyCloudData(patch);
           }
-        } catch(err) {}
+        } catch(err) { console.log('[SSE put error]', err); }
       });
       _sseSource.addEventListener('patch', function(e) {
         try {
           var msg = JSON.parse(e.data);
+          console.log('[SSE patch]', msg);
           if (msg && msg.data) _applyCloudData(msg.data);
-        } catch(err) {}
+        } catch(err) { console.log('[SSE patch error]', err); }
       });
-      _sseSource.onerror = function() {
+      _sseSource.onopen = function() { console.log('[SSE] connected'); };
+      _sseSource.onerror = function(e) {
+        console.log('[SSE] error, reconnecting...', e);
         // On error, back off and reconnect after 3s
         if (_sseSource) { _sseSource.close(); _sseSource = null; }
         setTimeout(_startSSE, 3000);
