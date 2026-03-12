@@ -57,36 +57,49 @@
   var _isSyncing = false;
 
   function _applyCloudData(data) {
-    if (!data) { console.log('[SYNC] _applyCloudData: no data'); return; }
+    if (!data) return;
     var changed = false;
     Object.keys(data).forEach(function(k) {
       var incoming = JSON.stringify(data[k]);
       if (localStorage.getItem(k) !== incoming) {
         window._rawLS(k, incoming);
         changed = true;
-        console.log('[SYNC] updated key:', k);
       }
     });
-    console.log('[SYNC] _applyCloudData changed:', changed);
-    if (changed && typeof reloadAllData === 'function' && !_isSyncing) {
-      var active = document.activeElement;
-      var isTyping = active && (active.tagName === 'TEXTAREA' || active.tagName === 'INPUT') && active.value.length > 0;
-      console.log('[SYNC] isTyping:', isTyping, '— calling reloadAllData');
-      if (!isTyping) {
-        _isSyncing = true;
-        try { reloadAllData(); if (typeof _reloadActiveSection === 'function') _reloadActiveSection(); } catch(e) { console.log('[SYNC] reloadAllData error:', e.message); }
-        _isSyncing = false;
-      } else {
+    if (!changed || _isSyncing) return;
+
+    // Don't clobber the field the user is actively typing in,
+    // but update everything else instantly.
+    var activeEl = document.activeElement;
+    var typingEl = (activeEl && (activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'INPUT') && document.hasFocus()) ? activeEl : null;
+
+    function _doReload() {
+      if (_isSyncing) return;
+      _isSyncing = true;
+      try {
+        if (typeof reloadAllData === 'function') reloadAllData();
+        if (typeof _reloadActiveSection === 'function') _reloadActiveSection();
+      } catch(e) {}
+      _isSyncing = false;
+    }
+
+    if (!typingEl) {
+      _doReload();
+    } else {
+      // Reload lists/cards immediately (won't touch the focused input),
+      // then wait 1.5s after user stops typing to do a final full reload.
+      _doReload();
+      clearTimeout(window._pendingReload);
+      var _watchEl = typingEl;
+      function _waitForPause() {
         clearTimeout(window._pendingReload);
         window._pendingReload = setTimeout(function() {
-          var stillTyping = document.activeElement && (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT');
-          if (!stillTyping && !_isSyncing) {
-            _isSyncing = true;
-            try { reloadAllData(); if (typeof _reloadActiveSection === 'function') _reloadActiveSection(); } catch(e) {}
-            _isSyncing = false;
-          }
-        }, 3000);
+          _watchEl.removeEventListener('input', _waitForPause);
+          _doReload();
+        }, 1500);
       }
+      _watchEl.addEventListener('input', _waitForPause);
+      _waitForPause();
     }
   }
 
@@ -113,7 +126,6 @@
     var active = document.querySelector('.section.active');
     if (!active) return;
     var id = active.id;
-    console.log('[SYNC] _reloadActiveSection:', id);
     if (id === 'schedule' && typeof loadPlannerDay === 'function') loadPlannerDay();
     if (id === 'home' && typeof renderAnalytics === 'function') renderAnalytics();
     if (id === 'vision' && typeof renderDimensionBoards === 'function') renderDimensionBoards();
