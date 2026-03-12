@@ -93,10 +93,10 @@
     // Immediately re-render jesus lists as soon as data lands — don't wait for _isSyncing
     if (jesusChanged) {
       try {
-        if (typeof jesusRenderStudyNotes === 'function') jesusRenderStudyNotes();
-        if (typeof jesusRenderStudyQuestions === 'function') jesusRenderStudyQuestions();
+        if (typeof jesusLoad === 'function') jesusLoad();
+        if (typeof jesusRenderStudyNotes === 'function') jesusRenderStudyNotes(true);
+        if (typeof jesusRenderStudyQuestions === 'function') jesusRenderStudyQuestions(true);
         if (typeof jesusRenderHeIs === 'function') jesusRenderHeIs();
-        // Also re-render prayer lists directly
         if (typeof jesusGetDay === 'function' && typeof jesusCurrentDate !== 'undefined') {
           var _day = jesusGetDay(jesusCurrentDate);
           var _tEl = document.getElementById('jesus-pray-things-list');
@@ -4960,9 +4960,7 @@ function jesusTogglePrayThing(id) {
   day.prayThings = day.prayThings.map(function(x){ return x.id===id?{...x,done:!x.done}:x; });
   jesusSave(); jesusRender('prayer');
 }
-var _deletedPrayThingIds = new Set();
 function jesusDeletePrayThing(id) {
-  _deletedPrayThingIds.add(id);
   jesusGetDay(jesusCurrentDate).prayThings = jesusGetDay(jesusCurrentDate).prayThings.filter(function(x){ return x.id!==id; });
   jesusSave(); jesusRender('prayer');
 }
@@ -4979,9 +4977,7 @@ function jesusTogglePrayPerson(id) {
   day.prayPeople = day.prayPeople.map(function(x){ return x.id===id?{...x,done:!x.done}:x; });
   jesusSave(); jesusRender('prayer');
 }
-var _deletedPrayPersonIds = new Set();
 function jesusDeletePrayPerson(id) {
-  _deletedPrayPersonIds.add(id);
   jesusGetDay(jesusCurrentDate).prayPeople = jesusGetDay(jesusCurrentDate).prayPeople.filter(function(x){ return x.id!==id; });
   jesusSave(); jesusRender('prayer');
 }
@@ -5022,9 +5018,7 @@ function jesusSaveGodSaid() {
   if (status) { status.textContent = 'Saved'; setTimeout(function(){ status.textContent = ''; }, 2000); }
   jesusSave(); jesusRender('prayer');
 }
-var _deletedGodSaidIds = new Set();
 function jesusDeleteGodSaid(id) {
-  _deletedGodSaidIds.add(id);
   jesusGetDay(jesusCurrentDate).godsaid = jesusGetDay(jesusCurrentDate).godsaid.filter(function(x){ return x.id!==id; });
   jesusSave(); jesusRender('prayer');
 }
@@ -5059,16 +5053,14 @@ function jesusSaveStudyNote() {
   if (status) { status.textContent = 'Saved'; setTimeout(function(){ status.textContent = ''; }, 2000); }
   jesusSave(); jesusRenderStudyNotes(true);
 }
-var _deletedStudyNoteIds = new Set();
 function jesusDeleteStudyNote(id) {
-  _deletedStudyNoteIds.add(id);
   jesusData.studyNotes = (jesusData.studyNotes||[]).filter(function(x){ return x.id!==id; });
   jesusSave(); jesusRenderStudyNotes(true);
 }
 function jesusRenderStudyNotes(skipLoad) {
   if (!skipLoad) jesusLoad();
   var el = document.getElementById('jesus-study-notes-list'); if (!el) return;
-  var items = (jesusData.studyNotes || []).filter(function(x){ return !_deletedStudyNoteIds.has(x.id); });
+  var items = jesusData.studyNotes || [];
   if (!items.length) { el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">No notes yet.</div>'; return; }
   el.innerHTML = items.map(function(x) {
     var dl = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
@@ -5093,16 +5085,14 @@ function jesusToggleStudyQuestion(id) {
   jesusData.studyQuestions = (jesusData.studyQuestions||[]).map(function(x){ return x.id===id?{...x,answered:!x.answered}:x; });
   jesusSave(); jesusRenderStudyQuestions(true);
 }
-var _deletedStudyQIds = new Set();
 function jesusDeleteStudyQuestion(id) {
-  _deletedStudyQIds.add(id);
   jesusData.studyQuestions = (jesusData.studyQuestions||[]).filter(function(x){ return x.id!==id; });
   jesusSave(); jesusRenderStudyQuestions(true);
 }
 function jesusRenderStudyQuestions(skipLoad) {
   if (!skipLoad) jesusLoad();
   var el = document.getElementById('jesus-study-questions-list'); if (!el) return;
-  var items = (jesusData.studyQuestions || []).filter(function(x){ return !_deletedStudyQIds.has(x.id); });
+  var items = jesusData.studyQuestions || [];
   if (!items.length) { el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">No questions yet.</div>'; return; }
   el.innerHTML = items.map(function(x) {
     var dl = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
@@ -5170,9 +5160,7 @@ function jesusSaveHeIs() {
   jesusData.heIs.unshift({ id: Date.now(), text: text, date: new Date().toISOString() });
   inp.value = ''; jesusSave(); jesusRenderHeIs();
 }
-var _deletedHeIsIds = new Set();
 function jesusDeleteHeIs(id) {
-  _deletedHeIsIds.add(id);
   jesusData.heIs = (jesusData.heIs||[]).filter(function(x){ return x.id!==id; });
   jesusSave(); jesusRenderHeIs();
 }
@@ -5181,7 +5169,7 @@ function jesusRenderHeIs() {
   jesusLoad();
   var el = document.getElementById('jesus-heis-list');
   if (!el) return;
-  var items = (jesusData.heIs || []).filter(function(x){ return !_deletedHeIsIds.has(x.id); });
+  var items = jesusData.heIs || [];
   if (!items.length) { el.innerHTML = ''; return; }
   el.innerHTML = items.map(function(x) {
     var dateStr = '';
@@ -5248,8 +5236,6 @@ function jesusDeleteRepent(id) {
 
 // -- RENDER ---------------------------------------------------
 function jesusRenderCheckList(items, toggleFn, deleteFn) {
-  var _tombstones = (deleteFn==='jesusDeletePrayThing'?_deletedPrayThingIds:deleteFn==='jesusDeletePrayPerson'?_deletedPrayPersonIds:deleteFn==='jesusDeleteStudyQuestion'?_deletedStudyQIds:null);
-  if (_tombstones) items = (items||[]).filter(function(x){ return !_tombstones.has(x.id); });
   if (!items || !items.length) return '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">Nothing added yet.</div>';
   return items.map(function(x) {
     var dateStr = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
@@ -5296,9 +5282,8 @@ function jesusRender(tab) {
 
     var gel = document.getElementById('jesus-godsaid-list');
     if (gel) {
-      var _gsItems = (day.godsaid||[]).filter(function(x){ return !_deletedGodSaidIds.has(x.id); });
-      if (!_gsItems.length) { gel.innerHTML = ''; }
-      else gel.innerHTML = _gsItems.map(function(x) {
+      if (!day.godsaid || !day.godsaid.length) { gel.innerHTML = ''; }
+      else gel.innerHTML = day.godsaid.map(function(x) {
         return '<div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">' +
           '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
             '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + _dateLabel(x.date) + '</div>' +
