@@ -193,36 +193,8 @@
         if (typeof showJesusActionTab === 'function') showJesusActionTab(curJA, true);
       }
       if (jtab === 'study') {
-        var sNotes = document.getElementById('jesus-study-notes-list');
-        if (sNotes) {
-          var notes = jesusData.studyNotes || [];
-          sNotes.innerHTML = notes.length ? notes.map(function(x) {
-            var dl = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
-            return '<div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">' +
-              '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
-                '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + dl + '</div>' +
-                '<button onclick="jesusDeleteStudyNote('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">\u00d7</button>' +
-              '</div>' +
-              (x.passage ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;letter-spacing:0.08em;color:var(--gray);margin-bottom:0.3rem;">' + x.passage + '</div>' : '') +
-              '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;white-space:pre-wrap;">' + x.note + '</div>' +
-            '</div>';
-          }).join('') : '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">No notes yet.</div>';
-        }
-        var sQ = document.getElementById('jesus-study-questions-list');
-        if (sQ) {
-          var qs = jesusData.studyQuestions || [];
-          sQ.innerHTML = qs.length ? qs.map(function(x) {
-            var dl = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
-            return '<div style="padding:0.5rem 0;border-bottom:1px solid #f0f0ee;">' +
-              '<div style="display:flex;align-items:center;gap:0.6rem;">' +
-                '<div onclick="jesusToggleStudyQuestion('+x.id+')" style="width:14px;height:14px;border:1px solid '+(x.answered?'var(--black)':'#c8c8c5')+';background:'+(x.answered?'var(--black)':'transparent')+';cursor:pointer;flex-shrink:0;"></div>' +
-                '<div style="flex:1;font-family:\'Lora\',serif;font-style:italic;font-size:0.85rem;color:var(--black);'+(x.answered?'text-decoration:line-through;color:var(--gray);':'')+'">'+x.text+'</div>' +
-                '<button onclick="jesusDeleteStudyQuestion('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;">\u00d7</button>' +
-              '</div>' +
-              (dl ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:#bbb;margin-top:0.2rem;padding-left:20px;">' + dl + '</div>' : '') +
-            '</div>';
-          }).join('') : '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">No questions yet.</div>';
-        }
+        if (typeof jesusRenderStudyNotes === 'function') jesusRenderStudyNotes();
+        if (typeof jesusRenderStudyQuestions === 'function') jesusRenderStudyQuestions();
       }
       if (typeof jesusRenderHeIs === 'function') jesusRenderHeIs();
     }
@@ -5062,6 +5034,7 @@ function jesusDeleteStudyNote(id) {
   jesusSave(); jesusRenderStudyNotes();
 }
 function jesusRenderStudyNotes() {
+  jesusLoad();
   var el = document.getElementById('jesus-study-notes-list'); if (!el) return;
   var items = jesusData.studyNotes || [];
   if (!items.length) { el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">No notes yet.</div>'; return; }
@@ -5093,6 +5066,7 @@ function jesusDeleteStudyQuestion(id) {
   jesusSave(); jesusRenderStudyQuestions();
 }
 function jesusRenderStudyQuestions() {
+  jesusLoad();
   var el = document.getElementById('jesus-study-questions-list'); if (!el) return;
   var items = jesusData.studyQuestions || [];
   if (!items.length) { el.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">No questions yet.</div>'; return; }
