@@ -5008,11 +5008,7 @@ function showJesusPrayWordTab(tab) {
     var btn = document.getElementById('jpwtab-'+t);
     if (btn) btn.classList.toggle('active', t===tab);
   });
-  var day = jesusGetDay(jesusCurrentDate);
-  if (tab==='things') { var el=document.getElementById('jesus-pray-things-list'); if(el) el.innerHTML=jesusRenderCheckList(day.prayThings||[],'jesusTogglePrayThing','jesusDeletePrayThing'); }
-  if (tab==='people') { var el=document.getElementById('jesus-pray-people-list'); if(el) el.innerHTML=jesusRenderCheckList(day.prayPeople||[],'jesusTogglePrayPerson','jesusDeletePrayPerson'); }
-  if (tab==='verse') jesusRender('word');
-  if (tab==='godsaid') jesusRender('word');
+  jesusRender('prayer');
 }
 
 function showJesusWordTab(tab) {
@@ -5023,8 +5019,7 @@ function showJesusWordTab(tab) {
     if (btn) btn.classList.toggle('active', t===tab);
   });
   var day = jesusGetDay(jesusCurrentDate);
-  if (tab==='verse') { jesusRender('word'); }
-  if (tab==='godsaid') { jesusRender('word'); }
+  jesusRender('prayer');
 }
 
 function showJesusActionTab(tab) {
@@ -5142,10 +5137,14 @@ function jesusDeleteRepent(id) {
 function jesusRenderCheckList(items, toggleFn, deleteFn) {
   if (!items || !items.length) return '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:#ccc;padding:0.3rem 0;">Nothing added yet.</div>';
   return items.map(function(x) {
-    return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;border-bottom:1px solid #f0f0ee;">' +
-      '<div onclick="'+toggleFn+'('+x.id+')" style="width:14px;height:14px;border:1px solid '+(x.done?'var(--black)':'#c8c8c5')+';background:'+(x.done?'var(--black)':'transparent')+';cursor:pointer;flex-shrink:0;"></div>' +
-      '<div style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);'+(x.done?'text-decoration:line-through;color:var(--gray);':'')+'">' + x.text + '</div>' +
-      '<button onclick="'+deleteFn+'('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;">×</button>' +
+    var dateStr = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
+    return '<div style="padding:0.5rem 0;border-bottom:1px solid #f0f0ee;">' +
+      '<div style="display:flex;align-items:center;gap:0.6rem;">' +
+        '<div onclick="'+toggleFn+'('+x.id+')" style="width:14px;height:14px;border:1px solid '+(x.done?'var(--black)':'#c8c8c5')+';background:'+(x.done?'var(--black)':'transparent')+';cursor:pointer;flex-shrink:0;"></div>' +
+        '<div style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);'+(x.done?'text-decoration:line-through;color:var(--gray);':'')+'">' + x.text + '</div>' +
+        '<button onclick="'+deleteFn+'('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;">×</button>' +
+      '</div>' +
+      (dateStr ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:#bbb;margin-top:0.2rem;padding-left:20px;">' + dateStr + '</div>' : '') +
     '</div>';
   }).join('');
 }
