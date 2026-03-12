@@ -1343,19 +1343,16 @@ function tgAddMain() {
   var now = new Date();
   var time = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     + ' · ' + now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-  tgData[key].push({ id: Date.now(), text: val, time: time });
+  tgData[key].push({ id: String(Date.now()), text: val, time: time });
   input.value = '';
   tgSaveToDB();
   tgRenderAll(true);
 }
 
 function tgRemove(key, id) {
-  // Immediately wipe the DOM so nothing can ghost it back visually
   var el = document.getElementById('tg-all-list');
   if (el) el.innerHTML = '';
-  // Remove from memory
-  if (tgData[key]) tgData[key] = tgData[key].filter(function(e) { return e.id !== id; });
-  // Save and re-render from memory
+  if (tgData[key]) tgData[key] = tgData[key].filter(function(e) { return String(e.id) !== String(id); });
   tgSaveToDB();
   tgRenderAll(true);
 }
@@ -1381,7 +1378,7 @@ function tgRenderAll(skipLoad) {
         + '<span style="font-family:\'Nunito\',sans-serif;font-size:1rem;font-weight:300;color:var(--black);">' + e.text.replace(/</g,'&lt;') + '</span>'
         + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;color:var(--gray);margin-left:0.5rem;">' + e.time + '</span>'
         + '</div>'
-        + '<button onclick="tgRemove(\'' + key + '\',' + e.id + ')" style="font-size:0.6rem;color:var(--gray);border:none;background:none;cursor:pointer;flex-shrink:0;padding:0 0 0 0.5rem;">✕</button>'
+        + '<button onclick="tgRemove(\'' + key + '\',\'' + e.id + '\')" style="font-size:0.6rem;color:var(--gray);border:none;background:none;cursor:pointer;flex-shrink:0;padding:0 0 0 0.5rem;">✕</button>'
         + '</div>';
     });
     html += '</div>';
