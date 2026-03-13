@@ -372,7 +372,7 @@
     .ritual-label { font-size: 0.95rem; }
     .counter-label { font-size: 0.9rem; }
     .journal-content { font-size: 0.9rem; }
-    .balance-sub-tab { font-size: 0.62rem; padding: 0.45rem 0.6rem 0.5rem; letter-spacing: 0.04em; flex: 1; min-width: 0; }
+    .balance-sub-tab { font-size: 0.52rem; padding: 0.45rem 0.3rem 0.5rem; letter-spacing: 0.02em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .journal-tab { font-size: 0.62rem; padding: 0.45rem 0.6rem 0.5rem; letter-spacing: 0.04em; flex: 0 0 auto; }
     .wia-tab { font-size: 0.54rem; padding: 5px 4px; letter-spacing: 0.05em; flex: 1; }
     .home-card { padding: 0.9rem; }
@@ -3350,7 +3350,7 @@ function beliefRenderAll() {
       + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;">'
       + '<button onclick="beliefWeekShift(\'' + b.id + '\',-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8249;</button>'
       + '<div style="display:flex;align-items:center;gap:0.5rem;">'
-      + '<div id="blbl-' + b.id + '" style="font-family:Lora,serif;font-style:italic;font-size:0.95rem;color:var(--black);"></div>'
+      + '<div id="blbl-' + b.id + '" style="font-family:Lora,serif;font-style:italic;font-size:0.78rem;color:var(--black);"></div>'
       + '<div style="position:relative;">'
       + '<button id="bfcal-btn-' + b.id + '" onclick="beliefCalToggle(\'' + b.id + '\')" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></button>'
       + '<div id="bfcal-popup-' + b.id + '" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.6rem;z-index:1000;width:min(70vw,220px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">'
@@ -4086,7 +4086,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <!-- BELIEF -->
     <div id="jsub-belief" style="margin-top:0;">
       <div class="subtitle" style="margin-bottom:0.2rem;margin-top:0;">
-        <style>@media(max-width:480px){#jsub-belief{margin-top:1rem!important;}}</style>Rewire your mind</div>
+        <style>@media(max-width:480px){#jsub-belief{margin-top:2rem!important;}}</style>Rewire your mind</div>
       <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
         <h2 style="margin:0;">Change your belief.</h2>
       </div>
@@ -4109,7 +4109,7 @@ window.addEventListener('DOMContentLoaded', function() {
           </div>
         </div>
       </div>
-      <div id="belief-list" style="margin-top:1.5rem;"></div>
+      <div id="belief-list" style="margin-top:2.5rem;"></div>
     </div>
 
     <!-- WINS -->
