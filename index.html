@@ -423,8 +423,7 @@
     .op-btn { font-size: 0.68rem; padding: 0.35rem 0.6rem; }
   }
 
-  #memainsub-journal { width: 100%; max-width: 100%; overflow-x: hidden; box-sizing: border-box; }
-  #memainsub-journal * { max-width: 100%; box-sizing: border-box; }
+  #memainsub-journal { width: 100%; overflow-x: hidden; box-sizing: border-box; }
   .q-check-card { background: white; border: 1px solid #e8e8e5; padding: 0.75rem; margin-bottom: 0.5rem; transition: opacity 0.2s; }
   .q-check-card.answered { opacity: 0.4; }
   .q-check-text { font-family: 'Lora', serif; font-style: italic; font-size: 0.78rem; color: var(--black); line-height: 1.5; margin-bottom: 0.6rem; }
@@ -548,10 +547,10 @@
     <div class="home-card" style="cursor:default;">
       <div class="home-card-title">Journal</div>
       <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
-        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');setTimeout(()=>{ var el=document.getElementById('jsub-belief'); if(el)el.scrollIntoView({behavior:'smooth'}); },100);},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Belief</div>
-        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');setTimeout(()=>{ var el=document.getElementById('vent-section'); if(el)el.scrollIntoView({behavior:'smooth'}); },100);},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Journal</div>
-        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');setTimeout(()=>{ var el=document.getElementById('jsub-books'); if(el)el.scrollIntoView({behavior:'smooth'}); },100);},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Books</div>
-        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');setTimeout(()=>{ var el=document.getElementById('jsub-wins'); if(el)el.scrollIntoView({behavior:'smooth'}); },100);},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Wins</div>
+        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');showJournalTab('belief');},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Belief</div>
+        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');showJournalTab('vent');},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Journal</div>
+        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');showJournalTab('books');},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Books</div>
+        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');showJournalTab('wins');},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Wins</div>
       </div>
     </div>
 
@@ -2875,6 +2874,19 @@ function showMeJournalTab(tab) {
   setTimeout(function(){ showMeTab(tab); }, 100);
 }
 
+function showJournalTab(tab) {
+  ['belief','wins','vent','books'].forEach(function(t) {
+    var el = document.getElementById('jsub-' + t);
+    var btn = document.getElementById('jtabn-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  if (tab === 'wins') { renderWins(); }
+  if (tab === 'vent') { renderVentEntries(); }
+  if (tab === 'books') { renderBooks(); }
+  if (tab === 'belief') { beliefRenderAll(); }
+}
+
 function showMeMainTab(tab) {
   ['me','journal'].forEach(function(t) {
     var el = document.getElementById('memainsub-' + t);
@@ -2882,7 +2894,7 @@ function showMeMainTab(tab) {
     if (el) el.style.display = t === tab ? 'block' : 'none';
     if (btn) btn.classList.toggle('active', t === tab);
   });
-  if (tab === 'journal') { renderWins(); renderVentEntries(); renderBooks(); beliefRenderAll(); window.scrollTo(0,0); }
+  if (tab === 'journal') { showJournalTab('belief'); window.scrollTo(0,0); }
   if (tab === 'me') showMeTab('whiam');
 }
 
@@ -4062,8 +4074,16 @@ window.addEventListener('DOMContentLoaded', function() {
   <!-- JOURNAL content -->
   <div id="memainsub-journal" style="display:none;margin-top:0;padding-top:0;">
 
+  <!-- Journal sub-tabs -->
+  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
+    <button class="balance-sub-tab active" onclick="showJournalTab('belief')" id="jtabn-belief">Belief</button>
+    <button class="balance-sub-tab" onclick="showJournalTab('wins')" id="jtabn-wins">Wins</button>
+    <button class="balance-sub-tab" onclick="showJournalTab('vent')" id="jtabn-vent">Journal</button>
+    <button class="balance-sub-tab" onclick="showJournalTab('books')" id="jtabn-books">Books</button>
+  </div>
+
     <!-- BELIEF -->
-    <div id="jsub-belief" style="margin-top:1rem;">
+    <div id="jsub-belief" style="margin-top:1.5rem;">
       <div class="subtitle" style="margin-bottom:0.2rem;">Rewire your mind</div>
       <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
         <h2 style="margin:0;">Change your belief.</h2>
@@ -4090,10 +4110,8 @@ window.addEventListener('DOMContentLoaded', function() {
       <div id="belief-list"></div>
     </div>
 
-    <hr style="margin:1rem 0">
-
     <!-- WINS -->
-    <div id="jsub-wins">
+    <div id="jsub-wins" style="display:none;margin-top:1.5rem;">
       <div class="subtitle" style="margin-bottom:0.2rem;">Celebrate myself</div>
       <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
         <h2 style="margin:0;">My wins.</h2>
@@ -4111,10 +4129,8 @@ window.addEventListener('DOMContentLoaded', function() {
       <div id="wins-list"></div>
     </div>
 
-    <hr style="margin:1rem 0">
-
     <!-- JOURNAL -->
-    <div id="jsub-vent">
+    <div id="jsub-vent" style="display:none;margin-top:1.5rem;">
       <div id="vent-section" class="subtitle" style="margin-bottom:0.2rem;">Let it all out</div>
       <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
         <h2 style="margin:0;">Journal.</h2>
@@ -4131,10 +4147,8 @@ window.addEventListener('DOMContentLoaded', function() {
       <div id="vent-entries"></div>
     </div>
 
-    <hr style="margin:1rem 0">
-
     <!-- BOOKS -->
-    <div id="jsub-books">
+    <div id="jsub-books" style="display:none;margin-top:1.5rem;">
       <div class="subtitle" style="margin-bottom:0.2rem;">My reading list</div>
       <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
         <h2 style="margin:0;">Books I've read.</h2>
