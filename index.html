@@ -353,7 +353,7 @@
     .subtitle { margin-bottom: 0.6rem; font-size: 0.65rem; letter-spacing: 0.12em; }
     hr { margin: 2rem 0; }
     /* Space beneath every block element */
-    .section > *, .section div, .section p { margin-bottom: 0.6rem; }
+    .section > p { margin-bottom: 0.6rem; }
     .section input, .section textarea { margin-bottom: 1rem; }
     .section button + button { margin-top: 0.3rem; }
     /* Specific block spacing */
@@ -373,14 +373,13 @@
     .counter-label { font-size: 0.9rem; }
     .journal-content { font-size: 0.9rem; }
     .balance-sub-tab { font-size: 0.58rem; padding: 0.45rem 0.4rem 0.5rem; letter-spacing: 0.03em; flex: 0 0 50%; min-width: 0; white-space: nowrap; text-align: center; }
+    .journal-nav-tab { flex: 1 !important; }
+    #me-subtab-row { flex-wrap: wrap !important; }
     #me-subtab-row .balance-sub-tab { flex: 0 0 50%; border-bottom: 1px solid #e8e8e5; }
     #me-subtab-row .balance-sub-tab.active { border-bottom: 2px solid var(--black); }
     #asstab-understand, #asstab-asking, #asstab-giving, #asstab-practice { flex: 0 0 50%; border-bottom: 1px solid #e8e8e5; }
-    #jsub-belief .subtitle { font-size: 0.75rem !important; }
-    #jsub-belief h2 { font-size: 1.3rem !important; }
-    #jsub-belief > div[style*="italic"] { font-size: 0.95rem !important; }
-    #jsub-belief input { font-size: 0.95rem !important; }
-    #jsub-belief .belief-color-opt ~ span, #jsub-belief [style*="Color"], #jsub-belief [style*="color-opt"] ~ span { font-size: 0.75rem !important; }
+    [id^="asstab-"] { flex: 0 0 50% !important; }
+    .assertive-inner-tabs { flex-wrap: wrap !important; }
     .journal-tab { font-size: 0.62rem; padding: 0.45rem 0.6rem 0.5rem; letter-spacing: 0.04em; flex: 0 0 auto; }
     .wia-tab { font-size: 0.54rem; padding: 5px 4px; letter-spacing: 0.05em; flex: 1; }
     .home-card { padding: 0.9rem; }
@@ -431,8 +430,9 @@
     .op-btn { font-size: 0.68rem; padding: 0.35rem 0.6rem; }
   }
 
-  #memainsub-journal { width: 100%; overflow-x: hidden; box-sizing: border-box; padding-left: 20rem; padding-right: 20rem; }
-  @media (max-width: 480px) { #memainsub-journal { padding-left: 1.5rem; padding-right: 1.5rem; } }
+  #memainsub-journal { width: 100%; box-sizing: border-box; padding-left: 1.5rem; padding-right: 1.5rem; }
+  @media (max-width: 480px) { #memainsub-journal { padding-left: 0; padding-right: 0; } }
+  @media (max-width: 480px) { #journal-subtab-row { margin-top: 1rem !important; } }
   .q-check-card { background: white; border: 1px solid #e8e8e5; padding: 0.75rem; margin-bottom: 0.5rem; transition: opacity 0.2s; }
   .q-check-card.answered { opacity: 0.4; }
   .q-check-text { font-family: 'Lora', serif; font-style: italic; font-size: 0.78rem; color: var(--black); line-height: 1.5; margin-bottom: 0.6rem; }
@@ -3449,7 +3449,7 @@ window.addEventListener('DOMContentLoaded', function() {
   <!-- ME CONTENT -->
   <div id="memainsub-me">
   <!-- Me sub-tabs -->
-  <div id="me-subtab-row" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:wrap;">
+  <div id="me-subtab-row" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
     <button class="balance-sub-tab active" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
     <button class="balance-sub-tab" onclick="showMeTab('assertive')" id="metab-assertive">Assertive</button>
     <button class="balance-sub-tab" onclick="showMeTab('believe')" id="metab-believe">Believe</button>
@@ -3625,7 +3625,7 @@ window.addEventListener('DOMContentLoaded', function() {
   <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">Ask for what you need. Give what you can. Stay yourself.</div>
 
   <!-- Inner tabs -->
-  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;flex-wrap:wrap;">
+  <div class="assertive-inner-tabs" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;flex-wrap:nowrap;">
     <button class="balance-sub-tab active" onclick="assertiveInnerTab('understand')" id="asstab-understand">Understand</button>
     <button class="balance-sub-tab" onclick="assertiveInnerTab('asking')" id="asstab-asking">Asking</button>
     <button class="balance-sub-tab" onclick="assertiveInnerTab('giving')" id="asstab-giving">Giving</button>
@@ -4081,19 +4081,18 @@ window.addEventListener('DOMContentLoaded', function() {
   </div><!-- end memainsub-me -->
 
   <!-- JOURNAL content -->
-  <div id="memainsub-journal" style="display:none;margin-top:-6rem;padding-top:0;">
+  <div id="memainsub-journal" style="display:none;">
 
   <!-- Journal sub-tabs -->
-  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:0;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
-    <button class="balance-sub-tab active" onclick="showJournalTab('belief')" id="jtabn-belief">Belief</button>
-    <button class="balance-sub-tab" onclick="showJournalTab('wins')" id="jtabn-wins">Wins</button>
-    <button class="balance-sub-tab" onclick="showJournalTab('vent')" id="jtabn-vent">Journal</button>
-    <button class="balance-sub-tab" onclick="showJournalTab('books')" id="jtabn-books">Books</button>
+  <div id="journal-subtab-row" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:-1.5rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
+    <button class="balance-sub-tab journal-nav-tab" onclick="showJournalTab('wins')" id="jtabn-wins">Wins</button>
+    <button class="balance-sub-tab journal-nav-tab" onclick="showJournalTab('vent')" id="jtabn-vent">Journal</button>
+    <button class="balance-sub-tab journal-nav-tab" onclick="showJournalTab('books')" id="jtabn-books">Books</button>
   </div>
 
     <!-- BELIEF -->
-    <div id="jsub-belief" style="margin-top:0;">
-      <div class="subtitle" style="margin-bottom:0.2rem;margin-top:0;font-size:0.82rem;">
+    <div id="jsub-belief" style="margin-top:1.5rem;">
+      <div class="subtitle" style="margin-bottom:0.2rem;">
         <style>@media(max-width:480px){#jsub-belief{margin-top:2rem!important;}}</style>Rewire your mind</div>
       <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
         <h2 style="margin:0;font-size:1.6rem;">Change your belief.</h2>
@@ -4121,7 +4120,7 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <!-- WINS -->
-    <div id="jsub-wins" style="display:none;margin-top:3rem;">
+    <div id="jsub-wins" style="display:none;margin-top:1.5rem;">
       <div class="subtitle" style="margin-bottom:0.2rem;">Celebrate myself</div>
       <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
         <h2 style="margin:0;">My wins.</h2>
