@@ -519,6 +519,7 @@
   .wia-bar-wrap { width:70px; height:5px; background:#e8e8e5; overflow:hidden; flex-shrink:0; }
   .wia-bar { height:100%; background:var(--black); transition:width 0.4s; }
   .wia-practice-count { font-family:'Nunito',sans-serif; font-size:0.65rem; font-weight:300; color:var(--gray); flex-shrink:0; width:26px; text-align:right; }
+  #ass-day-view-popup::-webkit-scrollbar { display: none; }
 </style>
 </head>
 <body>
@@ -530,8 +531,8 @@
     <button class="nav-tab active" onclick="showSection('home')">Home</button>
     <button class="nav-tab" onclick="showSection('vision')">Vision</button>
     <button class="nav-tab" onclick="showSection('schedule')">Schedule</button>
-    <button class="nav-tab" onclick="showSection('me')">Me</button>
     <button class="nav-tab" onclick="showSection('journal')">Journal</button>
+    <button class="nav-tab" onclick="showSection('me')">Me</button>
   </div>
 </nav>
 
@@ -580,9 +581,6 @@
         <div onclick="goToScheduleItem('ps-schedule')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Schedule</div>
         <div onclick="goToScheduleItem('ps-todo')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">To Do</div>
         <div onclick="goToScheduleItem('ps-notes')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Notes</div>
-        <div onclick="goToScheduleItem('ps-tomorrow')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">For Tomorrow</div>
-        <div onclick="goToScheduleItem('ps-goal')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Today's Goal</div>
-        <div onclick="goToScheduleItem('ps-ibelieve')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">I Believe</div>
         <div onclick="goToScheduleItem('ps-mood')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Mood</div>
         <div id="home-sched-preview" style="margin-top:0.5rem;"></div>
       </div>
@@ -592,7 +590,6 @@
       <div class="home-card-title">Me</div>
       <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
         <div onclick="showSection('me');setTimeout(()=>showMeTab('whiam'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Who I Am</div>
-        <div onclick="showSection('me');setTimeout(()=>showMeTab('balance'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Balance</div>
         <div onclick="showSection('me');setTimeout(()=>showMeTab('rightforme'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Right For Me</div>
       </div>
     </div>
@@ -712,6 +709,14 @@
   </div>
 
 
+  <!-- Main tabs: Schedule | Habits -->
+  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.2rem;">
+    <button id="schtab-schedule" onclick="showSchedMainTab('schedule')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--black);border:none;background:none;padding:0.5rem 1rem 0.6rem;border-bottom:2px solid var(--black);font-weight:300;">Schedule</button>
+    <button id="schtab-habits" onclick="showSchedMainTab('habits')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 1rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">Habits</button>
+  </div>
+
+  <!-- SCHEDULE TAB -->
+  <div id="schmain-schedule">
   <!-- Planner grid -->
   <div id="planner-grid" style="display:flex;flex-direction:column;gap:0.6rem;">
 
@@ -769,29 +774,8 @@
     <!-- Notes -->
     <div id="ps-notes" style="border:1px solid #c8c8c5;padding:0.8rem;">
       <div class="planner-label">Notes</div>
-      <textarea id="sched-notes" rows="3" placeholder="Anything on your mind today…" oninput="schedAutoSave();schedUpdateTime('sched-notes-time')" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
-      <div id="sched-notes-time" style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);text-align:right;"></div>
-    </div>
-
-    <!-- For Tomorrow -->
-    <div id="ps-tomorrow" style="border:1px solid #c8c8c5;padding:0.8rem;">
-      <div class="planner-label">For Tomorrow</div>
-      <textarea id="sched-tomorrow" rows="3" placeholder="What do you want to prepare or remember for tomorrow?" oninput="schedAutoSave();schedUpdateTime('sched-tomorrow-time')" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
-      <div id="sched-tomorrow-time" style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);text-align:right;"></div>
-    </div>
-
-    <!-- Today's Goal -->
-    <div id="ps-goal" style="border:1px solid #c8c8c5;padding:0.8rem;">
-      <div class="planner-label">Today's Goal</div>
-      <textarea id="sched-goal" rows="2" placeholder="My one big goal for today is…" oninput="schedAutoSave();schedUpdateTime('sched-goal-time')" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
-      <div id="sched-goal-time" style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);text-align:right;"></div>
-    </div>
-
-    <!-- I Believe -->
-    <div id="ps-ibelieve" style="border:1px solid #c8c8c5;padding:0.8rem;">
-      <div class="planner-label">I Believe</div>
-      <textarea id="sched-ibelieve" rows="2" placeholder="Today I believe…" oninput="schedAutoSave();schedUpdateTime('sched-ibelieve-time')" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;resize:none;padding:0.4rem 0;margin-top:0.4rem;line-height:1.6;"></textarea>
-      <div id="sched-ibelieve-time" style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);text-align:right;"></div>
+      <input id="sched-notes" placeholder="Anything on your mind…" onkeydown="if(event.key==='Enter'){event.preventDefault();saveSchedNote();}" style="width:100%;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-top:0.4rem;">
+      <div id="sched-notes-list" style="margin-top:0.6rem;"></div>
     </div>
 
   </div>
@@ -799,6 +783,19 @@
   <div style="display:flex;justify-content:space-between;margin-top:1rem;flex-wrap:wrap;gap:0.5rem;">
     <button class="btn fill" onclick="savePlannerDay()">Save day</button>
     <button class="btn" onclick="showCopySchedule()">Copy to another day</button>
+  </div>
+  </div><!-- end schmain-schedule -->
+
+  <!-- HABITS TAB -->
+  <div id="schmain-habits" style="display:none;">
+    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+      <button class="journal-tab active" id="schtab-calisthenics" onclick="showSchedHabitsTab('calisthenics')" style="flex:1;text-align:center;">Calisthenics</button>
+      <button class="journal-tab" id="schtab-daily" onclick="showSchedHabitsTab('daily')" style="flex:1;text-align:center;">Daily</button>
+      <button class="journal-tab" id="schtab-bodycare" onclick="showSchedHabitsTab('bodycare')" style="flex:1;text-align:center;">Body Care</button>
+    </div>
+    <div id="schhabits-calisthenics"></div>
+    <div id="schhabits-daily" style="display:none;"></div>
+    <div id="schhabits-bodycare" style="display:none;"></div>
   </div>
 
   <!-- Copy schedule picker -->
@@ -1532,8 +1529,6 @@ let currentScheduleDate = new Date().toISOString().split('T')[0];
 
 function getDateKey() { return currentScheduleDate; }
 function getPlannerDay() {
-  // Always read fresh from localStorage so cloud sync is reflected immediately
-  try { var fresh = localStorage.getItem('all_planner_data'); if (fresh) allPlannerData = JSON.parse(fresh); } catch(e) {}
   return allPlannerData[getDateKey()] || {};
 }
 
@@ -1752,31 +1747,30 @@ function renderSchedule() {
     const defaultHtml = defaults.map((text, di) => {
       const done = defaultChecked[di] || false;
       return '<div style="display:flex;align-items:center;gap:0.3rem;padding:0.1rem 0;">' +
-        '<div onclick="toggleDefaultItem(\'' + key + '\',' + di + ')" style="width:12px;height:12px;border:1px solid ' + (done?'var(--black)':'#c8c8c5') + ';background:' + (done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">' +
+        '<div onclick="event.stopPropagation();toggleDefaultItem(\'' + key + '\',' + di + ')" style="width:12px;height:12px;border:1px solid ' + (done?'var(--black)':'#c8c8c5') + ';background:' + (done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">' +
           (done?'<svg width="7" height="5" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="white" stroke-width="1.5"/></svg>':'') +
         '</div>' +
         '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;' + (done?'color:var(--gray);text-decoration:line-through;':'') + '">' + text + '</span>' +
       '</div>';
     }).join('');
 
-    const itemsHtml = userItems.map((item, i) =>
+    const itemsHtml = userItems.map((item) =>
       '<div style="display:flex;align-items:center;gap:0.3rem;padding:0.1rem 0;">' +
-        '<div onclick="toggleScheduleItem(\'' + key + '\',' + i + ')" style="width:12px;height:12px;border:1px solid ' + (item.done?'var(--black)':'#c8c8c5') + ';background:' + (item.done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">' +
+        '<div onclick="event.stopPropagation();toggleScheduleItem(\'' + key + '\',' + item.id + ')" style="width:12px;height:12px;border:1px solid ' + (item.done?'var(--black)':'#c8c8c5') + ';background:' + (item.done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">' +
           (item.done?'<svg width="7" height="5" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="white" stroke-width="1.5"/></svg>':'') +
         '</div>' +
         '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;' + (item.done?'color:var(--gray);text-decoration:line-through;':'') + '">' + item.text + '</span>' +
-        '<button onclick="removeScheduleItem(\'' + key + '\',' + i + ')" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;flex-shrink:0;padding:0;">✕</button>' +
+        '<button onclick="event.stopPropagation();removeScheduleItem(\'' + key + '\',' + item.id + ')" style="font-size:0.7rem;color:#bbb;border:none;background:none;cursor:pointer;flex-shrink:0;padding:0 0.2rem;">✕</button>' +
       '</div>'
     ).join('');
 
     return '<div class="time-label" style="padding-top:0.35rem;">' + slot + '</div>' +
-      '<div style="padding:0.1rem 0 0.3rem;" onclick="var i=this.querySelector(\'.time-input\');if(i){i.style.display=\'block\';i.focus();}">' +
+      '<div style="padding:0.1rem 0 0.3rem;">' +
         defaultHtml +
         itemsHtml +
         '<input class="time-input" data-key="' + key + '" placeholder="" ' +
           'onkeydown="if(event.key===\'Enter\'){event.preventDefault();addScheduleItem(\'' + key + '\',this);}" ' +
-          'onblur="if(!this.value)this.style.display=\'none\';" ' +
-          'style="width:100%;margin-top:' + (defaults.length||userItems.length?'0.2rem':'0') + ';display:' + (defaults.length||userItems.length?'none':'block') + ';">' +
+          'style="width:100%;margin-top:0.2rem;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.1rem 0;">' +
       '</div>';
   }).join('');
 }
@@ -1820,11 +1814,8 @@ function renderHomeSchedulePreview() {
 
 var _scheduleSaveTimer = null;
 function saveScheduleFast() {
-  clearTimeout(_scheduleSaveTimer);
-  _scheduleSaveTimer = setTimeout(function() {
-    window._rawLS('all_planner_data', JSON.stringify(allPlannerData));
-    if (typeof window.syncToCloud === 'function') window.syncToCloud('all_planner_data', allPlannerData);
-  }, 300);
+  window._rawLS('all_planner_data', JSON.stringify(allPlannerData));
+  if (typeof window.syncToCloud === 'function') window.syncToCloud('all_planner_data', allPlannerData);
 }
 
 function addScheduleItem(key, input) {
@@ -1839,17 +1830,8 @@ function addScheduleItem(key, input) {
   items.push({id, text: val, done: false});
   allPlannerData[dayKey].schedule[key] = { items };
   input.value = '';
-  input.style.display = 'none';
-  // Insert new item before the input instantly
-  const row = input.parentElement;
-  const div = document.createElement('div');
-  div.style.cssText = 'display:flex;align-items:center;gap:0.3rem;padding:0.1rem 0;';
-  div.innerHTML =
-    '<div onclick="toggleScheduleItem(\'' + key + '\',' + (items.length-1) + ')" style="width:12px;height:12px;border:1px solid #c8c8c5;background:transparent;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;"></div>' +
-    '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;">' + val + '</span>' +
-    '<button onclick="removeScheduleItem(\'' + key + '\',' + (items.length-1) + ')" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;flex-shrink:0;padding:0;">✕</button>';
-  row.insertBefore(div, input);
   saveScheduleFast();
+  renderSchedule();
 }
 
 function toggleDefaultItem(key, di) {
@@ -1863,19 +1845,22 @@ function toggleDefaultItem(key, di) {
   renderSchedule();
 }
 
-function toggleScheduleItem(key, idx) {
+function toggleScheduleItem(key, id) {
   const dayKey = getDateKey();
-  if (!allPlannerData[dayKey]?.schedule?.[key]?.items) return;
-  const item = allPlannerData[dayKey].schedule[key].items[idx];
+  const items = allPlannerData[dayKey]?.schedule?.[key]?.items;
+  if (!items) return;
+  const item = items.find(x => x.id == id);
+  if (!item) return;
   item.done = !item.done;
   saveScheduleFast();
   renderSchedule();
 }
 
-function removeScheduleItem(key, idx) {
+function removeScheduleItem(key, id) {
   const dayKey = getDateKey();
-  if (!allPlannerData[dayKey]?.schedule?.[key]?.items) return;
-  allPlannerData[dayKey].schedule[key].items.splice(idx, 1);
+  const s = allPlannerData[dayKey]?.schedule?.[key];
+  if (!s?.items) return;
+  s.items = s.items.filter(x => x.id != id);
   saveScheduleFast();
   renderSchedule();
 }
@@ -1986,31 +1971,37 @@ function removeTodo(id) {
 
 // Notes
 let plannerNotes = [];
-function saveNote() {
-  const text = document.getElementById('planner-notes').value.trim();
+function saveSchedNote() {
+  const inp = document.getElementById('sched-notes');
+  if (!inp) return;
+  const text = inp.value.trim();
   if (!text) return;
   plannerNotes.unshift({
     id: Date.now(),
     text,
     time: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
   });
-  document.getElementById('planner-notes').value = '';
+  inp.value = '';
   renderNotes();
   savePlannerDay();
 }
+function saveNote() { saveSchedNote(); }
 function removeNote(id) {
   plannerNotes = plannerNotes.filter(n => n.id !== id);
   renderNotes();
   savePlannerDay();
 }
 function renderNotes() {
-  const el = document.getElementById('notes-list');
+  const el = document.getElementById('sched-notes-list');
   if (!el) return;
   if (!plannerNotes.length) { el.innerHTML = ''; return; }
   el.innerHTML = plannerNotes.map(n =>
-    '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid #f0f0ee;">' +
-      '<span style="font-family:\'Nunito\',sans-serif;font-size:0.88rem;font-weight:300;">' + n.text + '</span>' +
-      '<button onclick="removeNote(' + n.id + ')" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;flex-shrink:0;">✕</button>' +
+    '<div style="padding:0.4rem 0;border-bottom:1px solid #f0f0ee;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);">' + n.time + '</div>' +
+        '<button onclick="removeNote(' + n.id + ')" style="font-size:0.8rem;color:#bbb;border:none;background:none;cursor:pointer;padding:0;line-height:1;">×</button>' +
+      '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.5;margin-top:0.15rem;">' + n.text + '</div>' +
     '</div>'
   ).join('');
 }
@@ -2072,10 +2063,9 @@ function savePlannerDay() {
   d.bibleVerse = document.getElementById('bible-verse')?.value || '';
   d.bibleRef = document.getElementById('bible-ref')?.value || '';
   d.notesList = plannerNotes;
-  d.schedNotes = document.getElementById('sched-notes')?.value || '';
-  d.schedTomorrow = document.getElementById('sched-tomorrow')?.value || '';
-  d.schedGoal = document.getElementById('sched-goal')?.value || '';
-  d.schedBelieve = document.getElementById('sched-ibelieve')?.value || '';
+  d.schedTomorrow = '';
+  d.schedGoal = '';
+  d.schedBelieve = '';
 
   // todos & goals
   d.todos = plannerTodos;
@@ -2115,7 +2105,7 @@ function loadPlannerDay() {
   if (document.getElementById('bible-ref')) document.getElementById('bible-ref').value = d.bibleRef||'';
   plannerNotes = d.notesList || [];
   renderNotes();
-  if (document.getElementById('sched-notes')) document.getElementById('sched-notes').value = d.schedNotes||'';
+  if (document.getElementById('sched-notes')) document.getElementById('sched-notes').value = '';
   if (document.getElementById('sched-tomorrow')) document.getElementById('sched-tomorrow').value = d.schedTomorrow||'';
   if (document.getElementById('sched-goal')) document.getElementById('sched-goal').value = d.schedGoal||'';
   if (document.getElementById('sched-ibelieve')) document.getElementById('sched-ibelieve').value = d.schedBelieve||'';
@@ -2905,6 +2895,153 @@ function showMeMainTab(tab) {
   if (tab === 'me') showMeTab('whiam');
 }
 
+// ── ASSERTIVE DAILY CHECK-IN ──────────────────────────────────────────
+var ASS_PRACTICES = [
+  'I spoke up for what I needed',
+  'I said no without over-explaining',
+  'I used "I feel / I need" language',
+  'I set a boundary and held it',
+  'I asked for something instead of hinting',
+];
+var assCheckinChecked = {};
+
+function assCheckinRenderItems(fromStorage) {
+  var el = document.getElementById('ass-checkin-items'); if (!el) return;
+  var today = new Date().toISOString().split('T')[0];
+  if (fromStorage !== false) {
+    var logs = []; try { logs = JSON.parse(localStorage.getItem('ass_checkin_log') || '[]'); } catch(e) {}
+    var todayLog = logs.find(function(l){ return l.date === today; });
+    assCheckinChecked = todayLog ? (todayLog.checks || {}) : {};
+    if (document.getElementById('ass-checkin-note') && todayLog) document.getElementById('ass-checkin-note').value = todayLog.note || '';
+  }
+  var dateEl = document.getElementById('ass-checkin-date');
+  if (dateEl) { var d = new Date(); dateEl.textContent = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}); }
+  el.innerHTML = ASS_PRACTICES.map(function(p, i) {
+    var checked = !!assCheckinChecked[i];
+    return '<div onclick="assCheckinToggle('+i+')" id="ass-ci-'+i+'" style="display:flex;align-items:center;gap:0.8rem;padding:0.55rem 0.7rem;border:1px solid '+(checked?'var(--black)':'#e8e8e5')+';background:'+(checked?'var(--black)':'transparent')+';cursor:pointer;transition:all 0.2s;">'
+      + '<div style="width:14px;height:14px;border:1px solid '+(checked?'var(--white)':'#c8c8c5')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
+      + (checked ? '<div style="width:8px;height:8px;background:var(--white);"></div>' : '')
+      + '</div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:'+(checked?'var(--white)':'var(--black)')+';">'+p+'</div>'
+      + '</div>';
+  }).join('');
+}
+
+function assCheckinToggle(i) {
+  assCheckinChecked[i] = !assCheckinChecked[i];
+  assCheckinRenderItems(false);
+}
+
+function assCheckinSave() {
+  var note  = (document.getElementById('ass-checkin-note') || {}).value || '';
+  var today = new Date().toISOString().split('T')[0];
+  var logs  = []; try { logs = JSON.parse(localStorage.getItem('ass_checkin_log') || '[]'); } catch(e) {}
+  logs = logs.filter(function(l){ return l.date !== today; });
+  logs.unshift({ date: today, checks: assCheckinChecked, note: note });
+  try { localStorage.setItem('ass_checkin_log', JSON.stringify(logs)); } catch(e) {}
+  assCheckinRender();
+}
+
+function assCheckinRender() {
+  assCheckinRenderItems();
+  var el = document.getElementById('ass-checkin-log'); if (!el) return;
+  var logs = []; try { logs = JSON.parse(localStorage.getItem('ass_checkin_log') || '[]'); } catch(e) {}
+  var pastLogs = logs.filter(function(l){ return l.date !== new Date().toISOString().split('T')[0]; });
+  if (!pastLogs.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div style="font-family:Nunito,sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Previous days</div>'
+    + pastLogs.slice(0,10).map(function(l) {
+    var d = new Date(l.date+'T00:00:00');
+    var label = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    var checks = l.checks || {};
+    var count = Object.values(checks).filter(Boolean).length;
+    var total = ASS_PRACTICES.length;
+    return '<div style="padding:0.7rem 0;border-bottom:1px solid var(--light);">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem;">'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);">'+label+'</div>'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.65rem;color:var(--gray);">'+count+'/'+total+'</div>'
+      + '</div>'
+      + '<div style="display:flex;gap:0.3rem;flex-wrap:wrap;">'
+      + ASS_PRACTICES.map(function(p,i){ var on=!!checks[i]; return '<div style="font-family:Nunito,sans-serif;font-size:0.72rem;font-weight:300;padding:0.2rem 0.5rem;background:'+(on?'var(--black)':'#f0f0ee')+';color:'+(on?'var(--white)':'var(--gray)')+';">'+p+'</div>'; }).join('')
+      + '</div>'
+      + (l.note ? '<div style="font-family:Nunito,sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);margin-top:0.4rem;font-style:italic;">'+l.note+'</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+// ── BELIEVE DAILY CHECK-IN ────────────────────────────────────────────
+var BEL_PRACTICES = [
+  'I read my belief cards today',
+  'I caught and reframed a negative thought',
+  'I spoke to myself with kindness',
+  'I trusted myself to handle something',
+  'I did something even though I doubted myself',
+];
+var belCheckinChecked = {};
+
+function belCheckinRenderItems(fromStorage) {
+  var el = document.getElementById('bel-checkin-items'); if (!el) return;
+  var today = new Date().toISOString().split('T')[0];
+  if (fromStorage !== false) {
+    var logs = []; try { logs = JSON.parse(localStorage.getItem('bel_checkin_log') || '[]'); } catch(e) {}
+    var todayLog = logs.find(function(l){ return l.date === today; });
+    belCheckinChecked = todayLog ? (todayLog.checks || {}) : {};
+    if (document.getElementById('bel-checkin-note') && todayLog) document.getElementById('bel-checkin-note').value = todayLog.note || '';
+  }
+  var dateEl = document.getElementById('bel-checkin-date');
+  if (dateEl) { var d = new Date(); dateEl.textContent = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}); }
+  el.innerHTML = BEL_PRACTICES.map(function(p, i) {
+    var checked = !!belCheckinChecked[i];
+    return '<div onclick="belCheckinToggle('+i+')" id="bel-ci-'+i+'" style="display:flex;align-items:center;gap:0.8rem;padding:0.55rem 0.7rem;border:1px solid '+(checked?'var(--black)':'#e8e8e5')+';background:'+(checked?'var(--black)':'transparent')+';cursor:pointer;transition:all 0.2s;">'
+      + '<div style="width:14px;height:14px;border:1px solid '+(checked?'var(--white)':'#c8c8c5')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
+      + (checked ? '<div style="width:8px;height:8px;background:var(--white);"></div>' : '')
+      + '</div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:'+(checked?'var(--white)':'var(--black)')+';">'+p+'</div>'
+      + '</div>';
+  }).join('');
+}
+
+function belCheckinToggle(i) {
+  belCheckinChecked[i] = !belCheckinChecked[i];
+  belCheckinRenderItems(false);
+}
+
+function belCheckinSave() {
+  var note  = (document.getElementById('bel-checkin-note') || {}).value || '';
+  var today = new Date().toISOString().split('T')[0];
+  var logs  = []; try { logs = JSON.parse(localStorage.getItem('bel_checkin_log') || '[]'); } catch(e) {}
+  logs = logs.filter(function(l){ return l.date !== today; });
+  logs.unshift({ date: today, checks: belCheckinChecked, note: note });
+  try { localStorage.setItem('bel_checkin_log', JSON.stringify(logs)); } catch(e) {}
+  belCheckinRender();
+}
+
+function belCheckinRender() {
+  belCheckinRenderItems();
+  var el = document.getElementById('bel-checkin-log'); if (!el) return;
+  var logs = []; try { logs = JSON.parse(localStorage.getItem('bel_checkin_log') || '[]'); } catch(e) {}
+  var pastLogs = logs.filter(function(l){ return l.date !== new Date().toISOString().split('T')[0]; });
+  if (!pastLogs.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div style="font-family:Nunito,sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Previous days</div>'
+    + pastLogs.slice(0,10).map(function(l) {
+    var d = new Date(l.date+'T00:00:00');
+    var label = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    var checks = l.checks || {};
+    var count = Object.values(checks).filter(Boolean).length;
+    var total = BEL_PRACTICES.length;
+    return '<div style="padding:0.7rem 0;border-bottom:1px solid var(--light);">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem;">'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);">'+label+'</div>'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.65rem;color:var(--gray);">'+count+'/'+total+'</div>'
+      + '</div>'
+      + '<div style="display:flex;gap:0.3rem;flex-wrap:wrap;">'
+      + BEL_PRACTICES.map(function(p,i){ var on=!!checks[i]; return '<div style="font-family:Nunito,sans-serif;font-size:0.72rem;font-weight:300;padding:0.2rem 0.5rem;background:'+(on?'var(--black)':'#f0f0ee')+';color:'+(on?'var(--white)':'var(--gray)')+';">'+p+'</div>'; }).join('')
+      + '</div>'
+      + (l.note ? '<div style="font-family:Nunito,sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);margin-top:0.4rem;font-style:italic;">'+l.note+'</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+
 function showMeTab(tab) {
   ['whiam','rightforme','assertive','believe'].forEach(function(t) {
     var el = document.getElementById('mesub-' + t);
@@ -2912,7 +3049,8 @@ function showMeTab(tab) {
     if (el) el.style.display = t === tab ? 'block' : 'none';
     if (btn) btn.classList.toggle('active', t === tab);
   });
-  if (tab === 'whiam') { initWhiAm(); }
+  if (tab === 'assertive') { assCheckinRender(); }
+  if (tab === 'believe') { belCheckinRender(); }
   if (tab === 'balance') { showMeTab('whiam'); setTimeout(function(){ wiaTab('balance'); initBalanceDatePicker(); renderBalanceQuestions(); renderRelationshipQuestions(); }, 50); return; }
   if (tab === 'assertive') initAssertive();
   if (tab === 'believe') initBelieve();
@@ -3352,27 +3490,6 @@ function beliefRenderAll() {
   }
   el.innerHTML = beliefBeliefs.map(function(b) {
     return '<div style="margin-bottom:2rem;">'
-      // week nav + calendar btn
-      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;">'
-      + '<button onclick="beliefWeekShift(\'' + b.id + '\',-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8249;</button>'
-      + '<div style="display:flex;align-items:center;gap:0.5rem;">'
-      + '<div id="blbl-' + b.id + '" style="font-family:Lora,serif;font-style:italic;font-size:0.78rem;color:var(--black);"></div>'
-      + '<div style="position:relative;">'
-      + '<button id="bfcal-btn-' + b.id + '" onclick="beliefCalToggle(\'' + b.id + '\')" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></button>'
-      + '<div id="bfcal-popup-' + b.id + '" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.6rem;z-index:1000;width:min(70vw,220px);box-shadow:0 8px 40px rgba(0,0,0,0.18);">'
-      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">'
-      + '<button onclick="beliefCalShift(\'' + b.id + '\',-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>'
-      + '<div id="bfcal-label-' + b.id + '" style="font-family:Nunito,sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>'
-      + '<button onclick="beliefCalShift(\'' + b.id + '\',1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>'
-      + '</div>'
-      + '<div id="bfcal-grid-' + b.id + '"></div>'
-      + '</div></div></div>'
-      + '<button onclick="beliefWeekShift(\'' + b.id + '\',1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);padding:0.3rem;">&#8250;</button>'
-      + '</div>'
-      // day strip
-      + '<div id="bstrip-' + b.id + '" style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.3rem;margin-bottom:1.2rem;"></div>'
-      // streak
-      + '<div id="bstreak-' + b.id + '" style="font-family:Nunito,sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);text-align:center;margin-bottom:1rem;"></div>'
       // belief label row
       + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;margin-bottom:0.8rem;">'
       + '<div style="display:flex;gap:0.6rem;align-items:flex-start;flex:1;">'
@@ -3389,7 +3506,7 @@ function beliefRenderAll() {
       + '<hr style="border:none;border-top:1px solid var(--light);margin:0;">'
       + '</div>';
   }).join('');
-  beliefBeliefs.forEach(function(b){ beliefRenderStrip(b.id); });
+  beliefBeliefs.forEach(function(b){ });
 
   // close cal on outside click
   document.querySelectorAll('[id^="bfcal-popup-"]').forEach(function(popup) {
@@ -3451,12 +3568,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <div id="mesub-whiam">
     <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">You performed from every angle. Now you build from within.</div>
 
-    <div class="balance-sub-tabs">
-      <button class="balance-sub-tab active" onclick="wiaTab('identity')">Identity</button>
-      <button class="balance-sub-tab" onclick="wiaTab('perform')">Perform</button>
-      <button class="balance-sub-tab" onclick="wiaTab('daily')">Daily</button>
-      <button class="balance-sub-tab" onclick="wiaTab('balance');initBalanceDatePicker();renderBalanceQuestions();renderRelationshipQuestions();">Balance</button>
-    </div>
+
 
     <!-- IDENTITY -->
     <div class="wia-panel active" id="wia-identity">
@@ -3615,6 +3727,8 @@ window.addEventListener('DOMContentLoaded', function() {
     <div id="mesub-assertive" style="display:none;">
   <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">Ask for what you need. Give what you can. Stay yourself.</div>
 
+  <div id="ass-checkin-log" style="margin-bottom:1.5rem;"></div>
+
   <!-- Inner tabs -->
   <div class="assertive-inner-tabs" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;flex-wrap:nowrap;">
     <button class="balance-sub-tab active" onclick="assertiveInnerTab('understand')" id="asstab-understand">Understand</button>
@@ -3704,8 +3818,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <!-- Phrase builder -->
     <div style="border-top:1px solid var(--light);padding-top:1.2rem;">
       <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Save a phrase you want to use</div>
-      <textarea id="ass-asking-notes" placeholder="Write out something you need to say to someone… practice the words here first." style="width:100%;min-height:80px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;"></textarea>
-      <button onclick="assEntrySave('asking')" style="margin-top:0.6rem;background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1.2rem;cursor:pointer;">Save</button>
+      <textarea id="ass-asking-notes" placeholder="Write out something you need to say to someone… practice the words here first." oninput="assEntryAutoSave('asking')" style="width:100%;min-height:80px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;"></textarea>
     </div>
     <div id="ass-asking-entries" style="margin-top:1rem;"></div>
   </div>
@@ -3747,8 +3860,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <!-- Notes -->
     <div style="border-top:1px solid var(--light);padding-top:1.2rem;">
       <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Reflect what do I tend to over-give in?</div>
-      <textarea id="ass-giving-notes" placeholder="Where do you give too much? Time? Emotional energy? Saying yes when you mean no?…" style="width:100%;min-height:80px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;"></textarea>
-      <button onclick="assEntrySave('giving')" style="margin-top:0.6rem;background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1.2rem;cursor:pointer;">Save</button>
+      <textarea id="ass-giving-notes" placeholder="Where do you give too much? Time? Emotional energy? Saying yes when you mean no?…" oninput="assEntryAutoSave('giving')" style="width:100%;min-height:80px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;"></textarea>
     </div>
     <div id="ass-giving-entries" style="margin-top:1rem;"></div>
   </div>
@@ -3759,16 +3871,26 @@ window.addEventListener('DOMContentLoaded', function() {
 
     <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Assertiveness is a muscle. You build it with small, real moments not big confrontations.</div>
 
-    <!-- Check-in prompts -->
+    <!-- Inline mini calendar + day view side by side -->
     <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Daily check-in</div>
-    <div id="ass-checkin-list" style="margin-bottom:1.5rem;"></div>
+    <div style="display:flex;gap:1rem;align-items:flex-start;margin-bottom:1.5rem;">
+      <!-- Day view panel (left, 50%) -->
+      <div id="ass-day-view-popup" style="display:none;flex:0 0 calc(50% - 0.5rem);min-width:0;background:var(--white);border:1px solid #c8c8c5;padding:1rem;box-sizing:border-box;">
+        <div id="ass-day-view-content"></div>
+        <button onclick="document.getElementById('ass-day-view-popup').style.display='none';" style="width:100%;margin-top:0.8rem;border:none;background:none;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);cursor:pointer;padding:0.3rem;">close</button>
+      </div>
+      <!-- Calendar (right, 50%) -->
+      <div style="flex:0 0 50%;min-width:0;">
+        <div id="ass-habit-cal"></div>
+      </div>
+    </div>
+    <div id="ass-day-view-overlay" onclick="document.getElementById('ass-day-view-popup').style.display='none';this.style.display='none';" style="display:none;"></div>
 
     <!-- Situation log -->
     <div style="border-top:1px solid var(--light);padding-top:1.2rem;margin-bottom:1rem;">
       <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;">Log a moment</div>
       <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;">Did you speak up today? Stay silent when you wanted to say something? Give more than you had?</div>
-      <textarea id="ass-log-input" placeholder="What happened, how did you handle it, what would you do differently…" style="width:100%;min-height:70px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;"></textarea>
-      <button onclick="assLogAdd()" style="margin-top:0.6rem;background:var(--black);border:none;color:var(--white);font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:300;padding:0.4rem 1.2rem;cursor:pointer;">Save</button>
+      <textarea id="ass-log-input" placeholder="What happened, how did you handle it, what would you do differently…" oninput="assLogAutoSave()" style="width:100%;min-height:70px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;"></textarea>
     </div>
 
     <div id="ass-log-entries"></div>
@@ -3776,6 +3898,8 @@ window.addEventListener('DOMContentLoaded', function() {
 </div>
     <div id="mesub-believe" style="display:none;">
   <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">You don't have to earn the right to believe in yourself. But here's how to build it anyway.</div>
+
+  <div id="bel-checkin-log" style="margin-bottom:1.5rem;"></div>
 
   <!-- Inner tabs -->
   <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
@@ -3822,7 +3946,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
     <div style="border-top:1px solid var(--light);padding-top:1.2rem;">
       <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">What does believing in yourself mean to you?</div>
-      <textarea id="bel-foundation-notes" placeholder="Write freely… what would it feel like, look like, sound like if you truly believed in yourself?" style="width:100%;min-height:80px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;" onblur="belFoundationAutoSave()"></textarea>
+      <textarea id="bel-foundation-notes" placeholder="Write freely… what would it feel like, look like, sound like if you truly believed in yourself?" style="width:100%;min-height:80px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();belFoundationAutoSave();}"></textarea>
       <div id="bel-foundation-list" style="margin-top:1rem;"></div>
     </div>
   </div>
@@ -3844,7 +3968,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Add a piece of evidence</div>
     <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;">Big or small. What's something you did that proves you are more capable than you think?</div>
     <div style="margin-bottom:1.2rem;">
-      <textarea id="bel-evidence-input" placeholder="e.g. I started something I was scared of. I kept going after a hard week. I said no when I meant no…" style="width:100%;min-height:60px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;" onblur="belEvidenceAutoSave()"></textarea>
+      <textarea id="bel-evidence-input" placeholder="e.g. I started something I was scared of. I kept going after a hard week. I said no when I meant no…" style="width:100%;min-height:60px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();belEvidenceAutoSave();}"></textarea>
     </div>
     <div id="bel-evidence-list"></div>
   </div>
@@ -3904,7 +4028,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <div style="border-top:1px solid var(--light);padding-top:1.2rem;">
       <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;">Process a failure</div>
       <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;">Write out what happened, how you feel, what it taught you, and what you're choosing to do next.</div>
-      <textarea id="bel-failure-input" placeholder="What happened? How do I feel? What did it teach me? What am I choosing next?…" style="width:100%;min-height:80px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;" onblur="belFailureAutoSave()"></textarea>
+      <textarea id="bel-failure-input" placeholder="What happened? How do I feel? What did it teach me? What am I choosing next?…" style="width:100%;min-height:80px;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.6rem 0.8rem;resize:vertical;box-sizing:border-box;line-height:1.6;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();belFailureAutoSave();}"></textarea>
       <div id="bel-failure-list" style="margin-top:1rem;"></div>
     </div>
   </div>
@@ -4112,8 +4236,6 @@ window.addEventListener('DOMContentLoaded', function() {
       </div>
       <div id="belief-list" style="margin-top:2.5rem;"></div>
     </div>
-
-    <!-- WINS -->
     <div id="jsub-wins" style="display:none;margin-top:1.5rem;">
       <div class="subtitle">Celebrate myself</div>
       <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
@@ -4123,11 +4245,6 @@ window.addEventListener('DOMContentLoaded', function() {
         <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:0.8rem;">Add a win — big or small, they all count</div>
         <input id="win-input" placeholder="e.g. I got out of bed today" onkeydown="if(event.key==='Enter')addWin()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
         <button class="btn fill" onclick="addWin()">Add win</button>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-        <button onclick="changeWinsDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
-        <span id="wins-date-picker-label" onclick="document.getElementById('wins-date-picker').showPicker?document.getElementById('wins-date-picker').showPicker():document.getElementById('wins-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="wins-date-picker" onchange="loadWinsDay()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
-        <button onclick="changeWinsDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
       </div>
       <div id="wins-list"></div>
     </div>
@@ -4141,11 +4258,6 @@ window.addEventListener('DOMContentLoaded', function() {
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Your safe space. No judgment 🤍</div>
       <div style="margin-bottom:1rem;">
         <textarea id="vent-input" placeholder="Let it all out here..." rows="6" oninput="saveVentAuto()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.3rem 0;min-height:120px;"></textarea>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-        <button onclick="changeVentDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
-        <span id="vent-date-picker-label" onclick="document.getElementById('vent-date-picker').showPicker?document.getElementById('vent-date-picker').showPicker():document.getElementById('vent-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="vent-date-picker" onchange="loadVentDay()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
-        <button onclick="changeVentDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
       </div>
       <div id="vent-entries"></div>
     </div>
@@ -4161,11 +4273,6 @@ window.addEventListener('DOMContentLoaded', function() {
         <input id="book-input" placeholder="Book title..." onkeydown="if(event.key==='Enter')addBook()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
         <input id="book-author" placeholder="Author (optional)" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
         <button class="btn fill" onclick="addBook()">Add book</button>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-        <button onclick="changeBooksMonth(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
-        <span id="books-month-label" style="font-family:'Nunito',sans-serif;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
-        <button onclick="changeBooksMonth(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
       </div>
       <div id="books-list"></div>
     </div>
@@ -4615,10 +4722,10 @@ window.addEventListener('DOMContentLoaded', function() {
   <div id="jsub-action" style="display:none;">
 
     <!-- Inner sub-tabs -->
-    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-left:-1rem;margin-right:-1rem;padding-left:1rem;">
-      <button class="journal-tab active" id="jatab-action" onclick="showJesusActionTab('action')" style="flex:0 0 auto;white-space:nowrap;">Today's Action</button>
-      <button class="journal-tab" id="jatab-forgive" onclick="showJesusActionTab('forgive')" style="flex:0 0 auto;white-space:nowrap;">Forgiveness</button>
-      <button class="journal-tab" id="jatab-repent" onclick="showJesusActionTab('repent')" style="flex:0 0 auto;white-space:nowrap;">Repentance</button>
+    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
+      <button class="journal-tab active" id="jatab-action" onclick="showJesusActionTab('action')" style="flex:1;white-space:nowrap;text-align:center;">Today's Action</button>
+      <button class="journal-tab" id="jatab-forgive" onclick="showJesusActionTab('forgive')" style="flex:1;white-space:nowrap;text-align:center;">Forgiveness</button>
+      <button class="journal-tab" id="jatab-repent" onclick="showJesusActionTab('repent')" style="flex:1;white-space:nowrap;text-align:center;">Repentance</button>
     </div>
 
     <!-- Today's Action -->
@@ -5360,6 +5467,35 @@ function showHabitsTab(tab) {
   });
   if (tab === 'calisthenics') renderCalisthenics();
   if (tab === 'bodycare') { bodycareRender(); faceHabitsRender(); }
+  if (tab === 'daily') dailyLoad();
+}
+
+function showSchedMainTab(tab) {
+  document.getElementById('schmain-schedule').style.display = tab === 'schedule' ? 'block' : 'none';
+  document.getElementById('schmain-habits').style.display = tab === 'habits' ? 'block' : 'none';
+  document.getElementById('schtab-schedule').style.color = tab === 'schedule' ? 'var(--black)' : 'var(--gray)';
+  document.getElementById('schtab-schedule').style.borderBottom = tab === 'schedule' ? '2px solid var(--black)' : '2px solid transparent';
+  document.getElementById('schtab-habits').style.color = tab === 'habits' ? 'var(--black)' : 'var(--gray)';
+  document.getElementById('schtab-habits').style.borderBottom = tab === 'habits' ? '2px solid var(--black)' : '2px solid transparent';
+  if (tab === 'habits') showSchedHabitsTab('calisthenics');
+}
+
+function showSchedHabitsTab(tab) {
+  ['calisthenics','daily','bodycare'].forEach(function(t) {
+    var btn = document.getElementById('schtab-' + t);
+    if (btn) btn.classList.toggle('active', t === tab);
+    // Move the real hsub div into the right schhabits slot and show/hide
+    var hsub = document.getElementById('hsub-' + t);
+    var slot = document.getElementById('schhabits-' + t);
+    if (hsub && slot) {
+      if (!slot.contains(hsub)) slot.appendChild(hsub);
+      hsub.style.display = t === tab ? 'block' : 'none';
+    }
+    var el = document.getElementById('schhabits-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+  });
+  if (tab === 'calisthenics') renderCalisthenics();
+  if (tab === 'bodycare') { bodycareLoad(); bodycareRender(); faceHabitsRender(); }
   if (tab === 'daily') dailyLoad();
 }
 
@@ -6594,12 +6730,9 @@ function wiaUpdateCardAndSave() {
   if (nameEl) WIA.name = nameEl.value;
   var nameDisp = document.getElementById('wiaIdName');
   if (nameDisp) nameDisp.textContent = WIA.name || '';
-  console.log('[WIA] saving name:', WIA.name);
   wiaSave();
-  console.log('[WIA] localStorage after save:', localStorage.getItem('wia2')?.slice(0,100));
 }
 function wiaRenderValues() {
-  try { var _f=localStorage.getItem('wia2'); if(_f){ var _d=JSON.parse(_f); WIA.values=_d.values||[]; WIA.traits=_d.traits||WIA.traits; if(_d.name) WIA.name=_d.name; } } catch(e) {}
   var el = document.getElementById('wiaValuesList');
   if (!el) return;
   el.innerHTML = WIA.values.filter(function(v){return v&&v.trim();}).map(function(v, i) {
@@ -6614,7 +6747,6 @@ function wiaAddValue() {
 }
 function wiaDelValue(i) { WIA.values.splice(i,1); wiaSave(); wiaRenderValues(); }
 function wiaRenderTraits() {
-  try { var _f=localStorage.getItem('wia2'); if(_f){ var _d=JSON.parse(_f); WIA.traits=_d.traits||[]; if(_d.name) WIA.name=_d.name; } } catch(e) {}
   var el = document.getElementById('wiaTraitsList');
   if (!el) return;
   el.innerHTML = WIA.traits.filter(function(t){return t&&t.trim();}).map(function(t, i) {
@@ -6979,8 +7111,14 @@ function rfmRenderValues() {
     return;
   }
   list.innerHTML = rfmData.values.map(function(v, i) {
+    var dateLabel = v.date ? (function() {
+      var d = new Date(v.date);
+      return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);margin-top:0.2rem;">' +
+        d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + ' · ' +
+        d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + '</div>';
+    })() : '';
     return '<div class="rfm-value-row">' +
-      '<div class="rfm-value-name">' + v.name + '</div>' +
+      '<div class="rfm-value-name">' + v.name + dateLabel + '</div>' +
       '<button class="rfm-value-must' + (v.must ? ' on' : '') + '" onclick="rfmTogMust(' + i + ')">' + (v.must ? 'Must Have' : 'Nice to Have') + '</button>' +
       '<button class="rfm-value-del" onclick="rfmDelValue(' + i + ')">×</button>' +
     '</div>';
@@ -7032,7 +7170,7 @@ function rfmToggleGroup(id) {
 }
 
 function rfmAddSuggestion(name, must) {
-  rfmData.values.push({ name: name, must: must });
+  rfmData.values.push({ name: name, must: must, date: new Date().toISOString() });
   rfmSave(); rfmRenderValues(); rfmRenderSuggestions();
 }
 
@@ -7040,7 +7178,7 @@ function rfmAddValue() {
   var inp = document.getElementById('rfm-new-val');
   var name = inp.value.trim();
   if (!name) return;
-  rfmData.values.push({ name: name, must: false });
+  rfmData.values.push({ name: name, must: false, date: new Date().toISOString() });
   inp.value = '';
   rfmSave(); rfmRenderValues(); rfmRenderSuggestions();
 }
@@ -7063,22 +7201,18 @@ function rfmRenderPeople() {
     list.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.9rem;color:var(--gray);padding:1rem 0 1.5rem;">No one added yet. Add a name to start rating them.</div>';
     return;
   }
-  if (!rfmData.values.length) {
-    list.innerHTML = '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.9rem;color:var(--gray);padding:1rem 0 1.5rem;">Add your values first, then come back to rate people.</div>';
-    return;
-  }
   list.innerHTML = rfmData.people.map(function(p, i) {
     var result = rfmScore(p);
     return '<div class="rfm-person-card" style="position:relative;">' +
       '<div onclick="rfmOpenDetail(' + i + ')" style="cursor:pointer;">' +
         '<div class="rfm-person-name">' + p.name + '</div>' +
-        '<div class="rfm-score-bar"><div class="rfm-score-fill" style="width:' + result.pct + '%;"></div></div>' +
+        (rfmData.values.length ? '<div class="rfm-score-bar"><div class="rfm-score-fill" style="width:' + result.pct + '%;"></div></div>' +
         '<div style="display:flex;justify-content:space-between;margin-top:0.5rem;align-items:center;">' +
           '<div class="rfm-person-score">' + result.label + '</div>' +
           '<div style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;color:var(--gray);">' + result.pct + '% match · tap to rate</div>' +
-        '</div>' +
+        '</div>' : '<div style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;color:var(--gray);margin-top:0.3rem;">Add values to start rating</div>') +
       '</div>' +
-      '<button onclick="event.stopPropagation();rfmDeletePerson(' + i + ')" style="position:absolute;top:0.6rem;right:0.6rem;background:none;border:none;color:#ccc;font-size:1.1rem;cursor:pointer;line-height:1;padding:0 0.2rem;" title="Remove">×</button>' +
+      '<button onclick="event.stopPropagation();rfmDeletePerson(' + i + ')" style="position:absolute;top:0.6rem;right:0.6rem;background:none;border:none;color:#999;font-size:1.1rem;cursor:pointer;line-height:1;padding:0 0.2rem;" title="Remove">×</button>' +
     '</div>';
   }).join('');
 }
@@ -7208,6 +7342,7 @@ function rfmDeletePerson(i) {
   var detail = document.getElementById('rfm-person-detail');
   if (detail && detail.style.display !== 'none') rfmCloseDetail();
   rfmRenderPeople();
+  rfmRenderCompare();
 }
 
 function rfmCloseDetail() {
@@ -7377,10 +7512,11 @@ function rfmRenderCompare() {
     '</div>';
   }).join('');
 
-  // Summary note
   var top = scored[0];
   var note = '';
-  if (top && top.pct >= 70 && !top.mustFail) {
+  if (!rfmData.values.length) {
+    note = 'Add your values in the Values tab to see compatibility scores.';
+  } else if (top && top.pct >= 70 && !top.mustFail) {
     note = top.name + ' aligns most with what you\'ve said you need. Let that be data, not a decision: only you know the full picture.';
   } else if (top && top.mustFail) {
     note = 'Everyone here is missing at least one must-have. It may be worth asking if these are the right options, or if your standards need space to be honored.';
@@ -7535,30 +7671,115 @@ function assertiveInnerTab(tab) {
   if (tab === 'practice') assRenderLog();
 }
 
+function assHabitCalOpen() {
+  document.getElementById('ass-habit-cal-popup').style.display = 'block';
+  document.getElementById('ass-habit-cal-overlay').style.display = 'block';
+  assRenderHabitCal();
+}
+function assHabitCalClose() {
+  document.getElementById('ass-habit-cal-popup').style.display = 'none';
+  document.getElementById('ass-habit-cal-overlay').style.display = 'none';
+}
+
+var assHabitCalMonth = null;
+var assHabitCalYear  = null;
+
+function assRenderHabitCal() {
+  var el = document.getElementById('ass-habit-cal'); if (!el) return;
+  var now = new Date();
+  if (assHabitCalMonth === null) { assHabitCalMonth = now.getMonth(); assHabitCalYear = now.getFullYear(); }
+  var checkins = JSON.parse(localStorage.getItem('ass_checkin') || '{}');
+  var todayStr = now.toISOString().slice(0,10);
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var dayLabels  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var firstDay   = new Date(assHabitCalYear, assHabitCalMonth, 1).getDay();
+  var daysInMonth= new Date(assHabitCalYear, assHabitCalMonth+1, 0).getDate();
+  // a day is "done" if at least one question was checked
+  function dayDone(ds) { var d = checkins[ds] || {}; return Object.values(d).some(Boolean); }
+  var streak = 0;
+  var check = new Date(now);
+  while (true) {
+    var ds = check.toISOString().slice(0,10);
+    if (dayDone(ds)) { streak++; check.setDate(check.getDate()-1); } else break;
+  }
+  var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">'
+    + '<button onclick="assHabitCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.2rem;color:var(--gray);padding:0.2rem 0.5rem;">&#8249;</button>'
+    + '<div style="font-family:Nunito,sans-serif;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--black);">'+monthNames[assHabitCalMonth]+' '+assHabitCalYear+'</div>'
+    + '<button onclick="assHabitCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.2rem;color:var(--gray);padding:0.2rem 0.5rem;">&#8250;</button>'
+    + '</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;">';
+  dayLabels.forEach(function(l){ html += '<div style="font-family:Nunito,sans-serif;font-size:0.55rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray);text-align:center;">'+l+'</div>'; });
+  html += '</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;">';
+  for (var p = 0; p < firstDay; p++) html += '<div></div>';
+  for (var d = 1; d <= daysInMonth; d++) {
+    var dateStr = assHabitCalYear+'-'+String(assHabitCalMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    var done    = dayDone(dateStr);
+    var isToday = dateStr === todayStr;
+    var bg      = done ? 'var(--black)' : 'transparent';
+    var color   = done ? 'var(--white)' : 'var(--black)';
+    var border  = isToday && !done ? '1.5px solid var(--black)' : '1px solid '+(done?'var(--black)':'#e8e8e5');
+    html += '<div onclick="assHabitDayView(\'' + dateStr + '\')" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:'+bg+';border:'+border+';cursor:pointer;transition:all 0.15s;">'
+      + '<span style="font-family:Nunito,sans-serif;font-size:0.72rem;font-weight:300;color:'+color+';">'+d+'</span>'
+      + '</div>';
+  }
+  html += '</div>';
+  if (streak > 0) html += '<div style="font-family:Nunito,sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);margin-top:0.8rem;text-align:right;">'+streak+' day streak 🔥</div>';
+  el.innerHTML = html;
+}
+
+var ASS_QUESTIONS = [
+  'Did I say what I actually needed today?',
+  "Did I agree to something I didn't want to do?",
+  'Did I avoid a conversation I should have had?',
+  'Did I give from fullness or from fear?',
+  'Was there a moment I stood up for myself?'
+];
+var assCurrentDayView = null;
+
+function assHabitDayView(ds) {
+  assCurrentDayView = ds;
+  var checkins = JSON.parse(localStorage.getItem('ass_checkin') || '{}');
+  var dayData = checkins[ds] || {};
+  var d = new Date(ds+'T00:00:00');
+  var label = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  var isToday = ds === new Date().toISOString().slice(0,10);
+  var html = '<div style="font-family:Nunito,sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">'+label+(isToday?' · Today':'')+'</div>';
+  html += ASS_QUESTIONS.map(function(q,i){
+    var checked = !!dayData[i];
+    return '<div onclick="assHabitDayToggle('+i+')" style="display:flex;align-items:flex-start;gap:0.7rem;padding:0.5rem 0.4rem;border-bottom:1px solid var(--light);cursor:pointer;transition:background 0.1s;">'
+      + '<div style="width:15px;height:15px;flex-shrink:0;margin-top:1px;border:1px solid '+(checked?'var(--black)':'#c8c8c5')+';background:'+(checked?'var(--black)':'transparent')+';display:flex;align-items:center;justify-content:center;transition:all 0.15s;">'
+      + (checked?'<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5"><polyline points="2,6 5,9 10,3"/></svg>':'')
+      + '</div>'
+      + '<div style="font-family:Nunito,sans-serif;font-size:0.8rem;font-weight:300;color:'+(checked?'var(--black)':'var(--gray)')+';">'+q+'</div>'
+      + '</div>';
+  }).join('');
+  document.getElementById('ass-day-view-content').innerHTML = html;
+  document.getElementById('ass-day-view-popup').style.display = 'block';
+}
+
+function assHabitDayToggle(idx) {
+  var checkins = JSON.parse(localStorage.getItem('ass_checkin') || '{}');
+  if (!checkins[assCurrentDayView]) checkins[assCurrentDayView] = {};
+  checkins[assCurrentDayView][idx] = !checkins[assCurrentDayView][idx];
+  localStorage.setItem('ass_checkin', JSON.stringify(checkins));
+  assHabitDayView(assCurrentDayView);
+  assRenderHabitCal();
+  // sync the checkin list if viewing today
+  var today = new Date().toISOString().slice(0,10);
+  if (assCurrentDayView === today) { initAssertive(); assertiveInnerTab('practice'); }
+}
+
+function assHabitCalShift(dir) {
+  assHabitCalMonth += dir;
+  if (assHabitCalMonth > 11) { assHabitCalMonth = 0; assHabitCalYear++; }
+  if (assHabitCalMonth < 0)  { assHabitCalMonth = 11; assHabitCalYear--; }
+  assRenderHabitCal();
+}
+
 function initAssertive() {
   assertiveInnerTab('understand');
-  var checkins = [
-    'Did I say what I actually needed today?',
-    "Did I agree to something I didn't want to do?",
-    'Did I avoid a conversation I should have had?',
-    'Did I give from fullness or from fear?',
-    'Was there a moment I stood up for myself?'
-  ];
-  var today = new Date().toISOString().slice(0,10);
-  var saved = JSON.parse(localStorage.getItem('ass_checkin') || '{}');
-  var todayData = saved[today] || {};
-  var html = '';
-  checkins.forEach(function(q, i) {
-    var checked = todayData[i] === true;
-    html += '<div style="display:flex;align-items:flex-start;gap:0.8rem;padding:0.6rem 0;border-bottom:1px solid var(--light);">';
-    html += '<button onclick="assCheckinToggle(' + i + ')" id="ass-ci-' + i + '" style="flex-shrink:0;width:18px;height:18px;border:1px solid ' + (checked ? 'var(--black)' : '#c8c8c5') + ';background:' + (checked ? 'var(--black)' : 'transparent') + ';cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">';
-    if (checked) html += '<svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2"><polyline points="2,6 5,9 10,3"/></svg>';
-    html += '</button>';
-    html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.5;">' + q + '</div>';
-    html += '</div>';
-  });
-  var cl = document.getElementById('ass-checkin-list');
-  if (cl) cl.innerHTML = html;
+  assRenderHabitCal();
   assRestoreNotes();
   assRenderLog();
 }
@@ -7571,6 +7792,44 @@ function assCheckinToggle(idx) {
   localStorage.setItem('ass_checkin', JSON.stringify(saved));
   initAssertive();
   assertiveInnerTab('practice');
+  assRenderHabitCal();
+}
+
+var _assAutoSaveTimers = {};
+function assEntryAutoSave(key) {
+  clearTimeout(_assAutoSaveTimers[key]);
+  _assAutoSaveTimers[key] = setTimeout(function() {
+    var el = document.getElementById('ass-' + key + '-notes');
+    if (!el) return;
+    var text = el.value.trim();
+    if (!text) return;
+    var today = new Date().toISOString().split('T')[0];
+    var entries = JSON.parse(localStorage.getItem('ass_entries_' + key) || '[]');
+    // update today's entry if exists, else add new
+    var idx = entries.findIndex(function(e){ return e.date && e.date.startsWith(today); });
+    if (idx >= 0) { entries[idx].text = text; entries[idx].date = new Date().toISOString(); }
+    else { entries.unshift({ text: text, date: new Date().toISOString() }); }
+    localStorage.setItem('ass_entries_' + key, JSON.stringify(entries));
+    assRenderEntries(key);
+  }, 600);
+}
+
+var _assLogAutoSaveTimer = null;
+function assLogAutoSave() {
+  clearTimeout(_assLogAutoSaveTimer);
+  _assLogAutoSaveTimer = setTimeout(function() {
+    var input = document.getElementById('ass-log-input');
+    if (!input) return;
+    var text = input.value.trim();
+    if (!text) return;
+    var today = new Date().toISOString().split('T')[0];
+    var logs = JSON.parse(localStorage.getItem('ass_log') || '[]');
+    var idx = logs.findIndex(function(e){ return e.date && e.date.startsWith(today); });
+    if (idx >= 0) { logs[idx].text = text; logs[idx].date = new Date().toISOString(); }
+    else { logs.unshift({ text: text, date: new Date().toISOString() }); }
+    localStorage.setItem('ass_log', JSON.stringify(logs));
+    assRenderLog();
+  }, 600);
 }
 
 function assEntrySave(key) {
@@ -7613,6 +7872,23 @@ function assEntryDelete(key, idx) {
 function assRestoreNotes() {
   assRenderEntries('asking');
   assRenderEntries('giving');
+  // restore today's drafts
+  ['asking','giving'].forEach(function(key) {
+    var el = document.getElementById('ass-' + key + '-notes');
+    if (!el) return;
+    var today = new Date().toISOString().split('T')[0];
+    var entries = JSON.parse(localStorage.getItem('ass_entries_' + key) || '[]');
+    var todayEntry = entries.find(function(e){ return e.date && e.date.startsWith(today); });
+    if (todayEntry) el.value = todayEntry.text;
+  });
+  // restore today's practice log draft
+  var logEl = document.getElementById('ass-log-input');
+  if (logEl) {
+    var today = new Date().toISOString().split('T')[0];
+    var logs = JSON.parse(localStorage.getItem('ass_log') || '[]');
+    var todayLog = logs.find(function(e){ return e.date && e.date.startsWith(today); });
+    if (todayLog) logEl.value = todayLog.text;
+  }
 }
 
 function assLogAdd() {
