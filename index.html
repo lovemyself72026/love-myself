@@ -372,7 +372,7 @@
     .ritual-label { font-size: 0.95rem; }
     .counter-label { font-size: 0.9rem; }
     .journal-content { font-size: 0.9rem; }
-    .balance-sub-tab { font-size: 0.62rem; padding: 0.45rem 0.5rem 0.5rem; letter-spacing: 0.04em; flex: 0 0 auto; }
+    .balance-sub-tab { font-size: 0.62rem; padding: 0.45rem 0.6rem 0.5rem; letter-spacing: 0.04em; flex: 1; min-width: 0; }
     .journal-tab { font-size: 0.62rem; padding: 0.45rem 0.6rem 0.5rem; letter-spacing: 0.04em; flex: 0 0 auto; }
     .wia-tab { font-size: 0.54rem; padding: 5px 4px; letter-spacing: 0.05em; flex: 1; }
     .home-card { padding: 0.9rem; }
@@ -423,7 +423,8 @@
     .op-btn { font-size: 0.68rem; padding: 0.35rem 0.6rem; }
   }
 
-  /* Balance & Relationships */
+  #memainsub-journal { width: 100%; max-width: 100%; overflow-x: hidden; box-sizing: border-box; }
+  #memainsub-journal * { max-width: 100%; box-sizing: border-box; }
   .q-check-card { background: white; border: 1px solid #e8e8e5; padding: 0.75rem; margin-bottom: 0.5rem; transition: opacity 0.2s; }
   .q-check-card.answered { opacity: 0.4; }
   .q-check-text { font-family: 'Lora', serif; font-style: italic; font-size: 0.78rem; color: var(--black); line-height: 1.5; margin-bottom: 0.6rem; }
@@ -444,8 +445,9 @@
   .status-sub  { font-size: 0.72rem; color: var(--gray); font-weight: 300; line-height: 1.5; }
   .scale-wrap  { border: 1px solid #e8e8e5; padding: 1.2rem; margin-bottom: 1.5rem; }
   .scale-note  { font-size: 0.75rem; color: var(--gray); margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid #e8e8e5; font-style: italic; text-align: center; }
-  .balance-sub-tabs { display: flex; border-bottom: 1px solid #e8e8e5; margin-bottom: 1.5rem; }
-  .balance-sub-tab { font-family: 'Nunito', sans-serif; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; color: var(--gray); border: none; background: none; padding: 0.5rem 1rem 0.6rem; border-bottom: 2px solid transparent; transition: color 0.2s, border-color 0.2s; flex: 1; text-align: center; }
+  .balance-sub-tabs { display: flex; border-bottom: 1px solid #e8e8e5; margin-bottom: 1.5rem; overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; }
+  .balance-sub-tabs::-webkit-scrollbar { display: none; }
+  .balance-sub-tab { font-family: 'Nunito', sans-serif; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; color: var(--gray); border: none; background: none; padding: 0.5rem 1rem 0.6rem; border-bottom: 2px solid transparent; transition: color 0.2s, border-color 0.2s; flex: 1; text-align: center; white-space: nowrap; min-width: 0; }
   .balance-sub-tab.active { color: var(--black); border-bottom-color: var(--black); }
 
   .journal-tab { font-family:'Nunito',sans-serif; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; color:var(--gray); border:none; background:none; padding:0.5rem 1rem 0.6rem; border-bottom:2px solid transparent; transition:color 0.2s,border-color 0.2s; white-space:nowrap; flex:1; text-align:center; }
@@ -546,10 +548,10 @@
     <div class="home-card" style="cursor:default;">
       <div class="home-card-title">Journal</div>
       <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
-        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Belief</div>
-        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Journal</div>
-        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Books</div>
-        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Wins</div>
+        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');setTimeout(()=>{ var el=document.getElementById('jsub-belief'); if(el)el.scrollIntoView({behavior:'smooth'}); },100);},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Belief</div>
+        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');setTimeout(()=>{ var el=document.getElementById('vent-section'); if(el)el.scrollIntoView({behavior:'smooth'}); },100);},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Journal</div>
+        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');setTimeout(()=>{ var el=document.getElementById('jsub-books'); if(el)el.scrollIntoView({behavior:'smooth'}); },100);},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Books</div>
+        <div onclick="showSection('me');setTimeout(()=>{showMeMainTab('journal');setTimeout(()=>{ var el=document.getElementById('jsub-wins'); if(el)el.scrollIntoView({behavior:'smooth'}); },100);},150)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Wins</div>
       </div>
     </div>
 
@@ -1351,18 +1353,9 @@ function tgAddMain() {
 }
 
 function tgRemove(key, id) {
-  var el = document.getElementById('tg-all-list');
-  if (el) el.innerHTML = '<div style="font-size:0.7rem;color:red;padding:0.5rem;">Deleting key='+key+' id='+id+' (type:'+typeof id+')...<br>Items before: '+(tgData[key]||[]).map(function(e){return e.id+'('+typeof e.id+')'}).join(', ')+'</div>';
   if (tgData[key]) tgData[key] = tgData[key].filter(function(e) { return String(e.id) !== String(id); });
-  if (el) el.innerHTML += '<div style="font-size:0.7rem;color:green;padding:0.5rem;">Items after: '+(tgData[key]||[]).map(function(e){return e.id}).join(', ')+'</div>';
-  window._rawLS('that_girl_data', JSON.stringify(tgData));
-  fetch('https://lovemyselfapp-default-rtdb.firebaseio.com/my-love-myself-data/that_girl_data.json', {
-    method: 'PUT',
-    body: JSON.stringify(tgData),
-    headers: {'Content-Type': 'application/json'},
-    keepalive: true
-  }).then(function(r){ return r.json(); }).then(function(r){ console.log('Firebase response:', JSON.stringify(r)); }).catch(function(e){ console.log('Firebase error:', e); });
-  setTimeout(function(){ tgRenderAll(true); }, 100);
+  tgSaveToDB();
+  tgRenderAll(true);
 }
 
 var TG_LABELS = { morning:'Morning', looks:'Looks', health:'Health', mindset:'Mindset', time:'Time', relationships:'Relationships', feeling:'Feeling' };
@@ -2037,6 +2030,7 @@ function renderGoals() {
   if (!el) return;
   if (!el) return;
   el.innerHTML = plannerGoals.map(g => `
+    <div class="todo-item">
       <div class="todo-check${g.done?' done':''}" onclick="toggleGoal(${g.id})"></div>
       <div style="flex:1;"><div class="todo-text${g.done?' done':''}">${g.text}</div>${g.time?`<div style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);">${g.time}</div>`:''}</div>
       <button onclick="removeGoal(${g.id})" style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.08em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;flex-shrink:0;">✕</button>
@@ -3426,7 +3420,7 @@ window.addEventListener('DOMContentLoaded', function() {
 <div class="section" id="me" style="padding-top:0.5rem;">
 
   <!-- Top 2 tabs: Me | Journal -->
-  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;">
+  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
     <button class="balance-sub-tab active" onclick="showMeMainTab('me')" id="memaintab-me">Me</button>
     <button class="balance-sub-tab" onclick="showMeMainTab('journal')" id="memaintab-journal">Journal</button>
   </div>
@@ -3434,7 +3428,7 @@ window.addEventListener('DOMContentLoaded', function() {
   <!-- ME CONTENT -->
   <div id="memainsub-me">
   <!-- Me sub-tabs -->
-  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:2rem;">
+  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
     <button class="balance-sub-tab active" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
     <button class="balance-sub-tab" onclick="showMeTab('assertive')" id="metab-assertive">Assertive</button>
     <button class="balance-sub-tab" onclick="showMeTab('believe')" id="metab-believe">Believe</button>
