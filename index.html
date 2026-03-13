@@ -774,8 +774,53 @@
     <!-- Notes -->
     <div id="ps-notes" style="border:1px solid #c8c8c5;padding:0.8rem;">
       <div class="planner-label">Notes</div>
-      <input id="sched-notes" placeholder="Anything on your mind…" onkeydown="if(event.key==='Enter'){event.preventDefault();saveSchedNote();}" style="width:100%;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-top:0.4rem;">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;">
+        <input id="sched-notes" placeholder="Anything on your mind…" onkeydown="if(event.key==='Enter'){event.preventDefault();saveSchedNote();}" style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+        <!-- Image -->
+        <label style="cursor:pointer;color:var(--gray);flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;" title="Add image">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <input type="file" accept="image/*" onchange="saveSchedImage(this,'photo')" style="display:none;">
+        </label>
+        <!-- Style of the day -->
+        <label style="cursor:pointer;flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;filter:grayscale(1);opacity:0.5;font-size:0.9rem;line-height:1;" title="Style of the day">
+          👠
+          <input type="file" accept="image/*" onchange="saveSchedImage(this,'style')" style="display:none;">
+        </label>
+        <!-- Mindset -->
+        <button onclick="showMindsetModal()" style="border:none;background:none;cursor:pointer;color:var(--gray);flex-shrink:0;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;" title="Mindset">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a7 7 0 0 1 7 7c0 3-1.5 5-3.5 6.5V18h-7v-2.5C6.5 14 5 12 5 9a7 7 0 0 1 7-7z"/><line x1="9" y1="21" x2="15" y2="21"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+        </button>
+        <!-- Song -->
+        <button onclick="showSongModal()" style="border:none;background:none;cursor:pointer;color:var(--gray);flex-shrink:0;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;" title="Add song">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </button>
+      </div>
       <div id="sched-notes-list" style="margin-top:0.6rem;"></div>
+    </div>
+
+    <!-- Mindset modal -->
+    <div id="mindset-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:200;align-items:center;justify-content:center;">
+      <div style="background:var(--white);padding:1.5rem;width:88%;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,0.12);">
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:1rem;margin-bottom:0.3rem;">Mindset of the day</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:1rem;">How are you showing up today?</div>
+        <textarea id="mindset-inp" placeholder="e.g. I am calm, focused, and ready…" rows="4" style="width:100%;border:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.5rem;resize:none;line-height:1.6;box-sizing:border-box;"></textarea>
+        <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1rem;">
+          <button onclick="document.getElementById('mindset-modal').style.display='none'" style="border:1px solid #c8c8c5;background:none;font-family:'Nunito',sans-serif;font-size:0.78rem;padding:0.4rem 1rem;cursor:pointer;">Cancel</button>
+          <button onclick="saveMindset()" style="border:none;background:var(--black);color:var(--white);font-family:'Nunito',sans-serif;font-size:0.78rem;padding:0.4rem 1rem;cursor:pointer;">Save</button>
+        </div>
+      </div>
+    </div>
+    <div id="song-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:200;align-items:center;justify-content:center;">
+      <div style="background:var(--white);padding:1.5rem;width:88%;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,0.12);">
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:1rem;margin-bottom:1rem;">Song of the day</div>
+        <input id="song-title-inp" placeholder="Song title" style="width:100%;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
+        <input id="song-artist-inp" placeholder="Artist" style="width:100%;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
+        <input id="song-link-inp" placeholder="Link (optional)" style="width:100%;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.3rem 0;margin-bottom:1.2rem;">
+        <div style="display:flex;gap:0.5rem;justify-content:flex-end;">
+          <button onclick="document.getElementById('song-modal').style.display='none'" style="border:1px solid #c8c8c5;background:none;font-family:'Nunito',sans-serif;font-size:0.78rem;padding:0.4rem 1rem;cursor:pointer;">Cancel</button>
+          <button onclick="saveSong()" style="border:none;background:var(--black);color:var(--white);font-family:'Nunito',sans-serif;font-size:0.78rem;padding:0.4rem 1rem;cursor:pointer;">Save</button>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -1971,6 +2016,60 @@ function removeTodo(id) {
 
 // Notes
 let plannerNotes = [];
+function showMindsetModal() {
+  document.getElementById('mindset-inp').value = '';
+  document.getElementById('mindset-modal').style.display = 'flex';
+}
+function saveMindset() {
+  const text = document.getElementById('mindset-inp').value.trim();
+  if (!text) return;
+  plannerNotes.unshift({
+    id: Date.now(), type: 'mindset', text,
+    time: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+  });
+  document.getElementById('mindset-modal').style.display = 'none';
+  renderNotes(); savePlannerDay();
+}
+
+function showSongModal() {
+  document.getElementById('song-title-inp').value = '';
+  document.getElementById('song-artist-inp').value = '';
+  document.getElementById('song-link-inp').value = '';
+  const m = document.getElementById('song-modal');
+  m.style.display = 'flex';
+}
+function saveSong() {
+  const title = document.getElementById('song-title-inp').value.trim();
+  const artist = document.getElementById('song-artist-inp').value.trim();
+  const link = document.getElementById('song-link-inp').value.trim();
+  if (!title) return;
+  plannerNotes.unshift({
+    id: Date.now(), type: 'song', title, artist, link,
+    time: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+  });
+  document.getElementById('song-modal').style.display = 'none';
+  renderNotes(); savePlannerDay();
+}
+
+function saveSchedImage(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    plannerNotes.unshift({
+      id: Date.now(),
+      type: type || 'image',
+      src: e.target.result,
+      name: file.name,
+      time: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+    });
+    input.value = '';
+    renderNotes();
+    savePlannerDay();
+  };
+  reader.readAsDataURL(file);
+}
+
 function saveSchedNote() {
   const inp = document.getElementById('sched-notes');
   if (!inp) return;
@@ -1995,15 +2094,43 @@ function renderNotes() {
   const el = document.getElementById('sched-notes-list');
   if (!el) return;
   if (!plannerNotes.length) { el.innerHTML = ''; return; }
-  el.innerHTML = plannerNotes.map(n =>
-    '<div style="padding:0.4rem 0;border-bottom:1px solid #f0f0ee;">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;">' +
-        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);">' + n.time + '</div>' +
-        '<button onclick="removeNote(' + n.id + ')" style="font-size:0.8rem;color:#bbb;border:none;background:none;cursor:pointer;padding:0;line-height:1;">×</button>' +
-      '</div>' +
-      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.5;margin-top:0.15rem;">' + n.text + '</div>' +
-    '</div>'
-  ).join('');
+  function linkify(text) {
+    return text.replace(/(https?:\/\/[^\s]+)/g, function(url) {
+      var label = url;
+      try { var u = new URL(url); label = u.hostname.replace('www.','') + (u.pathname.length > 1 ? '/\u2026' : ''); } catch(e) {}
+      return '<a href="' + url + '" target="_blank" rel="noopener" style="color:var(--black);text-decoration:underline;word-break:break-all;">' + label + '</a>';
+    });
+  }
+  el.innerHTML = plannerNotes.map(n => {
+    var header = '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);">' + n.time + '</div>' +
+      '<button onclick="removeNote(' + n.id + ')" style="font-size:0.8rem;color:#bbb;border:none;background:none;cursor:pointer;padding:0;line-height:1;">\xd7</button>' +
+    '</div>';
+    var body = '';
+    if (n.type === 'image') {
+      body = '<img src="' + n.src + '" style="width:100%;max-height:220px;object-fit:cover;margin-top:0.4rem;border-radius:2px;" />';
+    } else if (n.type === 'style') {
+      body = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-top:0.3rem;margin-bottom:0.3rem;">Style of the day</div>' +
+             '<img src="' + n.src + '" style="width:100%;max-height:280px;object-fit:cover;border-radius:2px;" />';
+    } else if (n.type === 'song') {
+      var linkHtml = n.link ? ' <a href="' + n.link + '" target="_blank" rel="noopener" style="color:var(--gray);font-size:0.72rem;text-decoration:underline;">play</a>' : '';
+      body = '<div style="display:flex;align-items:center;gap:0.6rem;margin-top:0.4rem;padding:0.5rem 0.6rem;border:1px solid #e8e8e5;">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;color:var(--gray);"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:400;color:var(--black);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + n.title + linkHtml + '</div>' +
+          (n.artist ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);">' + n.artist + '</div>' : '') +
+        '</div>' +
+      '</div>';
+    } else if (n.type === 'mindset') {
+      body = '<div style="margin-top:0.4rem;padding:0.6rem 0.8rem;border-left:2px solid var(--black);background:#fafaf8;">' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.3rem;">Mindset</div>' +
+        '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.88rem;color:var(--black);line-height:1.6;">' + n.text + '</div>' +
+      '</div>';
+    } else {
+      body = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.5;margin-top:0.15rem;">' + linkify(n.text) + '</div>';
+    }
+    return '<div style="padding:0.4rem 0;border-bottom:1px solid #f0f0ee;">' + header + body + '</div>';
+  }).join('');
 }
 
 // Goals
