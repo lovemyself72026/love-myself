@@ -423,7 +423,8 @@
     .op-btn { font-size: 0.68rem; padding: 0.35rem 0.6rem; }
   }
 
-  #memainsub-journal { width: 100%; overflow-x: hidden; box-sizing: border-box; }
+  #memainsub-journal { width: 100%; overflow-x: hidden; box-sizing: border-box; padding-left: 20rem; padding-right: 20rem; }
+  @media (max-width: 480px) { #memainsub-journal { padding-left: 0; padding-right: 0; } }
   .q-check-card { background: white; border: 1px solid #e8e8e5; padding: 0.75rem; margin-bottom: 0.5rem; transition: opacity 0.2s; }
   .q-check-card.answered { opacity: 0.4; }
   .q-check-text { font-family: 'Lora', serif; font-style: italic; font-size: 0.78rem; color: var(--black); line-height: 1.5; margin-bottom: 0.6rem; }
@@ -4089,7 +4090,7 @@ window.addEventListener('DOMContentLoaded', function() {
         <h2 style="margin:0;">Change your belief.</h2>
       </div>
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Simple. Daily. It works over time.</div>
-      <div style="border:1px solid #c8c8c5;padding:1.5rem;margin-bottom:1.5rem;">
+      <div style="margin-bottom:1.5rem;">
         <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Now I choose to believe</div>
         <input type="text" id="belief-new" placeholder="e.g. I am enough, always." onkeydown="if(event.key==='Enter')document.getElementById('belief-old').focus()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:0.9rem;">
         <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">I used to believe</div>
@@ -4116,10 +4117,10 @@ window.addEventListener('DOMContentLoaded', function() {
       <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
         <h2 style="margin:0;">My wins.</h2>
       </div>
-      <div style="border:1px solid #c8c8c5;padding:1.5rem;margin-bottom:1rem;">
-        <div style="font-family:'Lora',serif;font-style:italic;font-size:1.05rem;margin-bottom:1rem;">Add a win big or small, they all count</div>
-        <input id="win-input" placeholder="e.g. I got out of bed today" onkeydown="if(event.key==='Enter')addWin()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1.2rem;">
-        <button class="btn fill" onclick="addWin()">Add win</button>
+      <div style="margin-bottom:1rem;">
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--gray);margin-bottom:0.8rem;">Add a win — big or small, they all count</div>
+        <input id="win-input" placeholder="e.g. I got out of bed today" onkeydown="if(event.key==='Enter')addWin()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
+        <button class="btn fill" onclick="addWin()" style="font-size:0.72rem;padding:0.5rem 1.2rem;">Add win</button>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <button onclick="changeWinsDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
@@ -4136,8 +4137,8 @@ window.addEventListener('DOMContentLoaded', function() {
         <h2 style="margin:0;">Journal.</h2>
       </div>
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Your safe space. No judgment 🤍</div>
-      <div style="border:1px solid #c8c8c5;padding:1.5rem;margin-bottom:1rem;">
-        <textarea id="vent-input" placeholder="Let it all out here..." rows="8" oninput="saveVentAuto()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.5rem 0;margin-bottom:0;min-height:150px;"></textarea>
+      <div style="margin-bottom:1rem;">
+        <textarea id="vent-input" placeholder="Let it all out here..." rows="6" oninput="saveVentAuto()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.3rem 0;min-height:120px;"></textarea>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <button onclick="changeVentDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
@@ -4155,9 +4156,9 @@ window.addEventListener('DOMContentLoaded', function() {
         <span id="books-count" style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);"></span>
       </div>
       <div style="border:1px solid #c8c8c5;padding:1.5rem;margin-bottom:1rem;">
-        <input id="book-input" placeholder="Book title..." onkeydown="if(event.key==='Enter')addBook()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
-        <input id="book-author" placeholder="Author (optional)" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:1rem;">
-        <button class="btn fill" onclick="addBook()">Add book</button>
+        <input id="book-input" placeholder="Book title..." onkeydown="if(event.key==='Enter')addBook()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
+        <input id="book-author" placeholder="Author (optional)" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.8rem;">
+        <button class="btn fill" onclick="addBook()" style="font-size:0.72rem;padding:0.5rem 1.2rem;">Add book</button>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <button onclick="changeBooksMonth(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
