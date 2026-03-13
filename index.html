@@ -6478,7 +6478,8 @@ function renderCaliTracker() {
     var bg = done ? 'var(--black)' : (isToday ? '#e8e8e5' : 'transparent');
     var col = done ? 'white' : 'var(--black)';
     var outline = isToday && !done ? 'outline:1px solid #c8c8c5;' : '';
-    html += '<div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;background:'+bg+';color:'+col+';'+outline+'">'+
+    var clickAttr = done ? 'onclick="caliShowDayLog(\''+dateStr+'\')" style="cursor:pointer;' : 'style="';
+    html += '<div '+clickAttr+'aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;background:'+bg+';color:'+col+';'+outline+'">'+
       (done ? '🤍' : day) +
     '</div>';
   }
@@ -6648,6 +6649,72 @@ function caliCloseCal(e) {
     document.removeEventListener('click', caliCloseCal, true);
     _caliCalKey = null;
   }
+}
+
+function caliShowDayLog(dateStr) {
+  // Find which week/day this date belongs to
+  var match = null;
+  Object.keys(caliLog).forEach(function(k) {
+    if (k.startsWith('date_w') && caliLog[k] === dateStr) {
+      // key format: date_w1_d2 → week 1, day index 2
+      var parts = k.replace('date_','').split('_');
+      var week = parseInt(parts[0].replace('w',''));
+      var dayIdx = parseInt(parts[1].replace('d',''));
+      match = { week: week, dayIdx: dayIdx };
+    }
+  });
+
+  var existing = document.getElementById('cali-daylog-popup');
+  if (existing) existing.remove();
+
+  var parts = dateStr.split('-');
+  var d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  var dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var label = dayNames[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+
+  var popup = document.createElement('div');
+  popup.id = 'cali-daylog-popup';
+  popup.style.cssText = 'position:fixed;z-index:9999;background:white;border:1px solid #c8c8c5;padding:1.2rem;min-width:260px;max-width:320px;box-shadow:0 4px 20px rgba(0,0,0,0.12);top:50%;left:50%;transform:translate(-50%,-50%);';
+
+  var content = '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1rem;">' +
+    '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.9rem;">' + label + '</div>' +
+    '<span onclick="document.getElementById(\'cali-daylog-popup\').remove()" style="cursor:pointer;font-size:1rem;color:#ccc;margin-left:0.8rem;">×</span>' +
+  '</div>';
+
+  if (!match) {
+    content += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);">No exercise details found for this date.</div>';
+  } else {
+    var dayData = caliProgram[match.week][match.dayIdx];
+    content += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Week ' + match.week + ' · ' + dayData.day + ' · ' + dayData.focus + '</div>';
+
+    if (dayData.exercises.length === 0) {
+      content += '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.82rem;color:var(--gray);">Rest day 🤍</div>';
+    } else {
+      dayData.exercises.forEach(function(ex, ei) {
+        var key = caliDoneKey(match.week, match.dayIdx, ei);
+        var done = !!caliLog[key];
+        content += '<div style="display:flex;gap:0.7rem;align-items:flex-start;padding:0.5rem 0;border-bottom:1px solid var(--light);">' +
+          '<div style="width:13px;height:13px;border:1px solid '+(done?'var(--black)':'#c8c8c5')+';background:'+(done?'var(--black)':'transparent')+';flex-shrink:0;margin-top:2px;"></div>' +
+          '<div>' +
+            '<div style="font-family:\'Nunito\',sans-serif;font-size:0.8rem;font-weight:300;color:'+(done?'var(--black)':'var(--gray)')+';'+(done?'':'opacity:0.5;')+'">'+ex.name+'</div>' +
+            '<div style="font-family:\'Nunito\',sans-serif;font-size:0.68rem;color:var(--gray);">'+ex.reps+'</div>' +
+          '</div>' +
+        '</div>';
+      });
+    }
+  }
+
+  popup.innerHTML = content;
+  document.body.appendChild(popup);
+
+  // Close on outside click
+  setTimeout(function() {
+    document.addEventListener('click', function _close(e) {
+      var p = document.getElementById('cali-daylog-popup');
+      if (p && !p.contains(e.target)) { p.remove(); document.removeEventListener('click', _close, true); }
+    }, true);
+  }, 50);
 }
 
 function caliClearDate(key) {
