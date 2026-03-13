@@ -826,8 +826,8 @@
   </div>
 
   <div style="display:flex;justify-content:space-between;margin-top:1rem;flex-wrap:wrap;gap:0.5rem;">
-    <button class="btn fill" onclick="savePlannerDay()">Save day</button>
-    <button class="btn" onclick="showCopySchedule()">Copy to another day</button>
+    <button class="btn fill" onclick="savePlannerDay()" style="font-size:0.7rem;padding:0.3rem 0.8rem;">Save day</button>
+    <button class="btn" onclick="showCopySchedule()" style="font-size:0.7rem;padding:0.3rem 0.8rem;">Copy to another day</button>
   </div>
   </div><!-- end schmain-schedule -->
 
@@ -837,10 +837,13 @@
       <button class="journal-tab active" id="schtab-calisthenics" onclick="showSchedHabitsTab('calisthenics')" style="flex:1;text-align:center;">Calisthenics</button>
       <button class="journal-tab" id="schtab-daily" onclick="showSchedHabitsTab('daily')" style="flex:1;text-align:center;">Daily</button>
       <button class="journal-tab" id="schtab-bodycare" onclick="showSchedHabitsTab('bodycare')" style="flex:1;text-align:center;">Body Care</button>
+      <button class="journal-tab" id="schtab-rest" onclick="showSchedHabitsTab('rest')" style="flex:1;text-align:center;">Rest</button>
     </div>
     <div id="schhabits-calisthenics"></div>
     <div id="schhabits-daily" style="display:none;"></div>
     <div id="schhabits-bodycare" style="display:none;"></div>
+    <div id="schhabits-rest" style="display:none;"></div>
+    <div id="schhabits-rest" style="display:none;"></div>
   </div>
 
   <!-- Copy schedule picker -->
@@ -949,7 +952,8 @@ var _balanceInited = false;
 function showSection(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  var sec = document.getElementById(id);
+  if (sec) sec.classList.add('active');
   const map=['jesus','home','vision','schedule','me','journal'];
   const navTab = document.querySelectorAll('.nav-tab')[map.indexOf(id)];
   if (navTab) navTab.classList.add('active');
@@ -1465,8 +1469,10 @@ function changeWhoiDate(dir) {
 function setWhoiType(type) {
   whoiType = type;
   ['word','thought','image'].forEach(t => {
-    document.getElementById(`whoi-input-${t}`).style.display = t === type ? (t === 'image' ? 'block' : 'flex') : 'none';
-    document.getElementById(`whoi-btn-${t}`).classList.toggle('active', t === type);
+    var inp = document.getElementById(`whoi-input-${t}`);
+    var btn = document.getElementById(`whoi-btn-${t}`);
+    if (inp) inp.style.display = t === type ? (t === 'image' ? 'block' : 'flex') : 'none';
+    if (btn) btn.classList.toggle('active', t === type);
   });
 }
 
@@ -4414,6 +4420,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <button class="journal-tab active" id="htab-calisthenics" onclick="showHabitsTab('calisthenics')">Calisthenics</button>
     <button class="journal-tab" id="htab-daily" onclick="showHabitsTab('daily')">Daily</button>
     <button class="journal-tab" id="htab-bodycare" onclick="showHabitsTab('bodycare')">Body Care</button>
+    <button class="journal-tab" id="htab-rest" onclick="showHabitsTab('rest')">Rest</button>
   </div>
 
   <!-- CALISTHENICS FOR BEGINNER -->
@@ -4764,8 +4771,35 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 
+  <!-- REST -->
+  <div id="hsub-rest" style="display:none;">
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.85rem;color:var(--gray);margin-bottom:1.2rem;">Rest well. You deserve it. 🤍</div>
+
+    <!-- Wind-Down App -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.8rem;">
+      <div class="planner-label">Wind down · 5pm to 9pm</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-top:0.3rem;margin-bottom:1rem;">You made it through another day. That alone is something. 🤍</div>
+
+      <div id="winddown-steps" style="display:flex;flex-direction:column;gap:0.5rem;"></div>
+
+      <div style="margin-top:1rem;padding:0.6rem 0.8rem;background:#fafaf8;">
+        <div id="winddown-message" style="font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--gray);line-height:1.6;"></div>
+      </div>
+    </div>
+
+    <!-- Adjustments -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div class="planner-label">Adjustments</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-top:0.3rem;margin-bottom:0.8rem;">Something not working? Write it here. This routine is yours and it can always change. 🤍</div>
+      <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;"></div>
+      <input id="winddown-adj-input" placeholder="What would you like to change…" onkeydown="if(event.key==='Enter'){event.preventDefault();saveWinddownAdj();}" style="width:100%;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-top:0.2rem;">
+      <div id="winddown-adj-list" style="margin-top:0.6rem;"></div>
+    </div>
+
+  </div>
+
 </div>
-<div class="section" id="jesus" style="padding-top:1.5rem;">
+<div class="section" id="jesus">
   <div class="subtitle">Walk with Him daily</div>
   <h1>Jesus Christ.</h1>
 
@@ -5070,7 +5104,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
   </div>
 
-</div>
+</div><!-- end #jesus section -->
 
 <script>
 // -- JESUS CHRIST ---------------------------------------------
@@ -5586,7 +5620,7 @@ function habitsInit() {
 }
 
 function showHabitsTab(tab) {
-  ['calisthenics','bodycare','daily'].forEach(function(t) {
+  ['calisthenics','bodycare','daily','rest'].forEach(function(t) {
     var btn = document.getElementById('htab-' + t);
     if (btn) btn.classList.toggle('active', t === tab);
     var el = document.getElementById('hsub-' + t);
@@ -5595,23 +5629,25 @@ function showHabitsTab(tab) {
   if (tab === 'calisthenics') renderCalisthenics();
   if (tab === 'bodycare') { bodycareRender(); faceHabitsRender(); }
   if (tab === 'daily') dailyLoad();
+  if (tab === 'rest') restLoad();
 }
 
 function showSchedMainTab(tab) {
-  document.getElementById('schmain-schedule').style.display = tab === 'schedule' ? 'block' : 'none';
-  document.getElementById('schmain-habits').style.display = tab === 'habits' ? 'block' : 'none';
-  document.getElementById('schtab-schedule').style.color = tab === 'schedule' ? 'var(--black)' : 'var(--gray)';
-  document.getElementById('schtab-schedule').style.borderBottom = tab === 'schedule' ? '2px solid var(--black)' : '2px solid transparent';
-  document.getElementById('schtab-habits').style.color = tab === 'habits' ? 'var(--black)' : 'var(--gray)';
-  document.getElementById('schtab-habits').style.borderBottom = tab === 'habits' ? '2px solid var(--black)' : '2px solid transparent';
+  var ms = document.getElementById('schmain-schedule');
+  var mh = document.getElementById('schmain-habits');
+  var ts = document.getElementById('schtab-schedule');
+  var th = document.getElementById('schtab-habits');
+  if (ms) ms.style.display = tab === 'schedule' ? 'block' : 'none';
+  if (mh) mh.style.display = tab === 'habits' ? 'block' : 'none';
+  if (ts) { ts.style.color = tab === 'schedule' ? 'var(--black)' : 'var(--gray)'; ts.style.borderBottom = tab === 'schedule' ? '2px solid var(--black)' : '2px solid transparent'; }
+  if (th) { th.style.color = tab === 'habits' ? 'var(--black)' : 'var(--gray)'; th.style.borderBottom = tab === 'habits' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (tab === 'habits') showSchedHabitsTab('calisthenics');
 }
 
 function showSchedHabitsTab(tab) {
-  ['calisthenics','daily','bodycare'].forEach(function(t) {
+  ['calisthenics','daily','bodycare','rest'].forEach(function(t) {
     var btn = document.getElementById('schtab-' + t);
     if (btn) btn.classList.toggle('active', t === tab);
-    // Move the real hsub div into the right schhabits slot and show/hide
     var hsub = document.getElementById('hsub-' + t);
     var slot = document.getElementById('schhabits-' + t);
     if (hsub && slot) {
@@ -5621,9 +5657,231 @@ function showSchedHabitsTab(tab) {
     var el = document.getElementById('schhabits-' + t);
     if (el) el.style.display = t === tab ? 'block' : 'none';
   });
-  if (tab === 'calisthenics') renderCalisthenics();
-  if (tab === 'bodycare') { bodycareLoad(); bodycareRender(); faceHabitsRender(); }
-  if (tab === 'daily') dailyLoad();
+  setTimeout(function() {
+    if (tab === 'calisthenics') renderCalisthenics();
+    if (tab === 'bodycare') { bodycareLoad(); bodycareRender(); faceHabitsRender(); }
+    if (tab === 'daily') dailyLoad();
+    if (tab === 'rest') restLoad();
+  }, 0);
+}
+
+// -- REST -----------------------------------------------------
+var REST_KEY = 'rest_data';
+var restData = {};
+
+function restTodayKey() {
+  return new Date().toISOString().split('T')[0];
+}
+
+// -- WIND-DOWN APP --------------------------------------------
+var WINDDOWN_KEY = 'winddown_data';
+var winddownSteps = [
+  { time: '5:00 PM-5:20 PM', emoji: '🛋️', title: 'Rest', desc: 'Put everything down. You\'re home.' },
+  { time: '5:30 PM', emoji: '🍳', title: 'Cook dinner', desc: 'Something warm, made just for you.' },
+  { time: '5:40 PM', emoji: '🚿', title: 'Take a bath', desc: 'Let the water be kind to you.' },
+  { time: '5:50 PM', emoji: '👂', title: 'Clean your ears', desc: 'A little tenderness for yourself.' },
+  { time: '6:00 PM-6:30 PM', emoji: '🎬', title: 'Watch something you enjoy', desc: 'Just enjoy, guilt free.' },
+  { time: '6:30 PM-7:00 PM', emoji: '💬', title: 'Talk to your special friend', desc: 'Someone who makes you feel safe.' },
+  { time: '7:00 PM-7:15 PM', emoji: '🍽️', title: 'Eat dinner', desc: 'Slow down and enjoy every bite.' },
+  { time: '7:15 PM-7:30 PM', emoji: '🌿', title: 'Rest', desc: 'Nothing to do. Just you.' },
+  { time: '7:30 PM-8:00 PM', emoji: '📓', title: 'Schedule or journal', desc: 'Let whatever\'s inside find its way out.' },
+  { time: '8:00 PM-8:30 PM', emoji: '🙏', title: 'Talk to God', desc: 'He\'s been waiting to hear from you.' },
+  { time: '8:30 PM-9:00 PM', emoji: '🌿', title: 'Prepare for sleep', desc: 'Soften everything. The day is done.' },
+  { time: '9:00 PM', emoji: '🌙', title: 'Sleep', desc: 'You did well today. Rest now. 🤍' }
+];
+
+function winddownTodayKey() { return new Date().toISOString().split('T')[0]; }
+
+var WINDDOWN_ADJ_KEY = 'winddown_adj';
+
+function saveWinddownAdj() {
+  var inp = document.getElementById('winddown-adj-input');
+  if (!inp || !inp.value.trim()) return;
+  var from = document.getElementById('winddown-adj-from')?.value || '';
+  var to = document.getElementById('winddown-adj-to')?.value || '';
+  var adjs = [];
+  try { adjs = JSON.parse(localStorage.getItem(WINDDOWN_ADJ_KEY) || '[]'); } catch(e) {}
+  adjs.unshift({
+    id: Date.now(),
+    text: inp.value.trim(),
+    from, to,
+    time: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+  });
+  localStorage.setItem(WINDDOWN_ADJ_KEY, JSON.stringify(adjs));
+  inp.value = '';
+  var f = document.getElementById('winddown-adj-from'); if(f) f.value = '';
+  var t = document.getElementById('winddown-adj-to'); if(t) t.value = '';
+  renderWinddownAdj();
+}
+
+function removeWinddownAdj(id) {
+  var adjs = [];
+  try { adjs = JSON.parse(localStorage.getItem(WINDDOWN_ADJ_KEY) || '[]'); } catch(e) {}
+  adjs = adjs.filter(function(a) { return a.id !== id; });
+  localStorage.setItem(WINDDOWN_ADJ_KEY, JSON.stringify(adjs));
+  renderWinddownAdj();
+}
+
+function renderWinddownAdj() {
+  var el = document.getElementById('winddown-adj-list');
+  if (!el) return;
+  var adjs = [];
+  try { adjs = JSON.parse(localStorage.getItem(WINDDOWN_ADJ_KEY) || '[]'); } catch(e) {}
+  if (!adjs.length) { el.innerHTML = ''; return; }
+  el.innerHTML = adjs.map(function(a) {
+    var timeRange = (a.from || a.to) ? '<span style="font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;color:var(--black);">' + (a.from || '') + (a.from && a.to ? ' to ' : '') + (a.to || '') + ' &nbsp;</span>' : '';
+    return '<div style="padding:0.4rem 0;border-bottom:1px solid #f0f0ee;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);">' + a.time + '</div>' +
+        '<button onclick="removeWinddownAdj(' + a.id + ')" style="font-size:0.8rem;color:#bbb;border:none;background:none;cursor:pointer;padding:0;">\xd7</button>' +
+      '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.5;margin-top:0.1rem;">' + timeRange + a.text + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function winddownLoad() {
+  var data = {};
+  try { data = JSON.parse(localStorage.getItem(WINDDOWN_KEY) || '{}'); } catch(e) {}
+  var key = winddownTodayKey();
+  var done = data[key] || [];
+  winddownRender(done);
+  renderWinddownAdj();
+}
+
+function winddownToggle(idx) {
+  var data = {};
+  try { data = JSON.parse(localStorage.getItem(WINDDOWN_KEY) || '{}'); } catch(e) {}
+  var key = winddownTodayKey();
+  var done = data[key] || [];
+  var pos = done.indexOf(idx);
+  if (pos === -1) done.push(idx); else done.splice(pos, 1);
+  data[key] = done;
+  localStorage.setItem(WINDDOWN_KEY, JSON.stringify(data));
+  winddownRender(done);
+}
+
+function winddownRender(done) {
+  var el = document.getElementById('winddown-steps');
+  if (!el) return;
+  el.innerHTML = winddownSteps.map(function(s, i) {
+    var checked = done.indexOf(i) !== -1;
+    return '<div onclick="winddownToggle(' + i + ')" style="cursor:pointer;padding:0.3rem 0.4rem;border-bottom:1px solid #f0f0ee;background:' + (checked ? '#fafaf8' : 'transparent') + ';transition:all 0.3s;">' +
+      '<div style="display:flex;gap:0.5rem;align-items:center;">' +
+        '<div style="font-size:0.9rem;flex-shrink:0;opacity:' + (checked ? '0.3' : '1') + ';">' + s.emoji + '</div>' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.68rem;color:var(--gray);flex-shrink:0;white-space:nowrap;opacity:' + (checked ? '0.3' : '1') + ';">' + s.time + '</div>' +
+        '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.82rem;color:' + (checked ? '#ccc' : 'var(--black)') + ';">' + s.title + '</div>' +
+      '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.7rem;font-weight:300;color:' + (checked ? '#ccc' : 'var(--gray)') + ';margin-top:0.05rem;padding-left:1.5rem;line-height:1.3;">' + s.desc + '</div>' +
+    '</div>';
+  }).join('');
+
+  var count = done.length;
+  var msg = document.getElementById('winddown-message');
+  if (msg) {
+    if (count === 0) msg.textContent = 'No rush. No pressure. Just let the evening come to you slowly. 🤍';
+    else if (count < 3) msg.textContent = 'You\'re already choosing yourself. That matters more than you know.';
+    else if (count < 6) msg.textContent = 'Look at you, actually resting. You deserve every single minute of this.';
+    else if (count < winddownSteps.length) msg.textContent = 'You\'re so close to sleep. I\'m proud of you for taking care of yourself tonight.';
+    else msg.textContent = 'You did it. All of it. Sleep well, you beautiful soul. 🌙';
+  }
+}
+
+function restLoad() {
+  winddownLoad();
+  try { restData = JSON.parse(localStorage.getItem(REST_KEY) || '{}'); } catch(e) { restData = {}; }
+  var key = restTodayKey();
+  var d = restData[key] || {};
+  var bed = document.getElementById('rest-bedtime');
+  var wake = document.getElementById('rest-wakeup');
+  if (bed) bed.value = d.bedtime || '';
+  if (wake) wake.value = d.wakeup || '';
+  restCalcHours();
+  // restore feel
+  document.querySelectorAll('.rest-feel-btn').forEach(function(btn) {
+    btn.style.background = (d.feel && d.feel === btn.textContent.trim()) ? 'var(--black)' : 'none';
+    btn.style.color = (d.feel && d.feel === btn.textContent.trim()) ? 'var(--white)' : 'var(--black)';
+  });
+  restRenderNotes(d.notes || []);
+}
+
+function saveRestData() {
+  var key = restTodayKey();
+  if (!restData[key]) restData[key] = {};
+  var bed = document.getElementById('rest-bedtime');
+  var wake = document.getElementById('rest-wakeup');
+  if (bed) restData[key].bedtime = bed.value;
+  if (wake) restData[key].wakeup = wake.value;
+  restCalcHours();
+  localStorage.setItem(REST_KEY, JSON.stringify(restData));
+}
+
+function restCalcHours() {
+  var key = restTodayKey();
+  var d = restData[key] || {};
+  var el = document.getElementById('rest-hours');
+  if (!el) return;
+  if (d.bedtime && d.wakeup) {
+    var b = d.bedtime.split(':').map(Number);
+    var w = d.wakeup.split(':').map(Number);
+    var mins = (w[0]*60+w[1]) - (b[0]*60+b[1]);
+    if (mins < 0) mins += 1440;
+    var h = Math.floor(mins/60), m = mins%60;
+    el.textContent = h + 'h ' + (m ? m + 'm' : '');
+  } else {
+    el.textContent = '—';
+  }
+}
+
+function toggleRestFeel(btn, val) {
+  var key = restTodayKey();
+  if (!restData[key]) restData[key] = {};
+  var current = restData[key].feel;
+  restData[key].feel = current === val ? '' : val;
+  localStorage.setItem(REST_KEY, JSON.stringify(restData));
+  document.querySelectorAll('.rest-feel-btn').forEach(function(b) {
+    var active = b.textContent.trim() === restData[key].feel;
+    b.style.background = active ? 'var(--black)' : 'none';
+    b.style.color = active ? 'var(--white)' : 'var(--black)';
+  });
+}
+
+function saveRestNote() {
+  var inp = document.getElementById('rest-note');
+  var text = inp ? inp.value.trim() : '';
+  if (!text) return;
+  var key = restTodayKey();
+  if (!restData[key]) restData[key] = {};
+  if (!restData[key].notes) restData[key].notes = [];
+  restData[key].notes.unshift({ id: Date.now(), text,
+    time: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+  });
+  inp.value = '';
+  localStorage.setItem(REST_KEY, JSON.stringify(restData));
+  restRenderNotes(restData[key].notes);
+}
+
+function removeRestNote(id) {
+  var key = restTodayKey();
+  if (!restData[key] || !restData[key].notes) return;
+  restData[key].notes = restData[key].notes.filter(function(n) { return n.id !== id; });
+  localStorage.setItem(REST_KEY, JSON.stringify(restData));
+  restRenderNotes(restData[key].notes);
+}
+
+function restRenderNotes(notes) {
+  var el = document.getElementById('rest-notes-list');
+  if (!el) return;
+  if (!notes || !notes.length) { el.innerHTML = ''; return; }
+  el.innerHTML = notes.map(function(n) {
+    return '<div style="padding:0.3rem 0;border-bottom:1px solid #f0f0ee;display:flex;justify-content:space-between;align-items:center;">' +
+      '<div>' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);">' + n.time + '</div>' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.8rem;font-weight:300;color:var(--black);">' + n.text + '</div>' +
+      '</div>' +
+      '<button onclick="removeRestNote(' + n.id + ')" style="font-size:0.8rem;color:#bbb;border:none;background:none;cursor:pointer;padding:0;">\xd7</button>' +
+    '</div>';
+  }).join('');
 }
 
 // -- DAILY ----------------------------------------------------
@@ -6883,7 +7141,8 @@ function wiaTab(id) {
     t.classList.toggle('active', tab === id);
   });
   document.querySelectorAll('.wia-panel').forEach(function(p) { p.classList.remove('active'); });
-  document.getElementById('wia-' + id).classList.add('active');
+  var panel = document.getElementById('wia-' + id);
+  if (panel) panel.classList.add('active');
 }
 
 function initWhiAm() {
