@@ -314,7 +314,7 @@
   .journal-entry { border-bottom: 1px solid var(--light); padding: 1.5rem 0; }
   .journal-date { font-family: 'Nunito', sans-serif; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); margin-bottom: 0.5rem; }
   .journal-content { font-size: 1.05rem; line-height: 1.7;  font-weight: 300; }
-  textarea { width: 100%; border: none; border-bottom: 1px solid #c8c8c5; background: transparent; font-family: 'Nunito', sans-serif; font-size: 1.15rem;  font-weight: 300; line-height: 1.7; color: var(--black); resize: none; outline: none; padding: 0.5rem 0; margin-bottom: 1rem; min-height: 120px; }
+  textarea { width: 100%; border: none; border-bottom: 1px solid #c8c8c5; background: transparent; font-family: 'Nunito', sans-serif; font-size: 1.15rem;  font-weight: 300; line-height: 1.7; color: var(--black); resize: none; outline: none; padding: 0.5rem 0; margin-bottom: 1rem; }
   textarea::placeholder { color: var(--gray); }
   .ritual-item { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--light); cursor: pointer; }
   .ritual-item:last-child { border-bottom: none; }
@@ -424,7 +424,7 @@
   }
 
   #memainsub-journal { width: 100%; overflow-x: hidden; box-sizing: border-box; padding-left: 20rem; padding-right: 20rem; }
-  @media (max-width: 480px) { #memainsub-journal { padding-left: 0; padding-right: 0; } }
+  @media (max-width: 480px) { #memainsub-journal { padding-left: 6.5rem; padding-right: 6.5rem; } }
   .q-check-card { background: white; border: 1px solid #e8e8e5; padding: 0.75rem; margin-bottom: 0.5rem; transition: opacity 0.2s; }
   .q-check-card.answered { opacity: 0.4; }
   .q-check-text { font-family: 'Lora', serif; font-style: italic; font-size: 0.78rem; color: var(--black); line-height: 1.5; margin-bottom: 0.6rem; }
@@ -4076,7 +4076,7 @@ window.addEventListener('DOMContentLoaded', function() {
   <div id="memainsub-journal" style="display:none;margin-top:0;padding-top:0;">
 
   <!-- Journal sub-tabs -->
-  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
+  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:0;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
     <button class="balance-sub-tab active" onclick="showJournalTab('belief')" id="jtabn-belief">Belief</button>
     <button class="balance-sub-tab" onclick="showJournalTab('wins')" id="jtabn-wins">Wins</button>
     <button class="balance-sub-tab" onclick="showJournalTab('vent')" id="jtabn-vent">Journal</button>
