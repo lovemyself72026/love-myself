@@ -372,7 +372,14 @@
     .ritual-label { font-size: 0.95rem; }
     .counter-label { font-size: 0.9rem; }
     .journal-content { font-size: 0.9rem; }
-    .balance-sub-tab { font-size: 0.52rem; padding: 0.45rem 0.3rem 0.5rem; letter-spacing: 0.02em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .balance-sub-tab { font-size: 0.58rem; padding: 0.45rem 0.4rem 0.5rem; letter-spacing: 0.03em; flex: 0 0 50%; min-width: 0; white-space: nowrap; text-align: center; }
+    #me-subtab-row .balance-sub-tab { flex: 0 0 50%; border-bottom: 1px solid #e8e8e5; }
+    #me-subtab-row .balance-sub-tab.active { border-bottom: 2px solid var(--black); }
+    #jsub-belief .subtitle { font-size: 0.75rem !important; }
+    #jsub-belief h2 { font-size: 1.3rem !important; }
+    #jsub-belief > div[style*="italic"] { font-size: 0.95rem !important; }
+    #jsub-belief input { font-size: 0.95rem !important; }
+    #jsub-belief .belief-color-opt ~ span, #jsub-belief [style*="Color"], #jsub-belief [style*="color-opt"] ~ span { font-size: 0.75rem !important; }
     .journal-tab { font-size: 0.62rem; padding: 0.45rem 0.6rem 0.5rem; letter-spacing: 0.04em; flex: 0 0 auto; }
     .wia-tab { font-size: 0.54rem; padding: 5px 4px; letter-spacing: 0.05em; flex: 1; }
     .home-card { padding: 0.9rem; }
@@ -3341,7 +3348,7 @@ function beliefRenderAll() {
   var el = document.getElementById('belief-list');
   if (!el) return;
   if (!beliefBeliefs.length) {
-    el.innerHTML = '<div style="font-family:Lora,serif;font-style:italic;font-size:0.88rem;color:var(--gray);padding:0.5rem 0;">No beliefs yet. Add one above.</div>';
+    el.innerHTML = '<div style="font-family:Lora,serif;font-style:italic;font-size:1rem;color:var(--gray);padding:0.5rem 0;">No beliefs yet. Add one above.</div>';
     return;
   }
   el.innerHTML = beliefBeliefs.map(function(b) {
@@ -3441,7 +3448,7 @@ window.addEventListener('DOMContentLoaded', function() {
   <!-- ME CONTENT -->
   <div id="memainsub-me">
   <!-- Me sub-tabs -->
-  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
+  <div id="me-subtab-row" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:wrap;">
     <button class="balance-sub-tab active" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
     <button class="balance-sub-tab" onclick="showMeTab('assertive')" id="metab-assertive">Assertive</button>
     <button class="balance-sub-tab" onclick="showMeTab('believe')" id="metab-believe">Believe</button>
@@ -4085,19 +4092,19 @@ window.addEventListener('DOMContentLoaded', function() {
 
     <!-- BELIEF -->
     <div id="jsub-belief" style="margin-top:0;">
-      <div class="subtitle" style="margin-bottom:0.2rem;margin-top:0;">
+      <div class="subtitle" style="margin-bottom:0.2rem;margin-top:0;font-size:0.82rem;">
         <style>@media(max-width:480px){#jsub-belief{margin-top:2rem!important;}}</style>Rewire your mind</div>
       <div style="display:flex;align-items:baseline;gap:0.8rem;margin-bottom:0.6rem;">
-        <h2 style="margin:0;">Change your belief.</h2>
+        <h2 style="margin:0;font-size:1.6rem;">Change your belief.</h2>
       </div>
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Simple. Daily. It works over time.</div>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:1.05rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Simple. Daily. It works over time.</div>
       <div style="margin-bottom:1.5rem;">
-        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Now I choose to believe</div>
-        <input type="text" id="belief-new" placeholder="e.g. I am enough, always." onkeydown="if(event.key==='Enter')document.getElementById('belief-old').focus()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:0.9rem;">
-        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">I used to believe</div>
-        <input type="text" id="belief-old" placeholder="e.g. I'm not good enough…" onkeydown="if(event.key==='Enter')beliefSaveNew()" onblur="beliefSaveNew()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Now I choose to believe</div>
+        <input type="text" id="belief-new" placeholder="e.g. I am enough, always." onkeydown="if(event.key==='Enter')document.getElementById('belief-old').focus()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:0.9rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">I used to believe</div>
+        <input type="text" id="belief-old" placeholder="e.g. I'm not good enough…" onkeydown="if(event.key==='Enter')beliefSaveNew()" onblur="beliefSaveNew()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.4rem 0;margin-bottom:1rem;">
         <div style="display:flex;align-items:center;gap:0.5rem;">
-          <span style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">Color</span>
+          <span style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">Color</span>
           <div style="display:flex;gap:0.4rem;">
             <button class="belief-color-opt selected" data-color="#f9a8c9" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#f9a8c9;border:2px solid #0a0a0a;cursor:pointer;flex-shrink:0;"></button>
             <button class="belief-color-opt" data-color="#a8d8f0" onclick="beliefPickColor(this)" style="width:18px;height:18px;background:#a8d8f0;border:2px solid transparent;cursor:pointer;flex-shrink:0;"></button>
