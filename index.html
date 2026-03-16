@@ -1263,8 +1263,8 @@ const lifeDimensions = [
 let dimensionItems = JSON.parse(localStorage.getItem('dimension_items') || '{}');
 let activeDimType = {};
 
-function renderDimensionBoards() {
-  try { var _f=localStorage.getItem('dimension_items'); if(_f){ dimensionItems=JSON.parse(_f); if(typeof dimensionItems!=='object'||Array.isArray(dimensionItems)) dimensionItems={}; } } catch(e) {}
+function renderDimensionBoards(fromStorage) {
+  if (fromStorage !== false) { try { var _f=localStorage.getItem('dimension_items'); if(_f){ dimensionItems=JSON.parse(_f); if(typeof dimensionItems!=='object'||Array.isArray(dimensionItems)) dimensionItems={}; } } catch(e) {} }
   const el = document.getElementById('dimension-boards');
   if (!el) return;
   el.innerHTML = lifeDimensions.map(d => {
@@ -1344,19 +1344,19 @@ async function addDimImage(key, input) {
 
   const tempId = Date.now();
   dimensionItems[key].push({ id: tempId, type: 'image', content: '', date, uploading: true });
-  renderDimensionBoards();
+  renderDimensionBoards(false);
 
   try {
     const url = await uploadImageToCloud(file);
     const idx = dimensionItems[key].findIndex(i => i.id === tempId);
     if (idx !== -1) { dimensionItems[key][idx].content = url; dimensionItems[key][idx].uploading = false; }
     localStorage.setItem('dimension_items', JSON.stringify(dimensionItems)); if(typeof syncToCloud==='function')syncToCloud('dimension_items',dimensionItems);
-    renderDimensionBoards();
+    renderDimensionBoards(false);
   } catch(e) {
     alert('❌ Upload failed: ' + e.message);
     const idx = dimensionItems[key].findIndex(i => i.id === tempId);
     if (idx !== -1) dimensionItems[key].splice(idx, 1);
-    renderDimensionBoards();
+    renderDimensionBoards(false);
   }
 }
 
@@ -1499,18 +1499,18 @@ async function addWhoiImage(input) {
   const date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   const tempId = Date.now();
   whoiItems.unshift({ id: tempId, type: 'image', content: '', date, uploading: true });
-  renderWhoiGrid();
+  renderWhoiGrid(false);
 
   try {
     const url = await uploadImageToCloud(file);
     const idx = whoiItems.findIndex(i => i.id === tempId);
     if (idx !== -1) { whoiItems[idx].content = url; whoiItems[idx].uploading = false; }
     localStorage.setItem('whoi_history', JSON.stringify(whoiItems)); if(typeof syncToCloud==='function')syncToCloud('whoi_history',whoiItems);
-    renderWhoiGrid();
+    renderWhoiGrid(false);
   } catch(e) {
     const idx = whoiItems.findIndex(i => i.id === tempId);
     if (idx !== -1) whoiItems.splice(idx, 1);
-    renderWhoiGrid();
+    renderWhoiGrid(false);
   }
 }
 
@@ -1520,8 +1520,8 @@ function deleteWhoIEntry(id) {
   renderWhoiGrid();
 }
 
-function renderWhoiGrid() {
-  try { var _f=localStorage.getItem('whoi_history'); if(_f){ whoiItems=JSON.parse(_f); if(!Array.isArray(whoiItems)) whoiItems=[]; } } catch(e) {}
+function renderWhoiGrid(fromStorage) {
+  if (fromStorage !== false) { try { var _f=localStorage.getItem('whoi_history'); if(_f){ whoiItems=JSON.parse(_f); if(!Array.isArray(whoiItems)) whoiItems=[]; } } catch(e) {} }
   const el = document.getElementById('whoi-grid');
   if (!el) return;
   // Init date picker
