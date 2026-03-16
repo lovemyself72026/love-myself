@@ -963,7 +963,7 @@ function showSection(id){
   try { localStorage.setItem('last_section', id); } catch(e) {}
   if (id === 'home') renderAnalytics();
   if (id === 'schedule') { initScheduleDatePicker(); loadPlannerDay(); }
-  if (id === 'vision') { loadThatGirl(); }
+  if (id === 'vision') { loadThatGirl(); renderVisionBoard(true); }
   if (id === 'me') { initMeSection(); initWhiAm(); showMeTab('whiam'); }
   if (id === 'journal') { showJournalTab('belief'); }
   if (id === 'jesus' && typeof jesusInit === 'function') jesusInit();
@@ -2375,10 +2375,16 @@ function renderVisionBoard(fromStorage) {
       + '<button onclick="addVisionItem()" style="font-family:Nunito,sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>'
       + '</div>'
       + '<div id="vision-input-image" style="display:none;">'
-      + '<input type="file" accept="image/*" id="vision-file-input" onchange="addVisionImage(this)" style="font-size:0.82rem;width:100%;">'
+      + '<input type="file" accept="image/*" id="vision-file-input" style="font-size:0.82rem;width:100%;">'
       + '</div>'
       + '</div>'
       + '<div id="vision-grid"></div>';
+    // Attach file input listener safely (only once, after innerHTML is set)
+    var _fi = document.getElementById('vision-file-input');
+    if (_fi && !_fi._listenerAttached) {
+      _fi._listenerAttached = true;
+      _fi.addEventListener('change', function() { addVisionImage(this); });
+    }
   }
   // Always update only the grid — never touch the controls
   var grid = document.getElementById('vision-grid');
