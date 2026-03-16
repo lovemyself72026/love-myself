@@ -619,7 +619,8 @@
 <div class="section" id="vision">
   <div class="subtitle">Dream it, live it</div>
   <h1>My vision board.</h1>
-  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0.5rem 0 2rem;line-height:1.6;">Build a vision board for every area of your life 🤍</div>
+  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0.5rem 0 1.5rem;line-height:1.6;">Build a vision board for every area of your life 🤍</div>
+  <div id="vision-board-section" style="margin-bottom:2rem;"></div>
   <div id="dimension-boards"></div>
 
   <!-- That Girl Vision -->
@@ -2285,11 +2286,125 @@ document.head.appendChild(visionStyle);
 let visionItems = JSON.parse(localStorage.getItem('vision_items') || '[]');
 let currentVisionType = 'dream';
 
-function selectVisionType(btn) {}
-function addVisionItem() {}
-function removeVisionItem(id) {}
-function saveAndRenderVision() {}
-function renderVisionBoard() {}
+function selectVisionType(btn) {
+  currentVisionType = btn.dataset.type || btn.getAttribute('data-type') || 'dream';
+  document.querySelectorAll('#vision-type-btns .vision-type-btn').forEach(function(b) {
+    b.classList.toggle('active', b === btn);
+  });
+  ['dream','word','image'].forEach(function(t) {
+    var el = document.getElementById('vision-input-' + t);
+    if (el) el.style.display = t === currentVisionType ? (t === 'image' ? 'block' : 'flex') : 'none';
+  });
+}
+
+function addVisionItem() {
+  var inp = document.getElementById('vision-text-' + currentVisionType);
+  if (!inp || !inp.value.trim()) return;
+  visionItems.unshift({
+    id: Date.now(),
+    type: currentVisionType,
+    content: inp.value.trim(),
+    date: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+  });
+  inp.value = '';
+  localStorage.setItem('vision_items', JSON.stringify(visionItems));
+  if (typeof syncToCloud === 'function') syncToCloud('vision_items', visionItems);
+  renderVisionBoard();
+}
+
+async function addVisionImage(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  var tempId = Date.now();
+  visionItems.unshift({ id: tempId, type: 'image', content: '', date: date, uploading: true });
+  renderVisionBoard();
+  try {
+    var url = await uploadImageToCloud(file);
+    var idx = visionItems.findIndex(function(i){ return i.id === tempId; });
+    if (idx !== -1) { visionItems[idx].content = url; visionItems[idx].uploading = false; }
+    localStorage.setItem('vision_items', JSON.stringify(visionItems));
+    if (typeof syncToCloud === 'function') syncToCloud('vision_items', visionItems);
+    // Reset file input so the same image can be re-selected if needed
+    var fi = document.getElementById('vision-file-input');
+    if (fi) fi.value = '';
+    renderVisionBoard();
+  } catch(e) {
+    alert('❌ Upload failed: ' + e.message);
+    var idx2 = visionItems.findIndex(function(i){ return i.id === tempId; });
+    if (idx2 !== -1) visionItems.splice(idx2, 1);
+    var fi2 = document.getElementById('vision-file-input');
+    if (fi2) fi2.value = '';
+    renderVisionBoard();
+  }
+}
+
+function removeVisionItem(id) {
+  visionItems = visionItems.filter(function(i){ return i.id !== id; });
+  localStorage.setItem('vision_items', JSON.stringify(visionItems));
+  if (typeof syncToCloud === 'function') syncToCloud('vision_items', visionItems);
+  renderVisionBoard();
+}
+
+function saveAndRenderVision() {
+  localStorage.setItem('vision_items', JSON.stringify(visionItems));
+  if (typeof syncToCloud === 'function') syncToCloud('vision_items', visionItems);
+  renderVisionBoard();
+}
+
+function renderVisionBoard(fromStorage) {
+  if (fromStorage) {
+    try { var _f = localStorage.getItem('vision_items'); if (_f) { visionItems = JSON.parse(_f); if (!Array.isArray(visionItems)) visionItems = []; } } catch(e) {}
+  }
+  var el = document.getElementById('vision-board-section');
+  if (!el) return;
+  // Build static controls only once — do NOT rebuild on every render (would destroy the file input mid-upload)
+  if (!document.getElementById('vision-type-btns')) {
+    el.innerHTML = '<div style="margin-bottom:1.5rem;">'
+      + '<div id="vision-type-btns" style="display:flex;gap:0.4rem;margin-bottom:0.8rem;">'
+      + '<button class="vision-type-btn active" data-type="dream" onclick="selectVisionType(this)">Dream</button>'
+      + '<button class="vision-type-btn" data-type="word" onclick="selectVisionType(this)">Word</button>'
+      + '<button class="vision-type-btn" data-type="image" onclick="selectVisionType(this)">Image</button>'
+      + '</div>'
+      + '<div id="vision-input-dream" style="display:flex;gap:0.5rem;align-items:center;">'
+      + '<input id="vision-text-dream" placeholder="A dream you&#39;re working toward…" onkeydown="if(event.key===&#39;Enter&#39;)addVisionItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:Nunito,sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">'
+      + '<button onclick="addVisionItem()" style="font-family:Nunito,sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>'
+      + '</div>'
+      + '<div id="vision-input-word" style="display:none;gap:0.5rem;align-items:center;">'
+      + '<input id="vision-text-word" placeholder="A word that calls you forward…" onkeydown="if(event.key===&#39;Enter&#39;)addVisionItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:Nunito,sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">'
+      + '<button onclick="addVisionItem()" style="font-family:Nunito,sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>'
+      + '</div>'
+      + '<div id="vision-input-image" style="display:none;">'
+      + '<input type="file" accept="image/*" id="vision-file-input" onchange="addVisionImage(this)" style="font-size:0.82rem;width:100%;">'
+      + '</div>'
+      + '</div>'
+      + '<div id="vision-grid"></div>';
+  }
+  // Always update only the grid — never touch the controls
+  var grid = document.getElementById('vision-grid');
+  if (!grid) return;
+  if (!visionItems.length) {
+    grid.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:Lora,serif;margin-top:0.5rem;">Your vision board is empty. Add a dream, a word, or an image 🤍</p>';
+    return;
+  }
+  grid.innerHTML = '<div class="vision-items-grid">'
+    + visionItems.map(function(item) {
+      return '<div style="border:1px solid #e8e8e5;padding:0.6rem;position:relative;">'
+        + '<button onclick="removeVisionItem(' + item.id + ')" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;position:absolute;top:0.3rem;right:0.3rem;line-height:1;">✕</button>'
+        + (item.type === 'image'
+          ? item.uploading
+            ? '<div style="font-family:Nunito,sans-serif;font-size:0.7rem;color:var(--gray);text-align:center;padding:1rem 0;">Uploading...</div>'
+            : '<img src="' + item.content + '" style="width:100%;display:block;border-radius:0;">'
+          : item.type === 'word'
+          ? '<div style="font-family:Lora,serif;font-style:italic;font-size:1rem;text-align:center;padding:0.5rem 0.5rem 0.2rem;">' + item.content + '</div>'
+          : '<div style="font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:300;line-height:1.5;padding-right:0.8rem;">' + item.content + '</div>'
+        )
+        + '<div style="font-family:Nunito,sans-serif;font-size:0.55rem;color:var(--gray);margin-top:0.3rem;">' + (item.date||'') + '</div>'
+        + '</div>';
+    }).join('')
+    + '</div>';
+}
+renderVisionBoard(true);
 
 let ventEntries = JSON.parse(localStorage.getItem('vent_entries') || '[]');
 if (!Array.isArray(ventEntries)) ventEntries = [];
