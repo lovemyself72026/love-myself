@@ -2046,7 +2046,10 @@ async function saveSchedImage(input, type) {
   if (!file) return;
   var tempId = Date.now();
   var time = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  plannerNotes.unshift({ id: tempId, type: type || 'image', src: '', name: file.name, time: time, uploading: true });
+  // Show local preview immediately using blob URL
+  var localSrc = URL.createObjectURL(file);
+  plannerNotes.unshift({ id: tempId, type: type || 'image', src: localSrc, name: file.name, time: time, uploading: true });
+  savePlannerDay();
   renderNotes();
   try {
     var url = await window.uploadImageToCloud(file);
@@ -2054,14 +2057,15 @@ async function saveSchedImage(input, type) {
     if (idx !== -1) { plannerNotes[idx].src = url; plannerNotes[idx].uploading = false; }
     var fi = document.getElementById('sched-photo-input');
     if (fi) fi.value = '';
-    renderNotes();
     savePlannerDay();
+    renderNotes();
   } catch(e) {
     alert('Upload failed: ' + e.message);
     var idx2 = plannerNotes.findIndex(function(n){ return n.id === tempId; });
     if (idx2 !== -1) plannerNotes.splice(idx2, 1);
     var fi2 = document.getElementById('sched-photo-input');
     if (fi2) fi2.value = '';
+    savePlannerDay();
     renderNotes();
   }
 }
