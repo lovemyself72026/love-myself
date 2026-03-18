@@ -777,11 +777,10 @@
       <div class="planner-label">Notes</div>
       <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;">
         <input id="sched-notes" placeholder="Anything on your mind…" onkeydown="if(event.key==='Enter'){event.preventDefault();saveSchedNote();}" style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-        <!-- Image -->
-        <label for="sched-photo-input" style="cursor:pointer;color:var(--gray);flex-shrink:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;" title="Add image">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        </label>
-        <input type="file" id="sched-photo-input" accept="image/*" onchange="saveSchedImage(this,'photo')" style="display:none;">
+        <div style="position:relative;flex-shrink:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:1.2rem;line-height:1;pointer-events:none;">🖼️</span>
+          <input type="file" accept="image/*" id="sched-photo-input" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+        </div>
       </div>
       <div id="sched-notes-list" style="margin-top:0.6rem;"></div>
     </div>
@@ -2046,23 +2045,27 @@ function saveSong() {
 }
 
 async function saveSchedImage(input, type) {
-  const file = input.files[0];
+  var file = input.files[0];
   if (!file) return;
-  input.value = '';
-  const tempId = Date.now();
-  const time = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  var tempId = Date.now();
+  var time = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   plannerNotes.unshift({ id: tempId, type: type || 'image', src: '', name: file.name, time: time, uploading: true });
   renderNotes();
   try {
-    const url = await window.uploadImageToCloud(file);
-    const idx = plannerNotes.findIndex(function(n){ return n.id === tempId; });
+    var url = await window.uploadImageToCloud(file);
+    var idx = plannerNotes.findIndex(function(n){ return n.id === tempId; });
     if (idx !== -1) { plannerNotes[idx].src = url; plannerNotes[idx].uploading = false; }
+    var fi = document.getElementById('sched-photo-input');
+    if (fi) fi.value = '';
     renderNotes();
     savePlannerDay();
   } catch(e) {
-    plannerNotes = plannerNotes.filter(function(n){ return n.id !== tempId; });
-    renderNotes();
     alert('Upload failed: ' + e.message);
+    var idx2 = plannerNotes.findIndex(function(n){ return n.id === tempId; });
+    if (idx2 !== -1) plannerNotes.splice(idx2, 1);
+    var fi2 = document.getElementById('sched-photo-input');
+    if (fi2) fi2.value = '';
+    renderNotes();
   }
 }
 
@@ -2261,6 +2264,15 @@ function formatTime(t) { return t||''; }
 
 initScheduleDatePicker();
 loadPlannerDay();
+
+// Attach schedule photo input listener (same pattern as Vision)
+(function() {
+  var _fi = document.getElementById('sched-photo-input');
+  if (_fi && !_fi._listenerAttached) {
+    _fi._listenerAttached = true;
+    _fi.addEventListener('change', function() { saveSchedImage(this, 'photo'); });
+  }
+})();
 
 // Vision Board styles
 const visionStyle = document.createElement('style');
