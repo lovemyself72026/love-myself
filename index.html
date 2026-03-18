@@ -775,12 +775,9 @@
     <!-- Notes -->
     <div id="ps-notes" style="border:1px solid #c8c8c5;padding:0.8rem;">
       <div class="planner-label">Notes</div>
-      <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;">
-        <input id="sched-notes" placeholder="Anything on your mind…" onkeydown="if(event.key==='Enter'){event.preventDefault();saveSchedNote();}" style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
-        <div style="position:relative;flex-shrink:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
-          <span style="font-size:1.2rem;line-height:1;pointer-events:none;">🖼️</span>
-          <input type="file" accept="image/*" id="sched-photo-input" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
-        </div>
+      <div style="margin-top:0.4rem;">
+        <input id="sched-notes" placeholder="Anything on your mind…" onkeydown="if(event.key==='Enter'){event.preventDefault();saveSchedNote();}" style="width:100%;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.6rem;">
+        <input type="file" accept="image/*" id="sched-photo-input" style="font-size:0.82rem;width:100%;">
       </div>
       <div id="sched-notes-list" style="margin-top:0.6rem;"></div>
     </div>
