@@ -778,21 +778,21 @@
       <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;">
         <input id="sched-notes" placeholder="Anything on your mind…" onkeydown="if(event.key==='Enter'){event.preventDefault();saveSchedNote();}" style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
         <!-- Image -->
-        <label style="cursor:pointer;color:var(--gray);flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;" title="Add image">
+        <label style="cursor:pointer;color:var(--gray);flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;" title="Add image">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <input type="file" accept="image/*" onchange="saveSchedImage(this,'photo')" style="display:none;">
+          <input type="file" accept="image/*" onchange="saveSchedImage(this,'photo')" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
         </label>
         <!-- Style of the day -->
-        <label style="cursor:pointer;flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;filter:grayscale(1);opacity:0.5;font-size:0.9rem;line-height:1;" title="Style of the day">
+        <label style="cursor:pointer;flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1rem;line-height:1;" title="Style of the day">
           👠
-          <input type="file" accept="image/*" onchange="saveSchedImage(this,'style')" style="display:none;">
+          <input type="file" accept="image/*" onchange="saveSchedImage(this,'style')" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
         </label>
         <!-- Mindset -->
-        <button onclick="showMindsetModal()" style="border:none;background:none;cursor:pointer;color:var(--gray);flex-shrink:0;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;" title="Mindset">
+        <button onclick="showMindsetModal()" style="border:none;background:none;cursor:pointer;color:var(--gray);flex-shrink:0;padding:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;" title="Mindset">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a7 7 0 0 1 7 7c0 3-1.5 5-3.5 6.5V18h-7v-2.5C6.5 14 5 12 5 9a7 7 0 0 1 7-7z"/><line x1="9" y1="21" x2="15" y2="21"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
         </button>
         <!-- Song -->
-        <button onclick="showSongModal()" style="border:none;background:none;cursor:pointer;color:var(--gray);flex-shrink:0;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;" title="Add song">
+        <button onclick="showSongModal()" style="border:none;background:none;cursor:pointer;color:var(--gray);flex-shrink:0;padding:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;" title="Add song">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
         </button>
       </div>
@@ -2058,23 +2058,25 @@ function saveSong() {
   renderNotes(); savePlannerDay();
 }
 
-function saveSchedImage(input, type) {
+async function saveSchedImage(input, type) {
   const file = input.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    plannerNotes.unshift({
-      id: Date.now(),
-      type: type || 'image',
-      src: e.target.result,
-      name: file.name,
-      time: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
-    });
-    input.value = '';
+  input.value = '';
+  const tempId = Date.now();
+  const time = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  plannerNotes.unshift({ id: tempId, type: type || 'image', src: '', name: file.name, time: time, uploading: true });
+  renderNotes();
+  try {
+    const url = await window.uploadImageToCloud(file);
+    const idx = plannerNotes.findIndex(function(n){ return n.id === tempId; });
+    if (idx !== -1) { plannerNotes[idx].src = url; plannerNotes[idx].uploading = false; }
     renderNotes();
     savePlannerDay();
-  };
-  reader.readAsDataURL(file);
+  } catch(e) {
+    plannerNotes = plannerNotes.filter(function(n){ return n.id !== tempId; });
+    renderNotes();
+    alert('Upload failed: ' + e.message);
+  }
 }
 
 function saveSchedNote() {
@@ -2115,10 +2117,14 @@ function renderNotes() {
     '</div>';
     var body = '';
     if (n.type === 'image') {
-      body = '<img src="' + n.src + '" style="width:100%;max-height:220px;object-fit:cover;margin-top:0.4rem;border-radius:2px;" />';
+      body = n.uploading
+        ? '<div style="width:100%;height:100px;background:#f0f0ee;display:flex;align-items:center;justify-content:center;margin-top:0.4rem;font-family:\'Nunito\',sans-serif;font-size:0.72rem;color:var(--gray);">Uploading…</div>'
+        : '<img src="' + n.src + '" style="width:100%;max-height:220px;object-fit:cover;margin-top:0.4rem;border-radius:2px;" />';
     } else if (n.type === 'style') {
       body = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-top:0.3rem;margin-bottom:0.3rem;">Style of the day</div>' +
-             '<img src="' + n.src + '" style="width:100%;max-height:280px;object-fit:cover;border-radius:2px;" />';
+             (n.uploading
+               ? '<div style="width:100%;height:100px;background:#f0f0ee;display:flex;align-items:center;justify-content:center;font-family:\'Nunito\',sans-serif;font-size:0.72rem;color:var(--gray);">Uploading…</div>'
+               : '<img src="' + n.src + '" style="width:100%;max-height:280px;object-fit:cover;border-radius:2px;" />');
     } else if (n.type === 'song') {
       var linkHtml = n.link ? ' <a href="' + n.link + '" target="_blank" rel="noopener" style="color:var(--gray);font-size:0.72rem;text-decoration:underline;">play</a>' : '';
       body = '<div style="display:flex;align-items:center;gap:0.6rem;margin-top:0.4rem;padding:0.5rem 0.6rem;border:1px solid #e8e8e5;">' +
