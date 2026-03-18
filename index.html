@@ -778,23 +778,10 @@
       <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;">
         <input id="sched-notes" placeholder="Anything on your mind…" onkeydown="if(event.key==='Enter'){event.preventDefault();saveSchedNote();}" style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
         <!-- Image -->
-        <label style="cursor:pointer;color:var(--gray);flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;" title="Add image">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <input type="file" accept="image/*" onchange="saveSchedImage(this,'photo')" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
+        <label for="sched-photo-input" style="cursor:pointer;color:var(--gray);flex-shrink:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;" title="Add image">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
         </label>
-        <!-- Style of the day -->
-        <label style="cursor:pointer;flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1rem;line-height:1;" title="Style of the day">
-          👠
-          <input type="file" accept="image/*" onchange="saveSchedImage(this,'style')" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
-        </label>
-        <!-- Mindset -->
-        <button onclick="showMindsetModal()" style="border:none;background:none;cursor:pointer;color:var(--gray);flex-shrink:0;padding:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;" title="Mindset">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a7 7 0 0 1 7 7c0 3-1.5 5-3.5 6.5V18h-7v-2.5C6.5 14 5 12 5 9a7 7 0 0 1 7-7z"/><line x1="9" y1="21" x2="15" y2="21"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
-        </button>
-        <!-- Song -->
-        <button onclick="showSongModal()" style="border:none;background:none;cursor:pointer;color:var(--gray);flex-shrink:0;padding:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;" title="Add song">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        </button>
+        <input type="file" id="sched-photo-input" accept="image/*" onchange="saveSchedImage(this,'photo')" style="display:none;">
       </div>
       <div id="sched-notes-list" style="margin-top:0.6rem;"></div>
     </div>
