@@ -179,6 +179,7 @@
     if (!active) return;
     var id = active.id;
     if (id === 'schedule' && typeof loadPlannerDay === 'function') loadPlannerDay();
+    if (id === 'schedule' && typeof showSchedMainTab === 'function') { var activeSchedTab = document.querySelector('#schtab-routine[style*="var(--black)"]') ? 'routine' : (document.querySelector('#schtab-habits[style*="var(--black)"]') ? 'habits' : 'schedule'); }
     if (id === 'home' && typeof renderAnalytics === 'function') renderAnalytics();
     if (id === 'vision' && typeof renderDimensionBoards === 'function') renderDimensionBoards();
     if (id === 'vision' && typeof tgRenderAll === 'function' ) tgRenderAll();
@@ -710,14 +711,67 @@
   </div>
 
 
-  <!-- Main tabs: Schedule | Habits -->
+  <!-- Main tabs: My Routine | Schedule | Habits -->
   <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.2rem;">
-    <button id="schtab-schedule" onclick="showSchedMainTab('schedule')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--black);border:none;background:none;padding:0.5rem 1rem 0.6rem;border-bottom:2px solid var(--black);font-weight:300;">Schedule</button>
+    <button id="schtab-routine" onclick="showSchedMainTab('routine')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--black);border:none;background:none;padding:0.5rem 1rem 0.6rem;border-bottom:2px solid var(--black);font-weight:300;">My Routine</button>
+    <button id="schtab-schedule" onclick="showSchedMainTab('schedule')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 1rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">Schedule</button>
     <button id="schtab-habits" onclick="showSchedMainTab('habits')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 1rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">Habits</button>
   </div>
 
+  <!-- MY ROUTINE TAB -->
+  <div id="schmain-routine">
+    <div style="margin-bottom:1.2rem;">
+      <div style="display:flex;gap:0;border:1px solid #e8e8e5;margin-bottom:1.2rem;">
+        <button id="rtab-4am" onclick="showRoutineTab('4am')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--white);background:var(--black);border:none;padding:0.5rem 1rem;font-weight:300;">4:00 AM</button>
+        <button id="rtab-6am" onclick="showRoutineTab('6am')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);background:none;border:none;border-left:1px solid #e8e8e5;padding:0.5rem 1rem;font-weight:300;">6:00 AM</button>
+      </div>
+    </div>
+
+    <!-- calendar icon + collapsible calendar -->
+    <div style="margin-bottom:1.2rem;border-bottom:1px solid #e8e8e5;padding-bottom:1rem;">
+      <button onclick="routineToggleCal()" style="display:flex;align-items:center;gap:0.5rem;background:none;border:none;cursor:pointer;padding:0;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="4" width="16" height="14" rx="2" stroke="var(--gray)" stroke-width="1.2"/>
+          <line x1="2" y1="8" x2="18" y2="8" stroke="var(--gray)" stroke-width="1.2"/>
+          <line x1="6" y1="2" x2="6" y2="6" stroke="var(--gray)" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="14" y1="2" x2="14" y2="6" stroke="var(--gray)" stroke-width="1.2" stroke-linecap="round"/>
+          <circle cx="6.5" cy="12" r="1" fill="var(--gray)"/>
+          <circle cx="10" cy="12" r="1" fill="var(--gray)"/>
+          <circle cx="13.5" cy="12" r="1" fill="var(--gray)"/>
+        </svg>
+        <span style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">Track days</span>
+      </button>
+      <div id="routine-cal-wrap" style="display:none;margin-top:1rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.7rem;">
+          <button onclick="routineCalShift(-1)" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0 0.3rem;">&#8249;</button>
+          <span id="routine-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);"></span>
+          <button onclick="routineCalShift(1)" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0 0.3rem;">&#8250;</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;margin-bottom:4px;">
+          <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;color:var(--gray);">S</span><span style="font-family:'Nunito',sans-serif;font-size:0.6rem;color:var(--gray);">M</span><span style="font-family:'Nunito',sans-serif;font-size:0.6rem;color:var(--gray);">T</span><span style="font-family:'Nunito',sans-serif;font-size:0.6rem;color:var(--gray);">W</span><span style="font-family:'Nunito',sans-serif;font-size:0.6rem;color:var(--gray);">T</span><span style="font-family:'Nunito',sans-serif;font-size:0.6rem;color:var(--gray);">F</span><span style="font-family:'Nunito',sans-serif;font-size:0.6rem;color:var(--gray);">S</span>
+        </div>
+        <div id="routine-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;"></div>
+        <p style="font-family:'Nunito',sans-serif;font-size:0.7rem;color:var(--gray);margin-top:0.8rem;">Tap a day to check off that day's routine 🌸</p>
+      </div>
+    </div>
+
+    <!-- 4AM ROUTINE -->
+    <div id="routine-4am">
+      <p style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:0.4rem;">Chores done before work · sleeps 9 PM</p>
+      <div id="routine-4am-progress" style="font-family:'Nunito',sans-serif;font-size:0.72rem;color:var(--gray);margin-bottom:1rem;"></div>
+      <div id="routine-4am-list" style="display:flex;flex-direction:column;gap:0;"></div>
+    </div>
+
+    <!-- 6AM ROUTINE -->
+    <div id="routine-6am" style="display:none;">
+      <p style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:0.4rem;">Chores done before work · sleeps 10 PM</p>
+      <div id="routine-6am-progress" style="font-family:'Nunito',sans-serif;font-size:0.72rem;color:var(--gray);margin-bottom:1rem;"></div>
+      <div id="routine-6am-list" style="display:flex;flex-direction:column;gap:0;"></div>
+    </div>
+  </div>
+
   <!-- SCHEDULE TAB -->
-  <div id="schmain-schedule">
+  <div id="schmain-schedule" style="display:none;">
   <!-- Planner grid -->
   <div id="planner-grid" style="display:flex;flex-direction:column;gap:0.6rem;">
 
@@ -775,9 +829,26 @@
     <!-- Notes -->
     <div id="ps-notes" style="border:1px solid #c8c8c5;padding:0.8rem;">
       <div class="planner-label">Notes</div>
-      <div style="margin-top:0.4rem;">
-        <input id="sched-notes" placeholder="Anything on your mind…" onkeydown="if(event.key==='Enter'){event.preventDefault();saveSchedNote();}" style="width:100%;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.6rem;">
-        <input type="file" accept="image/*" id="sched-photo-input" style="font-size:0.82rem;width:100%;">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;">
+        <input id="sched-notes" placeholder="Anything on your mind…" onkeydown="if(event.key==='Enter'){event.preventDefault();saveSchedNote();}" style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+        <!-- Image -->
+        <label style="cursor:pointer;color:var(--gray);flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;" title="Add image">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <input type="file" accept="image/*" onchange="saveSchedImage(this,'photo')" style="display:none;">
+        </label>
+        <!-- Style of the day -->
+        <label style="cursor:pointer;flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;filter:grayscale(1);opacity:0.5;font-size:0.9rem;line-height:1;" title="Style of the day">
+          👠
+          <input type="file" accept="image/*" onchange="saveSchedImage(this,'style')" style="display:none;">
+        </label>
+        <!-- Mindset -->
+        <button onclick="showMindsetModal()" style="border:none;background:none;cursor:pointer;color:var(--gray);flex-shrink:0;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;" title="Mindset">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a7 7 0 0 1 7 7c0 3-1.5 5-3.5 6.5V18h-7v-2.5C6.5 14 5 12 5 9a7 7 0 0 1 7-7z"/><line x1="9" y1="21" x2="15" y2="21"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+        </button>
+        <!-- Song -->
+        <button onclick="showSongModal()" style="border:none;background:none;cursor:pointer;color:var(--gray);flex-shrink:0;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;" title="Add song">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </button>
       </div>
       <div id="sched-notes-list" style="margin-top:0.6rem;"></div>
     </div>
@@ -2041,33 +2112,23 @@ function saveSong() {
   renderNotes(); savePlannerDay();
 }
 
-async function saveSchedImage(input, type) {
-  var file = input.files[0];
+function saveSchedImage(input, type) {
+  const file = input.files[0];
   if (!file) return;
-  var tempId = Date.now();
-  var time = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  // Show local preview immediately using blob URL
-  var localSrc = URL.createObjectURL(file);
-  plannerNotes.unshift({ id: tempId, type: type || 'image', src: localSrc, name: file.name, time: time, uploading: true });
-  savePlannerDay();
-  renderNotes();
-  try {
-    var url = await window.uploadImageToCloud(file);
-    var idx = plannerNotes.findIndex(function(n){ return n.id === tempId; });
-    if (idx !== -1) { plannerNotes[idx].src = url; plannerNotes[idx].uploading = false; }
-    var fi = document.getElementById('sched-photo-input');
-    if (fi) fi.value = '';
-    savePlannerDay();
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    plannerNotes.unshift({
+      id: Date.now(),
+      type: type || 'image',
+      src: e.target.result,
+      name: file.name,
+      time: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+    });
+    input.value = '';
     renderNotes();
-  } catch(e) {
-    alert('Upload failed: ' + e.message);
-    var idx2 = plannerNotes.findIndex(function(n){ return n.id === tempId; });
-    if (idx2 !== -1) plannerNotes.splice(idx2, 1);
-    var fi2 = document.getElementById('sched-photo-input');
-    if (fi2) fi2.value = '';
     savePlannerDay();
-    renderNotes();
-  }
+  };
+  reader.readAsDataURL(file);
 }
 
 function saveSchedNote() {
@@ -2108,14 +2169,10 @@ function renderNotes() {
     '</div>';
     var body = '';
     if (n.type === 'image') {
-      body = n.uploading
-        ? '<div style="width:100%;height:100px;background:#f0f0ee;display:flex;align-items:center;justify-content:center;margin-top:0.4rem;font-family:\'Nunito\',sans-serif;font-size:0.72rem;color:var(--gray);">Uploading…</div>'
-        : '<img src="' + n.src + '" style="width:100%;max-height:220px;object-fit:cover;margin-top:0.4rem;border-radius:2px;" />';
+      body = '<img src="' + n.src + '" style="width:100%;max-height:220px;object-fit:cover;margin-top:0.4rem;border-radius:2px;" />';
     } else if (n.type === 'style') {
       body = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-top:0.3rem;margin-bottom:0.3rem;">Style of the day</div>' +
-             (n.uploading
-               ? '<div style="width:100%;height:100px;background:#f0f0ee;display:flex;align-items:center;justify-content:center;font-family:\'Nunito\',sans-serif;font-size:0.72rem;color:var(--gray);">Uploading…</div>'
-               : '<img src="' + n.src + '" style="width:100%;max-height:280px;object-fit:cover;border-radius:2px;" />');
+             '<img src="' + n.src + '" style="width:100%;max-height:280px;object-fit:cover;border-radius:2px;" />';
     } else if (n.type === 'song') {
       var linkHtml = n.link ? ' <a href="' + n.link + '" target="_blank" rel="noopener" style="color:var(--gray);font-size:0.72rem;text-decoration:underline;">play</a>' : '';
       body = '<div style="display:flex;align-items:center;gap:0.6rem;margin-top:0.4rem;padding:0.5rem 0.6rem;border:1px solid #e8e8e5;">' +
@@ -2265,15 +2322,6 @@ function formatTime(t) { return t||''; }
 
 initScheduleDatePicker();
 loadPlannerDay();
-
-// Attach schedule photo input listener (same pattern as Vision)
-(function() {
-  var _fi = document.getElementById('sched-photo-input');
-  if (_fi && !_fi._listenerAttached) {
-    _fi._listenerAttached = true;
-    _fi.addEventListener('change', function() { saveSchedImage(this, 'photo'); });
-  }
-})();
 
 // Vision Board styles
 const visionStyle = document.createElement('style');
@@ -5759,16 +5807,187 @@ function showHabitsTab(tab) {
   if (tab === 'rest') restLoad();
 }
 
+function routineToggleCal() {
+  var wrap = document.getElementById('routine-cal-wrap');
+  if (!wrap) return;
+  var open = wrap.style.display === 'none';
+  wrap.style.display = open ? 'block' : 'none';
+  if (open) { routineRenderCal(); }
+}
+
+var ROUTINE_ITEMS_4AM = [
+  {time:'4:00 AM', label:'Wake up + fresh air', sub:'Fix bed, wash face', color:'#1D9E75'},
+  {time:'4:20 AM', label:'Brush teeth + drink water', sub:'', color:'#1D9E75'},
+  {time:'4:30 AM', label:'Calisthenics', sub:'30 min workout', color:'#D85A30'},
+  {time:'5:00 AM', label:'Bath + get dressed', sub:'', color:'#1D9E75'},
+  {time:'5:15 AM', label:'Make breakfast', sub:'', color:'#BA7517'},
+  {time:'5:30 AM', label:'Talk to God', sub:'Bible, pray, journal, meditate', color:'#7F77DD'},
+  {time:'6:00 AM', label:'Eat breakfast', sub:'', color:'#BA7517'},
+  {time:'6:30 AM', label:'House chores', sub:'1 hr · clean while fresh!', color:'#639922'},
+  {time:'7:30 AM', label:'Work block 1', sub:'7:30 – 11:30 AM · 4 hrs', color:'#378ADD'},
+  {time:'11:30 AM', label:'Break + snack', sub:'30 min', color:'#1D9E75'},
+  {time:'12:00 PM', label:'Cook + eat lunch', sub:'', color:'#BA7517'},
+  {time:'12:30 PM', label:'Work block 2', sub:'12:30 – 3:30 PM · 3 hrs', color:'#378ADD'},
+  {time:'3:30 PM', label:'Rest', sub:'1 hr', color:'#D85A30'},
+  {time:'4:30 PM', label:'Games', sub:'1.5 hrs', color:'#378ADD'},
+  {time:'5:30 PM', label:'Cook dinner', sub:'', color:'#BA7517'},
+  {time:'6:00 PM', label:'Eat dinner', sub:'', color:'#D4537E'},
+  {time:'6:30 PM', label:'Anime', sub:'2 hrs', color:'#378ADD'},
+  {time:'7:00 PM', label:'Read book', sub:'30 min', color:'#BA7517'},
+  {time:'7:30 PM', label:'Talk to people', sub:'', color:'#D4537E'},
+  {time:'8:00 PM', label:'Study calisthenics form', sub:'30 min', color:'#D85A30'},
+  {time:'8:30 PM', label:'Journal', sub:'', color:'#7F77DD'},
+  {time:'9:00 PM', label:'Sleep', sub:'7 hrs of rest', color:'#888780'}
+];
+var ROUTINE_ITEMS_6AM = [
+  {time:'6:00 AM', label:'Wake up + fresh air', sub:'Fix bed, wash face', color:'#1D9E75'},
+  {time:'6:20 AM', label:'Brush teeth + drink water', sub:'', color:'#1D9E75'},
+  {time:'6:30 AM', label:'Calisthenics', sub:'30 min workout', color:'#D85A30'},
+  {time:'7:00 AM', label:'Bath + get dressed', sub:'', color:'#1D9E75'},
+  {time:'7:15 AM', label:'Make breakfast', sub:'', color:'#BA7517'},
+  {time:'7:30 AM', label:'Talk to God', sub:'Bible, pray, journal, meditate', color:'#7F77DD'},
+  {time:'8:00 AM', label:'Eat breakfast', sub:'', color:'#BA7517'},
+  {time:'8:30 AM', label:'House chores', sub:'1 hr · clean while fresh!', color:'#639922'},
+  {time:'9:30 AM', label:'Work block 1', sub:'9:30 AM – 1:00 PM · 3.5 hrs', color:'#378ADD'},
+  {time:'1:00 PM', label:'Break + snack', sub:'30 min', color:'#1D9E75'},
+  {time:'1:30 PM', label:'Cook + eat lunch', sub:'', color:'#BA7517'},
+  {time:'2:00 PM', label:'Work block 2', sub:'2:00 – 5:30 PM · 3.5 hrs', color:'#378ADD'},
+  {time:'5:30 PM', label:'Rest', sub:'30 min', color:'#D85A30'},
+  {time:'6:00 PM', label:'Games', sub:'1 hr', color:'#378ADD'},
+  {time:'7:00 PM', label:'Cook + eat dinner', sub:'', color:'#D4537E'},
+  {time:'7:30 PM', label:'Anime', sub:'1 hr', color:'#378ADD'},
+  {time:'8:30 PM', label:'Read book', sub:'15 min', color:'#BA7517'},
+  {time:'8:45 PM', label:'Talk to people', sub:'', color:'#D4537E'},
+  {time:'9:00 PM', label:'Study calisthenics form', sub:'15 min', color:'#D85A30'},
+  {time:'9:15 PM', label:'Journal + wind-down', sub:'', color:'#7F77DD'},
+  {time:'10:00 PM', label:'Sleep', sub:'8 hrs of rest', color:'#888780'}
+];
+
+var _routineWhich = '4am';
+var _routineCalYear = new Date().getFullYear();
+var _routineCalMonth = new Date().getMonth();
+var _routineViewDate = new Date().toISOString().slice(0,10);
+
+function routineKey(which, date) { return 'routine_checklist_' + which + '_' + date; }
+
+function routineGetData(which, date) {
+  try { return JSON.parse(localStorage.getItem(routineKey(which, date)) || '{}'); } catch(e) { return {}; }
+}
+
+function routineSaveData(which, date, data) {
+  localStorage.setItem(routineKey(which, date), JSON.stringify(data));
+}
+
+function routineDayComplete(which, date) {
+  var items = which === '4am' ? ROUTINE_ITEMS_4AM : ROUTINE_ITEMS_6AM;
+  var data = routineGetData(which, date);
+  var done = items.filter(function(it, i) { return data[i]; }).length;
+  return { done: done, total: items.length };
+}
+
+function routineRenderCal() {
+  var label = document.getElementById('routine-cal-label');
+  var grid = document.getElementById('routine-cal-grid');
+  if (!label || !grid) return;
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  label.textContent = months[_routineCalMonth] + ' ' + _routineCalYear;
+  var first = new Date(_routineCalYear, _routineCalMonth, 1).getDay();
+  var days = new Date(_routineCalYear, _routineCalMonth + 1, 0).getDate();
+  var today = new Date().toISOString().slice(0,10);
+  var html = '';
+  for (var i = 0; i < first; i++) html += '<div></div>';
+  for (var d = 1; d <= days; d++) {
+    var dateStr = _routineCalYear + '-' + String(_routineCalMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    var stat = routineDayComplete(_routineWhich, dateStr);
+    var isToday = dateStr === today;
+    var isView = dateStr === _routineViewDate;
+    var pct = stat.total > 0 ? stat.done / stat.total : 0;
+    var bg = pct === 1 ? '#1D9E75' : pct > 0 ? '#9FE1CB' : 'transparent';
+    var border = isView ? '2px solid #888' : isToday ? '2px solid #c8c8c5' : '1px solid transparent';
+    var fw = isToday || isView ? '500' : '300';
+    html += '<div onclick="routineViewDate(\'' + dateStr + '\')" style="cursor:pointer;font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:' + fw + ';padding:3px 2px;border-radius:4px;background:' + bg + ';border:' + border + ';color:' + (pct===1?'#fff':'var(--black)') + ';text-align:center;">' + d + '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function routineViewDate(date) {
+  _routineViewDate = date;
+  routineRenderChecklist();
+  routineRenderCal();
+}
+
+function routineCalShift(dir) {
+  _routineCalMonth += dir;
+  if (_routineCalMonth > 11) { _routineCalMonth = 0; _routineCalYear++; }
+  if (_routineCalMonth < 0)  { _routineCalMonth = 11; _routineCalYear--; }
+  routineRenderCal();
+}
+
+function routineToggleItem(idx) {
+  var data = routineGetData(_routineWhich, _routineViewDate);
+  data[idx] = !data[idx];
+  routineSaveData(_routineWhich, _routineViewDate, data);
+  routineRenderChecklist();
+  routineRenderCal();
+}
+
+function routineRenderChecklist() {
+  var which = _routineWhich;
+  var items = which === '4am' ? ROUTINE_ITEMS_4AM : ROUTINE_ITEMS_6AM;
+  var data = routineGetData(which, _routineViewDate);
+  var done = items.filter(function(it, i) { return data[i]; }).length;
+  var today = new Date().toISOString().slice(0,10);
+  var isToday = _routineViewDate === today;
+  var dateLabel = isToday ? 'Today' : (function(){
+    var d = new Date(_routineViewDate + 'T12:00:00');
+    return d.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'});
+  })();
+  var progEl = document.getElementById('routine-' + which + '-progress');
+  if (progEl) progEl.textContent = dateLabel + ' · ' + done + ' of ' + items.length + ' done';
+  var listEl = document.getElementById('routine-' + which + '-list');
+  if (!listEl) return;
+  listEl.innerHTML = items.map(function(it, i) {
+    var checked = !!data[i];
+    var isLast = i === items.length - 1;
+    return '<div onclick="routineToggleItem(' + i + ')" style="display:flex;align-items:flex-start;gap:1rem;padding:0.7rem 0;border-bottom:' + (isLast ? 'none' : '1px solid #f0f0ed') + ';cursor:pointer;">'
+      + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.7rem;color:var(--gray);min-width:70px;padding-top:3px;">' + it.time + '</span>'
+      + '<span style="width:18px;height:18px;border-radius:50%;border:1.5px solid ' + (checked ? 'var(--black)' : '#c8c8c5') + ';background:' + (checked ? 'var(--black)' : 'transparent') + ';flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;">'
+      + (checked ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '')
+      + '</span>'
+      + '<div style="flex:1;">'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;color:' + (checked ? 'var(--gray)' : 'var(--black)') + ';text-decoration:' + (checked ? 'line-through' : 'none') + ';">' + it.label + '</div>'
+      + (it.sub ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.72rem;color:var(--gray);">' + it.sub + '</div>' : '')
+      + '</div></div>';
+  }).join('');
+}
+
+function showRoutineTab(which) {
+  _routineWhich = which;
+  document.getElementById('routine-4am').style.display = which === '4am' ? 'block' : 'none';
+  document.getElementById('routine-6am').style.display = which === '6am' ? 'block' : 'none';
+  var b4 = document.getElementById('rtab-4am');
+  var b6 = document.getElementById('rtab-6am');
+  if (b4) { b4.style.background = which === '4am' ? 'var(--black)' : 'none'; b4.style.color = which === '4am' ? 'var(--white)' : 'var(--gray)'; }
+  if (b6) { b6.style.background = which === '6am' ? 'var(--black)' : 'none'; b6.style.color = which === '6am' ? 'var(--white)' : 'var(--gray)'; }
+  routineRenderChecklist();
+  routineRenderCal();
+}
+
 function showSchedMainTab(tab) {
+  var mr = document.getElementById('schmain-routine');
   var ms = document.getElementById('schmain-schedule');
   var mh = document.getElementById('schmain-habits');
+  var tr = document.getElementById('schtab-routine');
   var ts = document.getElementById('schtab-schedule');
   var th = document.getElementById('schtab-habits');
+  if (mr) mr.style.display = tab === 'routine' ? 'block' : 'none';
   if (ms) ms.style.display = tab === 'schedule' ? 'block' : 'none';
   if (mh) mh.style.display = tab === 'habits' ? 'block' : 'none';
+  if (tr) { tr.style.color = tab === 'routine' ? 'var(--black)' : 'var(--gray)'; tr.style.borderBottom = tab === 'routine' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (ts) { ts.style.color = tab === 'schedule' ? 'var(--black)' : 'var(--gray)'; ts.style.borderBottom = tab === 'schedule' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (th) { th.style.color = tab === 'habits' ? 'var(--black)' : 'var(--gray)'; th.style.borderBottom = tab === 'habits' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (tab === 'habits') showSchedHabitsTab('calisthenics');
+  if (tab === 'routine') { routineRenderChecklist(); routineRenderCal(); }
 }
 
 function showSchedHabitsTab(tab) {
