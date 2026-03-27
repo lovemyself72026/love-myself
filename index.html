@@ -760,6 +760,15 @@
       <p style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:0.4rem;">Chores done before work · sleeps 9 PM</p>
       <div id="routine-4am-progress" style="font-family:'Nunito',sans-serif;font-size:0.72rem;color:var(--gray);margin-bottom:1rem;"></div>
       <div id="routine-4am-list" style="display:flex;flex-direction:column;gap:0;"></div>
+
+      <!-- Notes for 4AM routine -->
+      <div style="margin-top:1.4rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;">Notes</div>
+        <div id="routine-4am-notes-day-label" style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);margin-bottom:0.5rem;letter-spacing:0.03em;"></div>
+        <textarea id="routine-4am-notes" onkeydown="routineNoteKeydown(event,'4am')" placeholder="Write a note… press Enter to save" style="width:100%;min-height:80px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);background:transparent;border:1px solid #e8e8e5;padding:0.7rem 0.8rem;resize:vertical;outline:none;line-height:1.6;box-sizing:border-box;"></textarea>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;color:var(--gray);margin-top:0.25rem;letter-spacing:0.04em;">Press Enter to save · Shift+Enter for new line</div>
+        <div id="routine-4am-notes-entries" style="margin-top:0.8rem;display:flex;flex-direction:column;gap:0.5rem;"></div>
+      </div>
     </div>
 
     <!-- 6AM ROUTINE -->
@@ -767,6 +776,15 @@
       <p style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:0.4rem;">Chores done before work · sleeps 10 PM</p>
       <div id="routine-6am-progress" style="font-family:'Nunito',sans-serif;font-size:0.72rem;color:var(--gray);margin-bottom:1rem;"></div>
       <div id="routine-6am-list" style="display:flex;flex-direction:column;gap:0;"></div>
+
+      <!-- Notes for 6AM routine -->
+      <div style="margin-top:1.4rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;">Notes</div>
+        <div id="routine-6am-notes-day-label" style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);margin-bottom:0.5rem;letter-spacing:0.03em;"></div>
+        <textarea id="routine-6am-notes" onkeydown="routineNoteKeydown(event,'6am')" placeholder="Write a note… press Enter to save" style="width:100%;min-height:80px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);background:transparent;border:1px solid #e8e8e5;padding:0.7rem 0.8rem;resize:vertical;outline:none;line-height:1.6;box-sizing:border-box;"></textarea>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;color:var(--gray);margin-top:0.25rem;letter-spacing:0.04em;">Press Enter to save · Shift+Enter for new line</div>
+        <div id="routine-6am-notes-entries" style="margin-top:0.8rem;display:flex;flex-direction:column;gap:0.5rem;"></div>
+      </div>
     </div>
   </div>
 
@@ -8725,7 +8743,95 @@ function assRenderLog() {
       '</div>';
   }).join('');
 }
-</script>
 
-</body>
+// ── Routine Notes (multi-note log, per day) ───────────────────────────────────
+function _rNoteKey(tab, dateStr) {
+  return 'routine_notes_v2_' + tab + '_' + dateStr;
+}
+
+function routineNoteKeydown(e, tab) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    routineNoteSave(tab);
+  }
+}
+
+function routineNoteSave(tab) {
+  var el = document.getElementById('routine-' + tab + '-notes');
+  if (!el) return;
+  var text = el.value.trim();
+  if (!text) return;
+  var dateStr = (typeof _routineViewDate !== 'undefined') ? _routineViewDate : new Date().toISOString().slice(0,10);
+  var key = _rNoteKey(tab, dateStr);
+  var notes = JSON.parse(localStorage.getItem(key) || '[]');
+  notes.unshift({ text: text, savedAt: new Date().toISOString() });
+  localStorage.setItem(key, JSON.stringify(notes));
+  el.value = '';
+  routineNoteRenderEntries(tab);
+}
+
+function routineNoteRenderEntries(tab) {
+  var el = document.getElementById('routine-' + tab + '-notes-entries');
+  if (!el) return;
+  var dateStr = (typeof _routineViewDate !== 'undefined') ? _routineViewDate : new Date().toISOString().slice(0,10);
+  var key = _rNoteKey(tab, dateStr);
+  var notes = JSON.parse(localStorage.getItem(key) || '[]');
+  // Update day label
+  var labelEl = document.getElementById('routine-' + tab + '-notes-day-label');
+  if (labelEl) {
+    var isToday = dateStr === new Date().toISOString().slice(0,10);
+    var d = new Date(dateStr + 'T00:00:00');
+    labelEl.textContent = isToday ? 'Today' : d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  }
+  if (!notes.length) { el.innerHTML = ''; return; }
+  el.innerHTML = notes.map(function(n, i) {
+    var d = new Date(n.savedAt);
+    var timeLabel = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    return '<div style="border:1px solid #e8e8e5;padding:0.75rem 0.9rem;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.35rem;">' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + timeLabel + '</div>' +
+      '<button onclick="routineNoteDelete(\'' + tab + '\',' + i + ')" style="border:none;background:none;cursor:pointer;font-size:0.9rem;color:#ccc;padding:0;line-height:1;">×</button>' +
+      '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;white-space:pre-wrap;">' + n.text + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function routineNoteDelete(tab, idx) {
+  var dateStr = (typeof _routineViewDate !== 'undefined') ? _routineViewDate : new Date().toISOString().slice(0,10);
+  var key = _rNoteKey(tab, dateStr);
+  var notes = JSON.parse(localStorage.getItem(key) || '[]');
+  notes.splice(idx, 1);
+  localStorage.setItem(key, JSON.stringify(notes));
+  routineNoteRenderEntries(tab);
+}
+
+function routineNoteLoad(tab) {
+  var el = document.getElementById('routine-' + tab + '-notes');
+  if (el) el.value = '';
+  routineNoteRenderEntries(tab);
+}
+
+// Hook into date change
+var _origRoutineViewDate = routineViewDate;
+routineViewDate = function(date) {
+  _origRoutineViewDate(date);
+  routineNoteLoad('4am');
+  routineNoteLoad('6am');
+};
+
+// Hook into tab switch
+var _origShowRoutineTab = typeof showRoutineTab === 'function' ? showRoutineTab : null;
+if (_origShowRoutineTab) {
+  showRoutineTab = function(tab) {
+    _origShowRoutineTab(tab);
+    routineNoteLoad(tab);
+  };
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  routineNoteLoad('4am');
+  routineNoteLoad('6am');
+});
+</script></body>
 </html>
