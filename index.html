@@ -3369,7 +3369,7 @@ function belCheckinRender() {
 
 
 function showMeTab(tab) {
-  ['whiam','rightforme','assertive'].forEach(function(t) {
+  ['whiam','rightforme','assertive','infp'].forEach(function(t) {
     var el = document.getElementById('mesub-' + t);
     var btn = document.getElementById('metab-' + t);
     if (el) el.style.display = t === tab ? 'block' : 'none';
@@ -3884,6 +3884,7 @@ window.addEventListener('DOMContentLoaded', function() {
   <!-- Me sub-tabs -->
   <div id="me-subtab-row" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
     <button class="balance-sub-tab active" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
+    <button class="balance-sub-tab" onclick="showMeTab('infp')" id="metab-infp">INFP</button>
     <button class="balance-sub-tab" onclick="showMeTab('assertive')" id="metab-assertive">Assertive</button>
     <button class="balance-sub-tab" onclick="showMeTab('rightforme')" id="metab-rightforme">Right For Me</button>
   </div>
@@ -4084,8 +4085,8 @@ window.addEventListener('DOMContentLoaded', function() {
   </div>
   </div> <!-- /whopanel-explore -->
   </div> <!-- /mesub-whiam -->
-    <div id="mesub-assertive" style="display:none;">
-  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">Ask for what you need. Give what you can. Stay yourself.</div>
+    <div id="mesub-assertive" style="display:none;padding:0 1.8rem;margin-top:-2.5rem;">
+  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0 0 1rem;line-height:1.6;">Ask for what you need. Give what you can. Stay yourself.</div>
 
   <div id="ass-checkin-log" style="margin-bottom:1.5rem;"></div>
 
@@ -4256,8 +4257,8 @@ window.addEventListener('DOMContentLoaded', function() {
     <div id="ass-log-entries"></div>
   </div>
 </div>
-    <div id="mesub-rightforme" style="display:none;">
-  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">Clarity before connection. Know what you need, then see who shows up.</div>
+    <div id="mesub-rightforme" style="display:none;padding-top:0;margin-top:-2.5rem;">
+  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0 0 1rem;line-height:1.6;">Clarity before connection. Know what you need, then see who shows up.</div>
 
   <!-- Inner tabs -->
   <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;" id="rfm-tab-bar">
@@ -4417,6 +4418,225 @@ window.addEventListener('DOMContentLoaded', function() {
 <!-- ASSERTIVE SECTION -->
 
   </div><!-- end me section -->
+
+<div id="mesub-infp" style="display:none;padding:0 1.8rem;margin-top:-1.8rem;">
+
+  <!-- Fi Ne Si Te tabs -->
+  <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;margin-left:-0.3rem;margin-right:-0.3rem;">
+    <button class="balance-sub-tab active" onclick="infpTab('fi')" id="infptab-fi" style="flex:1;">Fi</button>
+    <button class="balance-sub-tab" onclick="infpTab('ne')" id="infptab-ne" style="flex:1;">Ne</button>
+    <button class="balance-sub-tab" onclick="infpTab('si')" id="infptab-si" style="flex:1;">Si</button>
+    <button class="balance-sub-tab" onclick="infpTab('te')" id="infptab-te" style="flex:1;">Te</button>
+    <button class="balance-sub-tab" onclick="infpTab('overview')" id="infptab-overview" style="flex:1;">Overview</button>
+  </div>
+
+  <!-- Fi panel -->
+  <div id="infppanel-fi" style="padding-top:1rem;">
+    <div style="display:flex;align-items:baseline;gap:0.6rem;margin-bottom:0.4rem;">
+      <div style="font-family:'Lora',serif;font-size:1.1rem;">Fi</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Introverted Feeling · Dominant</div>
+    </div>
+    <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;margin-bottom:1.2rem;">Your core. You have a deep internal value system that is entirely your own not what others told you to believe, but what you have felt and decided is true. You filter everything through this. When something violates your values, you feel it before you can explain it. Authenticity matters more to you than approval.</div>
+    <div id="infp-fi-list"></div>
+    <input id="infp-fi-list-input" type="text" placeholder="Add to list..." onkeydown="if(event.key==='Enter')infpListAdd('fi')" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:1.2rem;box-sizing:border-box;">
+    <div id="infp-fi-entries"></div>
+    <textarea id="infp-fi-input" placeholder="Your notes on Fi..." onkeydown="infpNoteKeydown(event,'fi')" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:300;color:var(--black);resize:none;min-height:60px;outline:none;padding:0.3rem 0;line-height:1.6;box-sizing:border-box;"></textarea>
+  </div>
+
+  <!-- Ne panel -->
+  <div id="infppanel-ne" style="display:none;padding-top:1rem;">
+    <div style="display:flex;align-items:baseline;gap:0.6rem;margin-bottom:0.4rem;">
+      <div style="font-family:'Lora',serif;font-size:1.1rem;">Ne</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Extroverted Intuition · Auxiliary</div>
+    </div>
+    <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;margin-bottom:1.2rem;">Your mind sees connections everywhere between ideas, people, patterns, possibilities. You are drawn to what could be. You love exploring concepts, asking what if, and finding meaning in unexpected places. Ne keeps you curious, open, and imaginative, always generating new ways of seeing things.</div>
+    <div id="infp-ne-list"></div>
+    <input id="infp-ne-list-input" type="text" placeholder="Add to list..." onkeydown="if(event.key==='Enter')infpListAdd('ne')" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:1.2rem;box-sizing:border-box;">
+    <div id="infp-ne-entries"></div>
+    <textarea id="infp-ne-input" placeholder="Your notes on Ne..." onkeydown="infpNoteKeydown(event,'ne')" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:300;color:var(--black);resize:none;min-height:60px;outline:none;padding:0.3rem 0;line-height:1.6;box-sizing:border-box;"></textarea>
+  </div>
+
+  <!-- Si panel -->
+  <div id="infppanel-si" style="display:none;padding-top:1rem;">
+    <div style="display:flex;align-items:baseline;gap:0.6rem;margin-bottom:0.4rem;">
+      <div style="font-family:'Lora',serif;font-size:1.1rem;">Si</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Introverted Sensing · Tertiary</div>
+    </div>
+    <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;margin-bottom:1.2rem;">Your memory and comfort. Si holds on to personal experiences, feelings tied to specific moments, and the quiet comfort of the familiar. It is why nostalgia hits you deeply, why certain places or rituals feel sacred, and why your past shapes how you experience the present. It grounds you when the world gets too loud.</div>
+    <div id="infp-si-list"></div>
+    <input id="infp-si-list-input" type="text" placeholder="Add to list..." onkeydown="if(event.key==='Enter')infpListAdd('si')" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:1.2rem;box-sizing:border-box;">
+    <div id="infp-si-entries"></div>
+    <textarea id="infp-si-input" placeholder="Your notes on Si..." onkeydown="infpNoteKeydown(event,'si')" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:300;color:var(--black);resize:none;min-height:60px;outline:none;padding:0.3rem 0;line-height:1.6;box-sizing:border-box;"></textarea>
+  </div>
+
+  <!-- Te panel -->
+  <div id="infppanel-te" style="display:none;padding-top:1rem;">
+    <div style="display:flex;align-items:baseline;gap:0.6rem;margin-bottom:0.4rem;">
+      <div style="font-family:'Lora',serif;font-size:1.1rem;">Te</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Extroverted Thinking · Inferior</div>
+    </div>
+    <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--gray);line-height:1.6;margin-bottom:1.2rem;">Your growing edge. Te is about structure, efficiency, and getting things done in the external world. As your inferior function, it is where you feel least confident planning, organizing, being decisive under pressure. But when you are healthy and grounded, Te gives you the ability to actually bring your inner world out into reality.</div>
+    <div id="infp-te-list"></div>
+    <input id="infp-te-list-input" type="text" placeholder="Add to list..." onkeydown="if(event.key==='Enter')infpListAdd('te')" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:1.2rem;box-sizing:border-box;">
+    <div id="infp-te-entries"></div>
+    <textarea id="infp-te-input" placeholder="Your notes on Te..." onkeydown="infpNoteKeydown(event,'te')" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:300;color:var(--black);resize:none;min-height:60px;outline:none;padding:0.3rem 0;line-height:1.6;box-sizing:border-box;"></textarea>
+  </div>
+  <!-- Overview panel -->
+  <div id="infppanel-overview" style="display:none;padding-top:1rem;">
+
+    <!-- Checklist count summary -->
+    <div id="infp-overview-summary" style="display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:1.5rem;margin-left:5rem;margin-right:5rem;"></div>
+
+
+
+  </div>
+
+</div>
+
+<script>
+function infpTab(tab) {
+  ['fi','ne','si','te','overview'].forEach(function(t) {
+    var panel = document.getElementById('infppanel-' + t);
+    if (panel) panel.style.display = t === tab ? 'block' : 'none';
+    var btn = document.getElementById('infptab-' + t);
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  if (tab === 'overview') { infpRenderOverviewSummary(); }
+  else { infpRenderList(tab); infpRenderNotes(tab); }
+}
+
+function infpRenderOverviewSummary() {
+  var el = document.getElementById('infp-overview-summary');
+  if (!el) return;
+  el.innerHTML = '';
+  var fullNames = { fi:'Introverted Feeling', ne:'Extroverted Intuition', si:'Introverted Sensing', te:'Extroverted Thinking' };
+  ['fi','si','ne','te'].forEach(function(t) {
+    var items = JSON.parse(localStorage.getItem('infp_list_' + t) || '[]');
+    var notes = JSON.parse(localStorage.getItem('infp_notes_' + t) || '[]');
+    var label = t.toUpperCase();
+
+    var itemsHtml = items.length
+      ? items.map(function(item) {
+          return '<div style="display:flex;align-items:flex-start;gap:0.4rem;margin-bottom:0.25rem;">' +
+            '<span style="margin-top:0.05rem;color:' + (item.checked ? 'var(--black)' : '#ccc') + ';font-size:0.7rem;">&#10003;</span>' +
+            '<span style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:' + (item.checked ? 'var(--gray)' : 'var(--black)') + ';text-decoration:' + (item.checked ? 'line-through' : 'none') + ';line-height:1.5;">' + item.text + '</span>' +
+          '</div>';
+        }).join('')
+      : '';
+
+    var notesHtml = notes.length
+      ? notes.map(function(n) {
+          return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);line-height:1.6;border-left:2px solid #e8e8e5;padding-left:0.6rem;margin-bottom:0.4rem;white-space:pre-wrap;">' + n.text + '</div>';
+        }).join('')
+      : '';
+
+    var isEmpty = !items.length && !notes.length;
+
+    el.innerHTML += '<div style="border:1px solid #e8e8e5;padding:0.9rem 1.5rem;margin-bottom:0;margin-top:-1px;">' +
+      '<div style="display:flex;align-items:baseline;gap:0.6rem;margin-bottom:0.5rem;">' +
+        '<div style="font-family:\'Lora\',serif;font-size:1.1rem;">' + label + '</div>' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">' + fullNames[t] + '</div>' +
+      '</div>' +
+      (isEmpty ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:#ccc;">Nothing added yet.</div>' : '') +
+      (itemsHtml ? '<div style="margin-bottom:' + (notesHtml ? '0.7rem' : '0') + ';">' + itemsHtml + '</div>' : '') +
+      (notesHtml || '') +
+    '</div>';
+  });
+}
+
+function infpListAdd(tab) {
+  var inp = document.getElementById('infp-' + tab + '-list-input');
+  var text = inp.value.trim();
+  if (!text) return;
+  var items = JSON.parse(localStorage.getItem('infp_list_' + tab) || '[]');
+  items.push({ text: text, checked: false });
+  localStorage.setItem('infp_list_' + tab, JSON.stringify(items));
+  inp.value = '';
+  infpRenderList(tab);
+}
+
+function infpListDelete(tab, idx) {
+  var items = JSON.parse(localStorage.getItem('infp_list_' + tab) || '[]');
+  items.splice(idx, 1);
+  localStorage.setItem('infp_list_' + tab, JSON.stringify(items));
+  infpRenderList(tab);
+}
+
+function infpListToggle(tab, idx) {
+  var items = JSON.parse(localStorage.getItem('infp_list_' + tab) || '[]');
+  items[idx].checked = !items[idx].checked;
+  localStorage.setItem('infp_list_' + tab, JSON.stringify(items));
+  infpRenderList(tab);
+}
+
+function infpRenderList(tab) {
+  var el = document.getElementById('infp-' + tab + '-list');
+  if (!el) return;
+  var items = JSON.parse(localStorage.getItem('infp_list_' + tab) || '[]');
+  if (!items.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div style="margin-bottom:0.8rem;">' + items.map(function(item, i) {
+    var checked = item.checked;
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.45rem 0;border-bottom:1px solid #f0f0ec;">' +
+      '<div style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;" onclick="infpListToggle(\'' + tab + '\',' + i + ')">' +
+      '<div style="width:14px;height:14px;border:1px solid ' + (checked ? 'var(--black)' : '#c8c8c5') + ';background:' + (checked ? 'var(--black)' : 'transparent') + ';flex-shrink:0;display:flex;align-items:center;justify-content:center;">' +
+      (checked ? '<div style="width:8px;height:8px;background:var(--white);clip-path:polygon(20% 50%,40% 70%,80% 20%,80% 30%,40% 85%,15% 60%);"></div>' : '') +
+      '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.85rem;font-weight:300;color:' + (checked ? 'var(--gray)' : 'var(--black)') + ';text-decoration:' + (checked ? 'line-through' : 'none') + ';">' + item.text + '</div>' +
+      '</div>' +
+      '<button onclick="infpListDelete(\'' + tab + '\',' + i + ')" style="border:none;background:none;cursor:pointer;font-size:0.9rem;color:#ccc;padding:0;line-height:1;flex-shrink:0;">×</button>' +
+      '</div>';
+  }).join('') + '</div>';
+}
+
+function infpNoteKeydown(e, tab) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    infpNoteSave(tab);
+  }
+}
+
+function infpNoteSave(tab) {
+  var el = document.getElementById('infp-' + tab + '-input');
+  if (!el) return;
+  var text = el.value.trim();
+  if (!text) return;
+  var notes = JSON.parse(localStorage.getItem('infp_notes_' + tab) || '[]');
+  notes.unshift({ text: text, savedAt: new Date().toISOString() });
+  localStorage.setItem('infp_notes_' + tab, JSON.stringify(notes));
+  el.value = '';
+  infpRenderNotes(tab);
+}
+
+function infpNoteDelete(tab, idx) {
+  var notes = JSON.parse(localStorage.getItem('infp_notes_' + tab) || '[]');
+  notes.splice(idx, 1);
+  localStorage.setItem('infp_notes_' + tab, JSON.stringify(notes));
+  infpRenderNotes(tab);
+}
+
+function infpRenderNotes(tab) {
+  var el = document.getElementById('infp-' + tab + '-entries');
+  if (!el) return;
+  var notes = JSON.parse(localStorage.getItem('infp_notes_' + tab) || '[]');
+  if (!notes.length) { el.innerHTML = ''; return; }
+  el.innerHTML = notes.map(function(n, i) {
+    var d = new Date(n.savedAt);
+    var label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    return '<div style="border:1px solid #e8e8e5;padding:0.8rem 1rem;margin-bottom:0.6rem;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + label + '</div>' +
+      '<button onclick="infpNoteDelete(\'' + tab + '\',' + i + ')" style="border:none;background:none;cursor:pointer;font-size:0.9rem;color:#ccc;padding:0;line-height:1;">×</button>' +
+      '</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;white-space:pre-wrap;">' + n.text + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  infpRenderList('fi');
+  infpRenderNotes('fi');
+});
+</script>
 
 </div>
 
