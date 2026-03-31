@@ -541,11 +541,7 @@
   <br>
   <div class="subtitle">My Daily practice</div>
   <h1>Good to see you today.</h1><br>
-  <!-- Analytics -->
-  <div class="subtitle" style="margin-bottom:0.3rem;">My progress</div>
-  <h2 style="margin-bottom:1.5rem;">Analytics.</h2>
-  <div id="home-analytics"></div>
-  <hr style="margin:2rem 0;">
+
 
   <div class="home-grid">
 
@@ -570,43 +566,44 @@
     </div>
 
     <div class="home-card" style="cursor:default;">
-      <div class="home-card-title">Vision Board</div>
+      <div class="home-card-title">Me</div>
       <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
-        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-spiritual')&&document.getElementById('dim-spiritual').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Spiritual</div>
-        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-social')&&document.getElementById('dim-social').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Social</div>
-        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-physical')&&document.getElementById('dim-physical').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Physical</div>
-        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-nutritional')&&document.getElementById('dim-nutritional').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Nutritional</div>
-        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-emotional')&&document.getElementById('dim-emotional').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Emotional</div>
-        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('dim-financial')&&document.getElementById('dim-financial').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Financial</div>
-        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('whoi-grid')&&document.getElementById('whoi-grid').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Who I Am</div>
+        <div onclick="showSection('me');setTimeout(()=>showMeTab('whiam'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Who I Am</div>
+        <div onclick="showSection('me');setTimeout(()=>showMeTab('assertive'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Assertive</div>
+        <div onclick="showSection('me');setTimeout(()=>showMeTab('believe'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Believe</div>
+        <div onclick="showSection('me');setTimeout(()=>showMeTab('rightforme'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Right For Me</div>
       </div>
     </div>
 
     <div class="home-card" style="cursor:default;">
       <div class="home-card-title">Schedule</div>
       <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
-        <div onclick="goToScheduleItem('ps-schedule')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Schedule</div>
-        <div onclick="goToScheduleItem('ps-todo')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">To Do</div>
-        <div onclick="goToScheduleItem('ps-notes')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Notes</div>
-        <div onclick="goToScheduleItem('ps-mood')" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Mood</div>
+        <div onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('routine'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">My Routine</div>
+        <div onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('schedule'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Daily Schedule</div>
+        <div onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('habits'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Calisthenics</div>
         <div id="home-sched-preview" style="margin-top:0.5rem;"></div>
       </div>
     </div>
 
     <div class="home-card" style="cursor:default;">
-      <div class="home-card-title">Me</div>
+      <div class="home-card-title">Vision Board</div>
       <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
-        <div onclick="showSection('me');setTimeout(()=>showMeTab('whiam'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Who I Am</div>
-        <div onclick="showSection('me');setTimeout(()=>showMeTab('rightforme'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Right For Me</div>
+        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('vision-board-section')&&document.getElementById('vision-board-section').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Vision Board</div>
+        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('tg-all-list')&&document.getElementById('tg-all-list').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">She's Already In You</div>
       </div>
     </div>
 
     <div class="home-card" style="cursor:default;">
-      <div class="home-card-title">Habits</div>
+      <div class="home-card-title">Today's Progress</div>
       <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
-        <div onclick="showSection('habits');setTimeout(()=>showHabitsTab('calisthenics'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Calisthenics</div>
-        <div onclick="showSection('habits');setTimeout(()=>showHabitsTab('daily'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Daily</div>
-        <div onclick="showSection('habits');setTimeout(()=>showHabitsTab('bodycare'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Body Care</div>
+        <div onclick="showSection('schedule');setTimeout(()=>{ showSchedMainTab('schedule'); goToScheduleItem('ps-todo'); },100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">To Do</div>
+        <div onclick="showSection('schedule');setTimeout(()=>{ showSchedMainTab('schedule'); goToScheduleItem('ps-schedule'); },100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Schedule</div>
+        <div onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('schedule'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Mood</div>
+        <div onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('schedule'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Sleep (hrs)</div>
+        <div onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('schedule'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Water</div>
+        <div onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('schedule'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Meals</div>
+        <div onclick="showSection('schedule');setTimeout(()=>{ showSchedMainTab('schedule'); goToScheduleItem('ps-notes'); },100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Notes</div>
+        <div onclick="showSection('schedule');setTimeout(()=>{ showSchedMainTab('schedule'); goToScheduleItem('ps-photos'); },100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Photos</div>
       </div>
     </div>
 
@@ -628,58 +625,25 @@
 
   <!-- That Girl Vision -->
   <hr style="margin:2.5rem 0;">
-  <div class="subtitle" style="margin-bottom:0.5rem;">She's already in you</div>
-  <h2 style="margin-bottom:0.5rem;">What it looks like to be that girl.</h2>
-  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.2rem;line-height:1.6;">Paint a picture of her, how she moves, feels, lives, shows up 🤍</div>
+  <div class="subtitle">She's already in you</div>
+  <h1>What it looks like to be that girl.</h1>
+  <div style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:'Lora',serif;margin:0.5rem 0 1.5rem;line-height:1.6;">Paint a picture of her, how she moves, feels, lives, shows up 🤍</div>
 
+  <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">
+    <button class="vision-type-btn active" id="tgcat-morning"   onclick="tgSetCategory('morning')"      >MORNING</button>
+    <button class="vision-type-btn"        id="tgcat-looks"     onclick="tgSetCategory('looks')"        >LOOKS</button>
+    <button class="vision-type-btn"        id="tgcat-health"    onclick="tgSetCategory('health')"       >HEALTH</button>
+    <button class="vision-type-btn"        id="tgcat-mindset"   onclick="tgSetCategory('mindset')"      >MINDSET</button>
+    <button class="vision-type-btn"        id="tgcat-time"      onclick="tgSetCategory('time')"         >TIME</button>
+    <button class="vision-type-btn"        id="tgcat-relationships" onclick="tgSetCategory('relationships')">RELATIONSHIPS</button>
+    <button class="vision-type-btn"        id="tgcat-feeling"   onclick="tgSetCategory('feeling')"      >FEELING</button>
+  </div>
   <div style="display:flex;align-items:center;gap:0.5rem;border-bottom:1px solid #c8c8c5;padding-bottom:0.4rem;margin-bottom:0.8rem;">
-    <select id="tg-category" style="border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;cursor:pointer;padding:0.3rem 0;flex-shrink:0;">
-      <option value="morning">Morning</option>
-      <option value="looks">Looks</option>
-      <option value="health">Health</option>
-      <option value="mindset">Mindset</option>
-      <option value="time">Time</option>
-      <option value="relationships">Relationships</option>
-      <option value="feeling">Feeling</option>
-    </select>
-    <input id="tg-main-input" type="text" placeholder="e.g. she rises early, makes her bed…" onkeydown="if(event.key==='Enter')tgAddMain()" onblur="tgAddMain()" style="flex:1;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+    <input id="tg-main-input" type="text" placeholder="e.g. she rises early, makes her bed…" onkeydown="if(event.key==='Enter')tgAddMain()" onblur="tgAddMain()" style="flex:1;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
   </div>
   <div id="tg-all-list" style="margin-bottom:1.5rem;"></div>
 
-  <!-- Who I Am -->
-  <hr style="margin:2.5rem 0;">
-  <div class="subtitle" style="margin-bottom:0.5rem;">Who I am</div>
-  <h2 style="margin-bottom:0.5rem;">Track your growth.</h2>
-  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Add words, thoughts, and pictures that reflect who you are 🤍</div>
 
-  <!-- Date navigation -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-    <button onclick="changeWhoiDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
-    <span id="whoi-date-picker-label" onclick="document.getElementById('whoi-date-picker').showPicker?document.getElementById('whoi-date-picker').showPicker():document.getElementById('whoi-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="whoi-date-picker" onchange="renderWhoiGrid()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
-    <button onclick="changeWhoiDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
-  </div>
-
-  <!-- Type selector -->
-  <div style="display:flex;gap:0.4rem;margin-bottom:0.8rem;">
-    <button class="vision-type-btn active" id="whoi-btn-word" onclick="setWhoiType('word')">Word</button>
-    <button class="vision-type-btn" id="whoi-btn-thought" onclick="setWhoiType('thought')">Thought</button>
-    <button class="vision-type-btn" id="whoi-btn-image" onclick="setWhoiType('image')">Image</button>
-  </div>
-
-  <div id="whoi-input-word" style="display:flex;gap:0.5rem;align-items:center;">
-    <input id="whoi-text-word" placeholder="e.g. Resilient, Creative, Kind..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
-    <button onclick="addWhoiItem()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
-  </div>
-  <div id="whoi-input-thought" style="display:none;gap:0.5rem;align-items:center;">
-    <input id="whoi-text-thought" placeholder="Something true about me..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
-    <button onclick="addWhoiItem()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
-  </div>
-  <div id="whoi-input-image" style="display:none;">
-    <input type="file" accept="image/*" onchange="addWhoiImage(this)" style="font-size:0.82rem;width:100%;">
-  </div>
-
-  <div id="whoi-grid" class="vision-items-grid" style="margin-top:1rem;"></div>
-  <div id="whoi-saved-note" style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);letter-spacing:0.1em;text-align:center;margin-top:0.5rem;"></div>
 </div>
 
 <div class="section" id="schedule">
@@ -1409,14 +1373,7 @@ function saveMirror(){}
 
 
 // Life Dimension Vision Boards
-const lifeDimensions = [
-  { key: 'spiritual',   label: 'Spiritual',   icon: '✨', desc: 'Purpose, faith, meaning, mindfulness' },
-  { key: 'social',      label: 'Social',      icon: '🫂', desc: 'Relationships, community, connection' },
-  { key: 'physical',    label: 'Physical',    icon: '💪', desc: 'Exercise, sleep, nutrition, body care' },
-  { key: 'nutritional', label: 'Nutritional', icon: '🥗', desc: 'What you eat, hydration, nourishment' },
-  { key: 'emotional',   label: 'Emotional',   icon: '🤍', desc: 'Feelings, self-awareness, inner peace' },
-  { key: 'financial',   label: 'Financial',   icon: '💰', desc: 'Savings, spending, financial goals' },
-];
+const lifeDimensions = [];
 
 let dimensionItems = JSON.parse(localStorage.getItem('dimension_items') || '{}');
 let activeDimType = {};
@@ -1546,11 +1503,20 @@ function tgSaveToDB() {
   if (typeof window.syncToCloud === 'function') window.syncToCloud('that_girl_data', tgData);
 }
 
+var _tgCurrentCat = 'morning';
+
+function tgSetCategory(key) {
+  _tgCurrentCat = key;
+  ['morning','looks','health','mindset','time','relationships','feeling'].forEach(function(k) {
+    var btn = document.getElementById('tgcat-' + k);
+    if (btn) btn.classList.toggle('active', k === key);
+  });
+}
+
 function tgAddMain() {
-  var cat = document.getElementById('tg-category');
   var input = document.getElementById('tg-main-input');
-  if (!cat || !input) return;
-  var key = cat.value;
+  if (!input) return;
+  var key = _tgCurrentCat;
   var val = input.value.trim();
   if (!val) return;
   if (!tgData[key]) tgData[key] = [];
@@ -1569,7 +1535,7 @@ function tgRemove(key, id) {
   tgRenderAll(true);
 }
 
-var TG_LABELS = { morning:'Morning', looks:'Looks', health:'Health', mindset:'Mindset', time:'Time', relationships:'Relationships', feeling:'Feeling' };
+var TG_LABELS = { morning:'MORNING', looks:'LOOKS', health:'HEALTH', mindset:'MINDSET', time:'TIME', relationships:'RELATIONSHIPS', feeling:'FEELING' };
 
 function tgRenderAll(skipLoad) {
   if (!skipLoad) {
@@ -4273,8 +4239,6 @@ window.addEventListener('DOMContentLoaded', function() {
     <div id="mesub-whiam">
     <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">You performed from every angle. Now you build from within.</div>
 
-
-
     <!-- IDENTITY -->
     <div class="wia-panel active" id="wia-identity">
       <div class="wia-identity-card" style="margin-bottom:0.6rem;">
@@ -4299,6 +4263,41 @@ window.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
     </div>
+
+  <!-- Who I Am -->
+  <hr style="margin:2.5rem 0;">
+  <div class="subtitle" style="margin-bottom:0.5rem;">Who I am</div>
+  <h2 style="margin-bottom:0.5rem;">Track your growth.</h2>
+  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Add words, thoughts, and pictures that reflect who you are 🤍</div>
+
+  <!-- Date navigation -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+    <button onclick="changeWhoiDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
+    <span id="whoi-date-picker-label" onclick="document.getElementById('whoi-date-picker').showPicker?document.getElementById('whoi-date-picker').showPicker():document.getElementById('whoi-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="whoi-date-picker" onchange="renderWhoiGrid()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
+    <button onclick="changeWhoiDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
+  </div>
+
+  <!-- Type selector -->
+  <div style="display:flex;gap:0.4rem;margin-bottom:0.8rem;">
+    <button class="vision-type-btn active" id="whoi-btn-word" onclick="setWhoiType('word')">Word</button>
+    <button class="vision-type-btn" id="whoi-btn-thought" onclick="setWhoiType('thought')">Thought</button>
+    <button class="vision-type-btn" id="whoi-btn-image" onclick="setWhoiType('image')">Image</button>
+  </div>
+
+  <div id="whoi-input-word" style="display:flex;gap:0.5rem;align-items:center;">
+    <input id="whoi-text-word" placeholder="e.g. Resilient, Creative, Kind..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
+    <button onclick="addWhoiItem()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
+  </div>
+  <div id="whoi-input-thought" style="display:none;gap:0.5rem;align-items:center;">
+    <input id="whoi-text-thought" placeholder="Something true about me..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
+    <button onclick="addWhoiItem()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
+  </div>
+  <div id="whoi-input-image" style="display:none;">
+    <input type="file" accept="image/*" onchange="addWhoiImage(this)" style="font-size:0.82rem;width:100%;">
+  </div>
+
+  <div id="whoi-grid" class="vision-items-grid" style="margin-top:1rem;"></div>
+  <div id="whoi-saved-note" style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);letter-spacing:0.1em;text-align:center;margin-top:0.5rem;"></div>
 
     <!-- PERFORM -->
     <div class="wia-panel" id="wia-perform">
@@ -4908,9 +4907,9 @@ window.addEventListener('DOMContentLoaded', function() {
   <!-- Journal sub-tabs -->
   <div id="journal-subtab-row" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
     <button class="balance-sub-tab active" onclick="showJournalTab('belief')" id="jtabn-belief">Belief</button>
-    <button class="balance-sub-tab" onclick="showJournalTab('wins')" id="jtabn-wins">Wins</button>
     <button class="balance-sub-tab" onclick="showJournalTab('vent')" id="jtabn-vent">Journal</button>
     <button class="balance-sub-tab" onclick="showJournalTab('books')" id="jtabn-books">Books</button>
+    <button class="balance-sub-tab" onclick="showJournalTab('wins')" id="jtabn-wins">Wins</button>
   </div>
 
     <!-- BELIEF -->
