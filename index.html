@@ -23,7 +23,7 @@
     'bel_foundation','bel_evidence','bel_failure','belief_beliefs',
     'balance_data','that_girl_data','vision_items','ritual_state','user_rituals',
     'bc_habits_data','face_habits_data','daily_data','rfm_data','jesus_data'];
-  const SYNC_PREFIXES = ['ass_entries_','ass_notes_','jesus_','bc_','rfm_'];
+  const SYNC_PREFIXES = ['ass_entries_','ass_notes_','jesus_','bc_','rfm_','routine_extras_'];
 
   function _shouldSync(key) {
     return SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
@@ -761,13 +761,31 @@
       <div id="routine-4am-progress" style="font-family:'Nunito',sans-serif;font-size:0.72rem;color:var(--gray);margin-bottom:1rem;"></div>
       <div id="routine-4am-list" style="display:flex;flex-direction:column;gap:0;"></div>
 
-      <!-- Notes for 4AM routine -->
-      <div style="margin-top:1.4rem;">
-        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;">Notes</div>
-        <div id="routine-4am-notes-day-label" style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);margin-bottom:0.5rem;letter-spacing:0.03em;"></div>
-        <textarea id="routine-4am-notes" onkeydown="routineNoteKeydown(event,'4am')" placeholder="Write a note… press Enter to save" style="width:100%;min-height:80px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);background:transparent;border:1px solid #e8e8e5;padding:0.7rem 0.8rem;resize:vertical;outline:none;line-height:1.6;box-sizing:border-box;"></textarea>
-        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;color:var(--gray);margin-top:0.25rem;letter-spacing:0.04em;">Press Enter to save · Shift+Enter for new line</div>
-        <div id="routine-4am-notes-entries" style="margin-top:0.8rem;display:flex;flex-direction:column;gap:0.5rem;"></div>
+      <!-- To Do -->
+      <div style="margin-top:1.4rem;border-top:1px solid #f0f0ee;padding-top:1rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">To Do</div>
+        <div id="routine-4am-todo-list"></div>
+        <input id="routine-4am-todo-input" placeholder="Add task…" onkeydown="if(event.key==='Enter')routineAddTodo('4am')" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.4rem;box-sizing:border-box;">
+      </div>
+
+      <!-- Notes -->
+      <div style="margin-top:1.2rem;border-top:1px solid #f0f0ee;padding-top:1rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Notes</div>
+        <input id="routine-4am-note-input" placeholder="Write a note… press Enter to save" onkeydown="if(event.key==='Enter'){event.preventDefault();routineAddNote('4am')}" style="width:100%;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+        <div id="routine-4am-notes-list" style="margin-top:0.6rem;"></div>
+      </div>
+
+      <!-- Photos -->
+      <div style="margin-top:1.2rem;border-top:1px solid #f0f0ee;padding-top:1rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Photos</div>
+          <label style="cursor:pointer;display:flex;align-items:center;gap:0.35rem;border:1px solid #c8c8c5;padding:0.3rem 0.7rem;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--black);">Add</span>
+            <input type="file" accept="image/*" multiple onchange="routineAddPhotos('4am',this)" style="display:none;">
+          </label>
+        </div>
+        <div id="routine-4am-photos-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.35rem;"></div>
       </div>
     </div>
 
@@ -777,19 +795,46 @@
       <div id="routine-6am-progress" style="font-family:'Nunito',sans-serif;font-size:0.72rem;color:var(--gray);margin-bottom:1rem;"></div>
       <div id="routine-6am-list" style="display:flex;flex-direction:column;gap:0;"></div>
 
-      <!-- Notes for 6AM routine -->
-      <div style="margin-top:1.4rem;">
-        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;">Notes</div>
-        <div id="routine-6am-notes-day-label" style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);margin-bottom:0.5rem;letter-spacing:0.03em;"></div>
-        <textarea id="routine-6am-notes" onkeydown="routineNoteKeydown(event,'6am')" placeholder="Write a note… press Enter to save" style="width:100%;min-height:80px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);background:transparent;border:1px solid #e8e8e5;padding:0.7rem 0.8rem;resize:vertical;outline:none;line-height:1.6;box-sizing:border-box;"></textarea>
-        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;color:var(--gray);margin-top:0.25rem;letter-spacing:0.04em;">Press Enter to save · Shift+Enter for new line</div>
-        <div id="routine-6am-notes-entries" style="margin-top:0.8rem;display:flex;flex-direction:column;gap:0.5rem;"></div>
+      <!-- To Do -->
+      <div style="margin-top:1.4rem;border-top:1px solid #f0f0ee;padding-top:1rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">To Do</div>
+        <div id="routine-6am-todo-list"></div>
+        <input id="routine-6am-todo-input" placeholder="Add task…" onkeydown="if(event.key==='Enter')routineAddTodo('6am')" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.4rem;box-sizing:border-box;">
+      </div>
+
+      <!-- Notes -->
+      <div style="margin-top:1.2rem;border-top:1px solid #f0f0ee;padding-top:1rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Notes</div>
+        <input id="routine-6am-note-input" placeholder="Write a note… press Enter to save" onkeydown="if(event.key==='Enter'){event.preventDefault();routineAddNote('6am')}" style="width:100%;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+        <div id="routine-6am-notes-list" style="margin-top:0.6rem;"></div>
+      </div>
+
+      <!-- Photos -->
+      <div style="margin-top:1.2rem;border-top:1px solid #f0f0ee;padding-top:1rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Photos</div>
+          <label style="cursor:pointer;display:flex;align-items:center;gap:0.35rem;border:1px solid #c8c8c5;padding:0.3rem 0.7rem;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--black);">Add</span>
+            <input type="file" accept="image/*" multiple onchange="routineAddPhotos('6am',this)" style="display:none;">
+          </label>
+        </div>
+        <div id="routine-6am-photos-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.35rem;"></div>
       </div>
     </div>
-  </div>
 
   <!-- SCHEDULE TAB -->
   <div id="schmain-schedule" style="display:none;">
+
+  <!-- Shared history calendar -->
+  <div style="margin-bottom:1rem;">
+    <button onclick="toggleSharedMiniCal()" style="display:flex;align-items:center;gap:0.5rem;background:none;border:none;cursor:pointer;padding:0;">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="4" width="16" height="14" rx="2" stroke="var(--gray)" stroke-width="1.3"/><line x1="2" y1="8" x2="18" y2="8" stroke="var(--gray)" stroke-width="1.3"/><line x1="6" y1="2" x2="6" y2="6" stroke="var(--gray)" stroke-width="1.3" stroke-linecap="round"/><line x1="14" y1="2" x2="14" y2="6" stroke="var(--gray)" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">History</span>
+    </button>
+    <div id="shared-mini-cal" style="display:none;margin-top:0.8rem;border:1px solid #e8e8e5;padding:0.6rem;max-width:50%;"></div>
+  </div>
+
   <!-- Planner grid -->
   <div id="planner-grid" style="display:flex;flex-direction:column;gap:0.6rem;">
 
@@ -850,25 +895,25 @@
       <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;">
         <input id="sched-notes" placeholder="Anything on your mind…" onkeydown="if(event.key==='Enter'){event.preventDefault();saveSchedNote();}" style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
         <!-- Image -->
-        <label style="cursor:pointer;color:var(--gray);flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;" title="Add image">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <input type="file" accept="image/*" onchange="saveSchedImage(this,'photo')" style="display:none;">
-        </label>
+
         <!-- Style of the day -->
-        <label style="cursor:pointer;flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;filter:grayscale(1);opacity:0.5;font-size:0.9rem;line-height:1;" title="Style of the day">
-          👠
-          <input type="file" accept="image/*" onchange="saveSchedImage(this,'style')" style="display:none;">
-        </label>
         <!-- Mindset -->
-        <button onclick="showMindsetModal()" style="border:none;background:none;cursor:pointer;color:var(--gray);flex-shrink:0;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;" title="Mindset">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a7 7 0 0 1 7 7c0 3-1.5 5-3.5 6.5V18h-7v-2.5C6.5 14 5 12 5 9a7 7 0 0 1 7-7z"/><line x1="9" y1="21" x2="15" y2="21"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
-        </button>
         <!-- Song -->
-        <button onclick="showSongModal()" style="border:none;background:none;cursor:pointer;color:var(--gray);flex-shrink:0;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;" title="Add song">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        </button>
       </div>
       <div id="sched-notes-list" style="margin-top:0.6rem;"></div>
+
+      <!-- Photos -->
+      <div style="margin-top:1.2rem;border-top:1px solid #f0f0ee;padding-top:1rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Photos</div>
+          <label style="cursor:pointer;display:flex;align-items:center;gap:0.35rem;background:none;border:1px solid #c8c8c5;padding:0.3rem 0.7rem;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--black);">Add</span>
+            <input type="file" accept="image/*" multiple onchange="schedAddPhotos(this)" style="display:none;">
+          </label>
+        </div>
+        <div id="sched-photos-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.35rem;"></div>
+      </div>
     </div>
 
     <!-- Mindset modal -->
@@ -1819,6 +1864,109 @@ function schedCalJump(dateStr) {
   if (popup) popup.style.display = 'none';
 }
 
+// ── Shared history mini calendar for Schedule tab ────────────────────────────
+var _sharedMiniCalOffset = 0;
+
+function toggleSharedMiniCal() {
+  var el = document.getElementById('shared-mini-cal');
+  if (!el) return;
+  var open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  if (!open) renderSharedMiniCal();
+}
+
+function renderSharedMiniCal() {
+  var el = document.getElementById('shared-mini-cal');
+  if (!el) return;
+
+  var now = new Date();
+  var base = new Date(now.getFullYear(), now.getMonth() + _sharedMiniCalOffset, 1);
+  var year = base.getFullYear();
+  var month = base.getMonth();
+  var todayStr = now.toISOString().split('T')[0];
+  var monthLabel = base.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  var firstDow = (new Date(year, month, 1).getDay() + 6) % 7;
+  var daysInMonth = new Date(year, month + 1, 0).getDate();
+  var cells = [];
+  for (var i = 0; i < firstDow; i++) cells.push(null);
+  for (var d = 1; d <= daysInMonth; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.7rem;">'
+    + '<button onclick="_sharedMiniCalOffset--;renderSharedMiniCal()" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0 0.2rem;line-height:1;">&#8249;</button>'
+    + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);">' + monthLabel + '</span>'
+    + '<button onclick="_sharedMiniCalOffset++;renderSharedMiniCal()" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0 0.2rem;line-height:1;">&#8250;</button>'
+    + '</div>';
+
+  // Day name headers
+  html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;">'
+    + ['M','T','W','T','F','S','S'].map(function(n){
+        return '<div style="text-align:center;font-family:\'Nunito\',sans-serif;font-size:0.55rem;color:var(--gray);">' + n + '</div>';
+      }).join('')
+    + '</div>';
+
+  // Day cells
+  html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;">';
+  for (var ci = 0; ci < cells.length; ci++) {
+    var day = cells[ci];
+    if (!day) { html += '<div></div>'; continue; }
+    var mm = String(month + 1).padStart(2,'0');
+    var dd = String(day).padStart(2,'0');
+    var dateStr = year + '-' + mm + '-' + dd;
+    var isSel = dateStr === currentScheduleDate;
+    var isToday = dateStr === todayStr;
+    var isFuture = dateStr > todayStr;
+    var data = allPlannerData[dateStr] || {};
+
+    var hasMood  = !!(data.mood && data.mood.length);
+    var hasTodo  = !!(data.todos && data.todos.length);
+    var hasSched = !!(data.schedule && Object.keys(data.schedule).some(function(k){ return data.schedule[k].items && data.schedule[k].items.length; }));
+    var hasAny   = hasMood || hasTodo || hasSched;
+
+    // Tooltip
+    var tip = dateStr;
+    if (hasMood)  tip += ' · ' + data.mood.join(' ');
+    if (hasTodo)  { var done = data.todos.filter(function(t){ return t.done; }).length; tip += ' · ' + done + '/' + data.todos.length + ' todos'; }
+
+    var bg     = isSel ? 'var(--black)' : (hasAny ? '#ebebeb' : 'transparent');
+    var color  = isSel ? '#fff' : (isFuture ? '#ccc' : 'var(--black)');
+    var border = isToday && !isSel ? '2px solid var(--black)' : '1px solid ' + (hasAny ? '#c8c8c5' : '#ebebeb');
+    var fw     = (isToday || isSel) ? '600' : '300';
+
+    html += '<div onclick="sharedMiniCalJump(\'' + dateStr + '\')" title="' + tip + '" style="aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border:' + border + ';background:' + bg + ';cursor:pointer;">'
+      + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;font-weight:' + fw + ';color:' + color + ';line-height:1;">' + day + '</span>';
+
+    // Tiny dots for each type of data
+    if (hasAny && !isSel) {
+      html += '<div style="display:flex;gap:2px;margin-top:2px;">';
+      if (hasMood)  html += '<div style="width:3px;height:3px;border-radius:50%;background:#888;"></div>';
+      if (hasTodo)  html += '<div style="width:3px;height:3px;border-radius:50%;background:#888;"></div>';
+      if (hasSched) html += '<div style="width:3px;height:3px;border-radius:50%;background:#888;"></div>';
+      html += '</div>';
+    }
+
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // Legend
+  html += '<div style="display:flex;gap:1rem;margin-top:0.8rem;flex-wrap:wrap;">'
+    + '<div style="display:flex;align-items:center;gap:0.3rem;"><div style="width:3px;height:3px;border-radius:50%;background:#888;"></div><span style="font-family:\'Nunito\',sans-serif;font-size:0.58rem;color:var(--gray);">mood · todo · schedule</span></div>'
+    + '</div>';
+
+  el.innerHTML = html;
+}
+
+function sharedMiniCalJump(dateStr) {
+  savePlannerDay();
+  currentScheduleDate = dateStr;
+  updateDayLabel();
+  loadPlannerDay();
+  renderSchedCal();
+  renderSharedMiniCal();
+}
+
 // Schedule time rows
 function renderSchedule() {
   const el = document.getElementById('schedule-time-rows');
@@ -2149,6 +2297,56 @@ function saveSchedImage(input, type) {
   reader.readAsDataURL(file);
 }
 
+// ── Schedule Notes Photos ─────────────────────────────────────────────────────
+var plannerPhotos = [];
+
+function schedAddPhotos(input) {
+  var files = Array.from(input.files);
+  if (!files.length) return;
+  var loaded = 0;
+  files.forEach(function(file) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      plannerPhotos.push({ id: Date.now() + Math.random(), src: e.target.result, name: file.name });
+      loaded++;
+      if (loaded === files.length) {
+        input.value = '';
+        schedRenderPhotos();
+        savePlannerDay();
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function schedDeletePhoto(id) {
+  plannerPhotos = plannerPhotos.filter(function(p) { return p.id !== id; });
+  schedRenderPhotos();
+  savePlannerDay();
+}
+
+function schedRenderPhotos() {
+  var el = document.getElementById('sched-photos-grid');
+  if (!el) return;
+  if (!plannerPhotos.length) { el.innerHTML = ''; return; }
+  el.innerHTML = plannerPhotos.map(function(p) {
+    return '<div style="position:relative;aspect-ratio:1;overflow:hidden;background:#f0f0ee;">'
+      + '<img src="' + p.src + '" style="width:100%;height:100%;object-fit:cover;display:block;" onclick="schedViewPhoto(\'' + p.id + '\')" />'
+      + '<button onclick="schedDeletePhoto(' + p.id + ')" style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.45);border:none;color:#fff;font-size:0.65rem;width:18px;height:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;padding:0;line-height:1;">×</button>'
+      + '</div>';
+  }).join('');
+}
+
+function schedViewPhoto(id) {
+  var photo = plannerPhotos.find(function(p) { return p.id == id; });
+  if (!photo) return;
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;display:flex;align-items:center;justify-content:center;';
+  overlay.onclick = function() { document.body.removeChild(overlay); };
+  overlay.innerHTML = '<img src="' + photo.src + '" style="max-width:92vw;max-height:88vh;object-fit:contain;" />';
+  document.body.appendChild(overlay);
+}
+
 function saveSchedNote() {
   const inp = document.getElementById('sched-notes');
   if (!inp) return;
@@ -2269,6 +2467,7 @@ function savePlannerDay() {
   d.bibleVerse = document.getElementById('bible-verse')?.value || '';
   d.bibleRef = document.getElementById('bible-ref')?.value || '';
   d.notesList = plannerNotes;
+  d.photosList = plannerPhotos;
   d.schedTomorrow = '';
   d.schedGoal = '';
   d.schedBelieve = '';
@@ -2311,6 +2510,8 @@ function loadPlannerDay() {
   if (document.getElementById('bible-ref')) document.getElementById('bible-ref').value = d.bibleRef||'';
   plannerNotes = d.notesList || [];
   renderNotes();
+  plannerPhotos = d.photosList || [];
+  schedRenderPhotos();
   if (document.getElementById('sched-notes')) document.getElementById('sched-notes').value = '';
   if (document.getElementById('sched-tomorrow')) document.getElementById('sched-tomorrow').value = d.schedTomorrow||'';
   if (document.getElementById('sched-goal')) document.getElementById('sched-goal').value = d.schedGoal||'';
@@ -6020,6 +6221,18 @@ function routineDayComplete(which, date) {
   return { done: done, total: items.length };
 }
 
+function routineDayExtras(which, date) {
+  try {
+    var key = 'routine_extras_' + which + '_' + date;
+    var data = JSON.parse(localStorage.getItem(key) || '{}');
+    return {
+      hasTodo:  !!(data.todos  && data.todos.length),
+      hasNote:  !!(data.notes  && data.notes.length),
+      hasPhoto: !!(data.photos && data.photos.length)
+    };
+  } catch(e) { return { hasTodo: false, hasNote: false, hasPhoto: false }; }
+}
+
 function routineRenderCal() {
   var label = document.getElementById('routine-cal-label');
   var grid = document.getElementById('routine-cal-grid');
@@ -6034,13 +6247,24 @@ function routineRenderCal() {
   for (var d = 1; d <= days; d++) {
     var dateStr = _routineCalYear + '-' + String(_routineCalMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
     var stat = routineDayComplete(_routineWhich, dateStr);
+    var extras = routineDayExtras(_routineWhich, dateStr);
     var isToday = dateStr === today;
     var isView = dateStr === _routineViewDate;
     var pct = stat.total > 0 ? stat.done / stat.total : 0;
     var bg = pct === 1 ? '#1D9E75' : pct > 0 ? '#9FE1CB' : 'transparent';
     var border = isView ? '2px solid #888' : isToday ? '2px solid #c8c8c5' : '1px solid transparent';
     var fw = isToday || isView ? '500' : '300';
-    html += '<div onclick="routineViewDate(\'' + dateStr + '\')" style="cursor:pointer;font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:' + fw + ';padding:3px 2px;border-radius:4px;background:' + bg + ';border:' + border + ';color:' + (pct===1?'#fff':'var(--black)') + ';text-align:center;">' + d + '</div>';
+    var textColor = pct === 1 ? '#fff' : 'var(--black)';
+    var dotColor = pct === 1 ? 'rgba(255,255,255,0.8)' : '#aaa';
+    var dots = '';
+    if (extras.hasTodo || extras.hasNote || extras.hasPhoto) {
+      dots = '<div style="display:flex;justify-content:center;gap:2px;margin-top:1px;">';
+      if (extras.hasTodo)  dots += '<div style="width:3px;height:3px;border-radius:50%;background:' + dotColor + ';"></div>';
+      if (extras.hasNote)  dots += '<div style="width:3px;height:3px;border-radius:50%;background:' + dotColor + ';"></div>';
+      if (extras.hasPhoto) dots += '<div style="width:3px;height:3px;border-radius:50%;background:' + dotColor + ';"></div>';
+      dots += '</div>';
+    }
+    html += '<div onclick=\"routineViewDate(\\\'' + dateStr + '\\\')" style=\"cursor:pointer;font-family:\\\'Nunito\\\',sans-serif;font-size:0.72rem;font-weight:\' + fw + \';padding:3px 2px;border-radius:4px;background:\' + bg + \';border:\' + border + \';color:\' + textColor + \';text-align:center;\">' + d + dots + '</div>';
   }
   grid.innerHTML = html;
 }
@@ -6057,6 +6281,7 @@ function routineCalShift(dir) {
   if (_routineCalMonth < 0)  { _routineCalMonth = 11; _routineCalYear--; }
   routineRenderCal();
 }
+
 
 function routineToggleItem(idx) {
   var data = routineGetData(_routineWhich, _routineViewDate);
@@ -8883,80 +9108,150 @@ function assRenderLog() {
   }).join('');
 }
 
-// ── Routine Notes (multi-note log, per day) ───────────────────────────────────
-function _rNoteKey(tab, dateStr) {
-  return 'routine_notes_v2_' + tab + '_' + dateStr;
+// ── Routine To Do / Notes / Photos (per tab, per date) ───────────────────────
+function _routineDataKey(tab, dateStr) {
+  return 'routine_extras_' + tab + '_' + dateStr;
+}
+function _routineGetExtras(tab) {
+  var dateStr = (typeof _routineViewDate !== 'undefined') ? _routineViewDate : new Date().toISOString().slice(0,10);
+  try { return JSON.parse(localStorage.getItem(_routineDataKey(tab, dateStr)) || '{"todos":[],"notes":[],"photos":[]}'); } catch(e) { return {todos:[],notes:[],photos:[]}; }
+}
+function _routineSaveExtras(tab, data) {
+  var dateStr = (typeof _routineViewDate !== 'undefined') ? _routineViewDate : new Date().toISOString().slice(0,10);
+  var key = _routineDataKey(tab, dateStr);
+  localStorage.setItem(key, JSON.stringify(data));
+  if (typeof window.syncToCloud === 'function') window.syncToCloud(key, data);
 }
 
-function routineNoteKeydown(e, tab) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    routineNoteSave(tab);
-  }
-}
-
-function routineNoteSave(tab) {
-  var el = document.getElementById('routine-' + tab + '-notes');
-  if (!el) return;
-  var text = el.value.trim();
+// — To Do —
+function routineAddTodo(tab) {
+  var inp = document.getElementById('routine-' + tab + '-todo-input');
+  if (!inp) return;
+  var text = inp.value.trim();
   if (!text) return;
-  var dateStr = (typeof _routineViewDate !== 'undefined') ? _routineViewDate : new Date().toISOString().slice(0,10);
-  var key = _rNoteKey(tab, dateStr);
-  var notes = JSON.parse(localStorage.getItem(key) || '[]');
-  notes.unshift({ text: text, savedAt: new Date().toISOString() });
-  localStorage.setItem(key, JSON.stringify(notes));
-  el.value = '';
-  routineNoteRenderEntries(tab);
+  var data = _routineGetExtras(tab);
+  data.todos.push({ id: Date.now(), text: text, done: false });
+  _routineSaveExtras(tab, data);
+  inp.value = '';
+  routineRenderTodos(tab);
 }
-
-function routineNoteRenderEntries(tab) {
-  var el = document.getElementById('routine-' + tab + '-notes-entries');
+function routineToggleTodo(tab, id) {
+  var data = _routineGetExtras(tab);
+  data.todos = data.todos.map(function(t){ return t.id === id ? Object.assign({}, t, {done: !t.done}) : t; });
+  _routineSaveExtras(tab, data);
+  routineRenderTodos(tab);
+}
+function routineRemoveTodo(tab, id) {
+  var data = _routineGetExtras(tab);
+  data.todos = data.todos.filter(function(t){ return t.id !== id; });
+  _routineSaveExtras(tab, data);
+  routineRenderTodos(tab);
+}
+function routineRenderTodos(tab) {
+  var el = document.getElementById('routine-' + tab + '-todo-list');
   if (!el) return;
-  var dateStr = (typeof _routineViewDate !== 'undefined') ? _routineViewDate : new Date().toISOString().slice(0,10);
-  var key = _rNoteKey(tab, dateStr);
-  var notes = JSON.parse(localStorage.getItem(key) || '[]');
-  // Update day label
-  var labelEl = document.getElementById('routine-' + tab + '-notes-day-label');
-  if (labelEl) {
-    var isToday = dateStr === new Date().toISOString().slice(0,10);
-    var d = new Date(dateStr + 'T00:00:00');
-    labelEl.textContent = isToday ? 'Today' : d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-  }
-  if (!notes.length) { el.innerHTML = ''; return; }
-  el.innerHTML = notes.map(function(n, i) {
-    var d = new Date(n.savedAt);
-    var timeLabel = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-    return '<div style="border:1px solid #e8e8e5;padding:0.75rem 0.9rem;">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.35rem;">' +
-      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">' + timeLabel + '</div>' +
-      '<button onclick="routineNoteDelete(\'' + tab + '\',' + i + ')" style="border:none;background:none;cursor:pointer;font-size:0.9rem;color:#ccc;padding:0;line-height:1;">×</button>' +
-      '</div>' +
-      '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.6;white-space:pre-wrap;">' + n.text + '</div>' +
-      '</div>';
+  var data = _routineGetExtras(tab);
+  if (!data.todos.length) { el.innerHTML = ''; return; }
+  el.innerHTML = data.todos.map(function(t) {
+    return '<div class="todo-item">'
+      + '<div class="todo-check' + (t.done ? ' done' : '') + '" onclick="routineToggleTodo(\'' + tab + '\',' + t.id + ')"></div>'
+      + '<div style="flex:1;"><div class="todo-text' + (t.done ? ' done' : '') + '">' + t.text + '</div></div>'
+      + '<button onclick="routineRemoveTodo(\'' + tab + '\',' + t.id + ')" style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;flex-shrink:0;">✕</button>'
+      + '</div>';
   }).join('');
 }
 
-function routineNoteDelete(tab, idx) {
-  var dateStr = (typeof _routineViewDate !== 'undefined') ? _routineViewDate : new Date().toISOString().slice(0,10);
-  var key = _rNoteKey(tab, dateStr);
-  var notes = JSON.parse(localStorage.getItem(key) || '[]');
-  notes.splice(idx, 1);
-  localStorage.setItem(key, JSON.stringify(notes));
-  routineNoteRenderEntries(tab);
+// — Notes —
+function routineAddNote(tab) {
+  var inp = document.getElementById('routine-' + tab + '-note-input');
+  if (!inp) return;
+  var text = inp.value.trim();
+  if (!text) return;
+  var data = _routineGetExtras(tab);
+  var time = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  data.notes.unshift({ id: Date.now(), text: text, time: time });
+  _routineSaveExtras(tab, data);
+  inp.value = '';
+  routineRenderNotes(tab);
+}
+function routineRemoveNote(tab, id) {
+  var data = _routineGetExtras(tab);
+  data.notes = data.notes.filter(function(n){ return n.id !== id; });
+  _routineSaveExtras(tab, data);
+  routineRenderNotes(tab);
+}
+function routineRenderNotes(tab) {
+  var el = document.getElementById('routine-' + tab + '-notes-list');
+  if (!el) return;
+  var data = _routineGetExtras(tab);
+  if (!data.notes.length) { el.innerHTML = ''; return; }
+  el.innerHTML = data.notes.map(function(n) {
+    return '<div style="padding:0.4rem 0;border-bottom:1px solid #f0f0ee;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;">'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);">' + n.time + '</div>'
+      + '<button onclick="routineRemoveNote(\'' + tab + '\',' + n.id + ')" style="font-size:0.8rem;color:#bbb;border:none;background:none;cursor:pointer;padding:0;line-height:1;">×</button>'
+      + '</div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.5;margin-top:0.15rem;">' + n.text + '</div>'
+      + '</div>';
+  }).join('');
 }
 
-function routineNoteLoad(tab) {
-  var el = document.getElementById('routine-' + tab + '-notes');
-  if (el) el.value = '';
-  routineNoteRenderEntries(tab);
+// — Photos —
+function routineAddPhotos(tab, input) {
+  var files = Array.from(input.files);
+  if (!files.length) return;
+  var loaded = 0;
+  var data = _routineGetExtras(tab);
+  files.forEach(function(file) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      data.photos.push({ id: Date.now() + Math.random(), src: e.target.result });
+      loaded++;
+      if (loaded === files.length) {
+        input.value = '';
+        _routineSaveExtras(tab, data);
+        routineRenderPhotos(tab);
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function routineDeletePhoto(tab, id) {
+  var data = _routineGetExtras(tab);
+  data.photos = data.photos.filter(function(p){ return p.id !== id; });
+  _routineSaveExtras(tab, data);
+  routineRenderPhotos(tab);
+}
+function routineRenderPhotos(tab) {
+  var el = document.getElementById('routine-' + tab + '-photos-grid');
+  if (!el) return;
+  var data = _routineGetExtras(tab);
+  if (!data.photos.length) { el.innerHTML = ''; return; }
+  el.innerHTML = data.photos.map(function(p) {
+    return '<div style="position:relative;aspect-ratio:1;overflow:hidden;background:#f0f0ee;">'
+      + '<img src="' + p.src + '" style="width:100%;height:100%;object-fit:cover;display:block;" onclick="schedViewPhoto(\'' + p.id + '\')" />'
+      + '<button onclick="routineDeletePhoto(\'' + tab + '\',' + p.id + ')" style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.45);border:none;color:#fff;font-size:0.65rem;width:18px;height:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;padding:0;line-height:1;">×</button>'
+      + '</div>';
+  }).join('');
+}
+
+// — Load all extras for a tab —
+function routineExtrasLoad(tab) {
+  var inp = document.getElementById('routine-' + tab + '-note-input');
+  if (inp) inp.value = '';
+  var todoInp = document.getElementById('routine-' + tab + '-todo-input');
+  if (todoInp) todoInp.value = '';
+  routineRenderTodos(tab);
+  routineRenderNotes(tab);
+  routineRenderPhotos(tab);
 }
 
 // Hook into date change
 var _origRoutineViewDate = routineViewDate;
 routineViewDate = function(date) {
   _origRoutineViewDate(date);
-  routineNoteLoad('4am');
-  routineNoteLoad('6am');
+  routineExtrasLoad('4am');
+  routineExtrasLoad('6am');
 };
 
 // Hook into tab switch
@@ -8964,14 +9259,16 @@ var _origShowRoutineTab = typeof showRoutineTab === 'function' ? showRoutineTab 
 if (_origShowRoutineTab) {
   showRoutineTab = function(tab) {
     _origShowRoutineTab(tab);
-    routineNoteLoad(tab);
+    routineExtrasLoad(tab);
   };
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  routineNoteLoad('4am');
-  routineNoteLoad('6am');
+  routineExtrasLoad('4am');
+  routineExtrasLoad('6am');
 });
+
+
 
 // ── Who I Was / Am / Becoming ─────────────────────────────────────────────────
 function whoKeydown(e, tab) {
