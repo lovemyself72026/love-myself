@@ -541,6 +541,12 @@
   <br>
   <div class="subtitle">My Daily practice</div>
   <h1>Good to see you today.</h1><br>
+  <!-- Analytics -->
+  <div class="subtitle" style="margin-bottom:0.3rem;">My progress</div>
+  <h2 style="margin-bottom:1.5rem;">Analytics.</h2>
+  <div id="home-analytics"></div>
+  <hr style="margin:2rem 0;">
+
   <div class="home-grid">
 
     <div class="home-card" style="cursor:default;">
@@ -606,11 +612,7 @@
 
   </div>
 
-  <!-- Analytics -->
-  <hr style="margin:2rem 0;">
-  <div class="subtitle" style="margin-bottom:0.3rem;">My progress</div>
-  <h2 style="margin-bottom:1.5rem;">Analytics.</h2>
-  <div id="home-analytics"></div>
+
 
 
 </div>
@@ -690,14 +692,10 @@
     <div style="text-align:center;flex:1;min-width:0;position:relative;">
       <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;">
         <div id="schedule-day-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--black);"></div>
-        <button onclick="toggleSchedCal()" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;flex-shrink:0;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;">
-            <rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
-          </svg>
-        </button>
+
       </div>
       <!-- Popup calendar -->
-      <div id="sched-cal-popup" style="display:none;position:absolute;top:calc(100% + 0.5rem);left:50%;transform:translateX(-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.8rem;z-index:100;min-width:220px;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
+      <div id="sched-cal-popup" style="display:none;position:absolute;top:calc(100% + 0.5rem);left:50%;transform:translateX(-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.8rem;z-index:100;min-width:260px;max-width:320px;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
           <button onclick="schedCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
           <div id="sched-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
@@ -705,92 +703,195 @@
         </div>
         <div id="sched-cal-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;"></div>
         <div id="sched-cal-grid"></div>
+        <!-- Day summary shown when hovering/clicking a past day -->
+        <div id="sched-cal-summary" style="display:none;margin-top:0.8rem;border-top:1px solid #e8e8e5;padding-top:0.7rem;"></div>
       </div>
     </div>
     <button onclick="savePlannerDay();changeScheduleDay(1);" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8250;</button>
   </div>
 
 
+  <!-- LAYOUT NOTE: To Do is now inside the right column (ps-daily), above Mood.
+       Notes and Photos are inside the right column, below Dinner. -->
   <!-- Main tabs: My Routine | Schedule | Habits -->
   <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.2rem;">
     <button id="schtab-routine" onclick="showSchedMainTab('routine')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">My Routine</button>
-    <button id="schtab-schedule" onclick="showSchedMainTab('schedule')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--black);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid var(--black);font-weight:300;">Schedule</button>
-    <button id="schtab-habits" onclick="showSchedMainTab('habits')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">Habits</button>
+    <button id="schtab-schedule" onclick="showSchedMainTab('schedule')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--black);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid var(--black);font-weight:300;">Daily Schedule</button>
+    <button id="schtab-habits" onclick="showSchedMainTab('habits')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">Calisthenics</button>
   </div>
 
   <!-- SCHEDULE TAB -->
   <div id="schmain-schedule">
+
+  <!-- Track Days toggle -->
+  <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;cursor:pointer;" onclick="schedTrackToggleCal()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+    <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Track Days</span>
+  </div>
+
+  <!-- Track Days calendar -->
+  <div id="sched-track-cal-wrap" style="display:none;margin-bottom:1.2rem;border:1px solid #e8e8e5;padding:0.8rem;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+      <button onclick="schedTrackCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
+      <div id="sched-track-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+      <button onclick="schedTrackCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;" id="sched-track-cal-daynames"></div>
+    <div id="sched-track-cal-grid"></div>
+    <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;font-weight:300;color:var(--gray);margin-top:0.6rem;">Days with data logged are filled 🌸</div>
+  </div>
+
   <!-- Planner grid -->
   <div id="planner-grid" style="display:flex;flex-direction:column;gap:0.6rem;">
 
-    <!-- Mood -->
-    <div id="ps-mood" style="border:1px solid #c8c8c5;padding:0.8rem;">
-      <div class="planner-label">Mood</div>
-      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;">
-        <span class="mood-btn" onclick="toggleMood(this,'😊')">😊</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😔')">😔</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😰')">😰</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😡')">😡</span>
-        <span class="mood-btn" onclick="toggleMood(this,'🥰')">🥰</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😴')">😴</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😐')">😐</span>
-        <span class="mood-btn" onclick="toggleMood(this,'🥺')">🥺</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😭')">😭</span>
-        <span class="mood-btn" onclick="toggleMood(this,'🤩')">🤩</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😌')">😌</span>
-        <span class="mood-btn" onclick="toggleMood(this,'🤗')">🤗</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😶')">😶</span>
-        <span class="mood-btn" onclick="toggleMood(this,'🥱')">🥱</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😇')">😇</span>
-        <span class="mood-btn" onclick="toggleMood(this,'🤯')">🤯</span>
-        <span class="mood-btn" onclick="toggleMood(this,'💪')">💪</span>
-        <span class="mood-btn" onclick="toggleMood(this,'🔥')">🔥</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😞')">😞</span>
-        <span class="mood-btn" onclick="toggleMood(this,'🥹')">🥹</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😂')">😂</span>
-        <span class="mood-btn" onclick="toggleMood(this,'🤭')">🤭</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😒')">😒</span>
-        <span class="mood-btn" onclick="toggleMood(this,'🙃')">🙃</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😑')">😑</span>
-        <span class="mood-btn" onclick="toggleMood(this,'🤔')">🤔</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😅')">😅</span>
-        <span class="mood-btn" onclick="toggleMood(this,'🫠')">🫠</span>
-        <span class="mood-btn" onclick="toggleMood(this,'🫶')">🫶</span>
-        <span class="mood-btn" onclick="toggleMood(this,'🥴')">🥴</span>
-        <span class="mood-btn" onclick="toggleMood(this,'😩')">😩</span>
+    <!-- Schedule + Daily: two columns -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;align-items:start;">
+
+      <!-- LEFT: Schedule time rows -->
+      <div id="ps-schedule" style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label">Schedule</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:0 0.4rem;margin-top:0.5rem;" id="schedule-time-rows"></div>
       </div>
-    </div>
 
-    <!-- To Do -->
-    <div id="ps-todo" style="border:1px solid #c8c8c5;padding:0.8rem;">
-      <div class="planner-label">To Do</div>
-      <div id="todo-list" style="margin-top:0.5rem;"></div>
-      <input id="todo-input" placeholder="Add task..." onkeydown="if(event.key==='Enter')addTodo()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
-    </div>
+      <!-- RIGHT: Daily panel -->
+      <div id="ps-daily" style="display:flex;flex-direction:column;gap:0.6rem;">
 
-    <!-- Schedule -->
-    <div id="ps-schedule" style="border:1px solid #c8c8c5;padding:0.8rem;">
-      <div class="planner-label">Schedule</div>
-      <div style="display:grid;grid-template-columns:auto 1fr;gap:0 0.4rem;margin-top:0.5rem;" id="schedule-time-rows"></div>
-    </div>
+        <!-- Daily Analytics Summary -->
+        <div id="ps-daily-analytics" style="border:1px solid #c8c8c5;padding:0.8rem;"></div>
 
-    <!-- Notes -->
-    <div id="ps-notes" style="border:1px solid #c8c8c5;padding:0.8rem;">
-      <div class="planner-label">Notes</div>
-      <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;">
-        <input id="sched-notes" placeholder="Anything on your mind…" onkeydown="if(event.key==='Enter'){event.preventDefault();saveSchedNote();}" style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+        <!-- To Do -->
+        <div id="ps-todo" style="border:1px solid #c8c8c5;padding:0.8rem;">
+          <div class="planner-label">To Do</div>
+          <div id="todo-list" style="margin-top:0.5rem;"></div>
+          <input id="todo-input" placeholder="Add task..." onkeydown="if(event.key==='Enter')addTodo()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
+        </div>
+
+        <!-- Mood -->
+        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+          <div class="planner-label">Mood</div>
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;">
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😊')">😊</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😔')">😔</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😰')">😰</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😡')">😡</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🥰')">🥰</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😴')">😴</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😐')">😐</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🥺')">🥺</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😭')">😭</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🤩')">🤩</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😌')">😌</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🤗')">🤗</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😶')">😶</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🥱')">🥱</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😇')">😇</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🤯')">🤯</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'💪')">💪</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🔥')">🔥</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😞')">😞</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'🥹')">🥹</span>
+            <span class="mood-btn" onclick="schedDailyToggleMood(this,'😤')">😤</span>
+          </div>
+        </div>
+
+        <!-- Sleep -->
+        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div class="planner-label">Sleep (hrs)</div>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">9:00 PM</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:0.5rem;">
+            <span class="sleep-btn" onclick="schedDailySetSleep(this,4)">4</span>
+            <span class="sleep-btn" onclick="schedDailySetSleep(this,5)">5</span>
+            <span class="sleep-btn" onclick="schedDailySetSleep(this,6)">6</span>
+            <span class="sleep-btn" onclick="schedDailySetSleep(this,7)">7</span>
+            <span class="sleep-btn" onclick="schedDailySetSleep(this,8)">8+</span>
+          </div>
+        </div>
+
+        <!-- Water -->
+        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+          <div class="planner-label">Water</div>
+          <div style="display:flex;gap:0.2rem;margin-top:0.5rem;justify-content:space-between;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" id="sched-water-0" onclick="schedDailyToggleWater(this,0)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">7 AM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" id="sched-water-1" onclick="schedDailyToggleWater(this,1)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">8 AM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" id="sched-water-2" onclick="schedDailyToggleWater(this,2)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">9 AM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" id="sched-water-3" onclick="schedDailyToggleWater(this,3)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">11 AM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" id="sched-water-4" onclick="schedDailyToggleWater(this,4)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">1 PM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" id="sched-water-5" onclick="schedDailyToggleWater(this,5)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">3 PM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" id="sched-water-6" onclick="schedDailyToggleWater(this,6)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">5 PM</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.2rem;"><span class="water-cup" id="sched-water-7" onclick="schedDailyToggleWater(this,7)">💧</span><span style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);">7 PM</span></div>
+          </div>
+        </div>
+
+        <!-- Meals -->
+        <div style="border:1px solid #c8c8c5;padding:0.8rem;display:flex;flex-direction:column;gap:0.8rem;">
+
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div class="planner-label">Breakfast</div>
+              <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">6:30 AM</span>
+            </div>
+            <input id="sched-daily-breakfast-input" type="text" placeholder="What did you eat?" onkeydown="if(event.key==='Enter')schedDailyAddMeal('breakfast')" onblur="schedDailyAddMeal('breakfast')" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-top:0.4rem;box-sizing:border-box;">
+            <div id="sched-daily-breakfast-list" style="margin-top:0.4rem;"></div>
+          </div>
+
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div class="planner-label">Lunch</div>
+              <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">12:30 PM</span>
+            </div>
+            <input id="sched-daily-lunch-input" type="text" placeholder="What did you eat?" onkeydown="if(event.key==='Enter')schedDailyAddMeal('lunch')" onblur="schedDailyAddMeal('lunch')" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-top:0.4rem;box-sizing:border-box;">
+            <div id="sched-daily-lunch-list" style="margin-top:0.4rem;"></div>
+          </div>
+
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div class="planner-label">Dinner</div>
+              <span style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);">7:00 PM</span>
+            </div>
+            <input id="sched-daily-dinner-input" type="text" placeholder="What did you eat?" onkeydown="if(event.key==='Enter')schedDailyAddMeal('dinner')" onblur="schedDailyAddMeal('dinner')" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-top:0.4rem;box-sizing:border-box;">
+            <div id="sched-daily-dinner-list" style="margin-top:0.4rem;"></div>
+          </div>
+
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div class="planner-label">Snacks</div>
+            </div>
+            <input id="sched-daily-snacks-input" type="text" placeholder="What did you snack on?" onkeydown="if(event.key==='Enter')schedDailyAddMeal('snacks')" onblur="schedDailyAddMeal('snacks')" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-top:0.4rem;box-sizing:border-box;">
+            <div id="sched-daily-snacks-list" style="margin-top:0.4rem;"></div>
+          </div>
+
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div class="planner-label">Drinks</div>
+            </div>
+            <input id="sched-daily-drinks-input" type="text" placeholder="What did you drink?" onkeydown="if(event.key==='Enter')schedDailyAddMeal('drinks')" onblur="schedDailyAddMeal('drinks')" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;margin-top:0.4rem;box-sizing:border-box;">
+            <div id="sched-daily-drinks-list" style="margin-top:0.4rem;"></div>
+          </div>
+
+        </div>
+
+        <!-- Notes -->
+        <div id="ps-notes" style="border:1px solid #c8c8c5;padding:0.8rem;">
+          <div class="planner-label">Notes</div>
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;">
+            <input id="sched-notes" placeholder="Anything on your mind…" onkeydown="if(event.key==='Enter'){event.preventDefault();saveSchedNote();}" style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          </div>
+          <div id="sched-notes-list" style="margin-top:0.6rem;"></div>
+        </div>
+
+        <!-- Photos -->
+        <div id="ps-photos" style="border:1px solid #c8c8c5;padding:0.8rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div class="planner-label">Photos</div>
+            <label for="sched-photo-input" style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">+ Add</label>
+            <input type="file" id="sched-photo-input" accept="image/*" onchange="saveSchedImage(this,'photo')" style="display:none;">
+          </div>
+          <div id="sched-photos-list" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+        </div>
+
       </div>
-      <div id="sched-notes-list" style="margin-top:0.6rem;"></div>
-    </div>
-
-    <!-- Photos -->
-    <div id="ps-photos" style="border:1px solid #c8c8c5;padding:0.8rem;">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div class="planner-label">Photos</div>
-        <label for="sched-photo-input" style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">+ Add</label>
-        <input type="file" id="sched-photo-input" accept="image/*" onchange="saveSchedImage(this,'photo')" style="display:none;">
-      </div>
-      <div id="sched-photos-list" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
     </div>
 
     <!-- Mindset modal -->
@@ -898,14 +999,9 @@
 
   <!-- HABITS TAB -->
   <div id="schmain-habits" style="display:none;">
-    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-      <button class="journal-tab active" id="schtab-calisthenics" onclick="showSchedHabitsTab('calisthenics')" style="flex:1;text-align:center;">Calisthenics</button>
-      <button class="journal-tab" id="schtab-daily" onclick="showSchedHabitsTab('daily')" style="flex:1;text-align:center;">Daily</button>
-    </div>
     <div id="schhabits-calisthenics"></div>
     <div id="schhabits-daily" style="display:none;"></div>
     <div id="schhabits-bodycare" style="display:none;"></div>
-    <div id="schhabits-rest" style="display:none;"></div>
     <div id="schhabits-rest" style="display:none;"></div>
   </div>
 
@@ -1629,7 +1725,7 @@ scheduleStyle.textContent = `
   .exercise-btn { font-family:'Nunito',sans-serif; font-size:0.65rem; letter-spacing:0.06em; border:1px solid #c8c8c5; padding:0.2rem 0.5rem; cursor:pointer; color:var(--gray); background:none; transition:all 0.15s; }
   .exercise-btn.selected { background:var(--black); color:var(--white); border-color:var(--black); }
   .todo-item { display:flex; align-items:center; gap:0.4rem; margin-bottom:0.35rem; }
-  .todo-check { width:12px; height:12px; border:1px solid #c8c8c5; flex-shrink:0; cursor:pointer; transition:background 0.15s; }
+  .todo-check { width:12px; height:12px; border:1px solid #c8c8c5; border-radius:50%; flex-shrink:0; cursor:pointer; transition:background 0.15s; }
   .todo-check.done { background:var(--black); border-color:var(--black); }
   .todo-text { font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; flex:1; }
   .todo-text.done { text-decoration:line-through; color:var(--gray); }
@@ -1805,8 +1901,95 @@ function schedCalJump(dateStr) {
   updateDayLabel();
   loadPlannerDay();
   renderSchedCal();
-  const popup = document.getElementById('sched-cal-popup');
-  if (popup) popup.style.display = 'none';
+  showSchedCalSummary(dateStr);
+}
+
+function showSchedCalSummary(dateStr) {
+  const el = document.getElementById('sched-cal-summary');
+  if (!el) return;
+
+  const pd = allPlannerData[dateStr] || {};
+  const dl = localStorage.getItem('daily_data');
+  let dd = {};
+  try { const dlp = JSON.parse(dl||'{}'); dd = dlp[dateStr] || {}; } catch(e){}
+
+  const label = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+
+  function row(icon, text) {
+    return `<div style="display:flex;align-items:flex-start;gap:0.4rem;padding:0.2rem 0;">
+      <span style="font-size:0.75rem;flex-shrink:0;">${icon}</span>
+      <span style="font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:300;color:var(--black);line-height:1.4;">${text}</span>
+    </div>`;
+  }
+
+  let parts = [];
+
+  // Mood
+  const mood = dd.mood || pd.mood || [];
+  if (mood.length) parts.push(row('', mood.join(' ')));
+
+  // Sleep
+  const sleep = dd.sleep || pd.sleep;
+  if (sleep) parts.push(row('🌙', `${sleep} hrs sleep`));
+
+  // Water
+  const water = dd.water || pd.water || [];
+  const waterCount = water.filter(Boolean).length;
+  if (waterCount) parts.push(row('💧', `${waterCount} glass${waterCount>1?'es':''} of water`));
+
+  // Meals
+  const meals = dd.meals || {};
+  ['breakfast','lunch','dinner'].forEach(meal => {
+    let items = meals[meal] || [];
+    if (typeof items === 'string') items = items ? [items] : [];
+    if (items.length) parts.push(row('🍽️', `${meal.charAt(0).toUpperCase()+meal.slice(1)}: ${items.join(', ')}`));
+  });
+
+  // Schedule checked items
+  const schedule = pd.schedule || {};
+  const DEFAULTS = {
+    '4:00_AM':['Wake up :) Good Morning :)'],'4:05_AM':['Smell fresh air'],
+    '4:10_AM':['Fix Bed','Wash Face'],'4:20_AM':['Brush Teeth','Drink Water'],
+    '4:30_AM':['Calisthenics'],'5:00_AM':['Take a bath'],'5:15_AM':['Make Breakfast'],
+    '5:30_AM':["Talk to God - Read Bible, Pray, Journal, Meditate God's Word"],
+    '6:00_AM':['Eat Breakfast','Bath','Clothed'],'11:00_AM':['Cook Lunch'],
+    '12:30_PM':['Eat Lunch'],'5:30_PM':['Cook Dinner'],
+    '7:00_PM':['Eat Dinner','Read Book'],'7:30_PM':['Talk to People'],
+    '8:00_PM':['Studying Calisthenics and how to perform the right form of exercises'],
+    '8:30_PM':['Journal'],'9:00_PM':['Sleep']
+  };
+  let checked = [];
+  Object.keys(schedule).forEach(key => {
+    const entry = schedule[key];
+    // default items checked
+    if (entry.defaultDone) {
+      const defs = DEFAULTS[key] || [];
+      defs.forEach((text, i) => { if (entry.defaultDone[i]) checked.push(text); });
+    }
+    // user-added items checked
+    if (Array.isArray(entry.items)) {
+      entry.items.filter(it => it.done).forEach(it => checked.push(it.text));
+    }
+  });
+  if (checked.length) parts.push(row('✅', checked.join(', ')));
+
+  // Notes
+  const notes = pd.notesList || [];
+  if (notes.length) parts.push(row('📝', notes.map(n=>n.text||n).join(' · ')));
+
+  // To Do
+  const todos = pd.todos || [];
+  const doneTodos = todos.filter(t=>t.done);
+  if (todos.length) parts.push(row('📋', `To Do: ${doneTodos.length}/${todos.length} done`));
+
+  if (!parts.length) {
+    el.style.display = 'block';
+    el.innerHTML = `<div style="font-family:'Lora',serif;font-style:italic;font-size:0.75rem;color:var(--gray);">${label}</div><div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-top:0.3rem;">Nothing logged for this day.</div>`;
+    return;
+  }
+
+  el.style.display = 'block';
+  el.innerHTML = `<div style="font-family:'Lora',serif;font-style:italic;font-size:0.75rem;color:var(--black);margin-bottom:0.4rem;">${label}</div>` + parts.join('');
 }
 
 // Schedule time rows
@@ -1847,6 +2030,89 @@ function renderSchedule() {
     '9:00_PM': ['Sleep'],
   };
 
+  // Pull daily data for the currently viewed schedule date
+  var _dailyForSched = {};
+  try {
+    var _dd = localStorage.getItem('daily_data');
+    if (_dd) { var _ddp = JSON.parse(_dd); _dailyForSched = _ddp[getDateKey()] || {}; }
+  } catch(e) {}
+  var _dailyMeals = _dailyForSched.meals || {};
+  var _dailyMood  = _dailyForSched.mood  || [];
+  var _dailySleep = _dailyForSched.sleep || null;
+  var _dailyWater = _dailyForSched.water || [];
+
+  // Map slot keys to daily items
+  var DAILY_SLOT_MAP = {
+    '6:30_AM':  { meals: ['breakfast'] },
+    '12:30_PM': { meals: ['lunch'] },
+    '7:00_PM':  { meals: ['dinner'] },
+    '9:00_AM':  { water: [0,1,2] },      // 7AM,8AM,9AM water
+    '1:00_PM':  { water: [3,4] },         // 11AM,1PM water
+    '5:00_PM':  { water: [5,6] },         // 3PM,5PM water
+    '7:00_PM':  { water: [7] },           // 7PM water (merged with dinner slot below)
+    '9:00_PM':  { sleep: true },
+    '4:00_AM':  { mood: true },
+  };
+  // Merge 7:00 PM entries (dinner + water[7])
+  DAILY_SLOT_MAP['7:00_PM'] = { meals: ['dinner'], water: [7] };
+  DAILY_SLOT_MAP['9:00_AM'] = { water: [0,1,2] };
+  DAILY_SLOT_MAP['1:00_PM'] = { water: [3,4] };
+  DAILY_SLOT_MAP['5:00_PM'] = { water: [5,6] };
+
+  function _renderDailySlot(slotKey) {
+    var info = DAILY_SLOT_MAP[slotKey];
+    if (!info) return '';
+    var parts = [];
+    // Meals
+    if (info.meals) {
+      info.meals.forEach(function(meal) {
+        var items = _dailyMeals[meal];
+        if (!items) return;
+        if (typeof items === 'string') items = items ? [items] : [];
+        items.forEach(function(item) {
+          parts.push('<div style="display:flex;align-items:center;gap:0.3rem;padding:0.1rem 0;">'
+            + '<div style="width:12px;height:12px;border-radius:50%;border:1px solid #b8d4b8;background:#e8f5e8;flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
+            + '<svg width="6" height="5" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="#5a9a5a" stroke-width="1.5"/></svg></div>'
+            + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;color:var(--black);">'
+            + item.replace(/</g,'&lt;')
+            + '</span><span style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.07em;text-transform:uppercase;color:#8ab88a;flex-shrink:0;">'
+            + meal + '</span></div>');
+        });
+      });
+    }
+    // Water
+    if (info.water) {
+      var waterTimes = ['7 AM','8 AM','9 AM','11 AM','1 PM','3 PM','5 PM','7 PM'];
+      info.water.forEach(function(idx) {
+        if (_dailyWater[idx]) {
+          parts.push('<div style="display:flex;align-items:center;gap:0.3rem;padding:0.1rem 0;">'
+            + '<div style="width:12px;height:12px;border-radius:50%;border:1px solid #b8c8e8;background:#e8eef8;flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
+            + '<svg width="6" height="5" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="#5a7ab8" stroke-width="1.5"/></svg></div>'
+            + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;color:var(--black);">💧 Water</span>'
+            + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.07em;text-transform:uppercase;color:#8898c8;flex-shrink:0;">'
+            + waterTimes[idx] + '</span></div>');
+        }
+      });
+    }
+    // Sleep
+    if (info.sleep && _dailySleep) {
+      parts.push('<div style="display:flex;align-items:center;gap:0.3rem;padding:0.1rem 0;">'
+        + '<div style="width:12px;height:12px;border-radius:50%;border:1px solid #c8b8d8;background:#f0e8f8;flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
+        + '<svg width="6" height="5" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="#8a5ab8" stroke-width="1.5"/></svg></div>'
+        + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;color:var(--black);">🌙 Sleep · ' + _dailySleep + ' hrs</span>'
+        + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.07em;text-transform:uppercase;color:#a888c8;flex-shrink:0;">daily</span></div>');
+    }
+    // Mood
+    if (info.mood && _dailyMood.length) {
+      parts.push('<div style="display:flex;align-items:center;gap:0.3rem;padding:0.1rem 0;">'
+        + '<div style="width:12px;height:12px;border-radius:50%;border:1px solid #e8c8b8;background:#fdf0e8;flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
+        + '<svg width="6" height="5" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="#c87a5a" stroke-width="1.5"/></svg></div>'
+        + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;color:var(--black);">' + _dailyMood.join(' ') + '</span>'
+        + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.07em;text-transform:uppercase;color:#c89878;flex-shrink:0;">mood</span></div>');
+    }
+    return parts.join('');
+  }
+
   el.innerHTML = slots.map(slot => {
     const key = slot.replace(/\s/g,'_');
     const entry = schedule[key] || {};
@@ -1861,7 +2127,7 @@ function renderSchedule() {
     const defaultHtml = defaults.map((text, di) => {
       const done = defaultChecked[di] || false;
       return '<div style="display:flex;align-items:center;gap:0.3rem;padding:0.1rem 0;">' +
-        '<div onclick="event.stopPropagation();toggleDefaultItem(\'' + key + '\',' + di + ')" style="width:12px;height:12px;border:1px solid ' + (done?'var(--black)':'#c8c8c5') + ';background:' + (done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">' +
+        '<div onclick="event.stopPropagation();toggleDefaultItem(\'' + key + '\',' + di + ')" style="width:12px;height:12px;border-radius:50%;border:1px solid ' + (done?'var(--black)':'#c8c8c5') + ';background:' + (done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">' +
           (done?'<svg width="7" height="5" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="white" stroke-width="1.5"/></svg>':'') +
         '</div>' +
         '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;' + (done?'color:var(--gray);text-decoration:line-through;':'') + '">' + text + '</span>' +
@@ -1870,10 +2136,11 @@ function renderSchedule() {
 
     const itemsHtml = userItems.map((item) =>
       '<div style="display:flex;align-items:center;gap:0.3rem;padding:0.1rem 0;">' +
-        '<div onclick="event.stopPropagation();toggleScheduleItem(\'' + key + '\',' + item.id + ')" style="width:12px;height:12px;border:1px solid ' + (item.done?'var(--black)':'#c8c8c5') + ';background:' + (item.done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">' +
+        '<div onclick="event.stopPropagation();toggleScheduleItem(\'' + key + '\',' + item.id + ')" style="width:12px;height:12px;border-radius:50%;border:1px solid ' + (item.done?'var(--black)':'#c8c8c5') + ';background:' + (item.done?'var(--black)':'transparent') + ';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;">' +
           (item.done?'<svg width="7" height="5" viewBox="0 0 8 6"><polyline points="1,3 3,5 7,1" fill="none" stroke="white" stroke-width="1.5"/></svg>':'') +
         '</div>' +
         '<span style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;flex:1;' + (item.done?'color:var(--gray);text-decoration:line-through;':'') + '">' + item.text + '</span>' +
+        (item.savedAt ? '<span style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray);flex-shrink:0;margin-right:0.2rem;">' + item.savedAt + '</span>' : '') +
         '<button onclick="event.stopPropagation();removeScheduleItem(\'' + key + '\',' + item.id + ')" style="font-size:0.7rem;color:#bbb;border:none;background:none;cursor:pointer;flex-shrink:0;padding:0 0.2rem;">✕</button>' +
       '</div>'
     ).join('');
@@ -1941,7 +2208,9 @@ function addScheduleItem(key, input) {
   const entry = allPlannerData[dayKey].schedule[key] || {};
   let items = Array.isArray(entry.items) ? entry.items : (entry.text ? [{id: Date.now(), text: entry.text, done: false}] : []);
   const id = Date.now();
-  items.push({id, text: val, done: false});
+  const _now = new Date();
+  const _timeLabel = _now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  items.push({id, text: val, done: false, savedAt: _timeLabel});
   allPlannerData[dayKey].schedule[key] = { items };
   input.value = '';
   saveScheduleFast();
@@ -1957,6 +2226,7 @@ function toggleDefaultItem(key, di) {
   allPlannerData[dayKey].schedule[key].defaultDone[di] = !allPlannerData[dayKey].schedule[key].defaultDone[di];
   saveScheduleFast();
   renderSchedule();
+  if (typeof renderDailyAnalytics === 'function') renderDailyAnalytics();
 }
 
 function toggleScheduleItem(key, id) {
@@ -1968,6 +2238,7 @@ function toggleScheduleItem(key, id) {
   item.done = !item.done;
   saveScheduleFast();
   renderSchedule();
+  if (typeof renderDailyAnalytics === 'function') renderDailyAnalytics();
 }
 
 function removeScheduleItem(key, id) {
@@ -2320,6 +2591,8 @@ function savePlannerDay() {
   const btn = document.querySelector('[onclick="savePlannerDay()"]');
   if (btn) { btn.textContent = 'Saved ✓'; setTimeout(()=>btn.textContent='Save day',1500); }
   renderSchedCal();
+  if (typeof renderDailyAnalytics === 'function') renderDailyAnalytics();
+  if (typeof schedTrackRenderCal === 'function' && schedTrackCalVisible) schedTrackRenderCal();
 }
 
 function loadPlannerDay() {
@@ -2364,6 +2637,8 @@ function loadPlannerDay() {
   renderMeals();
   renderSchedPhotos();
   try { renderSchedule(); } catch(e) { console.error('renderSchedule error:', e); }
+  try { schedDailyLoadUI(); } catch(e) {}
+  if (typeof renderDailyAnalytics === 'function') renderDailyAnalytics();
   } catch(e) { console.error('loadPlannerDay error:', e); }
 }
 
@@ -2621,6 +2896,70 @@ function renderVentEntries() {
 window.addEventListener('DOMContentLoaded', function(){ initVentDate(); renderVentEntries(); });
 renderVentEntries();
 
+function renderDailyAnalytics() {
+  const el = document.getElementById('ps-daily-analytics');
+  if (!el) return;
+
+  const key = getDateKey();
+  const allPlanner = JSON.parse(localStorage.getItem('all_planner_data') || '{}');
+  const d = allPlanner[key] || {};
+
+  // Daily data (mood, sleep, water)
+  var dailyRaw = {};
+  try { var _dr = localStorage.getItem('daily_data'); if (_dr) dailyRaw = JSON.parse(_dr); } catch(e) {}
+  var todayKey = new Date().toISOString().split('T')[0];
+  var dd = (dailyRaw[todayKey] || dailyRaw[key]) || {};
+
+  // To Do
+  const todos = d.todos || [];
+  const todosDone = todos.filter(function(t){ return t.done; }).length;
+
+  // Mood
+  const moods = dd.mood || d.mood || [];
+
+  // Sleep
+  const sleep = dd.sleep || d.sleep || null;
+
+  // Water
+  const water = ((dd.water || d.water) || []).filter(Boolean).length;
+
+  // Meals — stored in daily_data[key].meals
+  var mealData = dd.meals || {};
+  var breakfast = Array.isArray(mealData.breakfast) ? mealData.breakfast : (mealData.breakfast ? [mealData.breakfast] : []);
+  var lunch     = Array.isArray(mealData.lunch)     ? mealData.lunch     : (mealData.lunch     ? [mealData.lunch]     : []);
+  var dinner    = Array.isArray(mealData.dinner)    ? mealData.dinner    : (mealData.dinner    ? [mealData.dinner]    : []);
+  var snacks    = Array.isArray(mealData.snacks)    ? mealData.snacks    : (mealData.snacks    ? [mealData.snacks]    : []);
+  var drinks    = Array.isArray(mealData.drinks)    ? mealData.drinks    : (mealData.drinks    ? [mealData.drinks]    : []);
+  var allMeals  = breakfast.concat(lunch, dinner, snacks, drinks);
+
+  function row(icon, label, value, done) {
+    const color = done ? 'var(--black)' : 'var(--gray)';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.25rem 0;border-bottom:1px solid #f5f5f3;">'
+      + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);">' + icon + ' ' + label + '</span>'
+      + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.75rem;font-weight:300;color:' + color + ';">' + value + '</span>'
+      + '</div>';
+  }
+
+  let html = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.7rem;">Today\'s Progress</div>';
+  html += '<div style="display:flex;flex-direction:column;">';
+
+  if (moods.length > 0) html += row('💭', 'Mood', moods.join(' '), true);
+  if (sleep) html += row('🌙', 'Sleep', sleep + ' hrs', true);
+  if (water > 0) html += row('💧', 'Water', water + '/8', water >= 8);
+  if (breakfast.length > 0) html += row('🍳', 'Breakfast', breakfast.join(', '), true);
+  if (lunch.length > 0)     html += row('🥗', 'Lunch',     lunch.join(', '),     true);
+  if (dinner.length > 0)    html += row('🍽️', 'Dinner',    dinner.join(', '),    true);
+  if (snacks.length > 0)    html += row('🍪', 'Snacks',    snacks.join(', '),    true);
+  if (drinks.length > 0)    html += row('🥤', 'Drinks',    drinks.join(', '),    true);
+
+  if (!todos.length && !moods.length && !sleep && !water && !allMeals.length) {
+    html += '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.82rem;color:var(--gray);padding:0.3rem 0;">Nothing logged yet 🤍</div>';
+  }
+
+  html += '</div>';
+  el.innerHTML = html;
+}
+
 // Analytics
 let analyticsDate = new Date();
 
@@ -2695,7 +3034,7 @@ function renderAnalytics() {
       <div style="position:relative;text-align:center;">
         <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;">
           <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--black);">${dateLabel}${isToday ? ' <span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">Today</span>' : ''}</div>
-          <button onclick="toggleAnalyticsCal()" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;">
+          <button onclick="toggleAnalyticsCal()" style="display:none;border:none;background:none;cursor:pointer;padding:0;line-height:1;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;">
               <rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
             </svg>
@@ -6138,6 +6477,127 @@ function dailyGetToday() {
 
 function dailySaveAll() {
   localStorage.setItem(DAILY_KEY, JSON.stringify(dailyData));
+  // Refresh schedule so daily items stay in sync
+  if (typeof renderSchedule === 'function') try { renderSchedule(); } catch(e) {}
+  // Sync the schedule daily panel UI
+  schedDailyLoadUI();
+}
+
+// -- SCHEDULE DAILY PANEL FUNCTIONS ---------------------------
+function schedDailyGetToday() {
+  var k = new Date().toISOString().split('T')[0];
+  try { var d = localStorage.getItem('daily_data'); if (d) dailyData = JSON.parse(d); } catch(e) {}
+  if (!dailyData[k]) dailyData[k] = { mood: [], sleep: null, water: [false,false,false,false,false,false,false,false], meals: {} };
+  return dailyData[k];
+}
+
+function schedDailyLoadUI() {
+  var today = schedDailyGetToday();
+  // Mood
+  document.querySelectorAll('#ps-daily .mood-btn').forEach(function(btn) {
+    btn.classList.toggle('selected', today.mood && today.mood.indexOf(btn.textContent) !== -1);
+  });
+  // Sleep
+  document.querySelectorAll('#ps-daily .sleep-btn').forEach(function(btn) {
+    btn.classList.toggle('selected', parseInt(btn.textContent) === today.sleep || (btn.textContent === '8+' && today.sleep === 8));
+  });
+  // Water
+  for (var i = 0; i < 8; i++) {
+    var cup = document.getElementById('sched-water-' + i);
+    if (cup) cup.style.opacity = (today.water && today.water[i]) ? '1' : '0.3';
+  }
+  // Meals
+  schedDailyRenderMeals();
+}
+
+function schedDailyRenderMeals() {
+  var today = schedDailyGetToday();
+  ['breakfast','lunch','dinner','snacks','drinks'].forEach(function(meal) {
+    var el = document.getElementById('sched-daily-' + meal + '-list');
+    if (!el) return;
+    var items = (today.meals && today.meals[meal]) || [];
+    if (typeof items === 'string') items = items ? [items] : [];
+    el.innerHTML = items.map(function(item, i) {
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.2rem 0;font-family:Nunito,sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);">'
+        + '<span>' + item + '</span>'
+        + '<button onclick="schedDailyRemoveMeal(\'' + meal + '\',' + i + ')" style="background:none;border:none;color:#ccc;cursor:pointer;font-size:0.9rem;padding:0;line-height:1;">&times;</button>'
+        + '</div>';
+    }).join('');
+  });
+}
+
+function schedDailyAddMeal(meal) {
+  var input = document.getElementById('sched-daily-' + meal + '-input');
+  var val = input ? input.value.trim() : '';
+  if (!val) return;
+  var today = schedDailyGetToday();
+  if (!today.meals) today.meals = {};
+  if (!today.meals[meal]) today.meals[meal] = [];
+  if (typeof today.meals[meal] === 'string') today.meals[meal] = today.meals[meal] ? [today.meals[meal]] : [];
+  today.meals[meal].push(val);
+  if (input) input.value = '';
+  localStorage.setItem('daily_data', JSON.stringify(dailyData));
+  if (window.syncToCloud) window.syncToCloud('daily_data', dailyData);
+  schedDailyRenderMeals();
+  // Also sync the habits daily panel
+  dailyRenderMeals();
+  if (typeof renderDailyAnalytics === 'function') renderDailyAnalytics();
+}
+
+function schedDailyRemoveMeal(meal, i) {
+  var today = schedDailyGetToday();
+  if (!today.meals || !today.meals[meal]) return;
+  if (typeof today.meals[meal] === 'string') today.meals[meal] = today.meals[meal] ? [today.meals[meal]] : [];
+  today.meals[meal].splice(i, 1);
+  localStorage.setItem('daily_data', JSON.stringify(dailyData));
+  if (window.syncToCloud) window.syncToCloud('daily_data', dailyData);
+  schedDailyRenderMeals();
+  dailyRenderMeals();
+  if (typeof renderDailyAnalytics === 'function') renderDailyAnalytics();
+}
+
+function schedDailyToggleMood(btn, emoji) {
+  var today = schedDailyGetToday();
+  if (!today.mood) today.mood = [];
+  var idx = today.mood.indexOf(emoji);
+  if (idx === -1) today.mood.push(emoji); else today.mood.splice(idx, 1);
+  btn.classList.toggle('selected', today.mood.indexOf(emoji) !== -1);
+  localStorage.setItem('daily_data', JSON.stringify(dailyData));
+  if (window.syncToCloud) window.syncToCloud('daily_data', dailyData);
+  // Sync habits daily panel
+  document.querySelectorAll('#hsub-daily .mood-btn').forEach(function(b) {
+    b.classList.toggle('selected', today.mood.indexOf(b.textContent) !== -1);
+  });
+  if (typeof renderDailyAnalytics === 'function') renderDailyAnalytics();
+}
+
+function schedDailySetSleep(btn, val) {
+  var today = schedDailyGetToday();
+  today.sleep = val;
+  localStorage.setItem('daily_data', JSON.stringify(dailyData));
+  if (window.syncToCloud) window.syncToCloud('daily_data', dailyData);
+  document.querySelectorAll('#ps-daily .sleep-btn').forEach(function(b) {
+    b.classList.toggle('selected', parseInt(b.textContent) === val || (b.textContent === '8+' && val === 8));
+  });
+  // Sync habits daily panel
+  document.querySelectorAll('#hsub-daily .sleep-btn').forEach(function(b) {
+    b.classList.toggle('selected', parseInt(b.textContent) === val || (b.textContent === '8+' && val === 8));
+  });
+  if (typeof renderDailyAnalytics === 'function') renderDailyAnalytics();
+}
+
+function schedDailyToggleWater(cup, i) {
+  var today = schedDailyGetToday();
+  if (!today.water) today.water = [false,false,false,false,false,false,false,false];
+  today.water[i] = !today.water[i];
+  cup.style.opacity = today.water[i] ? '1' : '0.3';
+  localStorage.setItem('daily_data', JSON.stringify(dailyData));
+  if (window.syncToCloud) window.syncToCloud('daily_data', dailyData);
+  // Sync habits daily panel
+  document.querySelectorAll('#hsub-daily .water-cup').forEach(function(c, idx) {
+    c.style.opacity = today.water[idx] ? '1' : '0.3';
+  });
+  if (typeof renderDailyAnalytics === 'function') renderDailyAnalytics();
 }
 
 function dailyLoad() {
@@ -8749,6 +9209,63 @@ function routineRenderSlot(slot) {
       + '</div>'
       + '</div>';
   }).join('');
+}
+
+// Daily Schedule Track Days Calendar
+var schedTrackCalVisible = false;
+var schedTrackCalMonth = new Date().getMonth();
+var schedTrackCalYear = new Date().getFullYear();
+
+function schedTrackToggleCal() {
+  schedTrackCalVisible = !schedTrackCalVisible;
+  document.getElementById('sched-track-cal-wrap').style.display = schedTrackCalVisible ? 'block' : 'none';
+  if (schedTrackCalVisible) schedTrackRenderCal();
+}
+
+function schedTrackCalShift(dir) {
+  schedTrackCalMonth += dir;
+  if (schedTrackCalMonth > 11) { schedTrackCalMonth = 0; schedTrackCalYear++; }
+  if (schedTrackCalMonth < 0) { schedTrackCalMonth = 11; schedTrackCalYear--; }
+  schedTrackRenderCal();
+}
+
+function schedTrackRenderCal() {
+  var lbl = document.getElementById('sched-track-cal-label');
+  var grid = document.getElementById('sched-track-cal-grid');
+  var dn = document.getElementById('sched-track-cal-daynames');
+  if (!lbl || !grid || !dn) return;
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  lbl.textContent = months[schedTrackCalMonth] + ' ' + schedTrackCalYear;
+  dn.innerHTML = ['S','M','T','W','T','F','S'].map(function(d){
+    return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray);text-align:center;">' + d + '</div>';
+  }).join('');
+  var allPlanner = {};
+  var dailyRaw = {};
+  try { allPlanner = JSON.parse(localStorage.getItem('all_planner_data') || '{}'); } catch(e) {}
+  try { dailyRaw = JSON.parse(localStorage.getItem('daily_data') || '{}'); } catch(e) {}
+  var first = new Date(schedTrackCalYear, schedTrackCalMonth, 1).getDay();
+  var days = new Date(schedTrackCalYear, schedTrackCalMonth + 1, 0).getDate();
+  var today = new Date().toISOString().split('T')[0];
+  var cells = '';
+  for (var i = 0; i < first; i++) cells += '<div></div>';
+  for (var d = 1; d <= days; d++) {
+    var key = schedTrackCalYear + '-' + String(schedTrackCalMonth + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    var isToday = key === today;
+    var pd = allPlanner[key] || {};
+    var dd = dailyRaw[key] || {};
+    var hasData = (pd.todos && pd.todos.length) ||
+      (dd.mood && dd.mood.length) ||
+      dd.sleep ||
+      (dd.water && dd.water.some(Boolean)) ||
+      (dd.meals && Object.values(dd.meals).some(function(m){ return m && (Array.isArray(m) ? m.length : m); }));
+    cells += '<div style="cursor:default;text-align:center;padding:0.2rem;font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;">'
+      + '<div style="width:24px;height:24px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;background:' + (hasData ? 'var(--black)' : (isToday ? '#f0f0ee' : 'transparent')) + ';color:' + (hasData ? 'var(--white)' : 'var(--black)') + ';">' + d + '</div>'
+      + '</div>';
+  }
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(7,1fr)';
+  grid.style.gap = '3px';
+  grid.innerHTML = cells;
 }
 
 function routineToggleCal() {
