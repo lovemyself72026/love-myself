@@ -337,6 +337,10 @@
   .counter-num { font-family: 'Nunito', sans-serif; font-size: 1rem; min-width: 24px; text-align: center; }
   .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-left: 1px solid #c8c8c5; border-top: 1px solid #c8c8c5; margin-bottom: 2rem; }
   .home-card { background: var(--white); padding: 1.2rem 1.5rem; cursor: pointer; transition: background 0.2s; display: flex; flex-direction: column; justify-content: flex-start; border-right: 1px solid #c8c8c5; border-bottom: 1px solid #c8c8c5; }
+  .home-card:last-child { border-bottom: none; }
+  .home-link { cursor: pointer; font-size: 0.95rem; font-weight: 300; color: var(--black); padding: 0.4rem 0; border-bottom: 1px solid var(--light); }
+  .home-link.last { border-bottom: none; }
+  .home-link:active { opacity: 0.6; }
   .home-card:nth-child(even) { }
   .home-card:hover, .home-card:active { background: var(--light); }
   .home-card-title { font-family: 'Nunito', sans-serif; font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.6rem; color: var(--gray); }
@@ -389,6 +393,7 @@
     .scale-wrap { padding: 0.8rem; }
     textarea { font-size: 0.9rem; min-height: 90px; }
     .balance-side-grid { grid-template-columns: 1fr !important; }
+    .planner-two-col { grid-template-columns: 1fr !important; }
     #vision h2 { font-size: 0.82rem !important; margin-bottom: 0.3rem; }
     #vision .subtitle { font-size: 0.6rem !important; margin-bottom: 0.3rem; }
     #vision [style*="font-size:0.95rem"] { font-size: 0.78rem !important; margin-bottom: 0.8rem; }
@@ -543,68 +548,75 @@
   <h1>Good to see you today.</h1><br>
 
 
-  <div class="home-grid">
+  <div style="display:grid;grid-template-columns:1fr 1fr;border:1px solid #c8c8c5;margin-bottom:2rem;">
 
-    <div class="home-card" style="cursor:default;">
-      <div class="home-card-title">Jesus Christ</div>
-      <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
-        <div onclick="showSection('jesus');setTimeout(()=>showJesusTab('whoisjesus'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Jesus Christ</div>
-        <div onclick="showSection('jesus');setTimeout(()=>showJesusTab('prayer'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Prayer</div>
-        <div onclick="showSection('jesus');setTimeout(()=>showJesusTab('action'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Today's Action</div>
-        <div onclick="showSection('jesus');setTimeout(()=>showJesusTab('study'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Study the Bible</div>
+    <!-- LEFT COLUMN -->
+    <div style="display:flex;flex-direction:column;">
+
+      <div class="home-card" style="cursor:default;">
+        <div class="home-card-title">Jesus Christ</div>
+        <div class="home-card-links">
+          <div class="home-link" onclick="showSection('jesus');setTimeout(()=>showJesusTab('whoisjesus'),100)">Jesus Christ</div>
+          <div class="home-link" onclick="showSection('jesus');setTimeout(()=>showJesusTab('prayer'),100)">Prayer</div>
+          <div class="home-link" onclick="showSection('jesus');setTimeout(()=>showJesusTab('action'),100)">Today's Action</div>
+          <div class="home-link last" onclick="showSection('jesus');setTimeout(()=>showJesusTab('study'),100)">Study the Bible</div>
+        </div>
       </div>
+
+      <div class="home-card" style="cursor:default;">
+        <div class="home-card-title">Me</div>
+        <div class="home-card-links">
+          <div class="home-link" onclick="showSection('me');setTimeout(()=>showMeTab('whiam'),100)">Who I Am</div>
+          <div class="home-link" onclick="showSection('me');setTimeout(()=>showMeTab('assertive'),100)">Assertive</div>
+          <div class="home-link" onclick="showSection('me');setTimeout(()=>showMeTab('believe'),100)">Believe</div>
+          <div class="home-link last" onclick="showSection('me');setTimeout(()=>showMeTab('rightforme'),100)">Right For Me</div>
+        </div>
+      </div>
+
+      <div class="home-card" style="cursor:default;">
+        <div class="home-card-title">Schedule</div>
+        <div class="home-card-links">
+          <div class="home-link" onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('routine'),100)">My Routine</div>
+          <div class="home-link" onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('schedule'),100)">Daily Schedule</div>
+          <div class="home-link" onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('habits'),100)">Calisthenics</div>
+          <div class="home-link last" onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('infp'),100)">INFP</div>
+          <div id="home-sched-preview" style="margin-top:0.5rem;"></div>
+        </div>
+      </div>
+
     </div>
 
-    <div class="home-card" style="cursor:default;">
-      <div class="home-card-title">Journal</div>
-      <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
-        <div onclick="showSection('journal');setTimeout(()=>showJournalTab('belief'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Belief</div>
-        <div onclick="showSection('journal');setTimeout(()=>showJournalTab('vent'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Journal</div>
-        <div onclick="showSection('journal');setTimeout(()=>showJournalTab('books'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Books</div>
-        <div onclick="showSection('journal');setTimeout(()=>showJournalTab('wins'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Wins</div>
-      </div>
-    </div>
+    <!-- RIGHT COLUMN -->
+    <div style="display:flex;flex-direction:column;">
 
-    <div class="home-card" style="cursor:default;">
-      <div class="home-card-title">Me</div>
-      <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
-        <div onclick="showSection('me');setTimeout(()=>showMeTab('whiam'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Who I Am</div>
-        <div onclick="showSection('me');setTimeout(()=>showMeTab('assertive'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Assertive</div>
-        <div onclick="showSection('me');setTimeout(()=>showMeTab('believe'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Believe</div>
-        <div onclick="showSection('me');setTimeout(()=>showMeTab('rightforme'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Right For Me</div>
+      <div class="home-card" style="cursor:default;">
+        <div class="home-card-title">Journal</div>
+        <div class="home-card-links">
+          <div class="home-link" onclick="showSection('journal');setTimeout(()=>showJournalTab('belief'),100)">Belief</div>
+          <div class="home-link" onclick="showSection('journal');setTimeout(()=>showJournalTab('vent'),100)">Journal</div>
+          <div class="home-link" onclick="showSection('journal');setTimeout(()=>showJournalTab('books'),100)">Books</div>
+          <div class="home-link last" onclick="showSection('journal');setTimeout(()=>showJournalTab('wins'),100)">Wins</div>
+        </div>
       </div>
-    </div>
 
-    <div class="home-card" style="cursor:default;">
-      <div class="home-card-title">Schedule</div>
-      <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
-        <div onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('routine'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">My Routine</div>
-        <div onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('schedule'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Daily Schedule</div>
-        <div onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('habits'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Calisthenics</div>
-        <div id="home-sched-preview" style="margin-top:0.5rem;"></div>
+      <div class="home-card" style="cursor:default;">
+        <div class="home-card-title">Today's Progress</div>
+        <div class="home-card-links">
+          <div class="home-link" onclick="showSection('schedule');setTimeout(()=>{ showSchedMainTab('schedule'); goToScheduleItem('ps-todo'); },100)">To Do</div>
+          <div class="home-link" onclick="showSection('schedule');setTimeout(()=>{ showSchedMainTab('schedule'); goToScheduleItem('ps-schedule'); },100)">Schedule</div>
+          <div class="home-link" onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('schedule'),100)">Mood, Sleep (hrs), Water, Meals</div>
+          <div class="home-link last" onclick="showSection('schedule');setTimeout(()=>{ showSchedMainTab('schedule'); goToScheduleItem('ps-notes'); },100)">Notes, Photos</div>
+        </div>
       </div>
-    </div>
 
-    <div class="home-card" style="cursor:default;">
-      <div class="home-card-title">Vision Board</div>
-      <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
-        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('vision-board-section')&&document.getElementById('vision-board-section').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Vision Board</div>
-        <div onclick="showSection('vision');setTimeout(()=>document.getElementById('tg-all-list')&&document.getElementById('tg-all-list').scrollIntoView({behavior:'smooth'}),200)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">She's Already In You</div>
+      <div class="home-card" style="cursor:default;">
+        <div class="home-card-title">Vision Board</div>
+        <div class="home-card-links">
+          <div class="home-link" onclick="showSection('vision');setTimeout(()=>document.getElementById('vision-board-section')&&document.getElementById('vision-board-section').scrollIntoView({behavior:'smooth'}),200)">Vision Board</div>
+          <div class="home-link last" onclick="showSection('vision');setTimeout(()=>document.getElementById('tg-all-list')&&document.getElementById('tg-all-list').scrollIntoView({behavior:'smooth'}),200)">She's Already In You</div>
+        </div>
       </div>
-    </div>
 
-    <div class="home-card" style="cursor:default;">
-      <div class="home-card-title">Today's Progress</div>
-      <div style="display:flex;flex-direction:column;margin-top:0.3rem;flex:1;">
-        <div onclick="showSection('schedule');setTimeout(()=>{ showSchedMainTab('schedule'); goToScheduleItem('ps-todo'); },100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">To Do</div>
-        <div onclick="showSection('schedule');setTimeout(()=>{ showSchedMainTab('schedule'); goToScheduleItem('ps-schedule'); },100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Schedule</div>
-        <div onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('schedule'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Mood</div>
-        <div onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('schedule'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Sleep (hrs)</div>
-        <div onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('schedule'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Water</div>
-        <div onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('schedule'),100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Meals</div>
-        <div onclick="showSection('schedule');setTimeout(()=>{ showSchedMainTab('schedule'); goToScheduleItem('ps-notes'); },100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;border-bottom:1px solid var(--light);">Notes</div>
-        <div onclick="showSection('schedule');setTimeout(()=>{ showSchedMainTab('schedule'); goToScheduleItem('ps-photos'); },100)" style="cursor:pointer;font-size:0.95rem;font-weight:300;color:var(--black);padding:0.4rem 0;">Photos</div>
-      </div>
     </div>
 
   </div>
@@ -682,6 +694,7 @@
     <button id="schtab-routine" onclick="showSchedMainTab('routine')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">My Routine</button>
     <button id="schtab-schedule" onclick="showSchedMainTab('schedule')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--black);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid var(--black);font-weight:300;">Daily Schedule</button>
     <button id="schtab-habits" onclick="showSchedMainTab('habits')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">Calisthenics</button>
+    <button id="schtab-infp" onclick="showSchedMainTab('infp')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">INFP</button>
   </div>
 
   <!-- SCHEDULE TAB -->
@@ -708,8 +721,8 @@
   <!-- Planner grid -->
   <div id="planner-grid" style="display:flex;flex-direction:column;gap:0.6rem;">
 
-    <!-- Schedule + Daily: two columns -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;align-items:start;">
+    <!-- Schedule + Daily: two columns on desktop, one on mobile -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;align-items:start;" class="planner-two-col">
 
       <!-- LEFT: Schedule time rows -->
       <div id="ps-schedule" style="border:1px solid #c8c8c5;padding:0.8rem;">
@@ -967,6 +980,49 @@
     <div id="schhabits-daily" style="display:none;"></div>
     <div id="schhabits-bodycare" style="display:none;"></div>
     <div id="schhabits-rest" style="display:none;"></div>
+  </div>
+
+  <!-- INFP TAB -->
+  <div id="schmain-infp" style="display:none;">
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0.5rem 0 1.5rem;line-height:1.6;">Your inner world matters. 🤍</div>
+
+    <!-- Notes -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label">Notes & Reflections</div>
+      <textarea id="infp-notes" placeholder="Write your thoughts, feelings, ideas..." oninput="infpSave()" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:120px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
+      <div style="margin-top:0.6rem;display:flex;align-items:center;gap:0.5rem;">
+        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.3rem 0.7rem;">
+          + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('notes',this)" style="display:none;">
+        </label>
+      </div>
+      <div id="infp-notes-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+    </div>
+
+    <!-- Things I'm feeling -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label">Things I'm Feeling</div>
+      <div id="infp-feelings-list" style="margin-top:0.5rem;"></div>
+      <input id="infp-feelings-input" placeholder="Add a feeling..." onkeydown="if(event.key==='Enter')infpAddFeeling()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
+    </div>
+
+    <!-- Things I need -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label">Things I Need Today</div>
+      <div id="infp-needs-list" style="margin-top:0.5rem;"></div>
+      <input id="infp-needs-input" placeholder="Add something you need..." onkeydown="if(event.key==='Enter')infpAddNeed()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
+    </div>
+
+    <!-- Creative space -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div class="planner-label">Creative Space</div>
+      <textarea id="infp-creative" placeholder="A dream, a story, a poem, an idea..." oninput="infpSave()" style="width:100%;border:none;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.88rem;outline:none;resize:none;min-height:100px;margin-top:0.5rem;line-height:1.8;color:var(--black);"></textarea>
+      <div style="margin-top:0.6rem;display:flex;align-items:center;gap:0.5rem;">
+        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.3rem 0.7rem;">
+          + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('creative',this)" style="display:none;">
+        </label>
+      </div>
+      <div id="infp-creative-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+    </div>
   </div>
 
   <!-- Copy schedule picker -->
@@ -6207,17 +6263,22 @@ function showSchedMainTab(tab) {
   var ms = document.getElementById('schmain-schedule');
   var mh = document.getElementById('schmain-habits');
   var mr = document.getElementById('schmain-routine');
+  var mi = document.getElementById('schmain-infp');
   var ts = document.getElementById('schtab-schedule');
   var th = document.getElementById('schtab-habits');
   var tr = document.getElementById('schtab-routine');
+  var ti = document.getElementById('schtab-infp');
   if (ms) ms.style.display = tab === 'schedule' ? 'block' : 'none';
   if (mh) mh.style.display = tab === 'habits' ? 'block' : 'none';
   if (mr) mr.style.display = tab === 'routine' ? 'block' : 'none';
+  if (mi) mi.style.display = tab === 'infp' ? 'block' : 'none';
   if (ts) { ts.style.color = tab === 'schedule' ? 'var(--black)' : 'var(--gray)'; ts.style.borderBottom = tab === 'schedule' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (th) { th.style.color = tab === 'habits' ? 'var(--black)' : 'var(--gray)'; th.style.borderBottom = tab === 'habits' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (tr) { tr.style.color = tab === 'routine' ? 'var(--black)' : 'var(--gray)'; tr.style.borderBottom = tab === 'routine' ? '2px solid var(--black)' : '2px solid transparent'; }
+  if (ti) { ti.style.color = tab === 'infp' ? 'var(--black)' : 'var(--gray)'; ti.style.borderBottom = tab === 'infp' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (tab === 'habits') showSchedHabitsTab('calisthenics');
   if (tab === 'routine') routineInit();
+  if (tab === 'infp') infpLoad();
 }
 
 function showSchedHabitsTab(tab) {
@@ -9314,6 +9375,149 @@ function routineRenderCal() {
   grid.style.gridTemplateColumns = 'repeat(7,1fr)';
   grid.style.gap = '3px';
   grid.innerHTML = cells;
+}
+
+// -- INFP -----------------------------------------------------
+var infpData = {};
+
+function infpLoad() {
+  try { infpData = JSON.parse(localStorage.getItem('infp_data') || '{}'); } catch(e) { infpData = {}; }
+  var notes = document.getElementById('infp-notes');
+  var creative = document.getElementById('infp-creative');
+  if (notes) notes.value = infpData.notes || '';
+  if (creative) creative.value = infpData.creative || '';
+  infpRenderFeelings();
+  infpRenderNeeds();
+  infpRenderPhotos('notes');
+  infpRenderPhotos('creative');
+}
+
+function infpSave() {
+  var notes = document.getElementById('infp-notes');
+  var creative = document.getElementById('infp-creative');
+  infpData.notes = notes ? notes.value : (infpData.notes || '');
+  infpData.creative = creative ? creative.value : (infpData.creative || '');
+  localStorage.setItem('infp_data', JSON.stringify(infpData));
+}
+
+function infpAddFeeling() {
+  var inp = document.getElementById('infp-feelings-input');
+  var text = inp.value.trim();
+  if (!text) return;
+  if (!infpData.feelings) infpData.feelings = [];
+  infpData.feelings.push({ id: Date.now(), text: text });
+  infpSave();
+  inp.value = '';
+  infpRenderFeelings();
+}
+
+function infpDeleteFeeling(id) {
+  infpData.feelings = (infpData.feelings || []).filter(function(f){ return f.id !== id; });
+  infpSave();
+  infpRenderFeelings();
+}
+
+function infpRenderFeelings() {
+  var el = document.getElementById('infp-feelings-list');
+  if (!el) return;
+  var list = infpData.feelings || [];
+  el.innerHTML = list.map(function(f){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.35rem 0;border-bottom:1px solid #f5f5f3;">'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);">' + f.text + '</div>'
+      + '<button onclick="infpDeleteFeeling(' + f.id + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:1rem;padding:0;">×</button>'
+      + '</div>';
+  }).join('');
+}
+
+function infpAddNeed() {
+  var inp = document.getElementById('infp-needs-input');
+  var text = inp.value.trim();
+  if (!text) return;
+  if (!infpData.needs) infpData.needs = [];
+  infpData.needs.push({ id: Date.now(), text: text, done: false });
+  infpSave();
+  inp.value = '';
+  infpRenderNeeds();
+}
+
+function infpToggleNeed(id) {
+  infpData.needs = (infpData.needs || []).map(function(n){ return n.id === id ? Object.assign({}, n, { done: !n.done }) : n; });
+  infpSave();
+  infpRenderNeeds();
+}
+
+function infpDeleteNeed(id) {
+  infpData.needs = (infpData.needs || []).filter(function(n){ return n.id !== id; });
+  infpSave();
+  infpRenderNeeds();
+}
+
+function infpRenderNeeds() {
+  var el = document.getElementById('infp-needs-list');
+  if (!el) return;
+  var list = infpData.needs || [];
+  el.innerHTML = list.map(function(n){
+    return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.35rem 0;border-bottom:1px solid #f5f5f3;">'
+      + '<div onclick="infpToggleNeed(' + n.id + ')" style="cursor:pointer;width:16px;height:16px;border-radius:50%;border:1px solid ' + (n.done ? 'var(--black)' : '#c8c8c5') + ';background:' + (n.done ? 'var(--black)' : 'transparent') + ';flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
+      + (n.done ? '<svg width="9" height="9" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="white" stroke-width="1.8"/></svg>' : '')
+      + '</div>'
+      + '<div onclick="infpToggleNeed(' + n.id + ')" style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.88rem;font-weight:300;color:' + (n.done ? '#bbb' : 'var(--black)') + ';text-decoration:' + (n.done ? 'line-through' : 'none') + ';cursor:pointer;">' + n.text + '</div>'
+      + '<button onclick="infpDeleteNeed(' + n.id + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:1rem;padding:0;">×</button>'
+      + '</div>';
+  }).join('');
+}
+
+function infpAddPhoto(section, input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    if (!infpData.photos) infpData.photos = {};
+    if (!infpData.photos[section]) infpData.photos[section] = [];
+    infpData.photos[section].unshift({ id: Date.now(), src: e.target.result, date: new Date().toISOString() });
+    infpSave();
+    infpRenderPhotos(section);
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function infpDeletePhoto(section, id) {
+  if (!infpData.photos || !infpData.photos[section]) return;
+  infpData.photos[section] = infpData.photos[section].filter(function(p){ return p.id !== id; });
+  infpSave();
+  infpRenderPhotos(section);
+}
+
+function infpViewPhoto(section, id) {
+  if (!infpData.photos || !infpData.photos[section]) return;
+  var p = infpData.photos[section].find(function(x){ return x.id === id; });
+  if (!p) return;
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;display:flex;align-items:center;justify-content:center;';
+  overlay.onclick = function(){ document.body.removeChild(overlay); };
+  var img = document.createElement('img');
+  img.src = p.src;
+  img.style.cssText = 'max-width:92vw;max-height:88vh;object-fit:contain;display:block;';
+  var close = document.createElement('button');
+  close.textContent = '×';
+  close.style.cssText = 'position:absolute;top:1rem;right:1rem;background:none;border:none;color:white;font-size:2rem;cursor:pointer;line-height:1;';
+  close.onclick = function(){ document.body.removeChild(overlay); };
+  overlay.appendChild(img);
+  overlay.appendChild(close);
+  document.body.appendChild(overlay);
+}
+
+function infpRenderPhotos(section) {
+  var el = document.getElementById('infp-' + section + '-photos');
+  if (!el) return;
+  var list = (infpData.photos && infpData.photos[section]) || [];
+  el.innerHTML = list.map(function(p){
+    return '<div style="position:relative;width:80px;height:80px;">'
+      + '<img src="' + p.src + '" onclick="infpViewPhoto(\'' + section + '\',' + p.id + ')" style="width:80px;height:80px;object-fit:cover;display:block;cursor:pointer;">'
+      + '<button onclick="infpDeletePhoto(\'' + section + '\',' + p.id + ')" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.5);border:none;color:white;width:18px;height:18px;font-size:0.7rem;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;border-radius:50%;">×</button>'
+      + '</div>';
+  }).join('');
 }
 
 function routineCalToggleDay(dateKey) {
