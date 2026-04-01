@@ -986,16 +986,44 @@
   <div id="schmain-infp" style="display:none;">
     <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0.5rem 0 1.5rem;line-height:1.6;">Your inner world matters. 🤍</div>
 
+    <!-- Track Days toggle -->
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;cursor:pointer;" onclick="infpToggleCal()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+      <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Track Days</span>
+    </div>
+
+    <!-- Track Days calendar -->
+    <div id="infp-cal-wrap" style="display:none;margin-bottom:1.2rem;border:1px solid #e8e8e5;">
+      <div style="display:flex;min-height:200px;">
+        <!-- Left: calendar -->
+        <div style="width:50%;min-width:0;border-right:1px solid #e8e8e5;padding:0.5rem;box-sizing:border-box;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem;">
+            <button onclick="infpCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1rem;color:var(--gray);padding:0.1rem;">&#8249;</button>
+            <div id="infp-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.48rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);text-align:center;"></div>
+            <button onclick="infpCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1rem;color:var(--gray);padding:0.1rem;">&#8250;</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:2px;" id="infp-cal-daynames"></div>
+          <div id="infp-cal-grid"></div>
+        </div>
+        <!-- Right: day content -->
+        <div id="infp-cal-day-view" style="width:50%;min-width:0;padding:0.6rem;box-sizing:border-box;overflow-y:auto;max-height:300px;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;font-weight:300;color:var(--gray);text-align:center;margin-top:2rem;">Tap a day 🤍</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Notes -->
     <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
       <div class="planner-label">Notes & Reflections</div>
-      <textarea id="infp-notes" placeholder="Write your thoughts, feelings, ideas..." oninput="infpSave()" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:120px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
-      <div style="margin-top:0.6rem;display:flex;align-items:center;gap:0.5rem;">
-        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.3rem 0.7rem;">
+      <textarea id="infp-notes" placeholder="Write your thoughts, feelings, ideas..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
+      <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
+        <button onclick="infpSaveEntry('notes')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
+        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
           + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('notes',this)" style="display:none;">
         </label>
       </div>
       <div id="infp-notes-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+      <div id="infp-notes-entries" style="margin-top:0.6rem;"></div>
     </div>
 
     <!-- Things I'm feeling -->
@@ -1015,13 +1043,15 @@
     <!-- Creative space -->
     <div style="border:1px solid #c8c8c5;padding:0.8rem;">
       <div class="planner-label">Creative Space</div>
-      <textarea id="infp-creative" placeholder="A dream, a story, a poem, an idea..." oninput="infpSave()" style="width:100%;border:none;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.88rem;outline:none;resize:none;min-height:100px;margin-top:0.5rem;line-height:1.8;color:var(--black);"></textarea>
-      <div style="margin-top:0.6rem;display:flex;align-items:center;gap:0.5rem;">
-        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.3rem 0.7rem;">
+      <textarea id="infp-creative" placeholder="A dream, a story, a poem, an idea..." style="width:100%;border:none;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.88rem;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.8;color:var(--black);"></textarea>
+      <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
+        <button onclick="infpSaveEntry('creative')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
+        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
           + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('creative',this)" style="display:none;">
         </label>
       </div>
       <div id="infp-creative-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+      <div id="infp-creative-entries" style="margin-top:0.6rem;"></div>
     </div>
   </div>
 
@@ -2460,18 +2490,19 @@ function schedDeletePhoto(id) {
 
 function schedViewPhoto(id) {
   var photos = JSON.parse(localStorage.getItem('sched_photos') || '[]');
-  var p = photos.find(function(x){ return x.id === id; });
+  var p = photos.find(function(x){ return x.id == id; });
   if (!p) return;
   var overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;display:flex;align-items:center;justify-content:center;';
-  overlay.onclick = function(){ document.body.removeChild(overlay); };
+  function removeOverlay() { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }
+  overlay.onclick = removeOverlay;
   var img = document.createElement('img');
   img.src = p.src;
   img.style.cssText = 'max-width:92vw;max-height:88vh;object-fit:contain;display:block;';
   var close = document.createElement('button');
   close.textContent = '×';
   close.style.cssText = 'position:absolute;top:1rem;right:1rem;background:none;border:none;color:white;font-size:2rem;cursor:pointer;line-height:1;';
-  close.onclick = function(){ document.body.removeChild(overlay); };
+  close.onclick = function(e){ e.stopPropagation(); removeOverlay(); };
   overlay.appendChild(img);
   overlay.appendChild(close);
   document.body.appendChild(overlay);
@@ -9379,25 +9410,168 @@ function routineRenderCal() {
 
 // -- INFP -----------------------------------------------------
 var infpData = {};
+var infpCalYear = new Date().getFullYear();
+var infpCalMonth = new Date().getMonth();
+var infpCalVisible = false;
+var infpCalSelectedDay = null;
+
+function infpToggleCal() {
+  infpCalVisible = !infpCalVisible;
+  document.getElementById('infp-cal-wrap').style.display = infpCalVisible ? 'block' : 'none';
+  if (infpCalVisible) infpRenderCal();
+}
+
+function infpCalShift(dir) {
+  infpCalMonth += dir;
+  if (infpCalMonth > 11) { infpCalMonth = 0; infpCalYear++; }
+  if (infpCalMonth < 0) { infpCalMonth = 11; infpCalYear--; }
+  infpRenderCal();
+}
+
+function infpDayHasContent(key) {
+  var entries = infpData.entries || {};
+  var hasNote = (entries.notes || []).some(function(e){ return e.dateKey === key; });
+  var hasCreative = (entries.creative || []).some(function(e){ return e.dateKey === key; });
+  var hasFeeling = (infpData.feelings || []).some(function(f){ return f.dateKey === key; });
+  var hasNeed = (infpData.needs || []).some(function(n){ return n.dateKey === key; });
+  return hasNote || hasCreative || hasFeeling || hasNeed;
+}
+
+function infpCalShowDay(key) {
+  infpCalSelectedDay = key;
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var parts = key.split('-');
+  var label = months[parseInt(parts[1])-1] + ' ' + parseInt(parts[2]) + ', ' + parts[0];
+
+  var entries = infpData.entries || {};
+  var notes = (entries.notes || []).filter(function(e){ return e.dateKey === key; });
+  var creative = (entries.creative || []).filter(function(e){ return e.dateKey === key; });
+  var feelings = (infpData.feelings || []).filter(function(f){ return f.dateKey === key; });
+  var needs = (infpData.needs || []).filter(function(n){ return n.dateKey === key; });
+
+  var html = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">' + label + '</div>';
+
+  if (notes.length) {
+    html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.3rem;">Notes</div>';
+    notes.forEach(function(e){
+      html += '<div style="margin-bottom:0.5rem;font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;white-space:pre-wrap;color:var(--black);">' + e.text + '</div>';
+    });
+  }
+
+  if (creative.length) {
+    html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.3rem;' + (notes.length ? 'margin-top:0.6rem;' : '') + '">Creative</div>';
+    creative.forEach(function(e){
+      html += '<div style="margin-bottom:0.5rem;font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;line-height:1.7;white-space:pre-wrap;color:var(--black);">' + e.text + '</div>';
+    });
+  }
+
+  if (feelings.length) {
+    html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.3rem;' + (notes.length||creative.length ? 'margin-top:0.6rem;' : '') + '">Feelings</div>';
+    feelings.forEach(function(f){
+      html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;padding:0.2rem 0;border-bottom:1px solid #f5f5f3;color:var(--black);">' + f.text + '</div>';
+    });
+  }
+
+  if (needs.length) {
+    html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.3rem;margin-top:0.6rem;">Needed</div>';
+    needs.forEach(function(n){
+      html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;padding:0.2rem 0;border-bottom:1px solid #f5f5f3;color:' + (n.done ? '#bbb' : 'var(--black)') + ';text-decoration:' + (n.done ? 'line-through' : 'none') + ';">' + n.text + '</div>';
+    });
+  }
+
+  if (!notes.length && !creative.length && !feelings.length && !needs.length) {
+    html += '<div style="font-family:\'Nunito\',sans-serif;font-size:0.75rem;font-weight:300;color:var(--gray);text-align:center;margin-top:1.5rem;">Nothing written.</div>';
+  }
+
+  var panel = document.getElementById('infp-cal-day-view');
+  if (panel) panel.innerHTML = html;
+  infpRenderCal();
+}
+
+function infpRenderCal() {
+  var lbl = document.getElementById('infp-cal-label');
+  var grid = document.getElementById('infp-cal-grid');
+  var dn = document.getElementById('infp-cal-daynames');
+  if (!lbl || !grid || !dn) return;
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  lbl.textContent = months[infpCalMonth] + ' ' + infpCalYear;
+  dn.innerHTML = ['S','M','T','W','T','F','S'].map(function(d){
+    return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.5rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--gray);text-align:center;">' + d + '</div>';
+  }).join('');
+  var first = new Date(infpCalYear, infpCalMonth, 1).getDay();
+  var days = new Date(infpCalYear, infpCalMonth+1, 0).getDate();
+  var today = new Date().toISOString().split('T')[0];
+  var cells = '';
+  for (var i = 0; i < first; i++) cells += '<div></div>';
+  for (var d = 1; d <= days; d++) {
+    var key = infpCalYear + '-' + String(infpCalMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    var isToday = key === today;
+    var hasContent = infpDayHasContent(key);
+    var isSelected = key === infpCalSelectedDay;
+    var bg = hasContent ? 'var(--black)' : (isSelected ? '#e8e8e5' : (isToday ? '#f0f0ee' : 'transparent'));
+    var color = hasContent ? 'var(--white)' : 'var(--black)';
+    cells += '<div onclick="infpCalShowDay(\'' + key + '\')" style="cursor:pointer;text-align:center;padding:1px;">'
+      + '<div style="aspect-ratio:1;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-family:\'Nunito\',sans-serif;font-size:0.55rem;font-weight:' + (isToday ? '400' : '300') + ';background:' + bg + ';color:' + color + ';">' + d + '</div>'
+      + '</div>';
+  }
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(7,1fr)';
+  grid.style.gap = '2px';
+  grid.innerHTML = cells;
+}
 
 function infpLoad() {
   try { infpData = JSON.parse(localStorage.getItem('infp_data') || '{}'); } catch(e) { infpData = {}; }
-  var notes = document.getElementById('infp-notes');
-  var creative = document.getElementById('infp-creative');
-  if (notes) notes.value = infpData.notes || '';
-  if (creative) creative.value = infpData.creative || '';
   infpRenderFeelings();
   infpRenderNeeds();
   infpRenderPhotos('notes');
   infpRenderPhotos('creative');
+  infpRenderEntries('notes');
+  infpRenderEntries('creative');
 }
 
 function infpSave() {
-  var notes = document.getElementById('infp-notes');
-  var creative = document.getElementById('infp-creative');
-  infpData.notes = notes ? notes.value : (infpData.notes || '');
-  infpData.creative = creative ? creative.value : (infpData.creative || '');
   localStorage.setItem('infp_data', JSON.stringify(infpData));
+}
+
+function infpSaveEntry(section) {
+  var inp = document.getElementById('infp-' + section);
+  if (!inp) return;
+  var text = inp.value.trim();
+  if (!text) return;
+  if (!infpData.entries) infpData.entries = {};
+  if (!infpData.entries[section]) infpData.entries[section] = [];
+  var now = new Date();
+  var time = now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  var dateKey = now.toISOString().split('T')[0];
+  infpData.entries[section].unshift({ id: Date.now(), text: text, time: time, dateKey: dateKey });
+  infpSave();
+  inp.value = '';
+  infpRenderEntries(section);
+}
+
+function infpDeleteEntry(section, id) {
+  if (!infpData.entries || !infpData.entries[section]) return;
+  infpData.entries[section] = infpData.entries[section].filter(function(e){ return e.id !== id; });
+  infpSave();
+  infpRenderEntries(section);
+}
+
+function infpRenderEntries(section) {
+  var el = document.getElementById('infp-' + section + '-entries');
+  if (!el) return;
+  var list = (infpData.entries && infpData.entries[section]) || [];
+  if (!list.length) { el.innerHTML = ''; return; }
+  var isCreative = section === 'creative';
+  el.innerHTML = list.map(function(e) {
+    return '<div style="border-top:1px solid #eee;padding-top:0.6rem;margin-top:0.6rem;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;">'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);">' + e.time + '</div>'
+      + '<button onclick="infpDeleteEntry(\''+section+'\','+e.id+')" style="font-size:0.8rem;color:#bbb;border:none;background:none;cursor:pointer;padding:0;line-height:1;">×</button>'
+      + '</div>'
+      + '<div style="margin-top:0.3rem;font-family:' + (isCreative ? '\'Lora\',serif;font-style:italic' : '\'Nunito\',sans-serif') + ';font-size:0.88rem;font-weight:300;color:var(--black);line-height:1.7;white-space:pre-wrap;">' + e.text + '</div>'
+      + '</div>';
+  }).join('');
 }
 
 function infpAddFeeling() {
@@ -9405,7 +9579,10 @@ function infpAddFeeling() {
   var text = inp.value.trim();
   if (!text) return;
   if (!infpData.feelings) infpData.feelings = [];
-  infpData.feelings.push({ id: Date.now(), text: text });
+  var _now = new Date();
+  var _time = _now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + _now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  var _dateKey = _now.toISOString().split('T')[0];
+  infpData.feelings.push({ id: Date.now(), text: text, time: _time, dateKey: _dateKey });
   infpSave();
   inp.value = '';
   infpRenderFeelings();
@@ -9422,9 +9599,12 @@ function infpRenderFeelings() {
   if (!el) return;
   var list = infpData.feelings || [];
   el.innerHTML = list.map(function(f){
-    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.35rem 0;border-bottom:1px solid #f5f5f3;">'
+    return '<div style="padding:0.35rem 0;border-bottom:1px solid #f5f5f3;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;">'
       + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.88rem;font-weight:300;color:var(--black);">' + f.text + '</div>'
       + '<button onclick="infpDeleteFeeling(' + f.id + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:1rem;padding:0;">×</button>'
+      + '</div>'
+      + (f.time ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);margin-top:0.1rem;">' + f.time + '</div>' : '')
       + '</div>';
   }).join('');
 }
@@ -9434,7 +9614,10 @@ function infpAddNeed() {
   var text = inp.value.trim();
   if (!text) return;
   if (!infpData.needs) infpData.needs = [];
-  infpData.needs.push({ id: Date.now(), text: text, done: false });
+  var _now = new Date();
+  var _time = _now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + _now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  var _dateKey = _now.toISOString().split('T')[0];
+  infpData.needs.push({ id: Date.now(), text: text, done: false, time: _time, dateKey: _dateKey });
   infpSave();
   inp.value = '';
   infpRenderNeeds();
@@ -9457,12 +9640,15 @@ function infpRenderNeeds() {
   if (!el) return;
   var list = infpData.needs || [];
   el.innerHTML = list.map(function(n){
-    return '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.35rem 0;border-bottom:1px solid #f5f5f3;">'
+    return '<div style="padding:0.35rem 0;border-bottom:1px solid #f5f5f3;">'
+      + '<div style="display:flex;align-items:center;gap:0.6rem;">'
       + '<div onclick="infpToggleNeed(' + n.id + ')" style="cursor:pointer;width:16px;height:16px;border-radius:50%;border:1px solid ' + (n.done ? 'var(--black)' : '#c8c8c5') + ';background:' + (n.done ? 'var(--black)' : 'transparent') + ';flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
       + (n.done ? '<svg width="9" height="9" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="white" stroke-width="1.8"/></svg>' : '')
       + '</div>'
       + '<div onclick="infpToggleNeed(' + n.id + ')" style="flex:1;font-family:\'Nunito\',sans-serif;font-size:0.88rem;font-weight:300;color:' + (n.done ? '#bbb' : 'var(--black)') + ';text-decoration:' + (n.done ? 'line-through' : 'none') + ';cursor:pointer;">' + n.text + '</div>'
       + '<button onclick="infpDeleteNeed(' + n.id + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:1rem;padding:0;">×</button>'
+      + '</div>'
+      + (n.time ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);margin-top:0.1rem;padding-left:22px;">' + n.time + '</div>' : '')
       + '</div>';
   }).join('');
 }
@@ -9474,7 +9660,9 @@ function infpAddPhoto(section, input) {
   reader.onload = function(e) {
     if (!infpData.photos) infpData.photos = {};
     if (!infpData.photos[section]) infpData.photos[section] = [];
-    infpData.photos[section].unshift({ id: Date.now(), src: e.target.result, date: new Date().toISOString() });
+    var _now = new Date();
+    var _time = _now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + _now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    infpData.photos[section].unshift({ id: Date.now(), src: e.target.result, date: new Date().toISOString(), time: _time });
     infpSave();
     infpRenderPhotos(section);
   };
@@ -9495,14 +9683,15 @@ function infpViewPhoto(section, id) {
   if (!p) return;
   var overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;display:flex;align-items:center;justify-content:center;';
-  overlay.onclick = function(){ document.body.removeChild(overlay); };
+  function removeOverlay() { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }
+  overlay.onclick = removeOverlay;
   var img = document.createElement('img');
   img.src = p.src;
   img.style.cssText = 'max-width:92vw;max-height:88vh;object-fit:contain;display:block;';
   var close = document.createElement('button');
   close.textContent = '×';
   close.style.cssText = 'position:absolute;top:1rem;right:1rem;background:none;border:none;color:white;font-size:2rem;cursor:pointer;line-height:1;';
-  close.onclick = function(){ document.body.removeChild(overlay); };
+  close.onclick = function(e){ e.stopPropagation(); removeOverlay(); };
   overlay.appendChild(img);
   overlay.appendChild(close);
   document.body.appendChild(overlay);
@@ -9513,9 +9702,12 @@ function infpRenderPhotos(section) {
   if (!el) return;
   var list = (infpData.photos && infpData.photos[section]) || [];
   el.innerHTML = list.map(function(p){
-    return '<div style="position:relative;width:80px;height:80px;">'
+    return '<div style="position:relative;">'
+      + '<div style="position:relative;width:80px;height:80px;">'
       + '<img src="' + p.src + '" onclick="infpViewPhoto(\'' + section + '\',' + p.id + ')" style="width:80px;height:80px;object-fit:cover;display:block;cursor:pointer;">'
       + '<button onclick="infpDeletePhoto(\'' + section + '\',' + p.id + ')" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.5);border:none;color:white;width:18px;height:18px;font-size:0.7rem;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;border-radius:50%;">×</button>'
+      + '</div>'
+      + (p.time ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);margin-top:0.2rem;max-width:80px;line-height:1.3;">' + p.time + '</div>' : '')
       + '</div>';
   }).join('');
 }
@@ -9669,14 +9861,15 @@ function routineViewPhoto(id) {
   if (!p) return;
   var overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;display:flex;align-items:center;justify-content:center;';
-  overlay.onclick = function(){ document.body.removeChild(overlay); };
+  function removeOverlay() { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }
+  overlay.onclick = removeOverlay;
   var img = document.createElement('img');
   img.src = p.src;
   img.style.cssText = 'max-width:92vw;max-height:88vh;object-fit:contain;display:block;';
   var close = document.createElement('button');
   close.textContent = '×';
   close.style.cssText = 'position:absolute;top:1rem;right:1rem;background:none;border:none;color:white;font-size:2rem;cursor:pointer;line-height:1;';
-  close.onclick = function(){ document.body.removeChild(overlay); };
+  close.onclick = function(e){ e.stopPropagation(); removeOverlay(); };
   overlay.appendChild(img);
   overlay.appendChild(close);
   document.body.appendChild(overlay);
