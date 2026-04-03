@@ -1734,27 +1734,13 @@ function renderWhoiGrid(fromStorage) {
   if (fromStorage !== false) { try { var _f=localStorage.getItem('whoi_history'); if(_f){ whoiItems=JSON.parse(_f); if(!Array.isArray(whoiItems)) whoiItems=[]; } } catch(e) {} }
   const el = document.getElementById('whoi-grid');
   if (!el) return;
-  // Init date picker
-  const dp = document.getElementById('whoi-date-picker');
-  if (dp && !dp.value) dp.value = new Date().toISOString().split('T')[0];
-  const dateKey = getWhoiDateKey();
-  const dayItems = whoiItems.filter(item => item.dateKey === dateKey || (!item.dateKey && item.date && item.date.includes(new Date(dateKey+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}))));
-  if (!dayItems.length) {
-    el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;margin-top:0.5rem;">Nothing here for this day 🤍</p>';
-    return;
-  }
-  el.innerHTML = dayItems.map(item => `
-    <div style="border:1px solid #e8e8e5;padding:0.6rem;position:relative;">
-      <button onclick="deleteWhoIEntry(${item.id})" style="font-size:0.55rem;color:var(--gray);border:none;background:none;cursor:pointer;position:absolute;top:0.3rem;right:0.3rem;line-height:1;">✕</button>
-      ${item.type === 'image'
-        ? item.uploading
-          ? `<div style="font-family:'Nunito',sans-serif;font-size:0.7rem;color:var(--gray);text-align:center;padding:1rem 0;">Uploading...</div>`
-          : `<img src="${item.content}" style="width:100%;display:block;">`
-        : item.type === 'word'
-        ? `<div style="font-family:'Lora',serif;font-style:italic;font-size:1rem;text-align:center;padding:0.4rem 0.5rem 0.2rem;">${item.content}</div>`
-        : `<div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;line-height:1.5;padding-right:0.8rem;">${item.content}</div>`
-      }
-      <div style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:var(--gray);margin-top:0.3rem;">${item.date||''}</div>
+  if (!whoiItems.length) { el.innerHTML = ''; return; }
+  el.innerHTML = whoiItems.map(item => `
+    <div style="display:flex;align-items:flex-start;gap:0.4rem;padding:0.25rem 0;">
+      <span style="color:var(--black);font-size:0.7rem;margin-top:0.15rem;flex-shrink:0;">•</span>
+      <span style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;line-height:1.5;flex:1;">${item.content||''}</span>
+      ${item.date ? `<span style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:rgba(150,150,145,0.25);white-space:nowrap;flex-shrink:0;margin-top:0.2rem;">${item.date}</span>` : ''}
+      <button onclick="deleteWhoIEntry(${item.id})" style="font-size:0.6rem;color:#ccc;border:none;background:none;cursor:pointer;flex-shrink:0;padding:0;line-height:1;">×</button>
     </div>`).join('');
 }
 
@@ -1762,6 +1748,114 @@ function renderWhoIHistory() { renderWhoiGrid(); }
 function saveWhoIAm() {}
 
 renderWhoiGrid();
+
+// Who I Am inner tabs
+function showWhoiInnerTab(tab) {
+  ['withhim','withouthim'].forEach(function(t) {
+    var panel = document.getElementById('whoiinner-' + t);
+    var btn = document.getElementById('whoitab-' + t);
+    if (panel) panel.style.display = t === tab ? '' : 'none';
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  if (tab === 'withouthim') {
+    var dp = document.getElementById('whoiwoh-date-picker');
+    if (dp && !dp.value) dp.value = new Date().toISOString().split('T')[0];
+    updateDateLabel('whoiwoh-date-picker');
+    renderWhoiWohGrid();
+  }
+}
+
+// Me without him — mirrored logic with separate storage key
+let whoiWohItems = JSON.parse(localStorage.getItem('whoi_woh_history') || '[]');
+if (!Array.isArray(whoiWohItems)) whoiWohItems = [];
+let whoiWohType = 'word';
+
+function getWhoiWohDateKey() {
+  const dp = document.getElementById('whoiwoh-date-picker');
+  if (dp && dp.value) return dp.value;
+  return new Date().toISOString().split('T')[0];
+}
+
+function changeWhoiWohDate(dir) {
+  const dp = document.getElementById('whoiwoh-date-picker');
+  if (!dp) return;
+  const d = new Date(dp.value || new Date().toISOString().split('T')[0]);
+  d.setDate(d.getDate() + dir);
+  dp.value = d.toISOString().split('T')[0];
+  updateDateLabel('whoiwoh-date-picker');
+  renderWhoiWohGrid();
+}
+
+function setWhoiWohType(type) {
+  whoiWohType = type;
+  ['word','thought','image'].forEach(t => {
+    var inp = document.getElementById(`whoiwoh-input-${t}`);
+    var btn = document.getElementById(`whoiwoh-btn-${t}`);
+    if (inp) inp.style.display = t === type ? (t === 'image' ? 'block' : 'flex') : 'none';
+    if (btn) btn.classList.toggle('active', t === type);
+  });
+}
+
+function addWhoiWohItem() {
+  const inp = document.getElementById(`whoiwoh-text-${whoiWohType}`);
+  if (!inp || !inp.value.trim()) return;
+  const dateKey = getWhoiWohDateKey();
+  whoiWohItems.unshift({
+    id: Date.now(),
+    type: whoiWohType,
+    content: inp.value.trim(),
+    dateKey,
+    date: new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+  });
+  inp.value = '';
+  localStorage.setItem('whoi_woh_history', JSON.stringify(whoiWohItems));
+  renderWhoiWohGrid();
+}
+
+async function addWhoiWohImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const tempId = Date.now();
+  whoiWohItems.unshift({ id: tempId, type: 'image', content: '', date, uploading: true });
+  renderWhoiWohGrid(false);
+  try {
+    const url = await uploadImageToCloud(file);
+    const idx = whoiWohItems.findIndex(i => i.id === tempId);
+    if (idx !== -1) { whoiWohItems[idx].content = url; whoiWohItems[idx].uploading = false; }
+    localStorage.setItem('whoi_woh_history', JSON.stringify(whoiWohItems));
+    renderWhoiWohGrid(false);
+  } catch(e) {
+    const idx = whoiWohItems.findIndex(i => i.id === tempId);
+    if (idx !== -1) whoiWohItems.splice(idx, 1);
+    renderWhoiWohGrid(false);
+  }
+}
+
+function deleteWhoiWohEntry(id) {
+  whoiWohItems = whoiWohItems.filter(e => e.id !== id);
+  localStorage.setItem('whoi_woh_history', JSON.stringify(whoiWohItems));
+  renderWhoiWohGrid();
+}
+
+function renderWhoiWohGrid(fromStorage) {
+  if (fromStorage !== false) { try { var _f=localStorage.getItem('whoi_woh_history'); if(_f){ whoiWohItems=JSON.parse(_f); if(!Array.isArray(whoiWohItems)) whoiWohItems=[]; } } catch(e) {} }
+  const el = document.getElementById('whoiwoh-grid');
+  if (!el) return;
+  if (!whoiWohItems.length) { el.innerHTML = ''; return; }
+  const dayItems = whoiWohItems;
+  if (!dayItems.length) {
+    el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;margin-top:0.5rem;">Nothing here for this day 🤍</p>';
+    return;
+  }
+  el.innerHTML = dayItems.map(item => `
+    <div style="display:flex;align-items:flex-start;gap:0.4rem;padding:0.25rem 0;">
+      <span style="color:var(--black);font-size:0.7rem;margin-top:0.15rem;flex-shrink:0;">•</span>
+      <span style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;line-height:1.5;flex:1;">${item.content||''}</span>
+      ${item.date ? `<span style="font-family:'Nunito',sans-serif;font-size:0.55rem;color:rgba(150,150,145,0.25);white-space:nowrap;flex-shrink:0;margin-top:0.2rem;">${item.date}</span>` : ''}
+      <button onclick="deleteWhoiWohEntry(${item.id})" style="font-size:0.6rem;color:#ccc;border:none;background:none;cursor:pointer;flex-shrink:0;padding:0;line-height:1;">×</button>
+    </div>`).join('');
+}
 
 // Schedule & Planner styles
 const scheduleStyle = document.createElement('style');
@@ -4357,34 +4451,33 @@ window.addEventListener('DOMContentLoaded', function() {
   <h2 style="margin-bottom:0.5rem;">Track your growth.</h2>
   <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Add words, thoughts, and pictures that reflect who you are 🤍</div>
 
-  <!-- Date navigation -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-    <button onclick="changeWhoiDate(-1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">← Prev</button>
-    <span id="whoi-date-picker-label" onclick="document.getElementById('whoi-date-picker').showPicker?document.getElementById('whoi-date-picker').showPicker():document.getElementById('whoi-date-picker').click()" style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></span><input type="date" id="whoi-date-picker" onchange="renderWhoiGrid()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
-    <button onclick="changeWhoiDate(1)" style="font-family:'Nunito',sans-serif;font-size:0.75rem;letter-spacing:0.1em;border:1px solid #c8c8c5;background:none;padding:0.35rem 0.8rem;cursor:pointer;color:var(--gray);">Next →</button>
-  </div>
+  <!-- Side-by-side two column layout -->
+  <div style="display:grid;grid-template-columns:1fr 1px 1fr;gap:0;min-height:300px;">
 
-  <!-- Type selector -->
-  <div style="display:flex;gap:0.4rem;margin-bottom:0.8rem;">
-    <button class="vision-type-btn active" id="whoi-btn-word" onclick="setWhoiType('word')">Word</button>
-    <button class="vision-type-btn" id="whoi-btn-thought" onclick="setWhoiType('thought')">Thought</button>
-    <button class="vision-type-btn" id="whoi-btn-image" onclick="setWhoiType('image')">Image</button>
-  </div>
+    <!-- Left: Me with him/others -->
+    <div style="padding-right:1rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);margin-bottom:0.8rem;font-weight:400;">Me <mark style="background:#c8f0d0;padding:0 2px;">with him</mark>/others</div>
+      <div style="display:flex;gap:0.4rem;align-items:center;margin-bottom:0.6rem;">
+        <input id="whoi-text-word" placeholder="Add something..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.2rem 0;">
+        <button onclick="addWhoiItem()" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.25rem 0.6rem;flex-shrink:0;">+</button>
+      </div>
+      <div id="whoi-grid"></div>
+    </div>
 
-  <div id="whoi-input-word" style="display:flex;gap:0.5rem;align-items:center;">
-    <input id="whoi-text-word" placeholder="e.g. Resilient, Creative, Kind..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
-    <button onclick="addWhoiItem()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
-  </div>
-  <div id="whoi-input-thought" style="display:none;gap:0.5rem;align-items:center;">
-    <input id="whoi-text-thought" placeholder="Something true about me..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;padding:0.3rem 0;">
-    <button onclick="addWhoiItem()" style="font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.3rem 0.7rem;flex-shrink:0;">Add</button>
-  </div>
-  <div id="whoi-input-image" style="display:none;">
-    <input type="file" accept="image/*" onchange="addWhoiImage(this)" style="font-size:0.82rem;width:100%;">
-  </div>
+    <!-- Divider -->
+    <div style="background:#c8c8c5;width:1px;"></div>
 
-  <div id="whoi-grid" class="vision-items-grid" style="margin-top:1rem;"></div>
-  <div id="whoi-saved-note" style="font-family:'Nunito',sans-serif;font-size:0.68rem;color:var(--gray);letter-spacing:0.1em;text-align:center;margin-top:0.5rem;"></div>
+    <!-- Right: Me without him -->
+    <div style="padding-left:1rem;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);margin-bottom:0.8rem;font-weight:400;">Me <mark style="background:#ffd6e0;padding:0 2px;">without him</mark>/others</div>
+      <div style="display:flex;gap:0.4rem;align-items:center;margin-bottom:0.6rem;">
+        <input id="whoiwoh-text-word" placeholder="Add something..." onkeydown="if(event.key==='Enter')addWhoiWohItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.2rem 0;">
+        <button onclick="addWhoiWohItem()" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;cursor:pointer;padding:0.25rem 0.6rem;flex-shrink:0;">+</button>
+      </div>
+      <div id="whoiwoh-grid"></div>
+    </div>
+
+  </div>
 
     <!-- PERFORM -->
     <div class="wia-panel" id="wia-perform">
