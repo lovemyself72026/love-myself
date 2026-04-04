@@ -667,7 +667,7 @@
     <button onclick="savePlannerDay();changeScheduleDay(-1);" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8249;</button>
     <div style="text-align:center;flex:1;min-width:0;position:relative;">
       <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;">
-        <div id="schedule-day-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--black);"></div>
+        <div id="schedule-day-label" onclick="toggleSchedCal()" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></div>
 
       </div>
       <!-- Popup calendar -->
@@ -700,24 +700,6 @@
   <!-- SCHEDULE TAB -->
   <div id="schmain-schedule">
 
-  <!-- Track Days toggle -->
-  <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;cursor:pointer;" onclick="schedTrackToggleCal()">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
-    <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Track Days</span>
-  </div>
-
-  <!-- Track Days calendar -->
-  <div id="sched-track-cal-wrap" style="display:none;margin-bottom:1.2rem;border:1px solid #e8e8e5;padding:0.8rem;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
-      <button onclick="schedTrackCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
-      <div id="sched-track-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
-      <button onclick="schedTrackCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;" id="sched-track-cal-daynames"></div>
-    <div id="sched-track-cal-grid"></div>
-    <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;font-weight:300;color:var(--gray);margin-top:0.6rem;">Days with data logged are filled 🌸</div>
-  </div>
-
   <!-- Planner grid -->
   <div id="planner-grid" style="display:flex;flex-direction:column;gap:0.6rem;">
 
@@ -732,6 +714,24 @@
 
       <!-- RIGHT: Daily panel -->
       <div id="ps-daily" style="display:flex;flex-direction:column;gap:0.6rem;">
+
+        <!-- Track Days -->
+        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+          <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" onclick="schedTrackToggleCal()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+            <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Track Days</span>
+          </div>
+          <div id="sched-track-cal-wrap" style="display:none;margin-top:0.8rem;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+              <button onclick="schedTrackCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
+              <div id="sched-track-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+              <button onclick="schedTrackCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;" id="sched-track-cal-daynames"></div>
+            <div id="sched-track-cal-grid"></div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;font-weight:300;color:var(--gray);margin-top:0.6rem;">Days with data logged are filled 🌸</div>
+          </div>
+        </div>
 
         <!-- Daily Analytics Summary -->
         <div id="ps-daily-analytics" style="border:1px solid #c8c8c5;padding:0.8rem;"></div>
@@ -2047,7 +2047,9 @@ function schedCalJump(dateStr) {
   updateDayLabel();
   loadPlannerDay();
   renderSchedCal();
-  showSchedCalSummary(dateStr);
+  // Close the popup so user sees the day's content
+  const popup = document.getElementById('sched-cal-popup');
+  if (popup) popup.style.display = 'none';
 }
 
 function showSchedCalSummary(dateStr) {
@@ -4452,10 +4454,10 @@ window.addEventListener('DOMContentLoaded', function() {
   <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Add words, thoughts, and pictures that reflect who you are 🤍</div>
 
   <!-- Side-by-side two column layout -->
-  <div style="display:grid;grid-template-columns:1fr 1px 1fr;gap:0;min-height:300px;">
+  <div style="display:flex;flex-wrap:nowrap;gap:0;min-height:300px;">
 
     <!-- Left: Me with him/others -->
-    <div style="padding-right:1rem;">
+    <div style="flex:1;min-width:0;padding-right:0.8rem;">
       <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);margin-bottom:0.8rem;font-weight:400;">Me <mark style="background:#c8f0d0;padding:0 2px;">with him</mark>/others</div>
       <div style="display:flex;gap:0.4rem;align-items:center;margin-bottom:0.6rem;">
         <input id="whoi-text-word" placeholder="Add something..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.2rem 0;">
@@ -4465,10 +4467,10 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <!-- Divider -->
-    <div style="background:#c8c8c5;width:1px;"></div>
+    <div style="background:#c8c8c5;width:1px;flex-shrink:0;"></div>
 
     <!-- Right: Me without him -->
-    <div style="padding-left:1rem;">
+    <div style="flex:1;min-width:0;padding-left:0.8rem;">
       <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);margin-bottom:0.8rem;font-weight:400;">Me <mark style="background:#ffd6e0;padding:0 2px;">without him</mark>/others</div>
       <div style="display:flex;gap:0.4rem;align-items:center;margin-bottom:0.6rem;">
         <input id="whoiwoh-text-word" placeholder="Add something..." onkeydown="if(event.key==='Enter')addWhoiWohItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.2rem 0;">
@@ -9435,21 +9437,40 @@ function schedTrackRenderCal() {
   for (var d = 1; d <= days; d++) {
     var key = schedTrackCalYear + '-' + String(schedTrackCalMonth + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
     var isToday = key === today;
+    var isSelected = key === currentScheduleDate;
     var pd = allPlanner[key] || {};
     var dd = dailyRaw[key] || {};
-    var hasData = (pd.todos && pd.todos.length) ||
+    var hasData = !!(
+      (pd.todos && pd.todos.length) ||
+      (pd.goals && pd.goals.length) ||
+      (pd.notesList && pd.notesList.length) ||
+      (pd.schedule && Object.keys(pd.schedule).some(function(k){ return pd.schedule[k] && pd.schedule[k].items && pd.schedule[k].items.length; })) ||
+      pd.bibleVerse || pd.schedGoal || pd.schedTomorrow ||
       (dd.mood && dd.mood.length) ||
       dd.sleep ||
       (dd.water && dd.water.some(Boolean)) ||
-      (dd.meals && Object.values(dd.meals).some(function(m){ return m && (Array.isArray(m) ? m.length : m); }));
-    cells += '<div style="cursor:default;text-align:center;padding:0.2rem;font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;">'
-      + '<div style="width:24px;height:24px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;background:' + (hasData ? 'var(--black)' : (isToday ? '#f0f0ee' : 'transparent')) + ';color:' + (hasData ? 'var(--white)' : 'var(--black)') + ';">' + d + '</div>'
+      (dd.meals && Object.values(dd.meals).some(function(m){ return m && (Array.isArray(m) ? m.length : m); }))
+    );
+    var bg = isSelected ? '#ffffff' : (hasData ? '#ffb6c1' : (isToday ? '#c8f0d0' : 'transparent'));
+    var color = isSelected ? 'var(--black)' : 'var(--black)';
+    var border = isSelected ? '2px solid #c8c8c5' : 'none';
+    cells += '<div onclick="schedTrackGoToDay(\'' + key + '\')" style="cursor:pointer;text-align:center;padding:0.2rem;font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;">'
+      + '<div style="width:24px;height:24px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;background:' + bg + ';color:' + color + ';border:' + border + ';box-sizing:border-box;">' + d + '</div>'
       + '</div>';
   }
   grid.style.display = 'grid';
   grid.style.gridTemplateColumns = 'repeat(7,1fr)';
   grid.style.gap = '3px';
   grid.innerHTML = cells;
+}
+
+function schedTrackGoToDay(dateStr) {
+  savePlannerDay();
+  currentScheduleDate = dateStr;
+  updateDayLabel();
+  loadPlannerDay();
+  renderSchedCal();
+  schedTrackRenderCal();
 }
 
 function routineToggleCal() {
