@@ -568,7 +568,7 @@
         <div class="home-card-links">
           <div class="home-link" onclick="showSection('me');setTimeout(()=>showMeTab('whiam'),100)">Who I Am</div>
           <div class="home-link" onclick="showSection('me');setTimeout(()=>showMeTab('assertive'),100)">Assertive</div>
-          <div class="home-link" onclick="showSection('me');setTimeout(()=>showMeTab('believe'),100)">Believe</div>
+          <div class="home-link" onclick="showSection('me');setTimeout(()=>showMeTab('assertive'),100)">Believe</div>
           <div class="home-link last" onclick="showSection('me');setTimeout(()=>showMeTab('rightforme'),100)">Right For Me</div>
         </div>
       </div>
@@ -614,6 +614,14 @@
         <div class="home-card-links">
           <div class="home-link" onclick="showSection('vision');setTimeout(()=>document.getElementById('vision-board-section')&&document.getElementById('vision-board-section').scrollIntoView({behavior:'smooth'}),200)">Vision Board</div>
           <div class="home-link last" onclick="showSection('vision');setTimeout(()=>document.getElementById('tg-all-list')&&document.getElementById('tg-all-list').scrollIntoView({behavior:'smooth'}),200)">She's Already In You</div>
+        </div>
+      </div>
+
+      <div class="home-card" style="cursor:default;">
+        <div class="home-card-title">Friends</div>
+        <div class="home-card-links">
+          <div class="home-link" onclick="showSection('me');setTimeout(()=>showMeTab('friends'),100)">All Friends</div>
+          <div class="home-link last" id="home-friends-checkin" onclick="showSection('me');setTimeout(()=>showMeTab('friends'),100)">Loading...</div>
         </div>
       </div>
 
@@ -1864,7 +1872,7 @@ scheduleStyle.textContent = `
   .planner-textarea { width:100%; border:none; border-bottom:1px solid #e8e8e5; background:transparent; font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; color:var(--black); outline:none; resize:none; padding:0.3rem 0; line-height:1.5; }
   .mood-btn { font-size:1.2rem; cursor:pointer; opacity:0.35; transition:opacity 0.15s; }
   .mood-btn.selected { opacity:1; }
-  .sleep-btn { font-family:'Nunito',sans-serif; font-size:0.72rem; border:1px solid #c8c8c5; padding:0.2rem 0.45rem; cursor:pointer; color:var(--gray); background:none; transition:all 0.15s; }
+  .sleep-btn { font-family:'Nunito',sans-serif; font-size:0.65rem; border:1px solid #c8c8c5; width:24px; height:24px; border-radius:50%; cursor:pointer; color:var(--gray); background:none; transition:all 0.15s; display:inline-flex; align-items:center; justify-content:center; padding:0; }
   .sleep-btn.selected { background:var(--black); color:var(--white); border-color:var(--black); }
   .water-cup { font-size:1rem; cursor:pointer; opacity:0.25; transition:opacity 0.15s; }
   .water-cup.filled { opacity:1; }
@@ -2804,6 +2812,7 @@ function formatTime(t) { return t||''; }
 
 initScheduleDatePicker();
 loadPlannerDay();
+setTimeout(function(){ if (typeof friendsRenderHomeCard === 'function') friendsRenderHomeCard(); }, 100);
 
 // Vision Board styles
 const visionStyle = document.createElement('style');
@@ -3897,18 +3906,21 @@ function belCheckinRender() {
 
 
 function showMeTab(tab) {
-  ['whiam','rightforme','assertive','believe'].forEach(function(t) {
+  ['whiam','rightforme','assertive','believe','friends'].forEach(function(t) {
     var el = document.getElementById('mesub-' + t);
     var btn = document.getElementById('metab-' + t);
+    if (t === 'believe') {
+      if (el) el.style.display = (tab === 'assertive') ? 'block' : 'none';
+      return;
+    }
     if (el) el.style.display = t === tab ? 'block' : 'none';
     if (btn) btn.classList.toggle('active', t === tab);
   });
-  if (tab === 'assertive') { assCheckinRender(); }
-  if (tab === 'believe') { belCheckinRender(); }
+  if (tab === 'assertive') { assCheckinRender(); belCheckinRender(); }
   if (tab === 'balance') { showMeTab('whiam'); setTimeout(function(){ wiaTab('balance'); initBalanceDatePicker(); renderBalanceQuestions(); renderRelationshipQuestions(); }, 50); return; }
-  if (tab === 'assertive') initAssertive();
-  if (tab === 'believe') initBelieve();
+  if (tab === 'assertive') { initAssertive(); initBelieve(); }
   if (tab === 'rightforme') rfmRender();
+  if (tab === 'friends') friendsRender();
 }
 
 function initMeSection() {
@@ -4413,9 +4425,8 @@ window.addEventListener('DOMContentLoaded', function() {
   <!-- Me sub-tabs -->
   <div id="me-subtab-row" style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:0;padding-bottom:0;margin-top:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;">
     <button class="balance-sub-tab active" onclick="showMeTab('whiam')" id="metab-whiam">Who I Am</button>
-    <button class="balance-sub-tab" onclick="showMeTab('assertive')" id="metab-assertive">Assertive</button>
-    <button class="balance-sub-tab" onclick="showMeTab('believe')" id="metab-believe">Believe</button>
     <button class="balance-sub-tab" onclick="showMeTab('rightforme')" id="metab-rightforme">Right For Me</button>
+    <button class="balance-sub-tab" onclick="showMeTab('friends')" id="metab-friends">Friends</button>
   </div>
 
   <!-- ME SUB-SECTIONS -->
@@ -4526,18 +4537,7 @@ window.addEventListener('DOMContentLoaded', function() {
             </div>
           </div>
         </div>
-        <div class="subtitle" style="margin-bottom:0.5rem;">Weekly check-in</div>
-        <div class="wia-q-card" style="padding:0.8rem 0.8rem 0.6rem;">
-          <div class="wia-q-text" id="wiaWQText"></div>
-          <textarea id="wiaWQAns" placeholder="your answer..." style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);resize:none;min-height:50px;outline:none;padding:0.3rem 0;line-height:1.5;"></textarea>
-          <div class="wia-q-footer">
-            <div class="wia-q-dots" id="wiaWDots"></div>
-            <div class="wia-q-btns">
-              <button class="wia-q-btn" id="wiaWPrev" onclick="wiaGoW(-1)">←</button>
-              <button class="wia-q-btn" id="wiaWNext" onclick="wiaGoW(1)">→</button>
-            </div>
-          </div>
-        </div>
+
       </div>
     </div>
 
@@ -4782,7 +4782,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <div id="ass-log-entries"></div>
   </div>
 </div>
-    <div id="mesub-believe" style="display:none;">
+    <div id="mesub-believe" style="display:block;margin-top:2rem;border-top:1px solid #e8e8e5;padding-top:1.5rem;">
   <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">You don't have to earn the right to believe in yourself. But here's how to build it anyway.</div>
 
   <div id="bel-checkin-log" style="margin-bottom:1.5rem;"></div>
@@ -4919,6 +4919,90 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 </div>
+    <!-- FRIENDS -->
+    <div id="mesub-friends" style="display:none;">
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">The people who make life feel like home.</div>
+
+      <!-- Add friend -->
+      <div style="display:flex;gap:0.5rem;margin-bottom:1.2rem;align-items:center;">
+        <input id="friends-name-input" type="text" placeholder="Name" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;border:none;border-bottom:1px solid #c8c8c5;padding:0.3rem 0;background:none;outline:none;color:var(--black);">
+        <select id="friends-type-input" style="font-family:'Nunito',sans-serif;font-size:0.72rem;border:none;border-bottom:1px solid #c8c8c5;padding:0.3rem 0;background:none;outline:none;color:var(--gray);">
+          <option value="close">Close</option>
+          <option value="good">Good friend</option>
+          <option value="acquaintance">Acquaintance</option>
+        </select>
+        <button onclick="friendsAdd()" style="border:none;background:none;font-family:'Nunito',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);cursor:pointer;">Add</button>
+      </div>
+
+      <!-- Five-column list -->
+      <div style="display:grid;grid-template-columns:1fr 1px auto 1px auto 1px auto;border:1px solid #e8e8e5;">
+        <!-- Header: Name -->
+        <div style="padding:0.6rem 0.8rem;border-bottom:1px solid #e8e8e5;text-align:left;">
+          <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Name</span>
+        </div>
+        <div style="background:#e8e8e5;border-bottom:1px solid #e8e8e5;"></div>
+        <!-- Header: Time -->
+        <div style="padding:0.6rem 0.8rem;border-bottom:1px solid #e8e8e5;white-space:nowrap;text-align:center;">
+          <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">hrs / day</span>
+        </div>
+        <div style="background:#e8e8e5;border-bottom:1px solid #e8e8e5;"></div>
+        <!-- Header: Date -->
+        <div style="padding:0.6rem 0.8rem;border-bottom:1px solid #e8e8e5;text-align:center;">
+          <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Date</span>
+        </div>
+        <div style="background:#e8e8e5;border-bottom:1px solid #e8e8e5;"></div>
+        <!-- Header: Start-End -->
+        <div style="padding:0.6rem 0.8rem;border-bottom:1px solid #e8e8e5;text-align:center;">
+          <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Start — End</span>
+        </div>
+        <!-- List rows -->
+        <div id="friends-list-left" style="padding:0.4rem 0;"></div>
+        <div style="background:#e8e8e5;"></div>
+        <div id="friends-list-mid" style="padding:0.4rem 0;text-align:center;"></div>
+        <div style="background:#e8e8e5;"></div>
+        <div id="friends-list-date" style="padding:0.4rem 0;text-align:center;"></div>
+        <div style="background:#e8e8e5;"></div>
+        <div id="friends-list-right" style="padding:0.4rem 0;text-align:center;"></div>
+      </div>
+
+      <!-- Notes + Your Day side by side -->
+      <div style="display:flex;gap:1rem;margin-top:1.2rem;align-items:flex-start;">
+
+        <!-- Notes per friend -->
+        <div id="friends-notes-section" style="flex:1;border:1px solid #e8e8e5;">
+          <div style="padding:0.6rem 0.8rem;border-bottom:1px solid #e8e8e5;">
+            <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Notes</span>
+          </div>
+          <div id="friends-list-notes" style="padding:0.4rem 0;"></div>
+        </div>
+
+        <!-- Hours legend -->
+        <div id="friends-hours-legend" style="flex:1;padding:0.9rem 1rem;border:1px solid #e8e8e5;background:#fafaf8;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.7rem;">Your Day</div>
+          <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;background:#f0f0ee;margin-bottom:0.75rem;">
+            <div id="friends-bar-used" style="background:#111;height:100%;width:0%;transition:width 0.3s;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+            <div style="display:flex;gap:1.4rem;">
+              <div>
+                <div style="font-family:'Nunito',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">given</div>
+                <div id="friends-hours-given" style="font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:200;color:#111;margin-top:0.1rem;">0h</div>
+              </div>
+              <div>
+                <div style="font-family:'Nunito',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">remaining</div>
+                <div id="friends-hours-left" style="font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:200;color:#111;margin-top:0.1rem;">24h</div>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-family:'Nunito',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);">in a day</div>
+              <div style="font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:200;color:#ccc;margin-top:0.1rem;">24h</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <div id="mesub-rightforme" style="display:none;">
   <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:1.5rem 0 1.5rem;line-height:1.6;">Clarity before connection. Know what you need, then see who shows up.</div>
 
@@ -9451,9 +9535,9 @@ function schedTrackRenderCal() {
       (dd.water && dd.water.some(Boolean)) ||
       (dd.meals && Object.values(dd.meals).some(function(m){ return m && (Array.isArray(m) ? m.length : m); }))
     );
-    var bg = isSelected ? '#ffffff' : (hasData ? '#ffb6c1' : (isToday ? '#c8f0d0' : 'transparent'));
-    var color = isSelected ? 'var(--black)' : 'var(--black)';
-    var border = isSelected ? '2px solid #c8c8c5' : 'none';
+    var bg = isToday ? '#c8f0d0' : (isSelected ? 'var(--black)' : (hasData ? '#ffb6c1' : 'transparent'));
+    var color = (isSelected && !isToday) ? 'var(--white)' : 'var(--black)';
+    var border = (isSelected && !isToday) ? '1px solid var(--black)' : 'none';
     cells += '<div onclick="schedTrackGoToDay(\'' + key + '\')" style="cursor:pointer;text-align:center;padding:0.2rem;font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;">'
       + '<div style="width:24px;height:24px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;background:' + bg + ';color:' + color + ';border:' + border + ';box-sizing:border-box;">' + d + '</div>'
       + '</div>';
@@ -9987,6 +10071,462 @@ function routineViewPhoto(id) {
   overlay.appendChild(img);
   overlay.appendChild(close);
   document.body.appendChild(overlay);
+}
+
+// ===== FRIENDS =====
+var friendsList = [];
+var friendsCheckInTarget = null;
+
+function friendsLoad() {
+  try { friendsList = JSON.parse(localStorage.getItem('friends_data') || '[]'); } catch(e) { friendsList = []; }
+}
+
+function friendsSave() {
+  localStorage.setItem('friends_data', JSON.stringify(friendsList));
+}
+
+function friendsAdd() {
+  var nameEl = document.getElementById('friends-name-input');
+  var typeEl = document.getElementById('friends-type-input');
+  var name = nameEl.value.trim();
+  if (!name) return;
+  friendsLoad();
+  friendsList.push({ id: Date.now(), name: name, type: typeEl.value, note: '', lastContacted: null, timeNum: '', timeUnit: 'min', timeStart: '', timeEnd: '', withTodayDate: null });
+  friendsSave();
+  nameEl.value = '';
+  friendsRender();
+}
+
+function friendsDelete(id) {
+  friendsLoad();
+  friendsList = friendsList.filter(function(f){ return f.id !== id; });
+  friendsSave();
+  friendsRender();
+}
+
+function friendsSetDate(id, val) {
+  friendsLoad();
+  friendsList = friendsList.map(function(f){ return f.id === id ? Object.assign({}, f, { withTodayDate: val }) : f; });
+  friendsSave();
+  friendsRender();
+}
+
+function friendsUpdateNote(id, val) {
+  if (!val || !val.trim()) return;
+  friendsLoad();
+  friendsList = friendsList.map(function(f) {
+    if (f.id !== id) return f;
+    var notes = Array.isArray(f.notes) ? f.notes : (f.note ? [{ text: f.note, savedAt: null }] : []);
+    notes = notes.concat([{ text: val.trim(), savedAt: new Date().toISOString() }]);
+    return Object.assign({}, f, { notes: notes, note: val.trim() });
+  });
+  friendsSave();
+  // Re-render only the notes section to avoid wiping active inputs
+  var notesEl = document.getElementById('friends-list-notes');
+  if (notesEl) {
+    friendsLoad();
+    var notesHtml = '';
+    friendsList.forEach(function(f) {
+      var friendNotes = Array.isArray(f.notes) ? f.notes : (f.note ? [{ text: f.note, savedAt: null }] : []);
+      var notesLog = friendNotes.slice().reverse().map(function(n) {
+        var ts = '';
+        if (n.savedAt) {
+          var d = new Date(n.savedAt);
+          ts = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+        }
+        return '<div style="padding:0.35rem 0;border-bottom:1px solid #f7f7f5;">'
+          + (ts ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;color:#bbb;margin-bottom:0.15rem;">' + ts + '</div>' : '')
+          + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;color:var(--black);line-height:1.5;white-space:pre-wrap;">' + n.text + '</div>'
+          + '</div>';
+      }).join('');
+      notesHtml += '<div style="padding:0.5rem 0.8rem;border-bottom:1px solid #f0f0ee;">'
+        + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;font-weight:400;color:#111;margin-bottom:0.35rem;">' + f.name + '</div>'
+        + (notesLog ? '<div style="margin-bottom:0.4rem;">' + notesLog + '</div>' : '')
+        + '<textarea placeholder="add a note..." rows="2" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();friendsUpdateNote(' + f.id + ',this.value);this.value=\'\';}" style="width:100%;border:none;border-bottom:1px solid #e8e8e6;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;color:var(--black);outline:none;padding:0.2rem 0;box-sizing:border-box;resize:none;line-height:1.5;"></textarea>'
+        + '</div>';
+    });
+    notesEl.innerHTML = notesHtml;
+  }
+}
+
+function friendsSetContacted(id) {
+  friendsLoad();
+  friendsList = friendsList.map(function(f){ return f.id === id ? Object.assign({}, f, { lastContacted: new Date().toISOString() }) : f; });
+  friendsSave();
+  friendsRender();
+}
+
+function friendsMarkCheckedIn() {
+  if (!friendsCheckInTarget) return;
+  friendsSetContacted(friendsCheckInTarget);
+}
+
+function friendsDaysSince(iso) {
+  if (!iso) return null;
+  var diff = Date.now() - new Date(iso).getTime();
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
+}
+
+function friendsRenderCheckIn() {
+  var el = document.getElementById('friends-checkin-suggestion');
+  if (!el) return;
+  friendsLoad();
+  if (!friendsList.length) {
+    el.textContent = 'Add some friends to get check-in suggestions.';
+    friendsCheckInTarget = null;
+    return;
+  }
+  // Pick the friend contacted longest ago (or never)
+  var sorted = friendsList.slice().sort(function(a, b) {
+    var da = a.lastContacted ? new Date(a.lastContacted).getTime() : 0;
+    var db = b.lastContacted ? new Date(b.lastContacted).getTime() : 0;
+    return da - db;
+  });
+  var pick = sorted[0];
+  friendsCheckInTarget = pick.id;
+  var days = friendsDaysSince(pick.lastContacted);
+  var msg = days === null
+    ? 'You haven\'t reached out to ' + pick.name + ' yet — maybe send them a message today? 🤍'
+    : days === 0
+    ? 'You contacted ' + pick.name + ' today — great!'
+    : 'It\'s been ' + days + ' day' + (days !== 1 ? 's' : '') + ' since you reached out to ' + pick.name + '. Time for a check-in? 🌸';
+  el.textContent = msg;
+}
+
+function friendsRenderHomeCard() {
+  var el = document.getElementById('home-friends-checkin');
+  if (!el) return;
+  friendsLoad();
+  if (!friendsList.length) { el.textContent = 'Add your first friend 🤍'; return; }
+  var sorted = friendsList.slice().sort(function(a, b) {
+    var da = a.lastContacted ? new Date(a.lastContacted).getTime() : 0;
+    var db = b.lastContacted ? new Date(b.lastContacted).getTime() : 0;
+    return da - db;
+  });
+  var pick = sorted[0];
+  var days = friendsDaysSince(pick.lastContacted);
+  el.textContent = days === null
+    ? 'Reach out to ' + pick.name + ' 🌸'
+    : days === 0
+    ? pick.name + ' — contacted today ✓'
+    : 'Check in with ' + pick.name + ' (' + days + 'd ago)';
+}
+
+function friendsTodayStr() {
+  var d = new Date(); return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+}
+
+function friendsSetTimeRange(id, field, val) {
+  friendsLoad();
+  friendsList = friendsList.map(function(f) {
+    if (f.id !== id) return f;
+    var update = {};
+    update[field === 'start' ? 'timeStart' : 'timeEnd'] = val;
+    return Object.assign({}, f, update);
+  });
+  friendsSave();
+}
+
+function friendsSetTime(id, num, unit) {
+  friendsLoad();
+  friendsList = friendsList.map(function(f) {
+    return f.id === id ? Object.assign({}, f, { timeNum: num, timeUnit: unit || 'min' }) : f;
+  });
+  friendsSave();
+}
+
+function _friendsFmtTime(t) {
+  if (!t) return '';
+  var parts = t.split(':');
+  var h = parseInt(parts[0], 10);
+  var m = parts[1] || '00';
+  var ampm = h >= 12 ? 'pm' : 'am';
+  h = h % 12 || 12;
+  return h + ':' + m + ' ' + ampm;
+}
+
+function _friendsTimeSelect(fid, which, val) {
+  var label = val ? _friendsFmtTime(val) : (which === 'start' ? 'start' : 'end');
+  var labelColor = '#111';
+  var pickerId = 'ftpick-' + fid + '-' + which;
+  // Build hour options
+  var hOpts = '';
+  for (var hh = 1; hh <= 12; hh++) hOpts += '<option value="' + hh + '">' + hh + '</option>';
+  // Build minute options
+  var mOpts = '';
+  ['00','15','30','45'].forEach(function(mm) { mOpts += '<option value="' + mm + '">' + mm + '</option>'; });
+  // Parse current val
+  var curH = 12, curM = '00', curAP = 'am';
+  if (val) {
+    var p = val.split(':');
+    var raw = parseInt(p[0], 10);
+    curAP = raw >= 12 ? 'pm' : 'am';
+    curH = raw % 12 || 12;
+    curM = p[1] || '00';
+    // round curM to nearest 15
+    var mNum = parseInt(curM, 10);
+    curM = mNum < 8 ? '00' : mNum < 23 ? '15' : mNum < 38 ? '30' : mNum < 53 ? '45' : '00';
+    if (curM === '00' && mNum >= 53) curH = (curH % 12) + 1;
+  }
+
+  var selStyle = 'border:none;background:#fff;font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;color:#111;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;text-align:center;';
+
+  var picker = '<div id="' + pickerId + '" style="display:none;position:absolute;z-index:999;background:#fff;border:1px solid #e8e8e6;padding:0.5rem 0.6rem;box-shadow:0 4px 16px rgba(0,0,0,0.07);display:none;align-items:center;gap:0.2rem;top:100%;left:50%;transform:translateX(-50%);">'
+    + '<select id="' + pickerId + '-h" style="' + selStyle + 'width:28px;">' + hOpts + '</select>'
+    + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.7rem;color:#bbb;">:</span>'
+    + '<select id="' + pickerId + '-m" style="' + selStyle + 'width:28px;">' + mOpts + '</select>'
+    + '<select id="' + pickerId + '-ap" style="' + selStyle + 'width:28px;"><option value="am">am</option><option value="pm">pm</option></select>'
+    + '<button onclick="_friendsApplyTime(\'' + fid + '\',\'' + which + '\')" style="border:none;background:none;font-family:\'Nunito\',sans-serif;font-size:0.65rem;font-weight:400;color:var(--black);cursor:pointer;padding:0 0.2rem;letter-spacing:0.05em;">ok</button>'
+    + '</div>';
+
+  return '<div style="position:relative;display:inline-flex;align-items:center;">'
+    + '<span id="' + pickerId + '-label" onclick="_friendsOpenPicker(\'' + pickerId + '\',\'' + curH + '\',\'' + curM + '\',\'' + curAP + '\')" style="font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;color:' + labelColor + ';cursor:pointer;min-width:52px;text-align:center;padding:0.15rem 0.3rem;border-bottom:1px solid #e0e0de;letter-spacing:0.01em;">' + label + '</span>'
+    + picker
+    + '</div>';
+}
+
+function _friendsOpenPicker(pickerId, h, m, ap) {
+  // close any open pickers first
+  document.querySelectorAll('[id^="ftpick-"]').forEach(function(el) {
+    if (el.id === pickerId || el.id.indexOf('-h') > -1 || el.id.indexOf('-m') > -1 || el.id.indexOf('-ap') > -1 || el.id.indexOf('-label') > -1) return;
+    el.style.display = 'none';
+  });
+  var el = document.getElementById(pickerId);
+  if (!el) return;
+  var isOpen = el.style.display === 'flex';
+  el.style.display = isOpen ? 'none' : 'flex';
+  if (!isOpen) {
+    var hEl = document.getElementById(pickerId + '-h');
+    var mEl = document.getElementById(pickerId + '-m');
+    var apEl = document.getElementById(pickerId + '-ap');
+    if (hEl) hEl.value = String(h);
+    if (mEl) mEl.value = String(m);
+    if (apEl) apEl.value = String(ap);
+  }
+}
+
+function _friendsApplyTime(fid, which) {
+  var pickerId = 'ftpick-' + fid + '-' + which;
+  var hEl = document.getElementById(pickerId + '-h');
+  var mEl = document.getElementById(pickerId + '-m');
+  var apEl = document.getElementById(pickerId + '-ap');
+  if (!hEl) return;
+  var h = parseInt(hEl.value, 10);
+  var m = mEl.value;
+  var ap = apEl.value;
+  var h24 = ap === 'pm' ? (h === 12 ? 12 : h + 12) : (h === 12 ? 0 : h);
+  var val = (h24 < 10 ? '0' : '') + h24 + ':' + m;
+  friendsSetTimeRange(parseInt(fid, 10), which, val);
+  var label = document.getElementById(pickerId + '-label');
+  if (label) label.textContent = h + ':' + m + ' ' + ap;
+  document.getElementById(pickerId).style.display = 'none';
+}
+
+// Close pickers when clicking outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest || e.target.closest('[id^="ftpick-"]') || e.target.closest('span[id$="-label"]')) return;
+  document.querySelectorAll('[id^="ftpick-"]').forEach(function(el) {
+    if (el.id.match(/^ftpick-\d+-(?:start|end)$/)) el.style.display = 'none';
+  });
+});
+
+function friendsRenderLegend() {
+  var givenEl = document.getElementById('friends-hours-given');
+  var leftEl2 = document.getElementById('friends-hours-left');
+  var barEl = document.getElementById('friends-bar-used');
+  if (!givenEl) return;
+  var totalMins = 0;
+  friendsList.forEach(function(f) {
+    if (f.timeStart && f.timeEnd) {
+      var toMins = function(t) { var p = t.split(':'); return parseInt(p[0],10)*60 + parseInt(p[1]||0,10); };
+      var diff = toMins(f.timeEnd) - toMins(f.timeStart);
+      if (diff > 0) totalMins += diff;
+    } else if (f.timeNum && parseFloat(f.timeNum) > 0) {
+      var n = parseFloat(f.timeNum);
+      totalMins += f.timeUnit === 'hr' ? n * 60 : n;
+    }
+  });
+  var givenH = totalMins / 60;
+  var leftH = Math.max(0, 24 - givenH);
+  var fmt = function(h) { return h % 1 === 0 ? h + 'h' : h.toFixed(1) + 'h'; };
+  givenEl.textContent = fmt(givenH);
+  leftEl2.textContent = fmt(leftH);
+  if (barEl) barEl.style.width = Math.min(100, (givenH / 24) * 100) + '%';
+}
+
+function _friendsDateSelect(fid, val) {
+  var pickerId = 'fdpick-' + fid;
+  var now = new Date();
+  var curY = val ? parseInt(val.split('-')[0],10) : now.getFullYear();
+  var curM = val ? parseInt(val.split('-')[1],10)-1 : now.getMonth();
+  var curD = val ? parseInt(val.split('-')[2],10) : 0;
+  var label = val ? (function(){ var p=val.split('-'); var d=new Date(+p[0],+p[1]-1,+p[2]); return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}); })() : 'date';
+
+  return '<div style="position:relative;display:inline-block;">'
+    + '<span id="' + pickerId + '-label" onclick="_friendsOpenDatePicker(\'' + pickerId + '\',' + curY + ',' + curM + ',' + curD + ')" style="font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;color:#111;cursor:pointer;border-bottom:1px solid #e0e0de;padding:0.15rem 0.3rem;min-width:52px;text-align:center;display:inline-block;">' + label + '</span>'
+    + '<div id="' + pickerId + '" style="display:none;position:absolute;z-index:1000;background:#fff;border:1px solid #e8e8e6;box-shadow:0 4px 16px rgba(0,0,0,0.07);padding:0.5rem;top:100%;left:50%;transform:translateX(-50%);min-width:180px;">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">'
+    + '<button onclick="_friendsDateNav(\'' + pickerId + '\',-1)" style="border:none;background:none;cursor:pointer;font-size:0.8rem;color:#999;padding:0 0.3rem;">‹</button>'
+    + '<span id="' + pickerId + '-month" style="font-family:\'Nunito\',sans-serif;font-size:0.68rem;font-weight:300;color:#111;"></span>'
+    + '<button onclick="_friendsDateNav(\'' + pickerId + '\',1)" style="border:none;background:none;cursor:pointer;font-size:0.8rem;color:#999;padding:0 0.3rem;">›</button>'
+    + '</div>'
+    + '<div id="' + pickerId + '-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;"></div>'
+    + '</div>'
+    + '</div>';
+}
+
+var _fdState = {};
+
+function _friendsOpenDatePicker(pickerId, y, m, d) {
+  document.querySelectorAll('[id^="fdpick-"]').forEach(function(el) {
+    if (/^fdpick-\d+$/.test(el.id) && el.id !== pickerId) el.style.display = 'none';
+  });
+  var el = document.getElementById(pickerId);
+  if (!el) return;
+  var isOpen = el.style.display === 'block';
+  el.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    _fdState[pickerId] = { y: y, m: m, sel: d };
+    _friendsRenderDateGrid(pickerId);
+  }
+}
+
+function _friendsDateNav(pickerId, dir) {
+  var s = _fdState[pickerId];
+  if (!s) return;
+  s.m += dir;
+  if (s.m > 11) { s.m = 0; s.y++; }
+  if (s.m < 0) { s.m = 11; s.y--; }
+  _friendsRenderDateGrid(pickerId);
+}
+
+function _friendsRenderDateGrid(pickerId) {
+  var s = _fdState[pickerId];
+  if (!s) return;
+  var monthEl = document.getElementById(pickerId + '-month');
+  var gridEl = document.getElementById(pickerId + '-grid');
+  if (!monthEl || !gridEl) return;
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  monthEl.textContent = months[s.m] + ' ' + s.y;
+  var first = new Date(s.y, s.m, 1).getDay();
+  var days = new Date(s.y, s.m+1, 0).getDate();
+  var html = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(function(d){ return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;color:#bbb;text-align:center;padding:1px 0;">' + d + '</div>'; }).join('');
+  for (var i=0; i<first; i++) html += '<div></div>';
+  for (var d=1; d<=days; d++) {
+    var isSel = s.sel === d;
+    html += '<div onclick="_friendsPickDate(\'' + pickerId + '\',' + d + ')" style="font-family:\'Nunito\',sans-serif;font-size:0.68rem;font-weight:300;text-align:center;padding:3px 1px;cursor:pointer;border-radius:2px;background:' + (isSel?'#111':'transparent') + ';color:' + (isSel?'#fff':'#111') + ';">' + d + '</div>';
+  }
+  gridEl.innerHTML = html;
+}
+
+function _friendsPickDate(pickerId, d) {
+  var s = _fdState[pickerId];
+  if (!s) return;
+  s.sel = d;
+  var mm = String(s.m+1).padStart(2,'0');
+  var dd = String(d).padStart(2,'0');
+  var val = s.y + '-' + mm + '-' + dd;
+  var fid = pickerId.replace('fdpick-','');
+  friendsSetDate(parseInt(fid,10), val);
+  var lbl = document.getElementById(pickerId + '-label');
+  if (lbl) { var dt = new Date(s.y, s.m, d); lbl.textContent = dt.toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+  document.getElementById(pickerId).style.display = 'none';
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest) return;
+  if (e.target.closest('[id^="fdpick-"]') || (e.target.id && e.target.id.indexOf('-label') > -1)) return;
+  document.querySelectorAll('[id^="fdpick-"]').forEach(function(el) {
+    if (/^fdpick-\d+$/.test(el.id)) el.style.display = 'none';
+  });
+});
+
+function friendsRender() {
+  friendsLoad();
+  friendsRenderCheckIn();
+  friendsRenderHomeCard();
+  setTimeout(friendsRenderLegend, 0);
+  var leftEl = document.getElementById('friends-list-left');
+  var midEl = document.getElementById('friends-list-mid');
+  var rightEl = document.getElementById('friends-list-right');
+  if (!leftEl || !rightEl) return;
+  if (!friendsList.length) {
+    leftEl.innerHTML = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.75rem;font-weight:300;color:var(--gray);padding:0.8rem;">No friends yet.</div>';
+    if (midEl) midEl.innerHTML = '';
+    rightEl.innerHTML = '';
+    return;
+  }
+  var leftHtml = '';
+  var midHtml = '';
+  var rightHtml = '';
+  var notesHtml = '';
+  var dateHtml = '';
+  var today = friendsTodayStr();
+  friendsList.forEach(function(f) {
+    var lastSeenLabel = '';
+    if (f.lastContacted) {
+      var d = new Date(f.lastContacted);
+      lastSeenLabel = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    }
+    var timeNum = f.timeNum || '';
+    var timeUnit = f.timeUnit || 'hr';
+
+    leftHtml += '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.55rem 0.8rem;border-bottom:1px solid #f0f0ee;width:100%;box-sizing:border-box;">'
+      + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);text-align:left;flex:1;">' + f.name + '</span>'
+      + '<button onclick="friendsDelete(' + f.id + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:0.9rem;padding:0;line-height:1;margin-left:0.6rem;flex-shrink:0;">×</button>'
+      + '</div>';
+
+    midHtml += '<div style="display:flex;align-items:center;justify-content:center;gap:0.15rem;padding:0.45rem 0.5rem;border-bottom:1px solid #f0f0ee;">'
+      + '<input type="text" inputmode="decimal" placeholder="0" value="' + timeNum + '" id="friends-num-' + f.id + '" onblur="friendsSetTime(' + f.id + ',this.value,\'hr\')" onkeydown="if(event.key===\'Enter\')this.blur()" style="width:36px;border:none;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.75rem;font-weight:300;color:var(--black);outline:none;padding:0.1rem 0;text-align:center;">'
+      + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.68rem;font-weight:300;color:var(--gray);">hr</span>'
+      + '</div>';
+
+    var timeStart = f.timeStart || '';
+    var timeEnd = f.timeEnd || '';
+    var withDate = f.withTodayDate || '';
+    var dateFmt = '';
+    if (withDate) {
+      var dp = withDate.split('-');
+      var dd = new Date(parseInt(dp[0],10), parseInt(dp[1],10)-1, parseInt(dp[2],10));
+      dateFmt = dd.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+    }
+
+    dateHtml += '<div style="display:flex;align-items:center;justify-content:center;padding:0.45rem 0.6rem;border-bottom:1px solid #f0f0ee;position:relative;">'
+      + _friendsDateSelect(f.id, withDate)
+      + '</div>';
+
+    rightHtml += '<div style="display:flex;align-items:center;justify-content:center;gap:0.3rem;padding:0.45rem 0.8rem;border-bottom:1px solid #f0f0ee;position:relative;">'
+      + _friendsTimeSelect(f.id, 'start', timeStart)
+      + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;color:#ccc;">—</span>'
+      + _friendsTimeSelect(f.id, 'end', timeEnd)
+      + '</div>';
+
+    var friendNotes = Array.isArray(f.notes) ? f.notes : (f.note ? [{ text: f.note, savedAt: null }] : []);
+    var notesLog = friendNotes.slice().reverse().map(function(n) {
+      var ts = '';
+      if (n.savedAt) {
+        var d = new Date(n.savedAt);
+        ts = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+      }
+      return '<div style="padding:0.35rem 0;border-bottom:1px solid #f7f7f5;">'
+        + (ts ? '<div style="font-family:\'Nunito\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;color:#bbb;margin-bottom:0.15rem;">' + ts + '</div>' : '')
+        + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;color:var(--black);line-height:1.5;">' + n.text + '</div>'
+        + '</div>';
+    }).join('');
+
+    notesHtml += '<div style="padding:0.5rem 0.8rem;border-bottom:1px solid #f0f0ee;">'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.65rem;font-weight:400;color:#111;margin-bottom:0.35rem;">' + f.name + '</div>'
+      + (notesLog ? '<div style="margin-bottom:0.4rem;">' + notesLog + '</div>' : '')
+      + '<textarea placeholder="add a note..." rows="2" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();friendsUpdateNote(' + f.id + ',this.value);this.value=\'\';}" style="width:100%;border:none;border-bottom:1px solid #e8e8e6;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;color:var(--black);outline:none;padding:0.2rem 0;box-sizing:border-box;resize:none;line-height:1.5;"></textarea>'
+      + '</div>';
+  });
+  leftEl.innerHTML = leftHtml;
+  if (midEl) midEl.innerHTML = midHtml;
+  var dateEl = document.getElementById('friends-list-date');
+  if (dateEl) dateEl.innerHTML = dateHtml;
+  rightEl.innerHTML = rightHtml;
+  var notesEl = document.getElementById('friends-list-notes');
+  if (notesEl) notesEl.innerHTML = notesHtml;
 }
 </script>
 
