@@ -5647,29 +5647,32 @@ window.addEventListener('DOMContentLoaded', function() {
         <div id="jesus-day-label" onclick="toggleJesusCal()" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></div>
       </div>
       <!-- Popup calendar -->
-      <div id="jesus-cal-popup" style="display:none;position:absolute;top:calc(100% + 0.5rem);left:50%;transform:translateX(-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.8rem;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.08);width:min(520px,92vw);box-sizing:border-box;overflow:hidden;">
-        <div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap;">
-          <!-- Calendar -->
-          <div style="flex:1;min-width:220px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
-              <button onclick="jesusCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
-              <div id="jesus-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
-              <button onclick="jesusCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
-            </div>
-            <div id="jesus-cal-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;"></div>
-            <div id="jesus-cal-grid"></div>
+      <div id="jesus-cal-popup" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border:1px solid #c8c8c5;padding:1rem;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,0.14);width:min(400px,92vw);max-height:90vh;box-sizing:border-box;flex-direction:column;overflow:hidden;">
+        <!-- Close button -->
+        <button onclick="toggleJesusCal()" style="position:absolute;top:0.6rem;right:0.8rem;border:none;background:none;cursor:pointer;font-size:1.2rem;color:var(--gray);line-height:1;padding:0.2rem;">×</button>
+        <!-- Calendar grid -->
+        <div id="jesus-cal-body" style="flex-shrink:0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;padding-right:1.5rem;">
+            <button onclick="jesusCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.2rem;color:var(--gray);padding:0.2rem 0.4rem;">&#8249;</button>
+            <div id="jesus-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+            <button onclick="jesusCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.2rem;color:var(--gray);padding:0.2rem 0.4rem;">&#8250;</button>
           </div>
-          <!-- Summary -->
-          <div id="jesus-cal-summary" style="display:none;flex:1;min-width:0;width:100%;border-top:1px solid #e8e8e5;padding-top:0.8rem;overflow:hidden;">
-            <div id="jesus-cal-summary-date" style="font-family:'Lora',serif;font-style:italic;font-size:0.72rem;color:var(--black);margin-bottom:0.6rem;word-break:break-word;"></div>
-            <div id="jesus-cal-summary-body" style="word-break:break-word;overflow-wrap:break-word;"></div>
+          <div id="jesus-cal-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;"></div>
+          <div id="jesus-cal-grid"></div>
+        </div>
+        <!-- Day summary (shown after tapping a date) -->
+        <div id="jesus-cal-summary" style="display:none;flex-direction:column;overflow-y:auto;flex:1;min-height:0;">
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;flex-shrink:0;">
+            <button onclick="jesusCalShowGrid()" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0;line-height:1;">&#8249;</button>
+            <div id="jesus-cal-summary-date" style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--black);"></div>
           </div>
+          <div id="jesus-cal-summary-body" style="word-break:break-word;overflow-wrap:break-word;padding-right:0.2rem;"></div>
         </div>
       </div>
     </div>
     <button onclick="jesusChangeDay(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8250;</button>
   </div>
-  <div id="jesus-cal-backdrop" onclick="toggleJesusCal()" style="display:none;position:fixed;inset:0;z-index:99;"></div>
+  <div id="jesus-cal-backdrop" onclick="toggleJesusCal()" style="display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.18);"></div>
 
   <!-- Sub-tabs -->
   <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-left:-1rem;margin-right:-1rem;padding-left:1rem;">
@@ -6014,11 +6017,16 @@ function toggleJesusCal() {
   var p = document.getElementById('jesus-cal-popup');
   var b = document.getElementById('jesus-cal-backdrop');
   var isOpen = p && p.style.display !== 'none';
-  if (p) p.style.display = isOpen ? 'none' : 'block';
+  if (p) p.style.display = isOpen ? 'none' : 'flex';
   if (b) b.style.display = isOpen ? 'none' : 'block';
-  if (!isOpen) renderJesusCal();
-  var s = document.getElementById('jesus-cal-summary');
-  if (s && isOpen) s.style.display = 'none';
+  if (!isOpen) {
+    renderJesusCal();
+    // Always start on calendar view
+    var calBody = document.getElementById('jesus-cal-body');
+    var s = document.getElementById('jesus-cal-summary');
+    if (calBody) calBody.style.display = 'block';
+    if (s) s.style.display = 'none';
+  }
 }
 
 function jesusCalShift(dir) {
@@ -6086,6 +6094,13 @@ function renderJesusCal() {
   grid.innerHTML = html;
 }
 
+function jesusCalShowGrid() {
+  var calBody = document.getElementById('jesus-cal-body');
+  var summaryEl = document.getElementById('jesus-cal-summary');
+  if (calBody) calBody.style.display = 'block';
+  if (summaryEl) summaryEl.style.display = 'none';
+}
+
 function jesusCJump(date) {
   jesusCurrentDate = date;
   jesusUpdateDayLabel();
@@ -6098,11 +6113,11 @@ function jesusCJump(date) {
   var rows = [];
   function addItems(label, items, getText) {
     if (!items || !items.length) return;
-    rows.push('<div style="margin-bottom:0.5rem;">'
-      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.25rem;">'+label+'</div>'
+    rows.push('<div style="margin-bottom:0.7rem;">'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.3rem;">'+label+'</div>'
       + items.map(function(x){
           var done = x.done || x.answered;
-          return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;color:'+(done?'#bbb':'var(--black)')+';line-height:1.5;'+(done?'text-decoration:line-through;':'')+'">'+(done?'✓ ':'· ')+getText(x)+'</div>';
+          return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:'+(done?'#bbb':'var(--black)')+';line-height:1.6;'+(done?'text-decoration:line-through;':'')+'">'+(done?'✓ ':'· ')+getText(x)+'</div>';
         }).join('')
       + '</div>');
   }
@@ -6117,19 +6132,23 @@ function jesusCJump(date) {
   addItems('Study Notes', dayNotes, function(x){ return (x.passage ? x.passage + ' — ' : '') + x.note; });
   addItems('Questions', dayQuestions, function(x){ return x.text; });
 
+  var calBody = document.getElementById('jesus-cal-body');
   var summaryEl = document.getElementById('jesus-cal-summary');
   var bodyEl = document.getElementById('jesus-cal-summary-body');
   var dateEl = document.getElementById('jesus-cal-summary-date');
   if (!summaryEl || !bodyEl) return;
+
+  // Hide calendar, show only date + entries
+  if (calBody) calBody.style.display = 'none';
 
   var d = new Date(date + 'T00:00:00');
   if (dateEl) dateEl.textContent = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
 
   bodyEl.innerHTML = rows.length
     ? rows.join('')
-    : '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.72rem;color:var(--gray);">Nothing logged this day.</div>';
+    : '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.78rem;color:var(--gray);">Nothing logged this day.</div>';
 
-  summaryEl.style.display = 'block';
+  summaryEl.style.display = 'flex';
 
   jesusRender(document.querySelector('.journal-tab.active[id^="jtab-"]') ? (document.querySelector('.journal-tab.active[id^="jtab-"]').id.replace('jtab-','')) : 'prayer');
 }
