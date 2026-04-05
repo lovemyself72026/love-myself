@@ -103,9 +103,9 @@
         if (typeof jesusGetDay === 'function' && typeof jesusCurrentDate !== 'undefined') {
           var _day = jesusGetDay(jesusCurrentDate);
           var _tEl = document.getElementById('jesus-pray-things-list');
-          if (_tEl && typeof jesusRenderCheckList === 'function') _tEl.innerHTML = jesusRenderCheckList(_day.prayThings, 'jesusTogglePrayThing', 'jesusDeletePrayThing');
+          if (_tEl && typeof jesusRenderCheckList === 'function') _tEl.innerHTML = jesusRenderCheckList((_day.prayThings||[]).filter(function(x){return !x.done;}), 'jesusTogglePrayThing', 'jesusDeletePrayThing');
           var _pEl = document.getElementById('jesus-pray-people-list');
-          if (_pEl) _pEl.innerHTML = jesusRenderCheckList(_day.prayPeople, 'jesusTogglePrayPerson', 'jesusDeletePrayPerson');
+          if (_pEl) _pEl.innerHTML = jesusRenderCheckList((_day.prayPeople||[]).filter(function(x){return !x.done;}), 'jesusTogglePrayPerson', 'jesusDeletePrayPerson');
           var _gEl = document.getElementById('jesus-godsaid-list');
           if (_gEl) _gEl.innerHTML = (_day.godsaid && _day.godsaid.length) ? _day.godsaid.map(function(x) {
             var dl = x.date ? (function(){ var d=new Date(x.date); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); })() : '';
@@ -192,9 +192,9 @@
         // Re-render all prayer sublists from fresh jesusData
         var day = jesusGetDay(jesusCurrentDate);
         var tEl = document.getElementById('jesus-pray-things-list');
-        if (tEl) tEl.innerHTML = jesusRenderCheckList(day.prayThings, 'jesusTogglePrayThing', 'jesusDeletePrayThing');
+        if (tEl) tEl.innerHTML = jesusRenderCheckList((day.prayThings||[]).filter(function(x){return !x.done;}), 'jesusTogglePrayThing', 'jesusDeletePrayThing');
         var pEl = document.getElementById('jesus-pray-people-list');
-        if (pEl) pEl.innerHTML = jesusRenderCheckList(day.prayPeople, 'jesusTogglePrayPerson', 'jesusDeletePrayPerson');
+        if (pEl) pEl.innerHTML = jesusRenderCheckList((day.prayPeople||[]).filter(function(x){return !x.done;}), 'jesusTogglePrayPerson', 'jesusDeletePrayPerson');
         var vEl = document.getElementById('jesus-verse-list');
         if (vEl) {
           vEl.innerHTML = (day.verses && day.verses.length) ? day.verses.map(function(v) {
@@ -219,6 +219,15 @@
                 '<button onclick="jesusDeleteGodSaid('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">\u00d7</button>' +
               '</div>' +
               '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;white-space:pre-wrap;">' + x.body + '</div>' +
+            '</div>';
+          }).join('') : '';
+        }
+        var aEl = document.getElementById('jesus-answered-list');
+        if (aEl) {
+          aEl.innerHTML = (day.answeredPrayers && day.answeredPrayers.length) ? day.answeredPrayers.map(function(x) {
+            return '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.4rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;">' +
+              '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.82rem;line-height:1.7;">' + x.text + '</div>' +
+              '<button onclick="jesusDeleteAnswered('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">×</button>' +
             '</div>';
           }).join('') : '';
         }
@@ -336,7 +345,7 @@
   .counter-btn:hover { background: var(--black); color: var(--white); }
   .counter-num { font-family: 'Nunito', sans-serif; font-size: 1rem; min-width: 24px; text-align: center; }
   .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-left: 1px solid #c8c8c5; border-top: 1px solid #c8c8c5; margin-bottom: 2rem; }
-  .home-card { background: var(--white); padding: 1.2rem 1.5rem; cursor: pointer; transition: background 0.2s; display: flex; flex-direction: column; justify-content: flex-start; border-right: 1px solid #c8c8c5; border-bottom: 1px solid #c8c8c5; }
+  .home-card { background: var(--white); padding: 1.2rem 1.5rem; cursor: pointer; transition: background 0.2s; display: flex; flex-direction: column; justify-content: flex-start; border-bottom: 1px solid #c8c8c5; }
   .home-card:last-child { border-bottom: none; }
   .home-link { cursor: pointer; font-size: 0.95rem; font-weight: 300; color: var(--black); padding: 0.4rem 0; border-bottom: 1px solid var(--light); }
   .home-link.last { border-bottom: none; }
@@ -472,13 +481,13 @@
   .wia-tab.active { background:var(--black); color:var(--white); }
   .wia-panel { display:none; }
   .wia-panel.active { display:block; }
-  .wia-identity-card { background:var(--black); padding:1rem; margin-bottom:0.8rem; position:relative; overflow:hidden; }
-  .wia-identity-card::after { content:'I'; position:absolute; right:12px; bottom:-20px; font-family:'Lora',serif; font-size:6rem; color:rgba(255,255,255,0.04); pointer-events:none; }
-  .wia-id-label { font-family:'Nunito',sans-serif; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:300; color:rgba(255,255,255,0.5); margin-bottom:6px; }
-  .wia-id-name { font-family:'Lora',serif; font-size:1.2rem; font-weight:300; color:var(--white); margin-bottom:1rem; font-style:italic; min-height:28px; }
+  .wia-identity-card { background:transparent; border:none; padding:1rem 0; margin-bottom:0.8rem; position:relative; overflow:hidden; }
+  .wia-identity-card::after { content:''; }
+  .wia-id-label { font-family:'Nunito',sans-serif; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:300; color:var(--gray); margin-bottom:6px; }
+  .wia-id-name { font-family:'Lora',serif; font-size:1.2rem; font-weight:300; color:var(--black); margin-bottom:1rem; font-style:italic; min-height:28px; }
   .wia-id-traits { display:flex; flex-wrap:wrap; gap:5px; }
-  .wia-trait-tag { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.15); padding:3px 10px; font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; color:rgba(255,255,255,0.7); }
-  .wia-trait-tag.empty { border-style:dashed; color:rgba(255,255,255,0.2); font-style:italic; }
+  .wia-trait-tag { background:#f0f0ec; border:1px solid #c8c8c5; padding:3px 10px; font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; color:var(--black); }
+  .wia-trait-tag.empty { border-style:dashed; color:var(--gray); font-style:italic; }
   .wia-goals-box { margin-bottom:1.2rem; padding:1rem; border:1px solid #c8c8c5; }
   .wia-goal-item { font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:300; color:var(--gray); display:flex; gap:8px; margin-bottom:5px; line-height:1.5; }
   .wia-goal-item:last-child { margin-bottom:0; }
@@ -551,7 +560,7 @@
   <div style="display:grid;grid-template-columns:1fr 1fr;border:1px solid #c8c8c5;margin-bottom:2rem;">
 
     <!-- LEFT COLUMN -->
-    <div style="display:flex;flex-direction:column;">
+    <div style="display:flex;flex-direction:column;border-right:1px solid #c8c8c5;">
 
       <div class="home-card" style="cursor:default;">
         <div class="home-card-title">Jesus Christ</div>
@@ -578,8 +587,8 @@
         <div class="home-card-links">
           <div class="home-link" onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('routine'),100)">My Routine</div>
           <div class="home-link" onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('schedule'),100)">Daily Schedule</div>
-          <div class="home-link" onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('habits'),100)">Calisthenics</div>
-          <div class="home-link last" onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('infp'),100)">INFP</div>
+          <div class="home-link last" onclick="showSection('schedule');setTimeout(()=>showSchedMainTab('habits'),100)">Calisthenics</div>
+
           <div id="home-sched-preview" style="margin-top:0.5rem;"></div>
         </div>
       </div>
@@ -617,11 +626,10 @@
         </div>
       </div>
 
-      <div class="home-card" style="cursor:default;">
+      <div class="home-card" style="cursor:default;flex:1;">
         <div class="home-card-title">Friends</div>
         <div class="home-card-links">
-          <div class="home-link" onclick="showSection('me');setTimeout(()=>showMeTab('friends'),100)">All Friends</div>
-          <div class="home-link last" id="home-friends-checkin" onclick="showSection('me');setTimeout(()=>showMeTab('friends'),100)">Loading...</div>
+          <div class="home-link last" style="border-bottom:none;" onclick="showSection('me');setTimeout(()=>showMeTab('friends'),100)">All Friends</div>
         </div>
       </div>
 
@@ -702,7 +710,7 @@
     <button id="schtab-routine" onclick="showSchedMainTab('routine')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">My Routine</button>
     <button id="schtab-schedule" onclick="showSchedMainTab('schedule')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--black);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid var(--black);font-weight:300;">Daily Schedule</button>
     <button id="schtab-habits" onclick="showSchedMainTab('habits')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">Calisthenics</button>
-    <button id="schtab-infp" onclick="showSchedMainTab('infp')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">INFP</button>
+
   </div>
 
   <!-- SCHEDULE TAB -->
@@ -990,78 +998,7 @@
     <div id="schhabits-rest" style="display:none;"></div>
   </div>
 
-  <!-- INFP TAB -->
-  <div id="schmain-infp" style="display:none;">
-    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin:0.5rem 0 1.5rem;line-height:1.6;">Your inner world matters. 🤍</div>
 
-    <!-- Track Days toggle -->
-    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;cursor:pointer;" onclick="infpToggleCal()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
-      <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Track Days</span>
-    </div>
-
-    <!-- Track Days calendar -->
-    <div id="infp-cal-wrap" style="display:none;margin-bottom:1.2rem;border:1px solid #e8e8e5;">
-      <div style="display:flex;min-height:200px;">
-        <!-- Left: calendar -->
-        <div style="width:50%;min-width:0;border-right:1px solid #e8e8e5;padding:0.5rem;box-sizing:border-box;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem;">
-            <button onclick="infpCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1rem;color:var(--gray);padding:0.1rem;">&#8249;</button>
-            <div id="infp-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.48rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);text-align:center;"></div>
-            <button onclick="infpCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1rem;color:var(--gray);padding:0.1rem;">&#8250;</button>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:2px;" id="infp-cal-daynames"></div>
-          <div id="infp-cal-grid"></div>
-        </div>
-        <!-- Right: day content -->
-        <div id="infp-cal-day-view" style="width:50%;min-width:0;padding:0.6rem;box-sizing:border-box;overflow-y:auto;max-height:300px;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;font-weight:300;color:var(--gray);text-align:center;margin-top:2rem;">Tap a day 🤍</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Notes -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-      <div class="planner-label">Notes & Reflections</div>
-      <textarea id="infp-notes" placeholder="Write your thoughts, feelings, ideas..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
-      <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
-        <button onclick="infpSaveEntry('notes')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
-        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
-          + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('notes',this)" style="display:none;">
-        </label>
-      </div>
-      <div id="infp-notes-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
-      <div id="infp-notes-entries" style="margin-top:0.6rem;"></div>
-    </div>
-
-    <!-- Things I'm feeling -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-      <div class="planner-label">Things I'm Feeling</div>
-      <div id="infp-feelings-list" style="margin-top:0.5rem;"></div>
-      <input id="infp-feelings-input" placeholder="Add a feeling..." onkeydown="if(event.key==='Enter')infpAddFeeling()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
-    </div>
-
-    <!-- Things I need -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-      <div class="planner-label">Things I Need Today</div>
-      <div id="infp-needs-list" style="margin-top:0.5rem;"></div>
-      <input id="infp-needs-input" placeholder="Add something you need..." onkeydown="if(event.key==='Enter')infpAddNeed()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
-    </div>
-
-    <!-- Creative space -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-      <div class="planner-label">Creative Space</div>
-      <textarea id="infp-creative" placeholder="A dream, a story, a poem, an idea..." style="width:100%;border:none;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.88rem;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.8;color:var(--black);"></textarea>
-      <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
-        <button onclick="infpSaveEntry('creative')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
-        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
-          + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('creative',this)" style="display:none;">
-        </label>
-      </div>
-      <div id="infp-creative-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
-      <div id="infp-creative-entries" style="margin-top:0.6rem;"></div>
-    </div>
-  </div>
 
   <!-- Copy schedule picker -->
   <div id="copy-schedule-box" style="display:none;border:1px solid #c8c8c5;padding:1rem;margin-top:0.6rem;">
@@ -4442,7 +4379,10 @@ window.addEventListener('DOMContentLoaded', function() {
       </div>
       <div style="margin-bottom:0.5rem;">
         <div class="subtitle" style="margin-bottom:0.2rem;">How you see yourself</div>
-        <input type="text" id="wiaNameInput" placeholder="e.g. a person who..." oninput="wiaUpdateCardAndSave()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.2rem 0;">
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <input type="text" id="wiaNameInput" placeholder="e.g. a person who..." style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.2rem 0;" onkeydown="if(event.key==='Enter'){wiaNameSave();this.blur();}" oninput="clearTimeout(window._wiaNameTimer);if(this.value.trim()){window._wiaNameTimer=setTimeout(wiaNameSave,1000);}else{WIA.name='';var _nd=document.getElementById('wiaIdName');if(_nd)_nd.textContent='';wiaSave();if(typeof syncToCloud==='function'){syncToCloud('wia2',WIA);}}">
+        </div>
+        <div id="wia-name-history" style="margin-top:0.6rem;"></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.5rem;">
         <div>
@@ -4456,6 +4396,77 @@ window.addEventListener('DOMContentLoaded', function() {
           <div class="wia-tags-list" id="wiaTraitsList" style="margin-top:0.3rem;"></div>
         </div>
       </div>
+    </div>
+
+
+  <hr style="margin:2.5rem 0;">
+  <div class="subtitle" style="margin-bottom:0.5rem;">INFP</div>
+  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Your inner world matters. 🤍</div>
+
+    <!-- Track Days toggle -->
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;cursor:pointer;" onclick="infpToggleCal()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+      <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Track Days</span>
+    </div>
+
+    <!-- Track Days calendar -->
+    <div id="infp-cal-wrap" style="display:none;margin-bottom:1.2rem;border:1px solid #e8e8e5;">
+      <div style="display:flex;min-height:200px;">
+        <div style="width:50%;min-width:0;border-right:1px solid #e8e8e5;padding:0.5rem;box-sizing:border-box;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem;">
+            <button onclick="infpCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1rem;color:var(--gray);padding:0.1rem;">&#8249;</button>
+            <div id="infp-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.48rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);text-align:center;"></div>
+            <button onclick="infpCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1rem;color:var(--gray);padding:0.1rem;">&#8250;</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:2px;" id="infp-cal-daynames"></div>
+          <div id="infp-cal-grid"></div>
+        </div>
+        <div id="infp-cal-day-view" style="width:50%;min-width:0;padding:0.6rem;box-sizing:border-box;overflow-y:auto;max-height:300px;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;font-weight:300;color:var(--gray);text-align:center;margin-top:2rem;">Tap a day 🤍</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label">Notes & Reflections</div>
+      <textarea id="infp-notes" placeholder="Write your thoughts, feelings, ideas..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
+      <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
+        <button onclick="infpSaveEntry('notes')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
+        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
+          + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('notes',this)" style="display:none;">
+        </label>
+      </div>
+      <div id="infp-notes-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+      <div id="infp-notes-entries" style="margin-top:0.6rem;"></div>
+    </div>
+
+    <!-- Things I'm feeling -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label">Things I'm Feeling</div>
+      <div id="infp-feelings-list" style="margin-top:0.5rem;"></div>
+      <input id="infp-feelings-input" placeholder="Add a feeling..." onkeydown="if(event.key==='Enter')infpAddFeeling()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
+    </div>
+
+    <!-- Things I need -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label">Things I Need Today</div>
+      <div id="infp-needs-list" style="margin-top:0.5rem;"></div>
+      <input id="infp-needs-input" placeholder="Add something you need..." onkeydown="if(event.key==='Enter')infpAddNeed()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
+    </div>
+
+    <!-- Creative space -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div class="planner-label">Creative Space</div>
+      <textarea id="infp-creative" placeholder="A dream, a story, a poem, an idea..." style="width:100%;border:none;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.88rem;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.8;color:var(--black);"></textarea>
+      <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
+        <button onclick="infpSaveEntry('creative')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
+        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
+          + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('creative',this)" style="display:none;">
+        </label>
+      </div>
+      <div id="infp-creative-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+      <div id="infp-creative-entries" style="margin-top:0.6rem;"></div>
     </div>
 
   <!-- Who I Am -->
@@ -4926,19 +4937,19 @@ window.addEventListener('DOMContentLoaded', function() {
       <!-- Add friend -->
       <div style="display:flex;gap:0.5rem;margin-bottom:1.2rem;align-items:center;">
         <input id="friends-name-input" type="text" placeholder="Name" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;border:none;border-bottom:1px solid #c8c8c5;padding:0.3rem 0;background:none;outline:none;color:var(--black);">
-        <select id="friends-type-input" style="font-family:'Nunito',sans-serif;font-size:0.72rem;border:none;border-bottom:1px solid #c8c8c5;padding:0.3rem 0;background:none;outline:none;color:var(--gray);">
-          <option value="close">Close</option>
-          <option value="good">Good friend</option>
-          <option value="acquaintance">Acquaintance</option>
-        </select>
         <button onclick="friendsAdd()" style="border:none;background:none;font-family:'Nunito',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);cursor:pointer;">Add</button>
       </div>
 
-      <!-- Five-column list -->
-      <div style="display:grid;grid-template-columns:1fr 1px auto 1px auto 1px auto;border:1px solid #e8e8e5;">
+      <!-- Six-column list -->
+      <div style="display:grid;grid-template-columns:1fr 1px auto 1px auto 1px auto 1px auto;border:1px solid #e8e8e5;">
         <!-- Header: Name -->
         <div style="padding:0.6rem 0.8rem;border-bottom:1px solid #e8e8e5;text-align:left;">
           <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Name</span>
+        </div>
+        <div style="background:#e8e8e5;border-bottom:1px solid #e8e8e5;"></div>
+        <!-- Header: Tag & Decision -->
+        <div style="padding:0.6rem 0.8rem;border-bottom:1px solid #e8e8e5;white-space:nowrap;text-align:center;">
+          <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Tag</span>
         </div>
         <div style="background:#e8e8e5;border-bottom:1px solid #e8e8e5;"></div>
         <!-- Header: Time -->
@@ -4958,6 +4969,8 @@ window.addEventListener('DOMContentLoaded', function() {
         <!-- List rows -->
         <div id="friends-list-left" style="padding:0.4rem 0;"></div>
         <div style="background:#e8e8e5;"></div>
+        <div id="friends-list-tag" style="padding:0.4rem 0;text-align:center;display:flex;flex-direction:column;"></div>
+        <div style="background:#e8e8e5;"></div>
         <div id="friends-list-mid" style="padding:0.4rem 0;text-align:center;"></div>
         <div style="background:#e8e8e5;"></div>
         <div id="friends-list-date" style="padding:0.4rem 0;text-align:center;"></div>
@@ -4965,19 +4978,8 @@ window.addEventListener('DOMContentLoaded', function() {
         <div id="friends-list-right" style="padding:0.4rem 0;text-align:center;"></div>
       </div>
 
-      <!-- Notes + Your Day side by side -->
-      <div style="display:flex;gap:1rem;margin-top:1.2rem;align-items:flex-start;">
-
-        <!-- Notes per friend -->
-        <div id="friends-notes-section" style="flex:1;border:1px solid #e8e8e5;">
-          <div style="padding:0.6rem 0.8rem;border-bottom:1px solid #e8e8e5;">
-            <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Notes</span>
-          </div>
-          <div id="friends-list-notes" style="padding:0.4rem 0;"></div>
-        </div>
-
-        <!-- Hours legend -->
-        <div id="friends-hours-legend" style="flex:1;padding:0.9rem 1rem;border:1px solid #e8e8e5;background:#fafaf8;">
+      <!-- Your Day -->
+      <div id="friends-hours-legend" style="margin-top:1.2rem;padding:0.9rem 1rem;border:1px solid #e8e8e5;background:#fafaf8;">
           <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.7rem;">Your Day</div>
           <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;background:#f0f0ee;margin-bottom:0.75rem;">
             <div id="friends-bar-used" style="background:#111;height:100%;width:0%;transition:width 0.3s;"></div>
@@ -5000,7 +5002,6 @@ window.addEventListener('DOMContentLoaded', function() {
           </div>
         </div>
 
-      </div>
     </div>
 
     <div id="mesub-rightforme" style="display:none;">
@@ -5676,43 +5677,44 @@ window.addEventListener('DOMContentLoaded', function() {
   <!-- PRAYER & WORD -->
   <div id="jsub-prayer">
 
-    <!-- Inner sub-tabs -->
-    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-      <button class="journal-tab active" id="jpwtab-things" onclick="showJesusPrayWordTab('things')">Things to Pray</button>
-      <button class="journal-tab" id="jpwtab-people" onclick="showJesusPrayWordTab('people')">People</button>
-      <button class="journal-tab" id="jpwtab-verse" onclick="showJesusPrayWordTab('verse')">Bible Verse</button>
-      <button class="journal-tab" id="jpwtab-godsaid" onclick="showJesusPrayWordTab('godsaid')">God Said</button>
-    </div>
-
-    <!-- Things to Pray -->
+    <!-- Prayer + Answered Prayer combined in one view -->
     <div id="jpwsub-things">
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">Bring everything to Him. He hears every word.</div>
-      <div id="jesus-pray-things-list" style="margin-bottom:0.6rem;"></div>
-      <input id="jesus-pray-things-input" placeholder="Add something…" onkeydown="if(event.key==='Enter')jesusSavePrayThing()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+
+      <!-- Left: Things to Pray + People + Answered Prayer -->
+      <div>
+
+        <!-- Things to Pray + People -->
+        <div style="display:grid;grid-template-columns:1fr 1px 1fr;gap:0;margin-bottom:1.5rem;">
+          <div style="padding-right:0.8rem;">
+            <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Things to Pray</div>
+            <div id="jesus-pray-things-list" style="margin-bottom:0.6rem;"></div>
+            <input id="jesus-pray-things-input" placeholder="Add something…" onkeydown="if(event.key==='Enter')jesusSavePrayThing()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+          </div>
+          <div style="background:#e8e8e5;"></div>
+          <div style="padding-left:0.8rem;">
+            <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">People</div>
+            <div id="jesus-pray-people-list" style="margin-bottom:0.6rem;"></div>
+            <input id="jesus-pray-people-input" placeholder="Add a person…" onkeydown="if(event.key==='Enter')jesusSavePrayPerson()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+          </div>
+        </div>
+
+        <!-- Answered Prayer -->
+        <div style="border-top:1px solid #e8e8e5;padding-top:1.2rem;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Answered Prayer</div>
+          <div id="jesus-answered-list" style="margin-bottom:0.6rem;"></div>
+          <input id="jesus-answered-input" placeholder="Write what God answered…" onkeydown="if(event.key==='Enter')jesusSaveAnswered()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+        </div>
+
+      </div>
+
+
     </div>
 
-    <!-- People to Pray For -->
-    <div id="jpwsub-people" style="display:none;">
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">Who are you lifting up today?</div>
-      <div id="jesus-pray-people-list" style="margin-bottom:0.6rem;"></div>
-      <input id="jesus-pray-people-input" placeholder="Add a person…" onkeydown="if(event.key==='Enter')jesusSavePrayPerson()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
-    </div>
-
-    <!-- Bible Verse -->
-    <div id="jpwsub-verse" style="display:none;">
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">Save verses that speak to your heart.</div>
-      <div id="jesus-verse-list" style="margin-bottom:1rem;"></div>
-      <input id="jesus-verse-text" placeholder="Type or paste a verse…" onkeydown="if(event.key==='Enter')jesusSaveVerse()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;margin-bottom:0.5rem;box-sizing:border-box;">
-      <input id="jesus-verse-ref" placeholder="Reference e.g. John 3:16" onkeydown="if(event.key==='Enter')jesusSaveVerse()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);outline:none;padding:0.3rem 0;margin-bottom:0.7rem;box-sizing:border-box;">
-    </div>
-
-    <!-- What God Said -->
-    <div id="jpwsub-godsaid" style="display:none;">
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">What did God speak to you today?</div>
-      <div id="jesus-godsaid-list" style="margin-bottom:1rem;"></div>
-      <textarea id="jesus-godsaid-body" placeholder="What God said today…" rows="4" oninput="jesusGodSaidTyping()" style="width:100%;border:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.8rem;box-sizing:border-box;"></textarea>
-      <div id="jesus-godsaid-status" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:#bbb;margin-top:0.4rem;min-height:1em;"></div>
-    </div>
+    <!-- hidden compat divs -->
+    <div id="jpwsub-people" style="display:none;"></div>
+    <div id="jpwsub-verse" style="display:none;"><div id="jesus-verse-list"></div><input id="jesus-verse-text"><input id="jesus-verse-ref"></div>
+    <div id="jpwsub-answered" style="display:none;"></div>
+    <div id="jpwsub-godsaid" style="display:none;"><div id="jesus-godsaid-list"></div><textarea id="jesus-godsaid-body"></textarea><div id="jesus-godsaid-status"></div></div>
 
   </div>
 
@@ -5839,105 +5841,104 @@ window.addEventListener('DOMContentLoaded', function() {
   <!-- WHO IS JESUS CHRIST & HIS HABITS -->
   <div id="jsub-whoisjesus" style="display:none;">
 
-    <!-- Inner sub-tabs -->
-    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-      <button class="journal-tab active" id="jctab-habits" onclick="showJesusChristTab('habits')">His Daily Life</button>
-      <button class="journal-tab" id="jctab-heis" onclick="showJesusChristTab('heis')">He Is...</button>
-    </div>
-
-    <!-- His Daily Life 4am–9pm -->
-    <div id="jcsub-habits">
+    <!-- His Daily Life + He Is combined -->
+    <div id="jcsub-habits" style="display:grid;grid-template-columns:1fr 1px 1fr;gap:0;">
+      <div style="padding-right:1.2rem;">
       <div style="display:flex;flex-direction:column;gap:0;">
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
           <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">4:00 AM</div>
           <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He rose before dawn to pray alone</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Before the world was awake, Jesus was already with the Father. He withdrew to isolated places a mountain, a garden, the wilderness and spent these hours in deep prayer. This was not occasional. It was His rhythm. (Mark 1:35, Luke 6:12)</div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He rose before dawn to pray alone</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Mark 1:35, Luke 6:12</div>
           </div>
         </div>
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
           <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">6:00 AM</div>
           <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He meditated on Scripture</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Jesus knew the Word deeply He quoted it under pressure, He taught it with authority, He lived it. The Scriptures were not just read but lived out in every moment of His day. (Matthew 4:4, Luke 4:16–17)</div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He meditated on Scripture</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Matthew 4:4, Luke 4:16–17</div>
           </div>
         </div>
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
           <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">7:00 AM</div>
           <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He gathered with His disciples</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Jesus walked closely with the twelve. He called them to be with Him not just to watch, but to be formed. Morning time together meant walking, talking, preparing hearts for the day ahead. (Luke 8:1, Mark 3:14)</div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He gathered with His disciples</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Luke 8:1, Mark 3:14</div>
           </div>
         </div>
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
           <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">9:00 AM</div>
           <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He taught in synagogues and on hillsides</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Jesus was a teacher above all. He taught with authority not like the scribes and the people were amazed. His words landed because they came from the Father, not from study alone. (Matthew 5:1–2, Luke 4:31–32)</div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He taught in synagogues and on hillsides</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Matthew 5:1–2, Luke 4:31–32</div>
           </div>
         </div>
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
           <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">11:00 AM</div>
           <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He healed and ministered to those in need</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Jesus was never too busy for one person. The blind, the lame, the leper, the grieving mother He stopped. He touched. He healed. Compassion was not a ministry strategy; it was who He was. (Matthew 9:35–36, Mark 1:40–42)</div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He healed and ministered to those in need</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Matthew 9:35–36, Mark 1:40–42</div>
           </div>
         </div>
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
           <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">1:00 PM</div>
           <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He shared meals with people</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Jesus ate with everyone tax collectors, sinners, Pharisees, friends. The table was His most consistent ministry space. He was fully human: He got hungry, He rested, He enjoyed the company of people. (Luke 19:5–6, John 6:11, Luke 7:34)</div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He shared meals with people</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Luke 19:5–6, John 6:11, Luke 7:34</div>
           </div>
         </div>
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
           <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">3:00 PM</div>
           <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He walked and talked the road was His classroom</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Much of Jesus' discipleship happened while walking. On the road to Emmaus, on the way to Jairus' house, crossing the lake movement and conversation were inseparable. He used every moment to shape those around Him. (Luke 24:13–27, Mark 5:21–24)</div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He walked and talked — the road was His classroom</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Luke 24:13–27, Mark 5:21–24</div>
           </div>
         </div>
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
           <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">5:00 PM</div>
           <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He withdrew to be alone with the Father</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">After full days of ministry, Jesus would slip away. Not to scroll, not to numb to be replenished. Solitude was not emptiness for Him; it was where He refilled. He protected this time fiercely. (Luke 5:16, Mark 6:45–46)</div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He withdrew to be alone with the Father</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Luke 5:16, Mark 6:45–46</div>
           </div>
         </div>
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
           <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">7:00 PM</div>
           <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He gathered with His disciples for deeper teaching</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Evenings were for the inner circle. Jesus unpacked parables, answered hard questions, prepared hearts. The upper room discourses the most intimate teaching He ever gave happened at night over a shared meal. (John 13–17, Mark 4:34)</div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He gathered with His disciples for deeper teaching</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">John 13–17, Mark 4:34</div>
           </div>
         </div>
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;">
           <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">9:00 PM</div>
           <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;margin-bottom:0.2rem;">He rested fully and without guilt</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);line-height:1.5;">Jesus slept. Even in a storm at sea, He was at peace in the boat. Rest was not laziness for Him it was trust. He had done what the Father gave Him to do that day. He closed His eyes, and that was enough. (Mark 4:38, Matthew 8:24)</div>
+            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He rested fully and without guilt</div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Mark 4:38, Matthew 8:24</div>
           </div>
         </div>
 
-      </div>
-    </div>
+      </div><!-- end daily life list -->
+      </div><!-- end left column -->
 
-    <!-- He Is... -->
-    <div id="jcsub-heis" style="display:none;">
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:1rem;">What have you discovered about Him? Add it here.</div>
-      <div id="jesus-heis-list" style="margin-bottom:1rem;"></div>
-      <input id="jesus-heis-input" placeholder="He is..." onkeydown="if(event.key==='Enter')jesusSaveHeIs()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
-    </div>
+      <!-- divider -->
+      <div style="background:#e8e8e5;"></div>
+      <!-- He Is -->
+      <div style="padding-left:1.2rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">He Is…</div>
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.75rem;color:var(--gray);margin-bottom:0.8rem;">What have you discovered about Him?</div>
+        <div id="jesus-heis-list" style="margin-bottom:1rem;"></div>
+        <input id="jesus-heis-input" placeholder="He is..." onkeydown="if(event.key==='Enter')jesusSaveHeIs()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+      </div>
+    </div><!-- end grid -->
 
   </div>
 
@@ -6104,7 +6105,14 @@ function jesusSavePrayThing() {
 }
 function jesusTogglePrayThing(id) {
   var day = jesusGetDay(jesusCurrentDate);
+  var item = day.prayThings.find(function(x){ return x.id===id; });
   day.prayThings = day.prayThings.map(function(x){ return x.id===id?{...x,done:!x.done}:x; });
+  if (item && !item.done) {
+    if (!day.answeredPrayers) day.answeredPrayers = [];
+    day.answeredPrayers.unshift({ id: Date.now(), text: item.text, date: new Date().toISOString() });
+  } else if (item) {
+    day.answeredPrayers = (day.answeredPrayers||[]).filter(function(x){ return x.text!==item.text; });
+  }
   jesusSave(); jesusRender('prayer');
 }
 function jesusDeletePrayThing(id) {
@@ -6121,11 +6129,32 @@ function jesusSavePrayPerson() {
 }
 function jesusTogglePrayPerson(id) {
   var day = jesusGetDay(jesusCurrentDate);
+  var item = day.prayPeople.find(function(x){ return x.id===id; });
   day.prayPeople = day.prayPeople.map(function(x){ return x.id===id?{...x,done:!x.done}:x; });
+  if (item && !item.done) {
+    if (!day.answeredPrayers) day.answeredPrayers = [];
+    day.answeredPrayers.unshift({ id: Date.now(), text: item.text, date: new Date().toISOString() });
+  } else if (item) {
+    day.answeredPrayers = (day.answeredPrayers||[]).filter(function(x){ return x.text!==item.text; });
+  }
   jesusSave(); jesusRender('prayer');
 }
 function jesusDeletePrayPerson(id) {
   jesusGetDay(jesusCurrentDate).prayPeople = jesusGetDay(jesusCurrentDate).prayPeople.filter(function(x){ return x.id!==id; });
+  jesusSave(); jesusRender('prayer');
+}
+
+// -- ANSWERED PRAYER ------------------------------------------
+function jesusSaveAnswered() {
+  var inp = document.getElementById('jesus-answered-input');
+  var text = inp.value.trim(); if (!text) return;
+  if (!jesusGetDay(jesusCurrentDate).answeredPrayers) jesusGetDay(jesusCurrentDate).answeredPrayers = [];
+  jesusGetDay(jesusCurrentDate).answeredPrayers.unshift({ id: Date.now(), text: text, date: new Date().toISOString() });
+  inp.value = ''; jesusSave(); jesusRender('prayer');
+}
+function jesusDeleteAnswered(id) {
+  var day = jesusGetDay(jesusCurrentDate);
+  day.answeredPrayers = (day.answeredPrayers || []).filter(function(x){ return x.id!==id; });
   jesusSave(); jesusRender('prayer');
 }
 
@@ -6255,13 +6284,11 @@ function jesusRenderStudyQuestions(skipLoad) {
 }
 
 function showJesusPrayWordTab(tab) {
-  ['things','people','verse','godsaid'].forEach(function(t) {
-    var sub = document.getElementById('jpwsub-'+t);
-    if (sub) sub.style.display = t===tab?'block':'none';
-    var btn = document.getElementById('jpwtab-'+t);
-    if (btn) btn.classList.toggle('active', t===tab);
-  });
+  // prayer and answered are now combined — always show things
+  var sub = document.getElementById('jpwsub-things');
+  if (sub) sub.style.display = 'block';
   jesusRender('prayer');
+  if (typeof jesusRenderHeIs === 'function') jesusRenderHeIs();
 }
 
 function showJesusWordTab(tab) {
@@ -6290,13 +6317,10 @@ function showJesusActionTab(tab, skipLoad) {
 }
 
 function showJesusChristTab(tab) {
-  ['habits','heis'].forEach(function(t) {
-    var sub = document.getElementById('jcsub-'+t);
-    if (sub) sub.style.display = t===tab?'block':'none';
-    var btn = document.getElementById('jctab-'+t);
-    if (btn) btn.classList.toggle('active', t===tab);
-  });
-  if (tab === 'heis') jesusRenderHeIs();
+  // habits and heis are now combined in one view
+  var sub = document.getElementById('jcsub-habits');
+  if (sub) sub.style.display = 'grid';
+  jesusRenderHeIs();
 }
 
 
@@ -6409,8 +6433,8 @@ function jesusRender(tab) {
   if (tab === 'prayer') {
     var things = document.getElementById('jesus-pray-things-list');
     var people = document.getElementById('jesus-pray-people-list');
-    if (things) things.innerHTML = jesusRenderCheckList(day.prayThings||[], 'jesusTogglePrayThing', 'jesusDeletePrayThing');
-    if (people) people.innerHTML = jesusRenderCheckList(day.prayPeople||[], 'jesusTogglePrayPerson', 'jesusDeletePrayPerson');
+    if (things) things.innerHTML = jesusRenderCheckList((day.prayThings||[]).filter(function(x){return !x.done;}), 'jesusTogglePrayThing', 'jesusDeletePrayThing');
+    if (people) people.innerHTML = jesusRenderCheckList((day.prayPeople||[]).filter(function(x){return !x.done;}), 'jesusTogglePrayPerson', 'jesusDeletePrayPerson');
 
     var vel = document.getElementById('jesus-verse-list');
     if (vel) {
@@ -6437,6 +6461,17 @@ function jesusRender(tab) {
             '<button onclick="jesusDeleteGodSaid('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">×</button>' +
           '</div>' +
           '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;white-space:pre-wrap;">' + x.body + '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    var ael = document.getElementById('jesus-answered-list');
+    if (ael) {
+      if (!day.answeredPrayers || !day.answeredPrayers.length) { ael.innerHTML = ''; }
+      else ael.innerHTML = day.answeredPrayers.map(function(x) {
+        return '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.4rem 0;border-bottom:1px solid #f0f0ee;gap:1rem;">' +
+          '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.82rem;line-height:1.7;">' + x.text + '</div>' +
+          '<button onclick="jesusDeleteAnswered('+x.id+')" style="background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;flex-shrink:0;padding:0;">×</button>' +
         '</div>';
       }).join('');
     }
@@ -8118,11 +8153,11 @@ function initWhiAm() {
   _wiaInited = true;
   var ni = document.getElementById('wiaNameInput');
   if (ni) ni.value = WIA.name;
-  document.getElementById('wiaValueInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddValue(); });
-  document.getElementById('wiaTraitInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddTrait(); });
-  document.getElementById('wiaQAns').addEventListener('input', function() { WIA.j[wiaQi] = this.value; wiaSave(); wiaRenderQ(); });
-  document.getElementById('wiaWQAns').addEventListener('input', function() { WIA.wj[wiaWqi] = this.value; wiaSave(); wiaRenderWQ(); });
-  wiaRenderValues(); wiaRenderTraits(); wiaUpdateCard();
+  var _vi = document.getElementById('wiaValueInput'); if (_vi) _vi.addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddValue(); });
+  var _ti = document.getElementById('wiaTraitInput'); if (_ti) _ti.addEventListener('keydown', function(e) { if (e.key === 'Enter') wiaAddTrait(); });
+  var _qa = document.getElementById('wiaQAns'); if (_qa) _qa.addEventListener('input', function() { WIA.j[wiaQi] = this.value; wiaSave(); wiaRenderQ(); });
+  var _wqa = document.getElementById('wiaWQAns'); if (_wqa) _wqa.addEventListener('input', function() { WIA.wj[wiaWqi] = this.value; wiaSave(); wiaRenderWQ(); });
+  wiaRenderValues(); wiaRenderTraits(); wiaUpdateCard(); if(typeof infpLoad==='function') infpLoad();
   wiaRenderQ();
   document.getElementById('wiaAffText').textContent = wiaAffs[wiaAffIdx];
   wiaRenderChecks();
@@ -8137,7 +8172,7 @@ function wiaUpdateCard() {
     nameEl.value = WIA.name || '';
   }
   var nameDisp = document.getElementById('wiaIdName');
-  if (nameDisp) nameDisp.textContent = WIA.name || '';
+  if (nameDisp) nameDisp.textContent = (WIA.name && WIA.name.trim()) ? WIA.name : '';
   var traitsEl = document.getElementById('wiaIdTraits');
   if (traitsEl) {
     var all = WIA.traits.concat(WIA.values).filter(function(t){ return t && t.trim(); });
@@ -8145,6 +8180,7 @@ function wiaUpdateCard() {
       ? all.map(function(t) { return '<span class="wia-trait-tag">' + t.trim() + '</span>'; }).join('')
       : '';
   }
+  wiaRenderNameHistory();
 }
 function wiaUpdateCardAndSave() {
   var nameEl = document.getElementById('wiaNameInput');
@@ -8152,6 +8188,49 @@ function wiaUpdateCardAndSave() {
   var nameDisp = document.getElementById('wiaIdName');
   if (nameDisp) nameDisp.textContent = WIA.name || '';
   wiaSave();
+}
+function wiaNameSave() {
+  var nameEl = document.getElementById('wiaNameInput');
+  if (!nameEl) return;
+  var val = nameEl.value.trim();
+  if (!val) return;
+  if (!Array.isArray(WIA.nameHistory)) WIA.nameHistory = [];
+  if (WIA.nameHistory.length && WIA.nameHistory[0].text === val) return;
+  WIA.name = val;
+  var nameDisp = document.getElementById('wiaIdName');
+  if (nameDisp) nameDisp.textContent = WIA.name;
+  WIA.nameHistory.unshift({ text: val, savedAt: new Date().toISOString() });
+  wiaSave();
+  wiaRenderNameHistory();
+}
+function wiaRenderNameHistory() {
+  var el = document.getElementById('wia-name-history');
+  if (!el) return;
+  var history = WIA.nameHistory || [];
+  if (!history.length) { el.innerHTML = ''; return; }
+  el.innerHTML = history.map(function(entry, i) {
+    var d = new Date(entry.savedAt);
+    var dateStr = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    var timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    return '<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid #f5f5f3;">'
+      + '<div>'
+      + '<div style="font-family:\'Lora\',serif;font-size:0.88rem;color:var(--black);line-height:1.5;">' + entry.text + '</div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.58rem;letter-spacing:0.08em;color:#bbb;margin-top:0.1rem;">' + dateStr + ' · ' + timeStr + '</div>'
+      + '</div>'
+      + '<button onclick="wiaDeleteNameEntry(' + i + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:0.85rem;padding:0;line-height:1;margin-left:0.5rem;flex-shrink:0;">×</button>'
+      + '</div>';
+  }).join('');
+}
+function wiaDeleteNameEntry(i) {
+  if (!Array.isArray(WIA.nameHistory)) return;
+  WIA.nameHistory.splice(i, 1);
+  if (WIA.nameHistory.length > 0) {
+    WIA.name = WIA.nameHistory[0].text;
+    var nameDisp = document.getElementById('wiaIdName');
+    if (nameDisp) nameDisp.textContent = WIA.name;
+  }
+  wiaSave();
+  wiaRenderNameHistory();
 }
 function wiaRenderValues() {
   var el = document.getElementById('wiaValuesList');
@@ -10449,18 +10528,35 @@ function friendsRender() {
   var leftEl = document.getElementById('friends-list-left');
   var midEl = document.getElementById('friends-list-mid');
   var rightEl = document.getElementById('friends-list-right');
+  var tagEl = document.getElementById('friends-list-tag');
   if (!leftEl || !rightEl) return;
   if (!friendsList.length) {
     leftEl.innerHTML = '<div style="font-family:\'Nunito\',sans-serif;font-size:0.75rem;font-weight:300;color:var(--gray);padding:0.8rem;">No friends yet.</div>';
     if (midEl) midEl.innerHTML = '';
+    if (tagEl) tagEl.innerHTML = '';
     rightEl.innerHTML = '';
     return;
   }
+
+  var TAG_COLORS = {
+    'good-for-me':         { border: '#f48fb1', bg: 'transparent', title: 'Good For Me' },
+    'trauma-pattern':      { border: '#b0b0b0', bg: 'transparent', title: 'Trauma Pattern' },
+    'stay-friends-forever':{ border: '#c6e03a', bg: 'transparent', title: 'Stay Friends Forever' },
+    'casual-for-needs':    { border: '#b39ddb', bg: 'transparent', title: 'Casual, For Needs' }
+  };
+
+  var DECISION_COLORS = {
+    'continue-talking': { color: '#f48fb1', title: 'Continue Talking' },
+    'not-be-friends':   { color: '#c6e03a', title: 'Not Be Friends' }
+  };
+
   var leftHtml = '';
   var midHtml = '';
   var rightHtml = '';
   var notesHtml = '';
   var dateHtml = '';
+  var tagHtml = '';
+  var decisionHtml = '';
   var today = friendsTodayStr();
   friendsList.forEach(function(f) {
     var lastSeenLabel = '';
@@ -10472,9 +10568,46 @@ function friendsRender() {
     var timeUnit = f.timeUnit || 'hr';
 
     leftHtml += '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.55rem 0.8rem;border-bottom:1px solid #f0f0ee;width:100%;box-sizing:border-box;">'
-      + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);text-align:left;flex:1;">' + f.name + '</span>'
+      + '<span onclick="friendsOpenPanel(' + f.id + ')" style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);text-align:left;flex:1;cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:#e0e0e0;">' + f.name + '</span>'
       + '<button onclick="friendsDelete(' + f.id + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:0.9rem;padding:0;line-height:1;margin-left:0.6rem;flex-shrink:0;">×</button>'
       + '</div>';
+
+    // Tag column: colored square dot for the type
+    var tc = TAG_COLORS[f.type] || null;
+    var HEART_COLORS = {
+      'good-for-me':          '#f48fb1',
+      'trauma-pattern':       '#b0b0b0',
+      'stay-friends-forever': '#c6e03a',
+      'casual-for-needs':     '#b39ddb'
+    };
+    var heartColor = HEART_COLORS[f.type];
+    var tagDot = heartColor
+      ? '<div title="' + (TAG_COLORS[f.type] ? TAG_COLORS[f.type].title : '') + '" onclick="friendsCycleTag(' + f.id + ')" style="width:11px;height:11px;border:2px solid ' + heartColor + ';background:transparent;border-radius:2px;cursor:pointer;display:inline-block;"></div>'
+      : '<div title="No tag" onclick="friendsCycleTag(' + f.id + ')" style="width:11px;height:11px;border:2px solid #ddd;background:transparent;border-radius:2px;cursor:pointer;display:inline-block;"></div>';
+    var tagLabel = tc ? tc.title : '';
+    var isFilled = (f.type === 'continue-talking' || f.type === 'not-be-friends');
+    var tagPill = heartColor
+      ? '<div onclick="friendsCycleTag(' + f.id + ')" style="display:inline-flex;align-items:center;gap:0.35rem;border:1.5px solid ' + heartColor + ';border-radius:20px;padding:0.18rem 0.55rem;cursor:pointer;white-space:nowrap;background:transparent;">'
+        + '<div style="width:7px;height:7px;background:' + heartColor + ';border-radius:50%;flex-shrink:0;"></div>'
+        + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;font-weight:300;color:' + heartColor + ';">' + tagLabel + '</span>'
+        + '</div>'
+      : '<div onclick="friendsCycleTag(' + f.id + ')" style="display:inline-flex;align-items:center;gap:0.35rem;border:1.5px solid #ddd;border-radius:20px;padding:0.18rem 0.55rem;cursor:pointer;">'
+        + '<div style="width:7px;height:7px;background:#ddd;border-radius:50%;flex-shrink:0;"></div>'
+        + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;font-weight:300;color:#bbb;">no tag</span>'
+        + '</div>';
+    var dc = DECISION_COLORS[f.decision] || null;
+    var decisionHtmlRow = dc
+      ? '<div onclick="friendsCycleDecision(' + f.id + ')" style="display:inline-flex;align-items:center;gap:0.35rem;border:1.5px solid ' + dc.color + ';border-radius:20px;padding:0.18rem 0.55rem;cursor:pointer;white-space:nowrap;background:' + dc.color + ';">'
+        + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;font-weight:300;color:#fff;">' + dc.title + '</span>'
+        + '</div>'
+      : '<div onclick="friendsCycleDecision(' + f.id + ')" style="display:inline-flex;align-items:center;gap:0.35rem;border:1.5px solid #ddd;border-radius:20px;padding:0.18rem 0.55rem;cursor:pointer;">'
+        + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;font-weight:300;color:#bbb;">—</span>'
+        + '</div>';
+    tagHtml += '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;padding:0.45rem 0.5rem;border-bottom:1px solid #f0f0ee;box-sizing:border-box;">'
+      + tagPill
+      + decisionHtmlRow
+      + '</div>';
+
 
     midHtml += '<div style="display:flex;align-items:center;justify-content:center;gap:0.15rem;padding:0.45rem 0.5rem;border-bottom:1px solid #f0f0ee;">'
       + '<input type="text" inputmode="decimal" placeholder="0" value="' + timeNum + '" id="friends-num-' + f.id + '" onblur="friendsSetTime(' + f.id + ',this.value,\'hr\')" onkeydown="if(event.key===\'Enter\')this.blur()" style="width:36px;border:none;background:transparent;font-family:\'Nunito\',sans-serif;font-size:0.75rem;font-weight:300;color:var(--black);outline:none;padding:0.1rem 0;text-align:center;">'
@@ -10521,12 +10654,382 @@ function friendsRender() {
       + '</div>';
   });
   leftEl.innerHTML = leftHtml;
+  if (tagEl) tagEl.innerHTML = tagHtml;
   if (midEl) midEl.innerHTML = midHtml;
   var dateEl = document.getElementById('friends-list-date');
   if (dateEl) dateEl.innerHTML = dateHtml;
   rightEl.innerHTML = rightHtml;
   var notesEl = document.getElementById('friends-list-notes');
   if (notesEl) notesEl.innerHTML = notesHtml;
+}
+
+var _friendsTagOrder = ['good-for-me','trauma-pattern','stay-friends-forever','casual-for-needs',''];
+var _friendsDecisionOrder = ['continue-talking','not-be-friends',''];
+function friendsCycleTag(id) {
+  friendsLoad();
+  friendsList = friendsList.map(function(f) {
+    if (f.id !== id) return f;
+    var cur = f.type || '';
+    var idx = _friendsTagOrder.indexOf(cur);
+    var next = _friendsTagOrder[(idx + 1) % _friendsTagOrder.length];
+    return Object.assign({}, f, { type: next });
+  });
+  friendsSave();
+  friendsRender();
+}
+function friendsCycleDecision(id) {
+  friendsLoad();
+  friendsList = friendsList.map(function(f) {
+    if (f.id !== id) return f;
+    var cur = f.decision || '';
+    var idx = _friendsDecisionOrder.indexOf(cur);
+    var next = _friendsDecisionOrder[(idx + 1) % _friendsDecisionOrder.length];
+    return Object.assign({}, f, { decision: next });
+  });
+  friendsSave();
+  friendsRender();
+}
+</script>
+
+<!-- Friend Pros/Cons Panel -->
+<div id="friends-panel-overlay" onclick="friendsClosePanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.25);z-index:2000;"></div>
+<div id="friends-panel" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;z-index:2001;border-radius:16px 16px 0 0;box-shadow:0 -4px 32px rgba(0,0,0,0.10);max-height:80vh;overflow-y:auto;padding:1.4rem 1.2rem 2rem;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
+    <div id="friends-panel-name" style="font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:400;color:var(--black);"></div>
+    <button onclick="friendsClosePanel()" style="border:none;background:none;color:#bbb;font-size:1.2rem;cursor:pointer;line-height:1;">×</button>
+  </div>
+
+  <!-- Pros & Cons side by side -->
+  <div style="display:grid;grid-template-columns:1fr 1px 1fr;gap:0;margin-bottom:1.1rem;border:1px solid #e8e8e5;">
+    <!-- Pros -->
+    <div style="padding:0.7rem 0.8rem;">
+      <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.5rem;">
+        <div style="width:11px;height:11px;background:#f48fb1;border-radius:2px;flex-shrink:0;"></div>
+        <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Pros</span>
+      </div>
+      <div id="friends-panel-pros-list" style="margin-bottom:0.4rem;min-height:2rem;"></div>
+      <div style="display:flex;gap:0.4rem;align-items:center;">
+        <input id="friends-panel-pros-input" type="text" placeholder="Add…" style="flex:1;border:none;border-bottom:1px solid #e8e8e5;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:300;color:var(--black);outline:none;padding:0.25rem 0;background:transparent;" onkeydown="if(event.key==='Enter')friendsPanelAddPro()">
+        <button onclick="friendsPanelAddPro()" style="border:none;background:none;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);cursor:pointer;">+</button>
+      </div>
+    </div>
+    <!-- Divider -->
+    <div style="background:#e8e8e5;"></div>
+    <!-- Cons -->
+    <div style="padding:0.7rem 0.8rem;">
+      <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.5rem;">
+        <div style="width:11px;height:11px;background:#c6e03a;border-radius:2px;flex-shrink:0;"></div>
+        <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Cons</span>
+      </div>
+      <div id="friends-panel-cons-list" style="margin-bottom:0.4rem;min-height:2rem;"></div>
+      <div style="display:flex;gap:0.4rem;align-items:center;">
+        <input id="friends-panel-cons-input" type="text" placeholder="Add…" style="flex:1;border:none;border-bottom:1px solid #e8e8e5;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:300;color:var(--black);outline:none;padding:0.25rem 0;background:transparent;" onkeydown="if(event.key==='Enter')friendsPanelAddCon()">
+        <button onclick="friendsPanelAddCon()" style="border:none;background:none;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);cursor:pointer;">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conclusion -->
+  <div style="margin-bottom:1.1rem;">
+    <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;">Conclusion</div>
+    <div style="display:flex;gap:0.6rem;margin-bottom:0.6rem;">
+      <button id="friends-panel-conc-good" onclick="friendsPanelSetConclusion('good')" style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;border:1px solid #f48fb1;border-radius:20px;padding:0.3rem 0.9rem;background:transparent;color:#f48fb1;cursor:pointer;">Good for me ♥</button>
+      <button id="friends-panel-conc-not" onclick="friendsPanelSetConclusion('not')" style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;border:1px solid #b0b0b0;border-radius:20px;padding:0.3rem 0.9rem;background:transparent;color:#b0b0b0;cursor:pointer;">Not good for me</button>
+    </div>
+    <div id="friends-panel-conc-display" style="font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--gray);"></div>
+  </div>
+
+  <!-- Analytics -->
+  <div>
+    <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.9rem;">Analytics</div>
+
+    <!-- Stat cards row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;margin-bottom:1rem;">
+      <div style="border:1px solid #e8e8e5;border-radius:8px;padding:0.7rem 0.6rem;text-align:center;">
+        <div id="fpanel-stat-hrs" style="font-family:'Lora',serif;font-size:1.4rem;color:var(--black);line-height:1;">—</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-top:0.3rem;">hrs logged</div>
+      </div>
+      <div style="border:1px solid #e8e8e5;border-radius:8px;padding:0.7rem 0.6rem;text-align:center;">
+        <div id="fpanel-stat-pros" style="font-family:'Lora',serif;font-size:1.4rem;color:#f48fb1;line-height:1;">—</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-top:0.3rem;">pros</div>
+      </div>
+      <div style="border:1px solid #e8e8e5;border-radius:8px;padding:0.7rem 0.6rem;text-align:center;">
+        <div id="fpanel-stat-cons" style="font-family:'Lora',serif;font-size:1.4rem;color:#c6e03a;line-height:1;">—</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-top:0.3rem;">cons</div>
+      </div>
+    </div>
+
+    <!-- Pros vs Cons bar -->
+    <div style="margin-bottom:1rem;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;">
+        <span style="font-family:'Nunito',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:#f48fb1;">Pros</span>
+        <span style="font-family:'Nunito',sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:#c6e03a;">Cons</span>
+      </div>
+      <div style="display:flex;height:6px;border-radius:4px;overflow:hidden;background:#f0f0ee;">
+        <div id="fpanel-bar-pros" style="background:#f48fb1;height:100%;transition:width 0.4s;"></div>
+        <div id="fpanel-bar-cons" style="background:#c6e03a;height:100%;transition:width 0.4s;"></div>
+      </div>
+      <div id="fpanel-bar-label" style="font-family:'Nunito',sans-serif;font-size:0.62rem;font-weight:300;color:var(--gray);margin-top:0.4rem;text-align:center;font-style:italic;"></div>
+    </div>
+
+    <!-- Tag & last seen -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:1rem;">
+      <div style="border:1px solid #e8e8e5;border-radius:8px;padding:0.6rem 0.7rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.3rem;">Type</div>
+        <div id="fpanel-stat-tag" style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--black);">—</div>
+      </div>
+      <div style="border:1px solid #e8e8e5;border-radius:8px;padding:0.6rem 0.7rem;">
+        <div style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.3rem;">Last seen</div>
+        <div id="fpanel-stat-seen" style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--black);">—</div>
+      </div>
+    </div>
+
+    <!-- Notes timeline -->
+    <div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem;">Notes</div>
+      <div style="display:flex;gap:0.4rem;align-items:flex-start;margin-bottom:0.6rem;">
+        <textarea id="friends-panel-note" rows="2" placeholder="Add a note…" style="flex:1;border:none;border-bottom:1px solid #e8e8e5;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;background:transparent;resize:none;box-sizing:border-box;line-height:1.6;"></textarea>
+        <button onclick="friendsPanelSaveNote()" style="border:none;background:none;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);cursor:pointer;padding:0.3rem 0;flex-shrink:0;">Save</button>
+      </div>
+      <div id="friends-panel-notes-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var _friendsPanelId = null;
+
+function friendsOpenPanel(id) {
+  friendsLoad();
+  var f = friendsList.find(function(x){ return x.id === id; });
+  if (!f) return;
+  _friendsPanelId = id;
+  document.getElementById('friends-panel-name').textContent = f.name;
+
+  var pros = f.pros || [];
+  var cons = f.cons || [];
+  var conclusion = f.conclusion || '';
+  var panelNote = f.panelNote || '';
+
+  friendsPanelRenderList('friends-panel-pros-list', pros, 'pro');
+  friendsPanelRenderList('friends-panel-cons-list', cons, 'con');
+
+  // Conclusion
+  var concDisp = document.getElementById('friends-panel-conc-display');
+  var btnGood = document.getElementById('friends-panel-conc-good');
+  var btnNot = document.getElementById('friends-panel-conc-not');
+  concDisp.textContent = conclusion === 'good' ? 'This person is good for me ♥' : conclusion === 'not' ? 'This person is not good for me.' : '';
+  btnGood.style.background = conclusion === 'good' ? '#f48fb1' : 'transparent';
+  btnGood.style.color = conclusion === 'good' ? '#fff' : '#f48fb1';
+  btnNot.style.background = conclusion === 'not' ? '#b0b0b0' : 'transparent';
+  btnNot.style.color = conclusion === 'not' ? '#fff' : '#b0b0b0';
+
+  // Analytics stats
+  var hrs = f.timeNum ? parseFloat(f.timeNum) : 0;
+  document.getElementById('fpanel-stat-hrs').textContent = hrs || '—';
+  document.getElementById('fpanel-stat-pros').textContent = pros.length || '—';
+  document.getElementById('fpanel-stat-cons').textContent = cons.length || '—';
+
+  // Pros vs cons bar
+  var total = pros.length + cons.length;
+  var prosPct = total ? Math.round((pros.length / total) * 100) : 50;
+  var consPct = 100 - prosPct;
+  document.getElementById('fpanel-bar-pros').style.width = (total ? prosPct : 0) + '%';
+  document.getElementById('fpanel-bar-cons').style.width = (total ? consPct : 0) + '%';
+  var barLabel = '';
+  if (total) {
+    if (pros.length > cons.length) barLabel = 'More pros than cons — looks good ♥';
+    else if (cons.length > pros.length) barLabel = 'More cons than pros — worth reflecting on';
+    else barLabel = 'Equal pros and cons';
+  }
+  document.getElementById('fpanel-bar-label').textContent = barLabel;
+
+  // Tag
+  var TAG_LABELS = {
+    'good-for-me': 'Good For Me',
+    'trauma-pattern': 'Trauma Pattern',
+    'stay-friends-forever': 'Stay Friends Forever',
+    'casual-for-needs': 'Casual, For Needs'
+  };
+  document.getElementById('fpanel-stat-tag').textContent = TAG_LABELS[f.type] || '—';
+
+  // Last seen
+  var seenEl = document.getElementById('fpanel-stat-seen');
+  if (f.lastContacted) {
+    var d = new Date(f.lastContacted);
+    seenEl.textContent = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } else {
+    seenEl.textContent = '—';
+  }
+
+  document.getElementById('friends-panel-note').value = '';
+  friendsPanelRenderNotes(f.panelNotes || (panelNote ? [{ text: panelNote, savedAt: '' }] : []));
+  document.getElementById('friends-panel-overlay').style.display = 'block';
+  document.getElementById('friends-panel').style.display = 'block';
+}
+
+function friendsClosePanel() {
+  document.getElementById('friends-panel-overlay').style.display = 'none';
+  document.getElementById('friends-panel').style.display = 'none';
+  _friendsPanelId = null;
+}
+
+function friendsPanelRenderList(elId, items, type) {
+  var el = document.getElementById(elId);
+  if (!el) return;
+  if (!items.length) { el.innerHTML = ''; return; }
+  el.innerHTML = items.map(function(item, idx) {
+    var color = type === 'pro' ? '#f48fb1' : '#c6e03a';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.25rem 0;border-bottom:1px solid #f7f7f5;">'
+      + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:' + color + ';">' + item + '</span>'
+      + '<button onclick="friendsPanelDeleteItem(\'' + type + '\',' + idx + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:0.85rem;padding:0;line-height:1;">×</button>'
+      + '</div>';
+  }).join('');
+}
+
+function friendsPanelAddPro() {
+  var inp = document.getElementById('friends-panel-pros-input');
+  var val = inp.value.trim();
+  if (!val || !_friendsPanelId) return;
+  friendsLoad();
+  friendsList = friendsList.map(function(f) {
+    if (f.id !== _friendsPanelId) return f;
+    var pros = f.pros ? f.pros.slice() : [];
+    pros.push(val);
+    return Object.assign({}, f, { pros: pros });
+  });
+  friendsSave();
+  inp.value = '';
+  var f = friendsList.find(function(x){ return x.id === _friendsPanelId; });
+  if (f) { friendsPanelRenderList('friends-panel-pros-list', f.pros || [], 'pro'); friendsPanelRefreshAnalytics(f); }
+}
+
+function friendsPanelAddCon() {
+  var inp = document.getElementById('friends-panel-cons-input');
+  var val = inp.value.trim();
+  if (!val || !_friendsPanelId) return;
+  friendsLoad();
+  friendsList = friendsList.map(function(f) {
+    if (f.id !== _friendsPanelId) return f;
+    var cons = f.cons ? f.cons.slice() : [];
+    cons.push(val);
+    return Object.assign({}, f, { cons: cons });
+  });
+  friendsSave();
+  inp.value = '';
+  var f = friendsList.find(function(x){ return x.id === _friendsPanelId; });
+  if (f) { friendsPanelRenderList('friends-panel-cons-list', f.cons || [], 'con'); friendsPanelRefreshAnalytics(f); }
+}
+
+function friendsPanelDeleteItem(type, idx) {
+  if (!_friendsPanelId) return;
+  friendsLoad();
+  friendsList = friendsList.map(function(f) {
+    if (f.id !== _friendsPanelId) return f;
+    var arr = (f[type === 'pro' ? 'pros' : 'cons'] || []).slice();
+    arr.splice(idx, 1);
+    var upd = {};
+    upd[type === 'pro' ? 'pros' : 'cons'] = arr;
+    return Object.assign({}, f, upd);
+  });
+  friendsSave();
+  var f = friendsList.find(function(x){ return x.id === _friendsPanelId; });
+  if (f) {
+    if (type === 'pro') friendsPanelRenderList('friends-panel-pros-list', f.pros || [], 'pro');
+    else friendsPanelRenderList('friends-panel-cons-list', f.cons || [], 'con');
+    friendsPanelRefreshAnalytics(f);
+  }
+}
+
+function friendsPanelRefreshAnalytics(f) {
+  var pros = f.pros || [];
+  var cons = f.cons || [];
+  document.getElementById('fpanel-stat-pros').textContent = pros.length || '—';
+  document.getElementById('fpanel-stat-cons').textContent = cons.length || '—';
+  var total = pros.length + cons.length;
+  var prosPct = total ? Math.round((pros.length / total) * 100) : 50;
+  var consPct = 100 - prosPct;
+  document.getElementById('fpanel-bar-pros').style.width = (total ? prosPct : 0) + '%';
+  document.getElementById('fpanel-bar-cons').style.width = (total ? consPct : 0) + '%';
+  var barLabel = '';
+  if (total) {
+    if (pros.length > cons.length) barLabel = 'More pros than cons — looks good ♥';
+    else if (cons.length > pros.length) barLabel = 'More cons than pros — worth reflecting on';
+    else barLabel = 'Equal pros and cons';
+  }
+  document.getElementById('fpanel-bar-label').textContent = barLabel;
+}
+
+function friendsPanelSetConclusion(val) {
+  if (!_friendsPanelId) return;
+  friendsLoad();
+  var cur = (friendsList.find(function(f){ return f.id === _friendsPanelId; }) || {}).conclusion;
+  var next = cur === val ? '' : val;
+  friendsList = friendsList.map(function(f) {
+    return f.id === _friendsPanelId ? Object.assign({}, f, { conclusion: next }) : f;
+  });
+  friendsSave();
+  var concDisp = document.getElementById('friends-panel-conc-display');
+  var btnGood = document.getElementById('friends-panel-conc-good');
+  var btnNot = document.getElementById('friends-panel-conc-not');
+  concDisp.textContent = next === 'good' ? 'This person is good for me ♥' : next === 'not' ? 'This person is not good for me.' : '';
+  btnGood.style.background = next === 'good' ? '#f48fb1' : 'transparent';
+  btnGood.style.color = next === 'good' ? '#fff' : '#f48fb1';
+  btnNot.style.background = next === 'not' ? '#b0b0b0' : 'transparent';
+  btnNot.style.color = next === 'not' ? '#fff' : '#b0b0b0';
+}
+
+function friendsPanelRenderNotes(notes) {
+  var el = document.getElementById('friends-panel-notes-list');
+  if (!el) return;
+  if (!notes || !notes.length) { el.innerHTML = ''; return; }
+  el.innerHTML = notes.slice().reverse().map(function(n, ri) {
+    var idx = notes.length - 1 - ri;
+    var dateStr = '';
+    if (n.savedAt) {
+      var d = new Date(n.savedAt);
+      dateStr = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+        + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    }
+    return '<div style="border-bottom:1px solid #f7f7f5;padding:0.55rem 0;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">'
+      + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);">' + dateStr + '</span>'
+      + '<button onclick="friendsPanelDeleteNote(' + idx + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:0.85rem;padding:0;line-height:1;">×</button>'
+      + '</div>'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:300;color:var(--black);line-height:1.6;white-space:pre-wrap;">' + n.text + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function friendsPanelSaveNote() {
+  if (!_friendsPanelId) return;
+  var val = (document.getElementById('friends-panel-note') || {}).value || '';
+  if (!val.trim()) return;
+  friendsLoad();
+  friendsList = friendsList.map(function(f) {
+    if (f.id !== _friendsPanelId) return f;
+    var notes = f.panelNotes ? f.panelNotes.slice() : (f.panelNote ? [{ text: f.panelNote, savedAt: '' }] : []);
+    notes.push({ text: val.trim(), savedAt: new Date().toISOString() });
+    return Object.assign({}, f, { panelNotes: notes, panelNote: '' });
+  });
+  friendsSave();
+  document.getElementById('friends-panel-note').value = '';
+  var f = friendsList.find(function(x){ return x.id === _friendsPanelId; });
+  if (f) friendsPanelRenderNotes(f.panelNotes || []);
+}
+
+function friendsPanelDeleteNote(idx) {
+  if (!_friendsPanelId) return;
+  friendsLoad();
+  friendsList = friendsList.map(function(f) {
+    if (f.id !== _friendsPanelId) return f;
+    var notes = f.panelNotes ? f.panelNotes.slice() : [];
+    notes.splice(idx, 1);
+    return Object.assign({}, f, { panelNotes: notes });
+  });
+  friendsSave();
+  var f = friendsList.find(function(x){ return x.id === _friendsPanelId; });
+  if (f) friendsPanelRenderNotes(f.panelNotes || []);
 }
 </script>
 
