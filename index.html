@@ -233,9 +233,7 @@
         }
       }
       if (jtab === 'action') {
-        var activJA = document.querySelector('#jatab-action.active, #jatab-forgive.active, #jatab-repent.active');
-        var curJA = activJA ? activJA.id.replace('jatab-','') : 'action';
-        if (typeof showJesusActionTab === 'function') showJesusActionTab(curJA, true);
+        if (typeof showJesusActionTab === 'function') showJesusActionTab('action', true);
       }
       if (jtab === 'study') {
         if (typeof jesusRenderStudyNotes === 'function') jesusRenderStudyNotes();
@@ -5641,30 +5639,37 @@ window.addEventListener('DOMContentLoaded', function() {
   <div class="subtitle">Walk with Him daily</div>
   <h1>Jesus Christ.</h1>
 
-  <!-- Date navigation with calendar -->
+  <!-- Date navigation -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;margin-top:1rem;">
     <button onclick="jesusChangeDay(-1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8249;</button>
     <div style="text-align:center;flex:1;min-width:0;position:relative;">
-      <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;">
-        <div id="jesus-day-label" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--black);"></div>
-        <button onclick="toggleJesusCal()" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;flex-shrink:0;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);display:block;">
-            <rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
-          </svg>
-        </button>
+      <div style="display:flex;align-items:center;justify-content:center;">
+        <div id="jesus-day-label" onclick="toggleJesusCal()" style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--black);cursor:pointer;border-bottom:1px solid #c8c8c5;padding-bottom:2px;"></div>
       </div>
-      <div id="jesus-cal-popup" style="display:none;position:absolute;top:calc(100% + 0.5rem);left:50%;transform:translateX(-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.8rem;z-index:100;min-width:220px;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
-          <button onclick="jesusCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
-          <div id="jesus-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
-          <button onclick="jesusCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+      <!-- Popup calendar -->
+      <div id="jesus-cal-popup" style="display:none;position:absolute;top:calc(100% + 0.5rem);left:50%;transform:translateX(-50%);background:var(--white);border:1px solid #c8c8c5;padding:0.8rem;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.08);width:520px;max-width:92vw;">
+        <div style="display:flex;gap:1rem;align-items:flex-start;">
+          <!-- Left: calendar -->
+          <div style="flex:0 0 240px;min-width:0;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+              <button onclick="jesusCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8249;</button>
+              <div id="jesus-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+              <button onclick="jesusCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.1rem 0.3rem;">&#8250;</button>
+            </div>
+            <div id="jesus-cal-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;"></div>
+            <div id="jesus-cal-grid"></div>
+          </div>
+          <!-- Right: day summary -->
+          <div id="jesus-cal-summary" style="display:none;flex:1;min-width:0;border-left:1px solid #e8e8e5;padding-left:1rem;">
+            <div id="jesus-cal-summary-date" style="font-family:'Lora',serif;font-style:italic;font-size:0.72rem;color:var(--black);margin-bottom:0.6rem;"></div>
+            <div id="jesus-cal-summary-body"></div>
+          </div>
         </div>
-        <div id="jesus-cal-daynames" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;"></div>
-        <div id="jesus-cal-grid"></div>
       </div>
     </div>
     <button onclick="jesusChangeDay(1)" style="border:none;background:none;cursor:pointer;font-size:1.3rem;color:var(--gray);flex-shrink:0;padding:0.5rem;">&#8250;</button>
   </div>
+  <div id="jesus-cal-backdrop" onclick="toggleJesusCal()" style="display:none;position:fixed;inset:0;z-index:99;"></div>
 
   <!-- Sub-tabs -->
   <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-left:-1rem;margin-right:-1rem;padding-left:1rem;">
@@ -5721,34 +5726,34 @@ window.addEventListener('DOMContentLoaded', function() {
   <!-- TODAY'S ACTION -->
   <div id="jsub-action" style="display:none;">
 
-    <!-- Inner sub-tabs -->
-    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
-      <button class="journal-tab active" id="jatab-action" onclick="showJesusActionTab('action')" style="flex:1;white-space:nowrap;text-align:center;">Today's Action</button>
-      <button class="journal-tab" id="jatab-forgive" onclick="showJesusActionTab('forgive')" style="flex:1;white-space:nowrap;text-align:center;">Forgiveness</button>
-      <button class="journal-tab" id="jatab-repent" onclick="showJesusActionTab('repent')" style="flex:1;white-space:nowrap;text-align:center;">Repentance</button>
-    </div>
-
     <!-- Today's Action -->
     <div id="jasub-action">
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">What will you do today to walk in faith?</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Today's Action</div>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:0.8rem;">What will you do today to walk in faith?</div>
       <div id="jesus-action-list" style="margin-bottom:0.6rem;"></div>
       <div style="display:flex;gap:0.5rem;">
-        <input id="jesus-action-input" placeholder="Add an action for today…" onkeydown="if(event.key==='Enter')jesusSaveAction()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;">
+        <input id="jesus-action-input" placeholder="Add an action for today…" onkeydown="if(event.key==='Enter')jesusSaveAction()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.92rem;color:var(--black);outline:none;padding:0.3rem 0;">
       </div>
     </div>
 
+    <div style="border-top:1px solid #e8e8e5;margin-top:2rem;padding-top:2rem;">
     <!-- Forgiveness -->
-    <div id="jasub-forgive" style="display:none;">
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">Who do you need to forgive today?</div>
+    <div id="jasub-forgive">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Forgiveness</div>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:0.8rem;">Who do you need to forgive today?</div>
       <div id="jesus-forgive-list" style="margin-bottom:0.6rem;"></div>
-      <input id="jesus-forgive-input" placeholder="I forgive…" onkeydown="if(event.key==='Enter')jesusSaveForgive()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+      <input id="jesus-forgive-input" placeholder="I forgive…" onkeydown="if(event.key==='Enter')jesusSaveForgive()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.92rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+    </div>
     </div>
 
+    <div style="border-top:1px solid #e8e8e5;margin-top:2rem;padding-top:2rem;">
     <!-- Repentance -->
-    <div id="jasub-repent" style="display:none;">
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">Bring it to Him. He is faithful and just to forgive. (1 John 1:9)</div>
+    <div id="jasub-repent">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem;">Repentance</div>
+      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.9rem;color:var(--gray);margin-bottom:0.8rem;">Bring it to Him. He is faithful and just to forgive. (1 John 1:9)</div>
       <div id="jesus-repent-list" style="margin-bottom:0.6rem;"></div>
-      <input id="jesus-repent-input" placeholder="Lord, I repent of…" onkeydown="if(event.key==='Enter')jesusSaveRepent()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+      <input id="jesus-repent-input" placeholder="Lord, I repent of…" onkeydown="if(event.key==='Enter')jesusSaveRepent()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.92rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+    </div>
     </div>
 
   </div>
@@ -5759,8 +5764,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <!-- Inner sub-tabs -->
     <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.5rem;">
       <button class="journal-tab active" id="jstab-howto" onclick="showJesusStudyTab('howto')">How to Study</button>
-      <button class="journal-tab" id="jstab-notes" onclick="showJesusStudyTab('notes')">My Notes</button>
-      <button class="journal-tab" id="jstab-questions" onclick="showJesusStudyTab('questions')">Questions</button>
+      <button class="journal-tab" id="jstab-notes" onclick="showJesusStudyTab('notes')">My Notes &amp; Questions</button>
     </div>
 
     <!-- How to Study -->
@@ -5827,13 +5831,13 @@ window.addEventListener('DOMContentLoaded', function() {
       <input id="jesus-study-passage" placeholder="Passage e.g. Romans 8:1–4" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);outline:none;padding:0.3rem 0;margin-bottom:0.5rem;box-sizing:border-box;">
       <textarea id="jesus-study-note" placeholder="What did you observe, learn, or feel called to apply?" rows="4" oninput="jesusStudyNoteTyping()" style="width:100%;border:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.8rem;box-sizing:border-box;"></textarea>
       <div id="jesus-study-note-status" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:#bbb;margin-top:0.4rem;min-height:1em;"></div>
-    </div>
 
-    <!-- Questions -->
-    <div id="jssub-questions" style="display:none;">
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">Questions you have for God, for the text, or about your faith.</div>
-      <div id="jesus-study-questions-list" style="margin-bottom:0.6rem;"></div>
-      <input id="jesus-study-question-input" placeholder="I want to understand…" onkeydown="if(event.key==='Enter')jesusSaveStudyQuestion()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+      <!-- Questions (merged) -->
+      <div id="jssub-questions" style="margin-top:2rem;">
+        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">Questions you have for God, for the text, or about your faith.</div>
+        <div id="jesus-study-questions-list" style="margin-bottom:0.6rem;"></div>
+        <input id="jesus-study-question-input" placeholder="I want to understand…" onkeydown="if(event.key==='Enter')jesusSaveStudyQuestion()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+      </div>
     </div>
 
   </div>
@@ -5942,6 +5946,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
   </div>
 
+
 </div><!-- end #jesus section -->
 
 <script>
@@ -5986,28 +5991,42 @@ function jesusTimestamp() {
 }
 
 function jesusUpdateDayLabel() {
+  var el = document.getElementById('jesus-day-label');
+  if (!el) return;
   var d = new Date(jesusCurrentDate + 'T00:00:00');
   var today = new Date().toISOString().split('T')[0];
   var full = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  var label = jesusCurrentDate === today ? full + ' · Today' : full;
-  document.getElementById('jesus-day-label').textContent = label;
+  el.textContent = jesusCurrentDate === today ? full + ' · Today' : full;
 }
 
 function jesusChangeDay(dir) {
   var d = new Date(jesusCurrentDate + 'T00:00:00');
   d.setDate(d.getDate() + dir);
   jesusCurrentDate = d.toISOString().split('T')[0];
+  var now = new Date();
+  var selDate = new Date(jesusCurrentDate + 'T00:00:00');
+  jesusCalOffset = (selDate.getFullYear() - now.getFullYear()) * 12 + (selDate.getMonth() - now.getMonth());
   jesusUpdateDayLabel();
   showJesusTab(document.querySelector('.journal-tab.active[id^="jtab-"]') ? document.querySelector('.journal-tab.active[id^="jtab-"]').id.replace('jtab-','') : 'prayer');
 }
 
 function toggleJesusCal() {
   var p = document.getElementById('jesus-cal-popup');
-  p.style.display = p.style.display === 'none' ? 'block' : 'none';
-  if (p.style.display === 'block') renderJesusCal();
+  var b = document.getElementById('jesus-cal-backdrop');
+  var isOpen = p && p.style.display !== 'none';
+  if (p) p.style.display = isOpen ? 'none' : 'block';
+  if (b) b.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) renderJesusCal();
+  var s = document.getElementById('jesus-cal-summary');
+  if (s && isOpen) s.style.display = 'none';
 }
 
-function jesusCalShift(dir) { jesusCalOffset += dir; renderJesusCal(); }
+function jesusCalShift(dir) {
+  jesusCalOffset += dir;
+  renderJesusCal();
+  var s = document.getElementById('jesus-cal-summary');
+  if (s) s.style.display = 'none';
+}
 
 function renderJesusCal() {
   var grid = document.getElementById('jesus-cal-grid');
@@ -6019,11 +6038,11 @@ function renderJesusCal() {
   var year = base.getFullYear(), month = base.getMonth();
   var todayStr = now.toISOString().split('T')[0];
   lbl.textContent = base.toLocaleDateString('en-US',{month:'long',year:'numeric'});
-  var dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var dayNames = ['S','M','T','W','T','F','S'];
   if (dayNamesEl) dayNamesEl.innerHTML = dayNames.map(function(n){
-    return '<div style="text-align:center;font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);font-weight:300;">'+n+'</div>';
+    return '<div style="text-align:center;font-family:\'Nunito\',sans-serif;font-size:0.65rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray);font-weight:300;padding-bottom:2px;">'+n+'</div>';
   }).join('');
-  var firstDow = (new Date(year,month,1).getDay()+6)%7;
+  var firstDow = new Date(year,month,1).getDay();
   var daysInMonth = new Date(year,month+1,0).getDate();
   var cells = [];
   for (var i=0;i<firstDow;i++) cells.push(null);
@@ -6031,7 +6050,7 @@ function renderJesusCal() {
   while (cells.length%7!==0) cells.push(null);
   var html = '';
   for (var w=0;w<cells.length/7;w++) {
-    html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;">';
+    html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;">';
     for (var ci=0;ci<7;ci++) {
       var day = cells[w*7+ci];
       if (!day) { html += '<div></div>'; continue; }
@@ -6039,34 +6058,28 @@ function renderJesusCal() {
       var dateStr = year+'-'+mm+'-'+dd;
       var isToday = dateStr===todayStr;
       var isSel = dateStr===jesusCurrentDate;
-      var isFuture = dateStr > todayStr;
-      var hasData = jesusData[dateStr] && (
-        (jesusData[dateStr].prayThings && jesusData[dateStr].prayThings.length) ||
-        (jesusData[dateStr].prayPeople && jesusData[dateStr].prayPeople.length) ||
-        (jesusData[dateStr].verses && jesusData[dateStr].verses.length) ||
-        (jesusData[dateStr].godsaid && jesusData[dateStr].godsaid.length) ||
-        (jesusData[dateStr].actions && jesusData[dateStr].actions.length)
-      );
-      var opacity = (isFuture && !isSel) ? '0.3' : '1';
-      var fw = (isToday || isSel) ? '600' : '300';
-      var bg, border, color, extraInner = '';
-      if (isSel && isToday) {
-        bg='var(--black)'; border='var(--black)'; color='var(--white)';
-        extraInner='<div style="width:3px;height:3px;border-radius:50%;background:var(--white);margin-top:1px;"></div>';
-      } else if (isSel) {
-        bg='var(--black)'; border='var(--black)'; color='var(--white)';
+      var d_data = jesusData[dateStr];
+      var hasAction = d_data && d_data.actions && d_data.actions.length;
+      var hasPrayer = d_data && ((d_data.prayThings && d_data.prayThings.length) || (d_data.prayPeople && d_data.prayPeople.length) || (d_data.godsaid && d_data.godsaid.length));
+      var hasData = hasAction || hasPrayer || (d_data && ((d_data.verses && d_data.verses.length) || (d_data.forgive && d_data.forgive.length) || (d_data.repent && d_data.repent.length)));
+
+      var bg, color, border;
+      if (isSel) {
+        bg = 'var(--black)'; color = 'var(--white)'; border = 'var(--black)';
       } else if (isToday) {
-        bg='transparent'; border='var(--black)'; color='var(--black)';
-        extraInner='<div style="width:3px;height:3px;border-radius:50%;background:var(--black);margin-top:1px;"></div>';
+        bg = '#c8f0c8'; color = 'var(--black)'; border = '#c8f0c8';
+      } else if (hasAction) {
+        bg = '#f9b8c4'; color = 'var(--black)'; border = '#f9b8c4';
       } else if (hasData) {
-        bg='#e8e8e5'; border='#0a0a0a'; color='var(--black)';
+        bg = '#fde8ec'; color = 'var(--black)'; border = '#fde8ec';
       } else {
-        bg='transparent'; border='#c8c8c5'; color='var(--gray)';
+        bg = 'transparent'; color = 'var(--black)'; border = 'transparent';
       }
-      html += '<div onclick="jesusCJump(\''+dateStr+'\')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid '+border+';background:'+bg+';opacity:'+opacity+';cursor:pointer;aspect-ratio:1;transition:all 0.15s;'+(isToday&&!isSel?'border-width:2px;':'')+'">' +
-        '<span style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;font-weight:'+fw+';color:'+color+';line-height:1;">'+day+'</span>' +
-        extraInner +
-        '</div>';
+
+      html += '<div onclick="jesusCJump(\''+dateStr+'\')" style="display:flex;align-items:center;justify-content:center;cursor:pointer;aspect-ratio:1;">'
+        + '<div style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:'+bg+';border:1px solid '+border+';transition:all 0.15s;">'
+        + '<span style="font-family:\'Nunito\',sans-serif;font-size:0.78rem;font-weight:'+(isToday||isSel?'600':'300')+';color:'+color+';line-height:1;">'+day+'</span>'
+        + '</div></div>';
     }
     html += '</div>';
   }
@@ -6076,11 +6089,49 @@ function renderJesusCal() {
 function jesusCJump(date) {
   jesusCurrentDate = date;
   jesusUpdateDayLabel();
-  document.getElementById('jesus-cal-popup').style.display = 'none';
-  var activeTab = 'prayer';
-  var el = document.querySelector('[id^="jtab-"].active');
-  if (el) activeTab = el.id.replace('jtab-','');
-  showJesusTab(activeTab);
+  renderJesusCal();
+
+  var day = jesusGetDay(date);
+  var dayNotes = (jesusData.studyNotes||[]).filter(function(x){ return x.date && x.date.startsWith(date); });
+  var dayQuestions = (jesusData.studyQuestions||[]).filter(function(x){ return x.date && x.date.startsWith(date); });
+
+  var rows = [];
+  function addItems(label, items, getText) {
+    if (!items || !items.length) return;
+    rows.push('<div style="margin-bottom:0.5rem;">'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.25rem;">'+label+'</div>'
+      + items.map(function(x){
+          var done = x.done || x.answered;
+          return '<div style="font-family:\'Nunito\',sans-serif;font-size:0.72rem;font-weight:300;color:'+(done?'#bbb':'var(--black)')+';line-height:1.5;'+(done?'text-decoration:line-through;':'')+'">'+(done?'✓ ':'· ')+getText(x)+'</div>';
+        }).join('')
+      + '</div>');
+  }
+
+  addItems('Today\'s Action', day.actions, function(x){ return x.text; });
+  addItems('Forgiveness', day.forgive, function(x){ return x.text; });
+  addItems('Repentance', day.repent, function(x){ return x.text; });
+  addItems('Praying For', day.prayThings, function(x){ return x.text; });
+  addItems('People', day.prayPeople, function(x){ return x.text; });
+  addItems('Answered Prayer', day.answeredPrayers, function(x){ return x.text; });
+  addItems('God Said', day.godsaid, function(x){ return x.body; });
+  addItems('Study Notes', dayNotes, function(x){ return (x.passage ? x.passage + ' — ' : '') + x.note; });
+  addItems('Questions', dayQuestions, function(x){ return x.text; });
+
+  var summaryEl = document.getElementById('jesus-cal-summary');
+  var bodyEl = document.getElementById('jesus-cal-summary-body');
+  var dateEl = document.getElementById('jesus-cal-summary-date');
+  if (!summaryEl || !bodyEl) return;
+
+  var d = new Date(date + 'T00:00:00');
+  if (dateEl) dateEl.textContent = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+
+  bodyEl.innerHTML = rows.length
+    ? rows.join('')
+    : '<div style="font-family:\'Lora\',serif;font-style:italic;font-size:0.72rem;color:var(--gray);">Nothing logged this day.</div>';
+
+  summaryEl.style.display = 'block';
+
+  jesusRender(document.querySelector('.journal-tab.active[id^="jtab-"]') ? (document.querySelector('.journal-tab.active[id^="jtab-"]').id.replace('jtab-','')) : 'prayer');
 }
 
 function showJesusTab(tab) {
@@ -6200,14 +6251,13 @@ function jesusDeleteGodSaid(id) {
 }
 
 function showJesusStudyTab(tab) {
-  ['howto','notes','questions'].forEach(function(t) {
+  ['howto','notes'].forEach(function(t) {
     var sub = document.getElementById('jssub-'+t);
     if (sub) sub.style.display = t===tab?'block':'none';
     var btn = document.getElementById('jstab-'+t);
     if (btn) btn.classList.toggle('active', t===tab);
   });
-  if (tab==='notes') jesusRenderStudyNotes();
-  if (tab==='questions') jesusRenderStudyQuestions();
+  if (tab==='notes') { jesusRenderStudyNotes(); jesusRenderStudyQuestions(); }
 }
 var _studyNoteTimer = null;
 function jesusStudyNoteTyping() {
@@ -6303,17 +6353,11 @@ function showJesusWordTab(tab) {
 }
 
 function showJesusActionTab(tab, skipLoad) {
-  ['action','forgive','repent'].forEach(function(t) {
-    var sub = document.getElementById('jasub-'+t);
-    if (sub) sub.style.display = t===tab?'block':'none';
-    var btn = document.getElementById('jatab-'+t);
-    if (btn) btn.classList.toggle('active', t===tab);
-  });
   if (!skipLoad) jesusLoad();
   var day = jesusGetDay(jesusCurrentDate);
-  if (tab==='action') { var el=document.getElementById('jesus-action-list'); if(el) el.innerHTML=jesusRenderCheckList(day.actions,'jesusToggleAction','jesusDeleteAction'); }
-  if (tab==='forgive') { var fl=document.getElementById('jesus-forgive-list'); if(fl) fl.innerHTML=jesusRenderCheckList(day.forgive||[],'jesusToggleForgive','jesusDeleteForgive'); }
-  if (tab==='repent') { var rl=document.getElementById('jesus-repent-list'); if(rl) rl.innerHTML=jesusRenderCheckList(day.repent||[],'jesusToggleRepent','jesusDeleteRepent'); }
+  var el = document.getElementById('jesus-action-list'); if(el) el.innerHTML=jesusRenderCheckList(day.actions,'jesusToggleAction','jesusDeleteAction');
+  var fl = document.getElementById('jesus-forgive-list'); if(fl) fl.innerHTML=jesusRenderCheckList(day.forgive||[],'jesusToggleForgive','jesusDeleteForgive');
+  var rl = document.getElementById('jesus-repent-list'); if(rl) rl.innerHTML=jesusRenderCheckList(day.repent||[],'jesusToggleRepent','jesusDeleteRepent');
 }
 
 function showJesusChristTab(tab) {
@@ -6477,9 +6521,7 @@ function jesusRender(tab) {
     }
   }
   if (tab === 'action') {
-    var activJA = document.querySelector('#jatab-action.active, #jatab-forgive.active, #jatab-repent.active');
-    var curJA = activJA ? activJA.id.replace('jatab-','') : 'action';
-    showJesusActionTab(curJA, true);
+    showJesusActionTab('action', true);
   }
 }
 </script>
