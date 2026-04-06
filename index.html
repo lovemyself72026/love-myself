@@ -5898,8 +5898,11 @@ window.addEventListener('DOMContentLoaded', function() {
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">What stood out to you in your study today?</div>
       <div id="jesus-study-notes-list" style="margin-bottom:1rem;"></div>
       <input id="jesus-study-passage" placeholder="Passage e.g. Romans 8:1–4" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);outline:none;padding:0.3rem 0;margin-bottom:0.5rem;box-sizing:border-box;">
-      <textarea id="jesus-study-note" placeholder="What did you observe, learn, or feel called to apply?" rows="4" oninput="jesusStudyNoteTyping()" style="width:100%;border:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.8rem;box-sizing:border-box;"></textarea>
-      <div id="jesus-study-note-status" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:#bbb;margin-top:0.4rem;min-height:1em;"></div>
+      <textarea id="jesus-study-note" placeholder="What did you observe, learn, or feel called to apply?" rows="4" style="width:100%;border:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:300;line-height:1.6;color:var(--black);outline:none;resize:none;padding:0.8rem;box-sizing:border-box;"></textarea>
+      <div style="margin-top:0.6rem;display:flex;align-items:center;gap:0.8rem;">
+        <button onclick="jesusSaveStudyNote()" style="font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;border:1px solid #c8c8c5;background:none;color:var(--black);padding:0.5rem 1.2rem;cursor:pointer;">Save note</button>
+        <div id="jesus-study-note-status" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:#bbb;"></div>
+      </div>
 
       <!-- Questions (merged) -->
       <div id="jssub-questions" style="margin-top:2rem;">
@@ -6053,6 +6056,9 @@ function jesusInit() {
   jesusUpdateDayLabel();
   renderJesusCal();
   showJesusTab('whoisjesus');
+  // Pre-render prayer and action so data is ready when user switches tabs
+  try { jesusRender('prayer'); } catch(e) {}
+  try { showJesusActionTab('action', true); } catch(e) {}
 }
 
 function jesusTimestamp() {
@@ -6344,14 +6350,7 @@ function showJesusStudyTab(tab) {
   });
   if (tab==='notes') { jesusRenderStudyNotes(); jesusRenderStudyQuestions(); }
 }
-var _studyNoteTimer = null;
-function jesusStudyNoteTyping() {
-  if (window._isSyncing) return;
-  clearTimeout(_studyNoteTimer);
-  var status = document.getElementById('jesus-study-note-status');
-  if (status) status.textContent = 'Saving…';
-  _studyNoteTimer = setTimeout(function() { jesusSaveStudyNote(); }, 1000);
-}
+// Study notes: manual save only (no autosave)
 function jesusSaveStudyNote() {
   var passage = document.getElementById('jesus-study-passage') ? document.getElementById('jesus-study-passage').value.trim() : '';
   var note = document.getElementById('jesus-study-note') ? document.getElementById('jesus-study-note').value.trim() : '';
@@ -6438,7 +6437,7 @@ function showJesusWordTab(tab) {
 }
 
 function showJesusActionTab(tab, skipLoad) {
-  if (!skipLoad) jesusLoad();
+  jesusLoad();
   var day = jesusGetDay(jesusCurrentDate);
   var el = document.getElementById('jesus-action-list'); if(el) el.innerHTML=jesusRenderCheckList(day.actions,'jesusToggleAction','jesusDeleteAction');
   var fl = document.getElementById('jesus-forgive-list'); if(fl) fl.innerHTML=jesusRenderCheckList(day.forgive||[],'jesusToggleForgive','jesusDeleteForgive');
@@ -6551,6 +6550,7 @@ function jesusRenderCheckList(items, toggleFn, deleteFn) {
 }
 
 function jesusRender(tab) {
+  jesusLoad();
   var day = jesusGetDay(jesusCurrentDate);
 
   function _dateLabel(iso) {
