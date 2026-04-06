@@ -519,8 +519,29 @@ self.addEventListener('fetch', e => {
     #planner-grid { grid-template-columns: 1fr !important; }
     .vision-items-grid { grid-template-columns: 1fr 1fr !important; }
     #balanceQuestions, #relationshipQuestions { font-size: 0.82rem; }
-    /* Stack op-btn rows on small screens */
     .op-btn { font-size: 0.68rem; padding: 0.35rem 0.6rem; }
+
+    /* Friends panel full-width on mobile */
+    #friends-panel { left: 0 !important; right: 0 !important; width: 100% !important; max-width: 100% !important; border-radius: 0 !important; max-height: 90vh !important; overflow-y: auto; }
+
+    /* Stack all 1fr 1px 1fr grids vertically */
+    [style*="grid-template-columns:1fr 1px 1fr"],
+    [style*="grid-template-columns: 1fr 1px 1fr"] { display: flex !important; flex-direction: column !important; }
+    [style*="grid-template-columns:1fr 1px 1fr"] > [style*="background:#e8e8e5"],
+    [style*="grid-template-columns: 1fr 1px 1fr"] > [style*="background:#e8e8e5"] { height: 1px !important; width: 100% !important; margin: 0.8rem 0; }
+
+    /* 3-col grids become 2-col */
+    [style*="grid-template-columns:1fr 1fr 1fr"] { grid-template-columns: 1fr 1fr !important; }
+    [style*="grid-template-columns: 1fr 1fr 1fr"] { grid-template-columns: 1fr 1fr !important; }
+
+    /* Remove left/right padding on stacked columns */
+    [style*="padding-right:0.8rem"] { padding-right: 0 !important; }
+    [style*="padding-left:0.8rem"] { padding-left: 0 !important; }
+    [style*="padding-right:1.2rem"] { padding-right: 0 !important; }
+    [style*="padding-left:1.2rem"] { padding-left: 0 !important; }
+
+    /* Prevent anything from going off screen */
+    .section * { max-width: 100%; box-sizing: border-box; }
   }
 
 
@@ -4559,11 +4580,21 @@ window.addEventListener('DOMContentLoaded', function() {
   <h2 style="margin-bottom:0.5rem;">Track your growth.</h2>
   <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Add words, thoughts, and pictures that reflect who you are 🤍</div>
 
-  <!-- Side-by-side two column layout -->
-  <div style="display:flex;flex-wrap:nowrap;gap:0;min-height:300px;">
+  <!-- Side-by-side two column layout — stacks on mobile -->
+  <style>
+    .whoi-two-col { display:flex; flex-wrap:nowrap; gap:0; min-height:300px; }
+    .whoi-two-col .whoi-divider { background:#c8c8c5; width:1px; flex-shrink:0; }
+    @media (max-width: 600px) {
+      .whoi-two-col { flex-direction:column; min-height:unset; }
+      .whoi-two-col .whoi-left { padding-right:0 !important; padding-bottom:1.2rem; border-bottom:1px solid #c8c8c5; }
+      .whoi-two-col .whoi-right { padding-left:0 !important; padding-top:1.2rem; }
+      .whoi-two-col .whoi-divider { display:none; }
+    }
+  </style>
+  <div class="whoi-two-col">
 
     <!-- Left: Me with him/others -->
-    <div style="flex:1;min-width:0;padding-right:0.8rem;">
+    <div class="whoi-left" style="flex:1;min-width:0;padding-right:0.8rem;">
       <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);margin-bottom:0.8rem;font-weight:400;">Me <mark style="background:#c8f0d0;padding:0 2px;">with him</mark>/others</div>
       <div style="display:flex;gap:0.4rem;align-items:center;margin-bottom:0.6rem;">
         <input id="whoi-text-word" placeholder="Add something..." onkeydown="if(event.key==='Enter')addWhoiItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.2rem 0;">
@@ -4573,10 +4604,10 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <!-- Divider -->
-    <div style="background:#c8c8c5;width:1px;flex-shrink:0;"></div>
+    <div class="whoi-divider"></div>
 
     <!-- Right: Me without him -->
-    <div style="flex:1;min-width:0;padding-left:0.8rem;">
+    <div class="whoi-right" style="flex:1;min-width:0;padding-left:0.8rem;">
       <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--black);margin-bottom:0.8rem;font-weight:400;">Me <mark style="background:#ffd6e0;padding:0 2px;">without him</mark>/others</div>
       <div style="display:flex;gap:0.4rem;align-items:center;margin-bottom:0.6rem;">
         <input id="whoiwoh-text-word" placeholder="Add something..." onkeydown="if(event.key==='Enter')addWhoiWohItem()" style="flex:1;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.2rem 0;">
@@ -5777,19 +5808,18 @@ window.addEventListener('DOMContentLoaded', function() {
       <!-- Left: Things to Pray + People + Answered Prayer -->
       <div>
 
-        <!-- Things to Pray + People -->
-        <div style="display:grid;grid-template-columns:1fr 1px 1fr;gap:0;margin-bottom:1.5rem;">
-          <div style="padding-right:0.8rem;">
-            <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Things to Pray</div>
-            <div id="jesus-pray-things-list" style="margin-bottom:0.6rem;"></div>
-            <input id="jesus-pray-things-input" placeholder="Add something…" onkeydown="if(event.key==='Enter')jesusSavePrayThing()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
-          </div>
-          <div style="background:#e8e8e5;"></div>
-          <div style="padding-left:0.8rem;">
-            <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">People</div>
-            <div id="jesus-pray-people-list" style="margin-bottom:0.6rem;"></div>
-            <input id="jesus-pray-people-input" placeholder="Add a person…" onkeydown="if(event.key==='Enter')jesusSavePrayPerson()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
-          </div>
+        <!-- Things to Pray -->
+        <div style="margin-bottom:1.5rem;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Things to Pray</div>
+          <div id="jesus-pray-things-list" style="margin-bottom:0.6rem;"></div>
+          <input id="jesus-pray-things-input" placeholder="Add something…" onkeydown="if(event.key==='Enter')jesusSavePrayThing()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
+        </div>
+
+        <!-- People -->
+        <div style="border-top:1px solid #e8e8e5;padding-top:1.2rem;margin-bottom:1.5rem;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">People</div>
+          <div id="jesus-pray-people-list" style="margin-bottom:0.6rem;"></div>
+          <input id="jesus-pray-people-input" placeholder="Add a person…" onkeydown="if(event.key==='Enter')jesusSavePrayPerson()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
         </div>
 
         <!-- Answered Prayer -->
@@ -5935,8 +5965,8 @@ window.addEventListener('DOMContentLoaded', function() {
   <div id="jsub-whoisjesus" style="display:none;">
 
     <!-- His Daily Life + He Is combined -->
-    <div id="jcsub-habits" style="display:grid;grid-template-columns:1fr 1px 1fr;gap:0;">
-      <div style="padding-right:1.2rem;">
+    <div id="jcsub-habits" style="display:flex;flex-direction:column;gap:0;">
+      <div style="padding-right:0;">
       <div style="display:flex;flex-direction:column;gap:0;">
 
         <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
@@ -6023,15 +6053,15 @@ window.addEventListener('DOMContentLoaded', function() {
       </div><!-- end left column -->
 
       <!-- divider -->
-      <div style="background:#e8e8e5;"></div>
+      <div style="background:#e8e8e5;height:1px;margin:1.2rem 0;"></div>
       <!-- He Is -->
-      <div style="padding-left:1.2rem;">
+      <div>
         <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">He Is…</div>
         <div style="font-family:'Lora',serif;font-style:italic;font-size:0.75rem;color:var(--gray);margin-bottom:0.8rem;">What have you discovered about Him?</div>
         <div id="jesus-heis-list" style="margin-bottom:1rem;"></div>
         <input id="jesus-heis-input" placeholder="He is..." onkeydown="if(event.key==='Enter')jesusSaveHeIs()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
       </div>
-    </div><!-- end grid -->
+    </div><!-- end flex column -->
 
   </div>
 
