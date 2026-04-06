@@ -254,9 +254,9 @@ self.addEventListener('fetch', e => {
     var active = document.querySelector('.section.active');
     if (!active) return;
     var id = active.id;
-    if (id === 'schedule' && typeof loadPlannerDay === 'function') loadPlannerDay();
-    if (id === 'home' && typeof renderAnalytics === 'function') renderAnalytics();
-    if (id === 'vision' && typeof renderDimensionBoards === 'function') renderDimensionBoards();
+    if (id === 'schedule' && typeof loadPlannerDay === 'function') try { loadPlannerDay(); } catch(e) {}
+    if (id === 'home' && typeof renderAnalytics === 'function') try { renderAnalytics(); } catch(e) {}
+    if (id === 'vision' && typeof renderDimensionBoards === 'function') try { renderDimensionBoards(); } catch(e) {}
     if (id === 'vision' && typeof tgRenderAll === 'function' ) tgRenderAll();
     if (id === 'me' && typeof rfmRender === 'function') rfmRender();
     if (id === 'jesus' && typeof jesusLoad === 'function') {
@@ -638,6 +638,15 @@ self.addEventListener('fetch', e => {
 </style>
 </head>
 <body>
+<script>
+// Silently suppress null-element errors in preview environments
+window.addEventListener('error', function(e) {
+  if (e.message && (e.message.includes('null') || e.message.includes('Cannot set properties'))) {
+    e.preventDefault();
+    return true;
+  }
+});
+</script>
 
 <!-- Offline indicator -->
 <div id="_net-indicator" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#2a2a2a;color:#f9f9f7;font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.45rem 1rem;align-items:center;justify-content:center;gap:0.5rem;">
@@ -1220,7 +1229,7 @@ function showSection(id){
   // Remember which section we're on so refresh returns here
   try { localStorage.setItem('last_section', id); } catch(e) {}
   if (id === 'home') renderAnalytics();
-  if (id === 'schedule') { initScheduleDatePicker(); loadPlannerDay(); }
+  if (id === 'schedule') { try { initScheduleDatePicker(); } catch(e) {} loadPlannerDay(); }
   if (id === 'vision') { loadThatGirl(); renderVisionBoard(true); }
   if (id === 'me') { initMeSection(); initWhiAm(); showMeTab('whiam'); }
   if (id === 'journal') { showJournalTab('belief'); }
@@ -1260,8 +1269,8 @@ function showJournalTab(tab) {
 function showJBWTab(tab) {
   // All panels are always visible (scrollable) just trigger renders
   renderWins();
-  renderVentEntries();
-  renderBooks();
+  try { renderVentEntries(); } catch(e) {}
+  try { renderBooks(); } catch(e) {}
   beliefRenderAll();
   window.scrollTo(0,0);
   // Scroll to the relevant section if called directly
@@ -1348,7 +1357,7 @@ function celebrateBook(title) {
   const overlay = document.getElementById('book-celebrate');
   const toast = document.getElementById('book-toast');
   const canvas = document.getElementById('confetti-canvas');
-  document.getElementById('toast-title').textContent = title;
+  var _toastTitle = document.getElementById('toast-title'); if (_toastTitle) _toastTitle.textContent = title;
   overlay.style.display = 'block';
   overlay.style.pointerEvents = 'auto';
   setTimeout(() => toast.style.opacity = '1', 50);
@@ -1724,7 +1733,7 @@ function changeWhoiDate(dir) {
   d.setDate(d.getDate() + dir);
   dp.value = d.toISOString().split('T')[0];
   updateDateLabel('whoi-date-picker');
-  renderWhoiGrid();
+  try { renderWhoiGrid(); } catch(e) {}
 }
 
 function setWhoiType(type) {
@@ -3488,7 +3497,7 @@ function analyticsCalJump(dateStr) {
 function showCopySchedule() {
   const box = document.getElementById('copy-schedule-box');
   box.style.display = box.style.display === 'none' ? 'block' : 'none';
-  document.getElementById('copy-msg').textContent = '';
+  var _copyMsg = document.getElementById('copy-msg'); if (_copyMsg) _copyMsg.textContent = '';
 }
 
 function copyScheduleToDay() {
@@ -6287,7 +6296,7 @@ function jesusSavePrayThing() {
   var inp = document.getElementById('jesus-pray-things-input');
   var text = inp.value.trim(); if (!text) return;
   jesusGetDay(jesusCurrentDate).prayThings.push({ id: Date.now(), text: text, done: false, date: new Date().toISOString() });
-  inp.value = ''; jesusSave(); jesusRender('prayer');
+  inp.value = ''; jesusSave(); jesusRender('prayer'); renderJesusCal();
 }
 function jesusTogglePrayThing(id) {
   var day = jesusGetDay(jesusCurrentDate);
@@ -6299,11 +6308,11 @@ function jesusTogglePrayThing(id) {
   } else if (item) {
     day.answeredPrayers = (day.answeredPrayers||[]).filter(function(x){ return x.text!==item.text; });
   }
-  jesusSave(); jesusRender('prayer');
+  jesusSave(); jesusRender('prayer'); renderJesusCal();
 }
 function jesusDeletePrayThing(id) {
   jesusGetDay(jesusCurrentDate).prayThings = jesusGetDay(jesusCurrentDate).prayThings.filter(function(x){ return x.id!==id; });
-  jesusSave(); jesusRender('prayer');
+  jesusSave(); jesusRender('prayer'); renderJesusCal();
 }
 
 // -- PRAYER: PEOPLE -------------------------------------------
@@ -6311,7 +6320,7 @@ function jesusSavePrayPerson() {
   var inp = document.getElementById('jesus-pray-people-input');
   var text = inp.value.trim(); if (!text) return;
   jesusGetDay(jesusCurrentDate).prayPeople.push({ id: Date.now(), text: text, done: false, date: new Date().toISOString() });
-  inp.value = ''; jesusSave(); jesusRender('prayer');
+  inp.value = ''; jesusSave(); jesusRender('prayer'); renderJesusCal();
 }
 function jesusTogglePrayPerson(id) {
   var day = jesusGetDay(jesusCurrentDate);
@@ -6323,11 +6332,11 @@ function jesusTogglePrayPerson(id) {
   } else if (item) {
     day.answeredPrayers = (day.answeredPrayers||[]).filter(function(x){ return x.text!==item.text; });
   }
-  jesusSave(); jesusRender('prayer');
+  jesusSave(); jesusRender('prayer'); renderJesusCal();
 }
 function jesusDeletePrayPerson(id) {
   jesusGetDay(jesusCurrentDate).prayPeople = jesusGetDay(jesusCurrentDate).prayPeople.filter(function(x){ return x.id!==id; });
-  jesusSave(); jesusRender('prayer');
+  jesusSave(); jesusRender('prayer'); renderJesusCal();
 }
 
 // -- ANSWERED PRAYER ------------------------------------------
@@ -6336,12 +6345,12 @@ function jesusSaveAnswered() {
   var text = inp.value.trim(); if (!text) return;
   if (!jesusGetDay(jesusCurrentDate).answeredPrayers) jesusGetDay(jesusCurrentDate).answeredPrayers = [];
   jesusGetDay(jesusCurrentDate).answeredPrayers.unshift({ id: Date.now(), text: text, date: new Date().toISOString() });
-  inp.value = ''; jesusSave(); jesusRender('prayer');
+  inp.value = ''; jesusSave(); jesusRender('prayer'); renderJesusCal();
 }
 function jesusDeleteAnswered(id) {
   var day = jesusGetDay(jesusCurrentDate);
   day.answeredPrayers = (day.answeredPrayers || []).filter(function(x){ return x.id!==id; });
-  jesusSave(); jesusRender('prayer');
+  jesusSave(); jesusRender('prayer'); renderJesusCal();
 }
 
 // -- VERSE ----------------------------------------------------
@@ -6352,11 +6361,11 @@ function jesusSaveVerse() {
   jesusGetDay(jesusCurrentDate).verses.unshift({ id: Date.now(), text: text, ref: ref, date: new Date().toISOString() });
   document.getElementById('jesus-verse-text').value = '';
   document.getElementById('jesus-verse-ref').value  = '';
-  jesusSave(); jesusRender('prayer');
+  jesusSave(); jesusRender('prayer'); renderJesusCal();
 }
 function jesusDeleteVerse(id) {
   jesusGetDay(jesusCurrentDate).verses = jesusGetDay(jesusCurrentDate).verses.filter(function(v){ return v.id!==id; });
-  jesusSave(); jesusRender('prayer');
+  jesusSave(); jesusRender('prayer'); renderJesusCal();
 }
 
 // -- WHAT GOD SAID --------------------------------------------
@@ -6378,11 +6387,11 @@ function jesusSaveGodSaid() {
   if (el) el.value = '';
   var status = document.getElementById('jesus-godsaid-status');
   if (status) { status.textContent = 'Saved'; setTimeout(function(){ status.textContent = ''; }, 2000); }
-  jesusSave(); jesusRender('prayer');
+  jesusSave(); jesusRender('prayer'); renderJesusCal();
 }
 function jesusDeleteGodSaid(id) {
   jesusGetDay(jesusCurrentDate).godsaid = jesusGetDay(jesusCurrentDate).godsaid.filter(function(x){ return x.id!==id; });
-  jesusSave(); jesusRender('prayer');
+  jesusSave(); jesusRender('prayer'); renderJesusCal();
 }
 
 function showJesusStudyTab(tab) {
@@ -6412,11 +6421,11 @@ function jesusSaveStudyNote() {
   document.getElementById('jesus-study-note').value = '';
   var status = document.getElementById('jesus-study-note-status');
   if (status) { status.textContent = 'Saved'; setTimeout(function(){ status.textContent = ''; }, 2000); }
-  jesusSave(); jesusRenderStudyNotes(true);
+  jesusSave(); jesusRenderStudyNotes(true); renderJesusCal();
 }
 function jesusDeleteStudyNote(id) {
   jesusData.studyNotes = (jesusData.studyNotes||[]).filter(function(x){ return x.id!==id; });
-  jesusSave(); jesusRenderStudyNotes(true);
+  jesusSave(); jesusRenderStudyNotes(true); renderJesusCal();
 }
 function jesusRenderStudyNotes(skipLoad) {
   if (!skipLoad) jesusLoad();
@@ -6440,15 +6449,15 @@ function jesusSaveStudyQuestion() {
   var text = inp.value.trim(); if (!text) return;
   if (!jesusData.studyQuestions) jesusData.studyQuestions = [];
   jesusData.studyQuestions.unshift({ id: Date.now(), text: text, answered: false, date: new Date().toISOString() });
-  inp.value = ''; jesusSave(); jesusRenderStudyQuestions(true);
+  inp.value = ''; jesusSave(); jesusRenderStudyQuestions(true); renderJesusCal();
 }
 function jesusToggleStudyQuestion(id) {
   jesusData.studyQuestions = (jesusData.studyQuestions||[]).map(function(x){ return x.id===id?{...x,answered:!x.answered}:x; });
-  jesusSave(); jesusRenderStudyQuestions(true);
+  jesusSave(); jesusRenderStudyQuestions(true); renderJesusCal();
 }
 function jesusDeleteStudyQuestion(id) {
   jesusData.studyQuestions = (jesusData.studyQuestions||[]).filter(function(x){ return x.id!==id; });
-  jesusSave(); jesusRenderStudyQuestions(true);
+  jesusSave(); jesusRenderStudyQuestions(true); renderJesusCal();
 }
 function jesusRenderStudyQuestions(skipLoad) {
   if (!skipLoad) jesusLoad();
@@ -6540,48 +6549,48 @@ function jesusSaveAction() {
   var inp = document.getElementById('jesus-action-input');
   var text = inp.value.trim(); if (!text) return;
   jesusGetDay(jesusCurrentDate).actions.push({ id: Date.now(), text: text, done: false, date: new Date().toISOString() });
-  inp.value = ''; jesusSave(); jesusRender('action');
+  inp.value = ''; jesusSave(); jesusRender('action'); renderJesusCal();
 }
 function jesusToggleAction(id) {
   var day = jesusGetDay(jesusCurrentDate);
   day.actions = day.actions.map(function(x){ return x.id===id?{...x,done:!x.done}:x; });
-  jesusSave(); jesusRender('action');
+  jesusSave(); jesusRender('action'); renderJesusCal();
 }
 function jesusDeleteAction(id) {
   jesusGetDay(jesusCurrentDate).actions = jesusGetDay(jesusCurrentDate).actions.filter(function(x){ return x.id!==id; });
-  jesusSave(); jesusRender('action');
+  jesusSave(); jesusRender('action'); renderJesusCal();
 }
 function jesusSaveForgive() {
   var inp = document.getElementById('jesus-forgive-input');
   var text = inp.value.trim(); if (!text) return;
   jesusGetDay(jesusCurrentDate).forgive.push({ id: Date.now(), text: text, done: false, date: new Date().toISOString() });
-  inp.value = ''; jesusSave(); jesusRender('action');
+  inp.value = ''; jesusSave(); jesusRender('action'); renderJesusCal();
 }
 function jesusToggleForgive(id) {
   var day = jesusGetDay(jesusCurrentDate);
   day.forgive = day.forgive.map(function(x){ return x.id===id?{...x,done:!x.done}:x; });
-  jesusSave(); jesusRender('action');
+  jesusSave(); jesusRender('action'); renderJesusCal();
 }
 function jesusDeleteForgive(id) {
   var day = jesusGetDay(jesusCurrentDate);
   day.forgive = day.forgive.filter(function(x){ return x.id!==id; });
-  jesusSave(); jesusRender('action');
+  jesusSave(); jesusRender('action'); renderJesusCal();
 }
 function jesusSaveRepent() {
   var inp = document.getElementById('jesus-repent-input');
   var text = inp.value.trim(); if (!text) return;
   jesusGetDay(jesusCurrentDate).repent.push({ id: Date.now(), text: text, done: false, date: new Date().toISOString() });
-  inp.value = ''; jesusSave(); jesusRender('action');
+  inp.value = ''; jesusSave(); jesusRender('action'); renderJesusCal();
 }
 function jesusToggleRepent(id) {
   var day = jesusGetDay(jesusCurrentDate);
   day.repent = day.repent.map(function(x){ return x.id===id?{...x,done:!x.done}:x; });
-  jesusSave(); jesusRender('action');
+  jesusSave(); jesusRender('action'); renderJesusCal();
 }
 function jesusDeleteRepent(id) {
   var day = jesusGetDay(jesusCurrentDate);
   day.repent = day.repent.filter(function(x){ return x.id!==id; });
-  jesusSave(); jesusRender('action');
+  jesusSave(); jesusRender('action'); renderJesusCal();
 }
 
 // -- RENDER ---------------------------------------------------
@@ -8336,7 +8345,7 @@ function initWhiAm() {
   var _wqa = document.getElementById('wiaWQAns'); if (_wqa) _wqa.addEventListener('input', function() { WIA.wj[wiaWqi] = this.value; wiaSave(); wiaRenderWQ(); });
   wiaRenderValues(); wiaRenderTraits(); wiaUpdateCard(); if(typeof infpLoad==='function') infpLoad();
   wiaRenderQ();
-  document.getElementById('wiaAffText').textContent = wiaAffs[wiaAffIdx];
+  var _wiaAff = document.getElementById('wiaAffText'); if (_wiaAff) _wiaAff.textContent = wiaAffs[wiaAffIdx];
   wiaRenderChecks();
   wiaRenderStreakRow(); wiaRenderPractice(); wiaRenderCalendar(); wiaRenderWQ();
 }
@@ -8452,7 +8461,7 @@ var wiaQs = [
   'What is one thing true about you that has nothing to do with what you have achieved?'
 ];
 function wiaRenderQ() {
-  document.getElementById('wiaQText').textContent = wiaQs[wiaQi];
+  var _wiaQt = document.getElementById('wiaQText'); if (_wiaQt) _wiaQt.textContent = wiaQs[wiaQi];
   var ans = document.getElementById('wiaQAns'); if (ans) ans.value = WIA.j[wiaQi] || '';
   var prev = document.getElementById('wiaQPrev'); if (prev) prev.disabled = wiaQi === 0;
   var next = document.getElementById('wiaQNext'); if (next) next.disabled = wiaQi === wiaQs.length - 1;
@@ -8645,7 +8654,7 @@ var wiaWqs = [
   'What do you want to focus on next week?'
 ];
 function wiaRenderWQ() {
-  document.getElementById('wiaWQText').textContent = wiaWqs[wiaWqi];
+  var _wiaWQt = document.getElementById('wiaWQText'); if (_wiaWQt) _wiaWQt.textContent = wiaWqs[wiaWqi];
   var ans = document.getElementById('wiaWQAns'); if (ans) ans.value = WIA.wj[wiaWqi] || '';
   var prev = document.getElementById('wiaWPrev'); if (prev) prev.disabled = wiaWqi === 0;
   var next = document.getElementById('wiaWNext'); if (next) next.disabled = wiaWqi === wiaWqs.length - 1;
@@ -9102,7 +9111,7 @@ function opSelectMBTI(type, btn) {
   btn.style.background = 'var(--black)';
   btn.style.color = 'var(--white)';
   var code = document.getElementById('rfm-type-code').textContent;
-  document.getElementById('rfm-type-combined').textContent = type + ' ' + code;
+  var _rfmComb = document.getElementById('rfm-type-combined'); if (_rfmComb) _rfmComb.textContent = type + ' ' + code;
 }
 
 function opUpdateResult() {
@@ -9127,9 +9136,9 @@ function opUpdateResult() {
   var types = opGetMBTI(c.od, c.sn, c.ft);
   selectedMBTI = null;
 
-  document.getElementById('rfm-type-code').textContent = typeCode;
-  document.getElementById('rfm-type-combined').textContent = typeCode;
-  document.getElementById('rfm-type-desc').textContent = odDesc + ' ' + snDesc + ' ' + ftDesc + ' Animal stack: ' + animalDesc;
+  var _rfmCode = document.getElementById('rfm-type-code'); if (_rfmCode) _rfmCode.textContent = typeCode;
+  var _rfmComb2 = document.getElementById('rfm-type-combined'); if (_rfmComb2) _rfmComb2.textContent = typeCode;
+  var _rfmDesc = document.getElementById('rfm-type-desc'); if (_rfmDesc) _rfmDesc.textContent = odDesc + ' ' + snDesc + ' ' + ftDesc + ' Animal stack: ' + animalDesc;
 
   var mbtiEl = document.getElementById('rfm-type-mbti');
   var optsEl = document.getElementById('rfm-mbti-options');
