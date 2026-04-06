@@ -12,8 +12,78 @@
 <meta name="theme-color" content="#f9f9f7">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400&family=Nunito:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  /* Fallback fonts if Google Fonts fails to load offline */
+  body { font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+</style>
 <script>
+  // ── Offline-first Service Worker (registered via Blob so no separate SW file needed) ──
+  if ('serviceWorker' in navigator) {
+    var _swCode = `
+const CACHE = 'love-myself-v1';
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll([location.href]))
+      .catch(() => {})
+  );
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys =>
+    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+  ));
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  // Network-first for Firebase/Cloudinary, cache-first for everything else
+  var url = e.request.url;
+  if (url.includes('firebaseio.com') || url.includes('cloudinary.com') || url.includes('googleapis.com/css')) {
+    e.respondWith(
+      fetch(e.request).then(res => {
+        if (res.ok) {
+          var clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return res;
+      }).catch(() => caches.match(e.request))
+    );
+  } else {
+    e.respondWith(
+      caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
+        if (res.ok) {
+          var clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return res;
+      }))
+    );
+  }
+});
+`;
+    try {
+      var _swBlob = new Blob([_swCode], { type: 'application/javascript' });
+      var _swUrl = URL.createObjectURL(_swBlob);
+      navigator.serviceWorker.register(_swUrl, { scope: './' }).catch(function(){});
+    } catch(e) {}
+  }
+
+  // ── Online / offline indicator ──
+  function _updateOnlineStatus() {
+    var el = document.getElementById('_net-indicator');
+    if (!el) return;
+    if (navigator.onLine) {
+      el.style.display = 'none';
+    } else {
+      el.style.display = 'flex';
+    }
+  }
+  window.addEventListener('online',  _updateOnlineStatus);
+  window.addEventListener('offline', _updateOnlineStatus);
+  window.addEventListener('load', _updateOnlineStatus);
+
   window._rawLS = localStorage.setItem.bind(localStorage);
   const DB_URL = 'https://lovemyselfapp-default-rtdb.firebaseio.com/my-love-myself-data';
 
@@ -32,9 +102,10 @@
 
   var _lastPush = Date.now();
 
-  // Push a single key to Firebase via REST
+  // Push a single key to Firebase via REST — silently skips when offline
   window.syncToCloud = function(key, value) {
     if (!_shouldSync(key)) return;
+    if (!navigator.onLine) return;
     _lastPush = Date.now();
     fetch(DB_URL + '/' + key + '.json', {
       method: 'PUT',
@@ -158,9 +229,13 @@
 
 
 
-  // One-off pull
+  // One-off pull — silently skips when offline
   var _syncErrorLogged = false;
   window.pullFromCloud = function(showMsg) {
+    if (!navigator.onLine) {
+      if (showMsg) alert('📵 You\'re offline. All your data is still saved on this device. 🤍');
+      return;
+    }
     fetch(DB_URL + '.json')
       .then(function(r){ return r.json(); })
       .then(function(data){
@@ -245,32 +320,38 @@
     if (id === 'journal' && typeof loadVentDay === 'function') loadVentDay();
   }
 
-  // Fast polling every 2 seconds reliable cross-device sync via Firebase REST
+  // Polling — skips entirely when offline, resumes when back online
   var _pollTimer = null;
   function _startPolling() {
     clearInterval(_pollTimer);
     _pollTimer = setInterval(function() {
-      window.pullFromCloud(false);
+      if (navigator.onLine) window.pullFromCloud(false);
     }, 3000);
   }
 
   window.addEventListener('load', function() {
     setTimeout(function(){
-      window.pullFromCloud(false);
+      if (navigator.onLine) window.pullFromCloud(false);
       _startPolling();
     }, 800);
+  });
+
+  // Resume sync when coming back online
+  window.addEventListener('online', function() {
+    window.pullFromCloud(false);
+    _startPolling();
   });
 
   // Restart polling when tab comes back into focus
   document.addEventListener('visibilitychange', function() {
     if (document.visibilityState === 'visible') {
-      window.pullFromCloud(false);
+      if (navigator.onLine) window.pullFromCloud(false);
       _startPolling();
     } else {
       // Slow down when tab is hidden to save resources
       clearInterval(_pollTimer);
       _pollTimer = setInterval(function() {
-        window.pullFromCloud(false);
+        if (navigator.onLine) window.pullFromCloud(false);
       }, 30000);
     }
   });
@@ -536,6 +617,11 @@
 </style>
 </head>
 <body>
+
+<!-- Offline indicator -->
+<div id="_net-indicator" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#2a2a2a;color:#f9f9f7;font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.45rem 1rem;align-items:center;justify-content:center;gap:0.5rem;">
+  <span>📵</span><span>offline — your data is saved</span>
+</div>
 
 <nav>
   <div class="logo">love myself</div>
