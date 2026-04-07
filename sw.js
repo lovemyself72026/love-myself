@@ -1,4 +1,4 @@
-const CACHE = 'love-myself-v2';
+const CACHE = 'love-myself-v3';
 
 const STATIC_FILES = [
   './',
