@@ -1,4 +1,5 @@
 const CACHE = 'love-myself-v3';
+const IMG_CACHE = 'love-myself-images-v1';
 
 const STATIC_FILES = [
   './',
@@ -20,18 +21,18 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+      Promise.all(keys.filter(k => k !== CACHE && k !== IMG_CACHE).map(k => caches.delete(k)))
     )
   );
   self.clients.claim();
 });
 
-// Fetch: network-first for Firebase/Cloudinary, cache-first for everything else
+// Fetch handler
 self.addEventListener('fetch', e => {
   var url = e.request.url;
 
-  // Always go network for Firebase and Cloudinary (data/uploads)
-  if (url.includes('firebaseio.com') || url.includes('cloudinary.com')) {
+  // Firebase: always network-first (it's data, not images)
+  if (url.includes('firebaseio.com')) {
     e.respondWith(
       fetch(e.request).catch(() => {
         return new Response('{}', { headers: { 'Content-Type': 'application/json' } });
@@ -40,7 +41,30 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Cache-first for everything else (app shell, fonts, etc.)
+  // Cloudinary images (GET): cache-first so they work offline
+  // Cloudinary uploads (POST): network only
+  if (url.includes('cloudinary.com')) {
+    if (e.request.method === 'POST') {
+      // Upload request — network only, fail naturally if offline
+      e.respondWith(fetch(e.request));
+      return;
+    }
+    // Image fetch — cache first, then network and cache the result
+    e.respondWith(
+      caches.open(IMG_CACHE).then(function(cache) {
+        return cache.match(e.request).then(function(cached) {
+          if (cached) return cached;
+          return fetch(e.request).then(function(res) {
+            if (res && res.ok) cache.put(e.request, res.clone());
+            return res;
+          }).catch(() => new Response('', { status: 408 }));
+        });
+      })
+    );
+    return;
+  }
+
+  // Everything else (app shell, fonts, etc.): cache-first
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
@@ -51,7 +75,6 @@ self.addEventListener('fetch', e => {
         }
         return res;
       }).catch(() => {
-        // If it's a navigation request and we're offline, serve index.html
         if (e.request.mode === 'navigate') {
           return caches.match('./index.html');
         }
