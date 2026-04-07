@@ -314,21 +314,204 @@
 
 <!-- Cloudinary image upload outside module so it's globally accessible -->
 <script>
-  window.uploadImageToCloud = async function(file) {
-    const formData = new FormData();
-    formData.append('file', file);
+  // ── Offline image storage using IndexedDB (no size limit unlike localStorage) ──
+  var _idb = null;
+  function _openIDB() {
+    if (_idb) return Promise.resolve(_idb);
+    return new Promise(function(resolve, reject) {
+      var req = indexedDB.open('lovemyself-images', 1);
+      req.onupgradeneeded = function(e) {
+        e.target.result.createObjectStore('images');
+      };
+      req.onsuccess = function(e) { _idb = e.target.result; resolve(_idb); };
+      req.onerror = function() { reject(new Error('IDB open failed')); };
+    });
+  }
+
+  function _idbPut(key, blob) {
+    return _openIDB().then(function(db) {
+      return new Promise(function(resolve, reject) {
+        var tx = db.transaction('images', 'readwrite');
+        tx.objectStore('images').put(blob, key);
+        tx.oncomplete = function() { resolve(); };
+        tx.onerror = function() { reject(); };
+      });
+    });
+  }
+
+  function _idbGet(key) {
+    return _openIDB().then(function(db) {
+      return new Promise(function(resolve, reject) {
+        var tx = db.transaction('images', 'readonly');
+        var req = tx.objectStore('images').get(key);
+        req.onsuccess = function() { resolve(req.result); };
+        req.onerror = function() { reject(); };
+      });
+    });
+  }
+
+  function _idbDelete(key) {
+    return _openIDB().then(function(db) {
+      return new Promise(function(resolve) {
+        var tx = db.transaction('images', 'readwrite');
+        tx.objectStore('images').delete(key);
+        tx.oncomplete = resolve;
+        tx.onerror = resolve;
+      });
+    });
+  }
+
+  // Convert a File to a blob URL stored in IndexedDB — returns an idb:// key
+  async function _saveFileOffline(file) {
+    var key = 'img_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    await _idbPut(key, file);
+    return '__offline__' + key;
+  }
+
+  // Get a usable object URL from an offline key (for displaying the image)
+  window._getOfflineImageUrl = async function(offlineKey) {
+    var key = offlineKey.replace('__offline__', '');
+    try {
+      var blob = await _idbGet(key);
+      if (!blob) return '';
+      return URL.createObjectURL(blob);
+    } catch(e) { return ''; }
+  };
+
+  // Upload a base64 data URL string to Cloudinary, returns secure_url
+  async function _uploadBase64ToCloud(base64) {
+    var formData = new FormData();
+    formData.append('file', base64);
     formData.append('upload_preset', 'love_myself_unsigned');
-    const res = await fetch('https://api.cloudinary.com/v1_1/dvo7yubho/image/upload', {
+    var res = await fetch('https://api.cloudinary.com/v1_1/dvo7yubho/image/upload', {
       method: 'POST',
       body: formData
     });
-    const data = await res.json();
+    var data = await res.json();
     if (!data.secure_url) {
-      console.error('Cloudinary error:', JSON.stringify(data));
-      throw new Error(data.error?.message || 'Upload failed');
+      throw new Error(data.error ? data.error.message : 'Upload failed');
     }
     return data.secure_url;
+  }
+
+  // Main upload function — works offline by storing file in IndexedDB
+  window.uploadImageToCloud = async function(file) {
+    // If clearly offline, save to IndexedDB
+    if (!navigator.onLine) {
+      return await _saveFileOffline(file);
+    }
+    // Try Cloudinary — fall back to IndexedDB if network fails for any reason
+    try {
+      var formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'love_myself_unsigned');
+      var res = await fetch('https://api.cloudinary.com/v1_1/dvo7yubho/image/upload', {
+        method: 'POST',
+        body: formData
+      });
+      var data = await res.json();
+      if (!data.secure_url) {
+        throw new Error(data.error ? data.error.message : 'Upload failed');
+      }
+      return data.secure_url;
+    } catch(e) {
+      // Network error — save locally in IndexedDB
+      return await _saveFileOffline(file);
+    }
   };
+
+
+  // After any render, resolve offline image srcs from IndexedDB
+  window._resolveOfflineImages = function() {
+    document.querySelectorAll('img[data-offline-key]').forEach(function(img) {
+      var key = img.getAttribute('data-offline-key');
+      if (key && !img._resolving) {
+        img._resolving = true;
+        window._getOfflineImageUrl('__offline__' + key).then(function(url) {
+          if (url) img.src = url;
+        });
+      }
+    });
+  };
+  // Background sync: when we come back online, upload any base64 images that are pending
+  window._syncPendingImages = async function() {
+    if (!navigator.onLine) return;
+
+    var STORES = [
+      { key: 'vision_items',      varName: 'visionItems',     isArray: true  },
+      { key: 'dimension_items',   varName: 'dimensionItems',  isArray: false },
+      { key: 'whoi_history',      varName: 'whoiItems',        isArray: true  },
+      { key: 'whoi_woh_history',  varName: 'whoiWohItems',     isArray: true  },
+    ];
+
+    var anyChanged = false;
+
+    for (var s = 0; s < STORES.length; s++) {
+      var store = STORES[s];
+      var raw = localStorage.getItem(store.key);
+      if (!raw) continue;
+      var parsed;
+      try { parsed = JSON.parse(raw); } catch(e) { continue; }
+
+      var changed = false;
+
+      async function processItems(arr) {
+        if (!Array.isArray(arr)) return arr;
+        for (var i = 0; i < arr.length; i++) {
+          var item = arr[i];
+          if (item && item.type === 'image' && typeof item.content === 'string' && item.content.startsWith('__offline__')) {
+            var idbKey = item.content.replace('__offline__', '');
+            try {
+              var blob = await _idbGet(idbKey);
+              if (blob) {
+                var fd = new FormData();
+                fd.append('file', blob);
+                fd.append('upload_preset', 'love_myself_unsigned');
+                var res = await fetch('https://api.cloudinary.com/v1_1/dvo7yubho/image/upload', { method: 'POST', body: fd });
+                var data = await res.json();
+                if (data.secure_url) {
+                  arr[i] = Object.assign({}, item, { content: data.secure_url, uploading: false, pendingUpload: false });
+                  changed = true;
+                  _idbDelete(idbKey);
+                }
+              }
+            } catch(e) {
+              // keep it as-is, will retry next time online
+            }
+          }
+        }
+        return arr;
+      }
+
+      if (store.isArray) {
+        parsed = await processItems(parsed);
+      } else {
+        // dimension_items is an object of arrays keyed by dimension
+        var keys = Object.keys(parsed);
+        for (var k = 0; k < keys.length; k++) {
+          parsed[keys[k]] = await processItems(parsed[keys[k]]);
+        }
+      }
+
+      if (changed) {
+        window._rawLS(store.key, JSON.stringify(parsed));
+        try { window.syncToCloud(store.key, parsed); } catch(e) {}
+        anyChanged = true;
+        // Update in-memory variables if they exist
+        try {
+          if (store.key === 'vision_items' && typeof visionItems !== 'undefined') { visionItems = parsed; if (typeof renderVisionBoard === 'function') renderVisionBoard(); }
+          if (store.key === 'dimension_items' && typeof dimensionItems !== 'undefined') { dimensionItems = parsed; if (typeof renderDimensionBoards === 'function') renderDimensionBoards(false); }
+          if (store.key === 'wia2' && typeof whoiItems !== 'undefined') { whoiItems = parsed; if (typeof renderWhoI === 'function') renderWhoI(); }
+          if (store.key === 'wia2wq' && typeof whoiWohItems !== 'undefined') { whoiWohItems = parsed; if (typeof renderWhoIWoh === 'function') renderWhoIWoh(); }
+        } catch(e) {}
+      }
+    }
+  };
+
+  // Auto-trigger sync when coming back online
+  window.addEventListener('online', function() {
+    setTimeout(window._syncPendingImages, 1500);
+  });
 </script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1180,7 +1363,6 @@ function showSection(id){
   const map=['jesus','home','vision','schedule','me','journal'];
   const navTab = document.querySelectorAll('.nav-tab')[map.indexOf(id)];
   if (navTab) navTab.classList.add('active');
-  window.scrollTo(0,0);
   // Remember which section we're on so refresh returns here
   try { localStorage.setItem('last_section', id); } catch(e) {}
   if (id === 'home') renderAnalytics();
@@ -1218,7 +1400,6 @@ function showJournalTab(tab) {
   });
   if (tab === 'journalbookswins') showJBWTab('wins');
   if (tab === 'mejournal') showMeJournalTab('whiam');
-  window.scrollTo(0,0);
 }
 
 function showJBWTab(tab) {
@@ -1227,10 +1408,6 @@ function showJBWTab(tab) {
   try { renderVentEntries(); } catch(e) {}
   try { renderBooks(); } catch(e) {}
   beliefRenderAll();
-  window.scrollTo(0,0);
-  // Scroll to the relevant section if called directly
-  var target = document.getElementById('jsub-' + tab);
-  if (target) setTimeout(function(){ target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 80);
 }
 
 let shuffled = [...affirmations].sort(() => Math.random() - 0.5);
@@ -1519,7 +1696,9 @@ function renderDimensionBoards(fromStorage) {
           ${item.type==='image'
             ? item.uploading
               ? `<div style="font-family:'Nunito',sans-serif;font-size:0.7rem;color:var(--gray);text-align:center;padding:1rem 0;">Uploading...</div>`
-              : `<img src="${item.content}" style="width:100%;display:block;border-radius:0;">`
+              : (item.content.startsWith('__offline__')
+                ? `<img data-offline-key="${item.content.replace('__offline__','')}" src="" style="width:100%;display:block;border-radius:0;min-height:80px;background:#f0f0ee;">`
+                : `<img src="${item.content}" style="width:100%;display:block;border-radius:0;">`)
             : item.type==='word'
             ? `<div style="font-family:'Lora',serif;font-style:italic;font-size:1rem;text-align:center;padding:0.5rem 0.5rem 0.2rem;">${item.content}</div>`
             : `<div style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;line-height:1.5;padding-right:0.8rem;">${item.content}</div>`
@@ -1564,14 +1743,27 @@ async function addDimImage(key, input) {
   try {
     const url = await uploadImageToCloud(file);
     const idx = dimensionItems[key].findIndex(i => i.id === tempId);
-    if (idx !== -1) { dimensionItems[key][idx].content = url; dimensionItems[key][idx].uploading = false; }
-    localStorage.setItem('dimension_items', JSON.stringify(dimensionItems)); if(typeof syncToCloud==='function')syncToCloud('dimension_items',dimensionItems);
+    if (idx !== -1) {
+      dimensionItems[key][idx].content = url;
+      dimensionItems[key][idx].uploading = false;
+      if (url.startsWith('__offline__')) dimensionItems[key][idx].pendingUpload = true;
+    }
+    localStorage.setItem('dimension_items', JSON.stringify(dimensionItems));
+    if(typeof syncToCloud==='function' && !url.startsWith('__offline__')) syncToCloud('dimension_items',dimensionItems);
     renderDimensionBoards(false);
   } catch(e) {
-    alert('❌ Upload failed: ' + e.message);
-    const idx = dimensionItems[key].findIndex(i => i.id === tempId);
-    if (idx !== -1) dimensionItems[key].splice(idx, 1);
-    renderDimensionBoards(false);
+    try {
+      var base64 = await _fileToBase64(file);
+      var url = '__offline__' + base64;
+      const idx = dimensionItems[key].findIndex(i => i.id === tempId);
+      if (idx !== -1) { dimensionItems[key][idx].content = url; dimensionItems[key][idx].uploading = false; dimensionItems[key][idx].pendingUpload = true; }
+      localStorage.setItem('dimension_items', JSON.stringify(dimensionItems));
+      renderDimensionBoards(false);
+    } catch(e2) {
+      const idx = dimensionItems[key].findIndex(i => i.id === tempId);
+      if (idx !== -1) dimensionItems[key].splice(idx, 1);
+      renderDimensionBoards(false);
+    }
   }
 }
 
@@ -1728,8 +1920,13 @@ async function addWhoiImage(input) {
   try {
     const url = await uploadImageToCloud(file);
     const idx = whoiItems.findIndex(i => i.id === tempId);
-    if (idx !== -1) { whoiItems[idx].content = url; whoiItems[idx].uploading = false; }
-    localStorage.setItem('whoi_history', JSON.stringify(whoiItems)); if(typeof syncToCloud==='function')syncToCloud('whoi_history',whoiItems);
+    if (idx !== -1) {
+      whoiItems[idx].content = url;
+      whoiItems[idx].uploading = false;
+      if (url.startsWith('__offline__')) whoiItems[idx].pendingUpload = true;
+    }
+    localStorage.setItem('whoi_history', JSON.stringify(whoiItems));
+    if(typeof syncToCloud==='function' && !url.startsWith('__offline__')) syncToCloud('whoi_history',whoiItems);
     renderWhoiGrid(false);
   } catch(e) {
     const idx = whoiItems.findIndex(i => i.id === tempId);
@@ -1836,8 +2033,13 @@ async function addWhoiWohImage(input) {
   try {
     const url = await uploadImageToCloud(file);
     const idx = whoiWohItems.findIndex(i => i.id === tempId);
-    if (idx !== -1) { whoiWohItems[idx].content = url; whoiWohItems[idx].uploading = false; }
+    if (idx !== -1) {
+      whoiWohItems[idx].content = url;
+      whoiWohItems[idx].uploading = false;
+      if (url.startsWith('__offline__')) whoiWohItems[idx].pendingUpload = true;
+    }
     localStorage.setItem('whoi_woh_history', JSON.stringify(whoiWohItems));
+    if(typeof syncToCloud==='function' && !url.startsWith('__offline__')) syncToCloud('whoi_woh_history',whoiWohItems);
     renderWhoiWohGrid(false);
   } catch(e) {
     const idx = whoiWohItems.findIndex(i => i.id === tempId);
@@ -2873,20 +3075,35 @@ async function addVisionImage(input) {
   try {
     var url = await uploadImageToCloud(file);
     var idx = visionItems.findIndex(function(i){ return i.id === tempId; });
-    if (idx !== -1) { visionItems[idx].content = url; visionItems[idx].uploading = false; }
+    if (idx !== -1) {
+      visionItems[idx].content = url;
+      visionItems[idx].uploading = false;
+      // If saved offline, mark pending so background sync will upload it later
+      if (url.startsWith('__offline__')) visionItems[idx].pendingUpload = true;
+    }
     localStorage.setItem('vision_items', JSON.stringify(visionItems));
-    if (typeof syncToCloud === 'function') syncToCloud('vision_items', visionItems);
-    // Reset file input so the same image can be re-selected if needed
+    if (typeof syncToCloud === 'function' && !url.startsWith('__offline__')) syncToCloud('vision_items', visionItems);
     var fi = document.getElementById('vision-file-input');
     if (fi) fi.value = '';
     renderVisionBoard();
   } catch(e) {
-    alert('❌ Upload failed: ' + e.message);
-    var idx2 = visionItems.findIndex(function(i){ return i.id === tempId; });
-    if (idx2 !== -1) visionItems.splice(idx2, 1);
-    var fi2 = document.getElementById('vision-file-input');
-    if (fi2) fi2.value = '';
-    renderVisionBoard();
+    // Fallback: try saving as base64 directly
+    try {
+      var base64 = await _fileToBase64(file);
+      var url = '__offline__' + base64;
+      var idx2 = visionItems.findIndex(function(i){ return i.id === tempId; });
+      if (idx2 !== -1) { visionItems[idx2].content = url; visionItems[idx2].uploading = false; visionItems[idx2].pendingUpload = true; }
+      localStorage.setItem('vision_items', JSON.stringify(visionItems));
+      var fi2 = document.getElementById('vision-file-input');
+      if (fi2) fi2.value = '';
+      renderVisionBoard();
+    } catch(e2) {
+      var idx3 = visionItems.findIndex(function(i){ return i.id === tempId; });
+      if (idx3 !== -1) visionItems.splice(idx3, 1);
+      var fi3 = document.getElementById('vision-file-input');
+      if (fi3) fi3.value = '';
+      renderVisionBoard();
+    }
   }
 }
 
@@ -2951,7 +3168,9 @@ function renderVisionBoard(fromStorage) {
         + (item.type === 'image'
           ? item.uploading
             ? '<div style="font-family:Nunito,sans-serif;font-size:0.7rem;color:var(--gray);text-align:center;padding:1rem 0;">Uploading...</div>'
-            : '<img src="' + item.content + '" style="width:100%;display:block;border-radius:0;">'
+            : (item.content.startsWith('__offline__')
+            ? '<img data-offline-key="' + item.content.replace('__offline__','') + '" src="" style="width:100%;display:block;border-radius:0;min-height:80px;background:#f0f0ee;">'
+            : '<img src="' + item.content + '" style="width:100%;display:block;border-radius:0;">')
           : item.type === 'word'
           ? '<div style="font-family:Lora,serif;font-style:italic;font-size:1rem;text-align:center;padding:0.5rem 0.5rem 0.2rem;">' + item.content + '</div>'
           : '<div style="font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:300;line-height:1.5;padding-right:0.8rem;">' + item.content + '</div>'
@@ -2960,6 +3179,7 @@ function renderVisionBoard(fromStorage) {
         + '</div>';
     }).join('')
     + '</div>';
+  setTimeout(function(){ if (typeof _resolveOfflineImages === 'function') _resolveOfflineImages(); }, 0);
 }
 renderVisionBoard(true);
 
@@ -2991,43 +3211,43 @@ function loadVentDay() {
   updateDateLabel('vent-date-picker');
   renderVentEntries();
   const dateKey = getVentDateKey();
-  const existing = ventEntries.find(e => e.dateKey === dateKey && e._auto);
   const el = document.getElementById('vent-input');
-  if (el) el.value = existing ? existing.text : '';
+  // Load draft (not a saved entry — just a textarea draft) for this date
+  if (el) el.value = localStorage.getItem('vent_draft_' + dateKey) || '';
 }
 
 var _ventAutoTimer = null;
 function saveVentAuto() {
   clearTimeout(_ventAutoTimer);
   _ventAutoTimer = setTimeout(function() {
-    const text = document.getElementById('vent-input').value.trim();
-    if (!text) return;
-    const dateKey = getVentDateKey();
-    // update existing entry for this date/session if exists, else create new
-    const existing = ventEntries.find(e => e.dateKey === dateKey && e._auto);
-    if (existing) {
-      existing.text = text;
-      existing.date = new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+    var _ventEl = document.getElementById('vent-input');
+    var text = _ventEl ? _ventEl.value : '';
+    var dateKey = getVentDateKey();
+    // Save as a draft only — not as a journal entry
+    if (text.trim()) {
+      localStorage.setItem('vent_draft_' + dateKey, text);
     } else {
-      ventEntries.unshift({ id: Date.now(), dateKey, _auto: true, date: new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}), text });
+      localStorage.removeItem('vent_draft_' + dateKey);
     }
-    localStorage.setItem('vent_entries', JSON.stringify(ventEntries));
-    if (typeof syncToCloud === 'function') syncToCloud('vent_entries', ventEntries);
-    renderVentEntries();
-  }, 1000);
+  }, 800);
 }
 
 function saveVent() {
   const text = document.getElementById('vent-input').value.trim();
   if (!text) return;
   const dateKey = getVentDateKey();
+  // Remove any _auto entries for this day (legacy cleanup)
+  ventEntries = ventEntries.filter(function(e) { return !(e.dateKey === dateKey && e._auto); });
   ventEntries.unshift({
     id: Date.now(),
     dateKey,
     date: new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}),
     text
   });
-  localStorage.setItem('vent_entries', JSON.stringify(ventEntries)); if(typeof syncToCloud==='function')syncToCloud('vent_entries',ventEntries);
+  localStorage.setItem('vent_entries', JSON.stringify(ventEntries));
+  if(typeof syncToCloud==='function') syncToCloud('vent_entries', ventEntries);
+  // Clear draft and textarea
+  localStorage.removeItem('vent_draft_' + dateKey);
   document.getElementById('vent-input').value = '';
   renderVentEntries();
 }
@@ -3047,7 +3267,7 @@ function renderVentEntries() {
   const el = document.getElementById('vent-entries');
   if (!el) return;
   const dateKey = getVentDateKey();
-  const dayEntries = ventEntries.filter(e => e.dateKey === dateKey || (!e.dateKey && e.date && e.date.includes(new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}))));
+  const dayEntries = ventEntries.filter(e => !e._auto && (e.dateKey === dateKey || (!e.dateKey && e.date && e.date.includes(new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'})))));
   if (!dayEntries.length) { el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;">Nothing here for this day 🤍</p>'; return; }
   el.innerHTML = dayEntries.map(e => `
     <div class="journal-entry">
@@ -3734,7 +3954,7 @@ function showJournalTab(tab) {
     if (btn) btn.classList.toggle('active', t === tab);
   });
   if (tab === 'wins') { renderWins(); }
-  if (tab === 'vent') { renderVentEntries(); }
+  if (tab === 'vent') { renderVentEntries(); loadVentDay(); }
   if (tab === 'books') { renderBooks(); }
   if (tab === 'belief') { beliefRenderAll(); }
 }
@@ -3746,7 +3966,7 @@ function showMeMainTab(tab) {
     if (el) el.style.display = t === tab ? 'block' : 'none';
     if (btn) btn.classList.toggle('active', t === tab);
   });
-  if (tab === 'journal') { showJournalTab('belief'); window.scrollTo(0,0); }
+  if (tab === 'journal') { showJournalTab('belief'); }
   if (tab === 'me') showMeTab('whiam');
 }
 
@@ -5294,6 +5514,7 @@ window.addEventListener('DOMContentLoaded', function() {
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Your safe space. No judgment 🤍</div>
       <div style="margin-bottom:1rem;">
         <textarea id="vent-input" placeholder="Let it all out here..." rows="6" oninput="saveVentAuto()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.3rem 0;min-height:120px;"></textarea>
+        <button class="btn fill" onclick="saveVent()" style="margin-top:0.8rem;">Save</button>
       </div>
       <div id="vent-entries"></div>
     </div>
@@ -8006,12 +8227,14 @@ function renderCalisthenics() {
   try { var _f=localStorage.getItem('cali_log'); if(_f){ caliLog=JSON.parse(_f); if(typeof caliLog!=='object'||Array.isArray(caliLog)) caliLog={}; } } catch(e) {}
   renderCaliTracker();
   var weekBtns = document.getElementById('cali-week-btns');
+  if (!weekBtns) return;
   weekBtns.innerHTML = [1,2,3,4].map(function(w) {
     var active = w === caliWeek;
     return '<button onclick="caliSetWeek('+w+')" style="font-family:\'Nunito\',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid '+(active?'var(--black)':'#c8c8c5')+';background:'+(active?'var(--black)':'transparent')+';color:'+(active?'var(--white)':'var(--gray)')+';padding:0.3rem 0.8rem;cursor:pointer;font-weight:300;">Week '+w+'</button>';
   }).join('');
   var plan = caliProgram[caliWeek];
   var planEl = document.getElementById('cali-plan');
+  if (!planEl) return;
   planEl.innerHTML = plan.map(function(d, di) {
     var isRest = d.exercises.length === 0;
     var dateKey = 'date_w'+caliWeek+'_d'+di;
@@ -8433,6 +8656,7 @@ var wiaAffs = [
 ];
 function wiaNewAff() {
   var el = document.getElementById('wiaAffText');
+  if (!el) return;
   el.style.opacity = '0';
   setTimeout(function() {
     wiaAffIdx = (wiaAffIdx + 1) % wiaAffs.length;
@@ -9015,6 +9239,7 @@ function opSelect(coin, val, btn) {
     opCoins.a2 = null;
     var a2Row = document.getElementById('op-a2-row');
     var a2Btns = document.getElementById('op-a2-btns');
+    if (!a2Btns) return;
     var opposite = opAnimalOpposites[val];
     var allowed = ['P','B','C','S'].filter(function(a){ return a !== val && a !== opposite; });
     a2Btns.innerHTML = allowed.map(function(a) {
@@ -9058,6 +9283,7 @@ function opSelectMBTI(type, btn) {
 function opUpdateResult() {
   var c = opCoins;
   var resultEl = document.getElementById('rfm-type-result');
+  if (!resultEl) return;
   if (!c.od || !c.sn || !c.ft || !c.a1 || !c.a2) { resultEl.style.display = 'none'; return; }
 
   var animalLabels = { P:'Play', B:'Blast', C:'Consume', S:'Sleep' };
@@ -9083,6 +9309,7 @@ function opUpdateResult() {
 
   var mbtiEl = document.getElementById('rfm-type-mbti');
   var optsEl = document.getElementById('rfm-mbti-options');
+  if (!optsEl) return;
   if (types.length) {
     optsEl.innerHTML = types.map(function(t) {
       return '<button class="mbti-opt-btn" onclick="opSelectMBTI(\'' + t + '\', this)" ' +
@@ -10945,11 +11172,9 @@ function friendsOpenPanel(id) {
   var concDisp = document.getElementById('friends-panel-conc-display');
   var btnGood = document.getElementById('friends-panel-conc-good');
   var btnNot = document.getElementById('friends-panel-conc-not');
-  concDisp.textContent = conclusion === 'good' ? 'This person is good for me ♥' : conclusion === 'not' ? 'This person is not good for me.' : '';
-  btnGood.style.background = conclusion === 'good' ? '#f48fb1' : 'transparent';
-  btnGood.style.color = conclusion === 'good' ? '#fff' : '#f48fb1';
-  btnNot.style.background = conclusion === 'not' ? '#b0b0b0' : 'transparent';
-  btnNot.style.color = conclusion === 'not' ? '#fff' : '#b0b0b0';
+  if (concDisp) concDisp.textContent = conclusion === 'good' ? 'This person is good for me ♥' : conclusion === 'not' ? 'This person is not good for me.' : '';
+  if (btnGood) { btnGood.style.background = conclusion === 'good' ? '#f48fb1' : 'transparent'; btnGood.style.color = conclusion === 'good' ? '#fff' : '#f48fb1'; }
+  if (btnNot) { btnNot.style.background = conclusion === 'not' ? '#b0b0b0' : 'transparent'; btnNot.style.color = conclusion === 'not' ? '#fff' : '#b0b0b0'; }
 
   // Analytics stats
   var hrs = f.timeNum ? parseFloat(f.timeNum) : 0;
@@ -11099,11 +11324,9 @@ function friendsPanelSetConclusion(val) {
   var concDisp = document.getElementById('friends-panel-conc-display');
   var btnGood = document.getElementById('friends-panel-conc-good');
   var btnNot = document.getElementById('friends-panel-conc-not');
-  concDisp.textContent = next === 'good' ? 'This person is good for me ♥' : next === 'not' ? 'This person is not good for me.' : '';
-  btnGood.style.background = next === 'good' ? '#f48fb1' : 'transparent';
-  btnGood.style.color = next === 'good' ? '#fff' : '#f48fb1';
-  btnNot.style.background = next === 'not' ? '#b0b0b0' : 'transparent';
-  btnNot.style.color = next === 'not' ? '#fff' : '#b0b0b0';
+  if (concDisp) concDisp.textContent = next === 'good' ? 'This person is good for me ♥' : next === 'not' ? 'This person is not good for me.' : '';
+  if (btnGood) { btnGood.style.background = next === 'good' ? '#f48fb1' : 'transparent'; btnGood.style.color = next === 'good' ? '#fff' : '#f48fb1'; }
+  if (btnNot) { btnNot.style.background = next === 'not' ? '#b0b0b0' : 'transparent'; btnNot.style.color = next === 'not' ? '#fff' : '#b0b0b0'; }
 }
 
 function friendsPanelRenderNotes(notes) {
