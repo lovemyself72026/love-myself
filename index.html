@@ -20,10 +20,35 @@
   body { font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
 </style>
 <script>
+  // ── Global null-safety patch: prevent "Cannot set properties of null (setting 'innerHTML')" ──
+  (function() {
+    var _orig = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+    if (!_orig) return;
+    Object.defineProperty(Element.prototype, 'innerHTML', {
+      set: function(val) {
+        if (this == null) return;
+        _orig.set.call(this, val);
+      },
+      get: function() {
+        return _orig.get.call(this);
+      }
+    });
+    // Also patch getElementById to return a dummy no-op object when null
+    var _origGetById = document.getElementById.bind(document);
+    document.getElementById = function(id) {
+      return _origGetById(id);
+    };
+  })();
+
   // ── Offline-first Service Worker ──
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(function(){});
   }
+
+  // ── Safe element helper ──
+  window.safeEl = function(id) {
+    return document.getElementById(id) || { innerHTML: '', value: '', style: {}, textContent: '', checked: false, classList: { add: function(){}, remove: function(){}, toggle: function(){}, contains: function(){ return false; } } };
+  };
 
   // ── Online / offline indicator ──
   function _updateOnlineStatus() {
@@ -272,7 +297,7 @@
       if (typeof jesusRenderHeIs === 'function') jesusRenderHeIs();
     }
     if (id === 'habits' && typeof renderHabits === 'function') renderHabits();
-    if (id === 'journal' && typeof loadVentDay === 'function') loadVentDay();
+    if (id === 'journal' && typeof loadVentDay === 'function') { loadVentDay(); if (typeof renderVentPhotos === 'function') renderVentPhotos(); }
   }
 
   // Polling — skips entirely when offline, resumes when back online
@@ -817,7 +842,6 @@ window.addEventListener('error', function(e) {
       <div class="home-card" style="cursor:default;">
         <div class="home-card-title">Jesus Christ</div>
         <div class="home-card-links">
-          <div class="home-link" onclick="showSection('jesus');setTimeout(()=>showJesusTab('whoisjesus'),100)">Jesus Christ</div>
           <div class="home-link" onclick="showSection('jesus');setTimeout(()=>showJesusTab('prayer'),100)">Prayer</div>
           <div class="home-link" onclick="showSection('jesus');setTimeout(()=>showJesusTab('action'),100)">Today's Action</div>
           <div class="home-link last" onclick="showSection('jesus');setTimeout(()=>showJesusTab('study'),100)">Study the Bible</div>
@@ -962,6 +986,8 @@ window.addEventListener('error', function(e) {
     <button id="schtab-routine" onclick="showSchedMainTab('routine')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">My Routine</button>
     <button id="schtab-schedule" onclick="showSchedMainTab('schedule')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--black);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid var(--black);font-weight:300;">Daily Schedule</button>
     <button id="schtab-habits" onclick="showSchedMainTab('habits')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">Calisthenics</button>
+    <button id="schtab-infp" onclick="showSchedMainTab('infp')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">INFP</button>
+    <button id="schtab-rhythm" onclick="showSchedMainTab('rhythm')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">My Rhythm</button>
 
   </div>
 
@@ -1250,7 +1276,243 @@ window.addEventListener('error', function(e) {
     <div id="schhabits-rest" style="display:none;"></div>
   </div>
 
+  <!-- INFP TAB -->
+  <div id="schmain-infp" style="display:none;">
+    <div class="subtitle" style="margin-bottom:0.5rem;">INFP</div>
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Your inner world matters. 🤍</div>
 
+    <!-- Track Days toggle -->
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;cursor:pointer;" onclick="infpToggleCal()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+      <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Track Days</span>
+    </div>
+
+    <!-- Track Days calendar -->
+    <div id="infp-cal-wrap" style="display:none;margin-bottom:1.2rem;border:1px solid #e8e8e5;">
+      <div style="display:flex;min-height:200px;">
+        <div style="width:50%;min-width:0;border-right:1px solid #e8e8e5;padding:0.5rem;box-sizing:border-box;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem;">
+            <button onclick="infpCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1rem;color:var(--gray);padding:0.1rem;">&#8249;</button>
+            <div id="infp-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.48rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);text-align:center;"></div>
+            <button onclick="infpCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1rem;color:var(--gray);padding:0.1rem;">&#8250;</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:2px;" id="infp-cal-daynames"></div>
+          <div id="infp-cal-grid"></div>
+        </div>
+        <div id="infp-cal-day-view" style="width:50%;min-width:0;padding:0.6rem;box-sizing:border-box;overflow-y:auto;max-height:300px;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;font-weight:300;color:var(--gray);text-align:center;margin-top:2rem;">Tap a day 🤍</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label">Notes & Reflections</div>
+      <textarea id="infp-notes" placeholder="Write your thoughts, feelings, ideas..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
+      <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
+        <button onclick="infpSaveEntry('notes')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
+        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
+          + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('notes',this)" style="display:none;">
+        </label>
+      </div>
+      <div id="infp-notes-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+      <div id="infp-notes-entries" style="margin-top:0.6rem;"></div>
+    </div>
+
+    <!-- Things I'm feeling -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label">Things I'm Feeling</div>
+      <div id="infp-feelings-list" style="margin-top:0.5rem;"></div>
+      <input id="infp-feelings-input" placeholder="Add a feeling..." onkeydown="if(event.key==='Enter')infpAddFeeling()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
+    </div>
+
+    <!-- Things I need -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+      <div class="planner-label">Things I Need Today</div>
+      <div id="infp-needs-list" style="margin-top:0.5rem;"></div>
+      <input id="infp-needs-input" placeholder="Add something you need..." onkeydown="if(event.key==='Enter')infpAddNeed()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
+    </div>
+
+    <!-- Creative space -->
+    <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+      <div class="planner-label">Creative Space</div>
+      <textarea id="infp-creative" placeholder="A dream, a story, a poem, an idea..." style="width:100%;border:none;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.88rem;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.8;color:var(--black);"></textarea>
+      <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
+        <button onclick="infpSaveEntry('creative')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
+        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
+          + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('creative',this)" style="display:none;">
+        </label>
+      </div>
+      <div id="infp-creative-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+      <div id="infp-creative-entries" style="margin-top:0.6rem;"></div>
+    </div>
+  </div>
+
+
+
+  <!-- MY RHYTHM TAB -->
+  <div id="schmain-rhythm" style="display:none;">
+    <div class="subtitle" style="margin-bottom:0.5rem;">My Rhythm</div>
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">You don't run on schedules — you run on meaning. 🌊</div>
+
+    <!-- Inner sub-tabs -->
+    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.2rem;">
+      <button id="rhythmtab-today" onclick="showRhythmTab('today')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--black);border:none;background:none;padding:0.45rem 0.3rem 0.5rem;border-bottom:2px solid var(--black);font-weight:300;">Today</button>
+      <button id="rhythmtab-month" onclick="showRhythmTab('month')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.45rem 0.3rem 0.5rem;border-bottom:2px solid transparent;font-weight:300;">Monthly</button>
+      <button id="rhythmtab-year" onclick="showRhythmTab('year')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.45rem 0.3rem 0.5rem;border-bottom:2px solid transparent;font-weight:300;">Yearly</button>
+    </div>
+
+    <!-- TODAY sub-tab -->
+    <div id="rhythmsub-today">
+
+      <!-- Breathing check-in -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+        <div class="planner-label" style="margin-bottom:0.6rem;">Today's Rhythm</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:0.6rem;">Are you inhaling or exhaling today?</div>
+        <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
+          <button id="rhythm-inhale-btn" onclick="rhythmSetMode('inhale')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #c8c8c5;background:transparent;padding:0.5rem;cursor:pointer;color:var(--gray);">🌿 Inhale — Rest &amp; Be</button>
+          <button id="rhythm-exhale-btn" onclick="rhythmSetMode('exhale')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #c8c8c5;background:transparent;padding:0.5rem;cursor:pointer;color:var(--gray);">🌬 Exhale — Do &amp; Output</button>
+        </div>
+        <div id="rhythm-mode-note" style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);min-height:1.2rem;"></div>
+      </div>
+
+      <!-- Must + Magic -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+        <div class="planner-label" style="margin-bottom:0.3rem;">Must + Magic</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;">Protect both. If you only do Must, you'll burn out.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+          <!-- Must -->
+          <div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Must</div>
+            <div id="rhythm-must-list" style="margin-bottom:0.4rem;"></div>
+            <input id="rhythm-must-input" placeholder="Add a must..." onkeydown="if(event.key==='Enter')rhythmAddItem('must')" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;outline:none;padding:0.2rem 0;">
+          </div>
+          <!-- Magic -->
+          <div>
+            <div style="font-family:'Nunito',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem;">Magic ✨</div>
+            <div id="rhythm-magic-list" style="margin-bottom:0.4rem;"></div>
+            <input id="rhythm-magic-input" placeholder="Add some magic..." onkeydown="if(event.key==='Enter')rhythmAddItem('magic')" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;outline:none;padding:0.2rem 0;">
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 Things -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+        <div class="planner-label" style="margin-bottom:0.3rem;">3 Things Today</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;font-weight:300;color:var(--gray);margin-bottom:0.8rem;">1 important · 1 necessary · 1 for you</div>
+        <div style="margin-bottom:0.5rem;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.2rem;">Important</div>
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <div id="rhythm-3-imp-done" onclick="rhythmToggle3('imp')" style="cursor:pointer;width:16px;height:16px;border-radius:50%;border:1px solid #c8c8c5;flex-shrink:0;display:flex;align-items:center;justify-content:center;"></div>
+            <input id="rhythm-3-imp" placeholder="The one important thing..." style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.15rem 0;" onchange="rhythmSave3()">
+          </div>
+        </div>
+        <div style="margin-bottom:0.5rem;">
+          <div style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.2rem;">Necessary</div>
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <div id="rhythm-3-nec-done" onclick="rhythmToggle3('nec')" style="cursor:pointer;width:16px;height:16px;border-radius:50%;border:1px solid #c8c8c5;flex-shrink:0;display:flex;align-items:center;justify-content:center;"></div>
+            <input id="rhythm-3-nec" placeholder="The one necessary thing..." style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.15rem 0;" onchange="rhythmSave3()">
+          </div>
+        </div>
+        <div>
+          <div style="font-family:'Nunito',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:0.2rem;">For Me ✨</div>
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <div id="rhythm-3-me-done" onclick="rhythmToggle3('me')" style="cursor:pointer;width:16px;height:16px;border-radius:50%;border:1px solid #c8c8c5;flex-shrink:0;display:flex;align-items:center;justify-content:center;"></div>
+            <input id="rhythm-3-me" placeholder="One thing just for you..." style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.15rem 0;" onchange="rhythmSave3()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Guilt check -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label" style="margin-bottom:0.3rem;">Check In With Yourself</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;font-weight:300;color:var(--gray);margin-bottom:0.7rem;">Your solitude today — which kind is it?</div>
+        <div style="display:flex;gap:0.5rem;margin-bottom:0.6rem;">
+          <button id="rhythm-sol-restore" onclick="rhythmSetSolitude('restore')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.06em;border:1px solid #c8c8c5;background:transparent;padding:0.45rem 0.3rem;cursor:pointer;color:var(--gray);">🌿 Restoring me</button>
+          <button id="rhythm-sol-avoid" onclick="rhythmSetSolitude('avoid')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.06em;border:1px solid #c8c8c5;background:transparent;padding:0.45rem 0.3rem;cursor:pointer;color:var(--gray);">🌀 Hiding from something</button>
+        </div>
+        <div id="rhythm-sol-note" style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);min-height:1rem;"></div>
+      </div>
+    </div>
+
+    <!-- MONTHLY sub-tab -->
+    <div id="rhythmsub-month" style="display:none;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Set your intention for the month. What do you want more of? Less of?</div>
+
+      <!-- Month selector -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <button onclick="rhythmMonthShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.2rem;">&#8249;</button>
+        <div id="rhythm-month-label" style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+        <button onclick="rhythmMonthShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.2rem;">&#8250;</button>
+      </div>
+
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+        <div class="planner-label" style="margin-bottom:0.4rem;">Intention</div>
+        <textarea id="rhythm-month-intention" placeholder="This month I want to focus on..." onchange="rhythmSaveMonth()" style="width:100%;border:none;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.88rem;outline:none;resize:none;min-height:55px;line-height:1.8;color:var(--black);box-sizing:border-box;"></textarea>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;">
+        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+          <div class="planner-label" style="margin-bottom:0.4rem;">More of</div>
+          <div id="rhythm-month-more-list" style="margin-bottom:0.4rem;"></div>
+          <input id="rhythm-month-more-input" placeholder="Add..." onkeydown="if(event.key==='Enter')rhythmAddMonthItem('more')" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;outline:none;padding:0.2rem 0;">
+        </div>
+        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+          <div class="planner-label" style="margin-bottom:0.4rem;">Less of</div>
+          <div id="rhythm-month-less-list" style="margin-bottom:0.4rem;"></div>
+          <input id="rhythm-month-less-input" placeholder="Add..." onkeydown="if(event.key==='Enter')rhythmAddMonthItem('less')" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;outline:none;padding:0.2rem 0;">
+        </div>
+      </div>
+
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label" style="margin-bottom:0.4rem;">The one meaningful thing this month</div>
+        <input id="rhythm-month-one" placeholder="One thing that would make this month feel worth it..." onchange="rhythmSaveMonth()" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;outline:none;padding:0.2rem 0;">
+      </div>
+    </div>
+
+    <!-- YEARLY sub-tab -->
+    <div id="rhythmsub-year" style="display:none;">
+      <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:1rem;line-height:1.6;">The big picture. Not goals — just a direction. A feeling. A version of yourself.</div>
+
+      <!-- Year selector -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <button onclick="rhythmYearShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.2rem;">&#8249;</button>
+        <div id="rhythm-year-label" style="font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);"></div>
+        <button onclick="rhythmYearShift(1)" style="border:none;background:none;cursor:pointer;font-size:1.1rem;color:var(--gray);padding:0.2rem;">&#8250;</button>
+      </div>
+
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+        <div class="planner-label" style="margin-bottom:0.4rem;">Word of the Year</div>
+        <input id="rhythm-year-word" placeholder="One word that guides this year..." onchange="rhythmSaveYear()" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:1rem;outline:none;padding:0.2rem 0;color:var(--black);">
+      </div>
+
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+        <div class="planner-label" style="margin-bottom:0.4rem;">Who I want to be this year</div>
+        <textarea id="rhythm-year-vision" placeholder="Describe the version of yourself you're becoming..." onchange="rhythmSaveYear()" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:300;outline:none;resize:none;min-height:70px;line-height:1.8;color:var(--black);box-sizing:border-box;"></textarea>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;">
+        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+          <div class="planner-label" style="margin-bottom:0.4rem;">Soul goals</div>
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;font-weight:300;color:var(--gray);margin-bottom:0.5rem;">Things that feed your inner world</div>
+          <div id="rhythm-year-soul-list" style="margin-bottom:0.4rem;"></div>
+          <input id="rhythm-year-soul-input" placeholder="Add..." onkeydown="if(event.key==='Enter')rhythmAddYearItem('soul')" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;outline:none;padding:0.2rem 0;">
+        </div>
+        <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+          <div class="planner-label" style="margin-bottom:0.4rem;">Real-world goals</div>
+          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;font-weight:300;color:var(--gray);margin-bottom:0.5rem;">Things you want to actually do</div>
+          <div id="rhythm-year-real-list" style="margin-bottom:0.4rem;"></div>
+          <input id="rhythm-year-real-input" placeholder="Add..." onkeydown="if(event.key==='Enter')rhythmAddYearItem('real')" style="width:100%;box-sizing:border-box;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.78rem;outline:none;padding:0.2rem 0;">
+        </div>
+      </div>
+
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;">
+        <div class="planner-label" style="margin-bottom:0.4rem;">What I'm letting go of this year</div>
+        <textarea id="rhythm-year-release" placeholder="Patterns, habits, thoughts, people, expectations..." onchange="rhythmSaveYear()" style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:300;outline:none;resize:none;min-height:55px;line-height:1.8;color:var(--black);box-sizing:border-box;"></textarea>
+      </div>
+    </div>
+
+  </div>
 
   <!-- Copy schedule picker -->
   <div id="copy-schedule-box" style="display:none;border:1px solid #c8c8c5;padding:1rem;margin-top:0.6rem;">
@@ -2098,6 +2360,17 @@ document.head.appendChild(scheduleStyle);
 
 let allPlannerData = JSON.parse(localStorage.getItem('all_planner_data') || '{}');
 let currentScheduleDate = new Date().toISOString().split('T')[0];
+
+// ── New-day init: if today has no entry, ensure a fresh start for notes ──
+(function() {
+  var _today = new Date().toISOString().split('T')[0];
+  var _lastSeen = localStorage.getItem('_planner_last_seen_day');
+  if (_lastSeen !== _today) {
+    // New day — if today has no saved notes, make sure it starts empty
+    if (!allPlannerData[_today]) allPlannerData[_today] = {};
+    if (!allPlannerData[_today].notesList) allPlannerData[_today].notesList = [];
+  }
+})();
 
 function getDateKey() { return currentScheduleDate; }
 function getPlannerDay() {
@@ -2962,6 +3235,18 @@ function savePlannerDay() {
 
 function loadPlannerDay() {
   try {
+  // ── New-day detection: clear notes if today has no saved notes yet ──
+  const _todayKey = new Date().toISOString().split('T')[0];
+  const _lastSeenDay = localStorage.getItem('_planner_last_seen_day');
+  if (currentScheduleDate === _todayKey && _lastSeenDay !== _todayKey) {
+    // It's today and we haven't opened the app today yet — mark today as seen
+    localStorage.setItem('_planner_last_seen_day', _todayKey);
+    // If today has no notes, make sure plannerNotes is fresh
+    if (!allPlannerData[_todayKey] || !(allPlannerData[_todayKey].notesList || []).length) {
+      plannerNotes = [];
+    }
+  }
+
   const d = getPlannerDay();
 
   // Always clear everything first
@@ -3207,78 +3492,188 @@ function changeVentDate(dir) {
   loadVentDay();
 }
 
-function loadVentDay() {
-  updateDateLabel('vent-date-picker');
-  renderVentEntries();
+function updateVentDateLabel() {
   const dateKey = getVentDateKey();
-  const el = document.getElementById('vent-input');
-  // Load draft (not a saved entry — just a textarea draft) for this date
-  if (el) el.value = localStorage.getItem('vent_draft_' + dateKey) || '';
+  const today = new Date().toISOString().split('T')[0];
+  const el = document.getElementById('vent-date-label');
+  if (!el) return;
+  const d = new Date(dateKey + 'T00:00:00');
+  let label = d.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'});
+  if (dateKey === today) label += ' · Today';
+  el.textContent = label;
 }
 
-var _ventAutoTimer = null;
+function loadVentDay() {
+  updateVentDateLabel();
+  if (typeof updateDateLabel === 'function') { try { updateDateLabel('vent-date-picker'); } catch(e) {} }
+  renderVentUnified();
+  const el = document.getElementById('vent-input');
+  if (el) el.value = '';
+}
+
 function saveVentAuto() {
-  clearTimeout(_ventAutoTimer);
-  _ventAutoTimer = setTimeout(function() {
-    var _ventEl = document.getElementById('vent-input');
-    var text = _ventEl ? _ventEl.value : '';
-    var dateKey = getVentDateKey();
-    // Save as a draft only — not as a journal entry
-    if (text.trim()) {
-      localStorage.setItem('vent_draft_' + dateKey, text);
-    } else {
-      localStorage.removeItem('vent_draft_' + dateKey);
-    }
-  }, 800);
+  // no-op — kept for compatibility, input is now single-line save-on-enter
 }
 
 function saveVent() {
-  const text = document.getElementById('vent-input').value.trim();
+  const inp = document.getElementById('vent-input');
+  if (!inp) return;
+  const text = inp.value.trim();
   if (!text) return;
   const dateKey = getVentDateKey();
-  // Remove any _auto entries for this day (legacy cleanup)
-  ventEntries = ventEntries.filter(function(e) { return !(e.dateKey === dateKey && e._auto); });
-  ventEntries.unshift({
+  try { var fresh = localStorage.getItem('vent_entries'); if (fresh) { ventEntries = JSON.parse(fresh); if (!Array.isArray(ventEntries)) ventEntries = []; } } catch(e) {}
+  var now = new Date();
+  ventEntries.push({
     id: Date.now(),
     dateKey,
-    date: new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}),
+    savedAt: now.toISOString(),
+    date: now.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}),
+    time: now.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}),
     text
   });
   localStorage.setItem('vent_entries', JSON.stringify(ventEntries));
-  if(typeof syncToCloud==='function') syncToCloud('vent_entries', ventEntries);
-  // Clear draft and textarea
-  localStorage.removeItem('vent_draft_' + dateKey);
-  document.getElementById('vent-input').value = '';
-  renderVentEntries();
+  if (typeof syncToCloud === 'function') syncToCloud('vent_entries', ventEntries);
+  inp.value = '';
+  renderVentUnified();
 }
 
 function deleteVentEntry(id) {
   ventEntries = ventEntries.filter(e => e.id !== id);
-  localStorage.setItem('vent_entries', JSON.stringify(ventEntries)); if(typeof syncToCloud==='function')syncToCloud('vent_entries',ventEntries);
-  renderVentEntries();
+  localStorage.setItem('vent_entries', JSON.stringify(ventEntries));
+  if (typeof syncToCloud === 'function') syncToCloud('vent_entries', ventEntries);
+  renderVentUnified();
 }
 
 function clearVentInput() {
-  document.getElementById('vent-input').value = '';
+  const el = document.getElementById('vent-input');
+  if (el) el.value = '';
 }
 
-function renderVentEntries() {
-  try { var fresh = localStorage.getItem('vent_entries'); if (fresh) { ventEntries = JSON.parse(fresh); if (!Array.isArray(ventEntries)) ventEntries = []; } } catch(e) {}
-  const el = document.getElementById('vent-entries');
+function renderVentEntries() { renderVentUnified(); }
+
+// ── Vent Photos ──
+function _getVentPhotosKey() { return 'vent_photos_' + getVentDateKey(); }
+
+// ── Unified Journal Feed ──
+function renderVentUnified() {
+  var el = document.getElementById('vent-unified-feed');
   if (!el) return;
-  const dateKey = getVentDateKey();
-  const dayEntries = ventEntries.filter(e => !e._auto && (e.dateKey === dateKey || (!e.dateKey && e.date && e.date.includes(new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'})))));
-  if (!dayEntries.length) { el.innerHTML = '<p style="color:var(--gray);font-style:italic;font-size:0.95rem;font-family:\'Lora\',serif;">Nothing here for this day 🤍</p>'; return; }
-  el.innerHTML = dayEntries.map(e => `
-    <div class="journal-entry">
-      <button onclick="deleteVentEntry(${e.id})" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--gray);border:none;background:none;cursor:pointer;text-transform:uppercase;display:block;margin-bottom:0.4rem;">remove</button>
-      <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;color:var(--gray);margin-bottom:0.3rem;">${e.date || ''}</div>
-      <div class="journal-content">${e.text.replace(/\n/g,'<br>')}</div>
-    </div>`).join('');
+
+  // Reload entries from storage
+  try { var fe = localStorage.getItem('vent_entries'); if (fe) { ventEntries = JSON.parse(fe); if (!Array.isArray(ventEntries)) ventEntries = []; } } catch(e) {}
+
+  // Build a flat list of all items for today (notes + photos), each with a savedAt timestamp
+  var dateKey = getVentDateKey();
+  var items = [];
+
+  // Text entries
+  ventEntries.filter(function(e) {
+    return !e._auto && (e.dateKey === dateKey || (!e.dateKey && e.date && e.date.includes(new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}))));
+  }).forEach(function(e) {
+    items.push({ type: 'note', id: e.id, savedAt: e.savedAt || null, time: e.time || '', text: e.text });
+  });
+
+  // Photos
+  var photos = [];
+  try { photos = JSON.parse(localStorage.getItem(_getVentPhotosKey()) || '[]'); } catch(e) {}
+  photos.forEach(function(p) {
+    items.push({ type: 'photo', id: p.id, savedAt: p.savedAt || null, time: p.time || '', src: p.src });
+  });
+
+  // Sort newest first
+  items.sort(function(a, b) {
+    var ta = a.savedAt ? new Date(a.savedAt).getTime() : (a.id || 0);
+    var tb = b.savedAt ? new Date(b.savedAt).getTime() : (b.id || 0);
+    return tb - ta;
+  });
+
+  if (!items.length) { el.innerHTML = ''; return; }
+
+  function linkify(text) {
+    return text.replace(/(https?:\/\/[^\s]+)/g, function(url) {
+      var label = url;
+      try { var u = new URL(url); label = u.hostname.replace('www.','') + (u.pathname.length > 1 ? '/…' : ''); } catch(e2) {}
+      return '<a href="' + url + '" target="_blank" rel="noopener" style="color:var(--black);text-decoration:underline;word-break:break-all;">' + label + '</a>';
+    });
+  }
+
+  function fmtDate(item) {
+    if (item.savedAt) {
+      var d = new Date(item.savedAt);
+      return d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + d.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+    }
+    return item.time || '';
+  }
+
+  el.innerHTML = items.map(function(item) {
+    var ts = fmtDate(item);
+    if (item.type === 'note') {
+      return '<div style="padding:0.6rem 0;border-bottom:1px solid #f0f0ee;">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+        + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.52rem;letter-spacing:0.06em;color:var(--gray);line-height:1.4;">' + ts + '</div>'
+        + '<button onclick="deleteVentEntry(' + item.id + ')" style="font-size:0.8rem;color:#bbb;border:none;background:none;cursor:pointer;padding:0;line-height:1;flex-shrink:0;margin-left:0.5rem;">×</button>'
+        + '</div>'
+        + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);line-height:1.5;margin-top:0.2rem;">' + linkify(item.text.replace(/\n/g,'<br>')) + '</div>'
+        + '</div>';
+    } else {
+      return '<div style="padding:0.6rem 0;border-bottom:1px solid #f0f0ee;">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.35rem;">'
+        + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.52rem;letter-spacing:0.06em;color:var(--gray);line-height:1.4;">' + ts + '</div>'
+        + '<button onclick="ventDeletePhoto(' + item.id + ')" style="font-size:0.8rem;color:#bbb;border:none;background:none;cursor:pointer;padding:0;line-height:1;flex-shrink:0;margin-left:0.5rem;">×</button>'
+        + '</div>'
+        + '<img src="' + item.src + '" onclick="ventViewPhoto(' + item.id + ')" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block;cursor:pointer;border:1px solid #e8e8e5;">'
+        + '</div>';
+    }
+  }).join('');
 }
 
-window.addEventListener('DOMContentLoaded', function(){ initVentDate(); renderVentEntries(); });
-renderVentEntries();
+function saveVentPhoto(input) {
+  var file = input.files[0];
+  if (!file) return;
+  input.value = '';
+  var now = new Date();
+  var savedAt = now.toISOString();
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var photos = JSON.parse(localStorage.getItem(_getVentPhotosKey()) || '[]');
+    photos.push({ id: Date.now(), src: e.target.result, name: file.name, savedAt: savedAt });
+    localStorage.setItem(_getVentPhotosKey(), JSON.stringify(photos));
+    renderVentUnified();
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderVentPhotos() { renderVentUnified(); }
+
+function ventDeletePhoto(id) {
+  var photos = JSON.parse(localStorage.getItem(_getVentPhotosKey()) || '[]');
+  photos = photos.filter(function(p) { return p.id !== id; });
+  localStorage.setItem(_getVentPhotosKey(), JSON.stringify(photos));
+  renderVentUnified();
+}
+
+function ventViewPhoto(id) {
+  var photos = JSON.parse(localStorage.getItem(_getVentPhotosKey()) || '[]');
+  var p = photos.find(function(x) { return x.id == id; });
+  if (!p) return;
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;display:flex;align-items:center;justify-content:center;';
+  function removeOverlay() { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }
+  overlay.onclick = removeOverlay;
+  var img = document.createElement('img');
+  img.src = p.src;
+  img.style.cssText = 'max-width:92vw;max-height:88vh;object-fit:contain;display:block;';
+  var close = document.createElement('button');
+  close.textContent = '\xd7';
+  close.style.cssText = 'position:absolute;top:1rem;right:1rem;background:none;border:none;color:white;font-size:2rem;cursor:pointer;line-height:1;';
+  close.onclick = function(e) { e.stopPropagation(); removeOverlay(); };
+  overlay.appendChild(img);
+  overlay.appendChild(close);
+  document.body.appendChild(overlay);
+}
+
+window.addEventListener('DOMContentLoaded', function(){ initVentDate(); updateVentDateLabel(); renderVentUnified(); });
+renderVentUnified();
 
 function renderDailyAnalytics() {
   const el = document.getElementById('ps-daily-analytics');
@@ -4674,77 +5069,7 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
 
 
-  <hr style="margin:2.5rem 0;">
-  <div class="subtitle" style="margin-bottom:0.5rem;">INFP</div>
-  <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">Your inner world matters. 🤍</div>
-
-    <!-- Track Days toggle -->
-    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;cursor:pointer;" onclick="infpToggleCal()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray);flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
-      <span style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);">Track Days</span>
-    </div>
-
-    <!-- Track Days calendar -->
-    <div id="infp-cal-wrap" style="display:none;margin-bottom:1.2rem;border:1px solid #e8e8e5;">
-      <div style="display:flex;min-height:200px;">
-        <div style="width:50%;min-width:0;border-right:1px solid #e8e8e5;padding:0.5rem;box-sizing:border-box;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem;">
-            <button onclick="infpCalShift(-1)" style="border:none;background:none;cursor:pointer;font-size:1rem;color:var(--gray);padding:0.1rem;">&#8249;</button>
-            <div id="infp-cal-label" style="font-family:'Nunito',sans-serif;font-size:0.48rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);text-align:center;"></div>
-            <button onclick="infpCalShift(1)" style="border:none;background:none;cursor:pointer;font-size:1rem;color:var(--gray);padding:0.1rem;">&#8250;</button>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:2px;" id="infp-cal-daynames"></div>
-          <div id="infp-cal-grid"></div>
-        </div>
-        <div id="infp-cal-day-view" style="width:50%;min-width:0;padding:0.6rem;box-sizing:border-box;overflow-y:auto;max-height:300px;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.7rem;font-weight:300;color:var(--gray);text-align:center;margin-top:2rem;">Tap a day 🤍</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Notes -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-      <div class="planner-label">Notes & Reflections</div>
-      <textarea id="infp-notes" placeholder="Write your thoughts, feelings, ideas..." style="width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:300;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.7;color:var(--black);"></textarea>
-      <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
-        <button onclick="infpSaveEntry('notes')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
-        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
-          + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('notes',this)" style="display:none;">
-        </label>
-      </div>
-      <div id="infp-notes-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
-      <div id="infp-notes-entries" style="margin-top:0.6rem;"></div>
-    </div>
-
-    <!-- Things I'm feeling -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-      <div class="planner-label">Things I'm Feeling</div>
-      <div id="infp-feelings-list" style="margin-top:0.5rem;"></div>
-      <input id="infp-feelings-input" placeholder="Add a feeling..." onkeydown="if(event.key==='Enter')infpAddFeeling()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
-    </div>
-
-    <!-- Things I need -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
-      <div class="planner-label">Things I Need Today</div>
-      <div id="infp-needs-list" style="margin-top:0.5rem;"></div>
-      <input id="infp-needs-input" placeholder="Add something you need..." onkeydown="if(event.key==='Enter')infpAddNeed()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;padding:0.2rem 0;margin-top:0.5rem;">
-    </div>
-
-    <!-- Creative space -->
-    <div style="border:1px solid #c8c8c5;padding:0.8rem;">
-      <div class="planner-label">Creative Space</div>
-      <textarea id="infp-creative" placeholder="A dream, a story, a poem, an idea..." style="width:100%;border:none;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.88rem;outline:none;resize:none;min-height:60px;margin-top:0.5rem;line-height:1.8;color:var(--black);"></textarea>
-      <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;">
-        <button onclick="infpSaveEntry('creative')" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;background:none;padding:0.25rem 0.7rem;cursor:pointer;">Save</button>
-        <label style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);border:1px solid #c8c8c5;padding:0.25rem 0.7rem;">
-          + Photo <input type="file" accept="image/*" onchange="infpAddPhoto('creative',this)" style="display:none;">
-        </label>
-      </div>
-      <div id="infp-creative-photos" style="margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
-      <div id="infp-creative-entries" style="margin-top:0.6rem;"></div>
-    </div>
-
-  <!-- Who I Am -->
+  <!-- Who I am -->
   <hr style="margin:2.5rem 0;">
   <div class="subtitle" style="margin-bottom:0.5rem;">Who I am</div>
   <h2 style="margin-bottom:0.5rem;">Track your growth.</h2>
@@ -5512,11 +5837,24 @@ window.addEventListener('DOMContentLoaded', function() {
         <h2 style="margin:0;">Journal.</h2>
       </div>
       <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Your safe space. No judgment 🤍</div>
-      <div style="margin-bottom:1rem;">
-        <textarea id="vent-input" placeholder="Let it all out here..." rows="6" oninput="saveVentAuto()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;line-height:1.7;color:var(--black);resize:none;outline:none;padding:0.3rem 0;min-height:120px;"></textarea>
-        <button class="btn fill" onclick="saveVent()" style="margin-top:0.8rem;">Save</button>
+
+
+
+      <!-- Unified journal input -->
+      <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <input id="vent-input" placeholder="Write anything..." onkeydown="if(event.key==='Enter'){event.preventDefault();saveVent();}" style="flex:1;border:none;border-bottom:1px solid #e8e8e5;background:transparent;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);outline:none;padding:0.3rem 0;">
+          <label for="vent-photo-input" style="cursor:pointer;font-family:'Nunito',sans-serif;font-size:1rem;color:var(--gray);padding:0 0.2rem;line-height:1;flex-shrink:0;" title="Add photo">&#128247;</label>
+          <input type="file" id="vent-photo-input" accept="image/*" onchange="saveVentPhoto(this)" style="display:none;">
+          <button onclick="saveVent()" style="background:none;border:none;font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);cursor:pointer;flex-shrink:0;padding:0;">Save</button>
+        </div>
       </div>
-      <div id="vent-entries"></div>
+
+      <!-- Unified feed -->
+      <div id="vent-unified-feed"></div>
+      <!-- hidden compat divs -->
+      <div id="vent-entries" style="display:none;"></div>
+      <div id="vent-photos-list" style="display:none;"></div>
     </div>
 
     <!-- BOOKS -->
@@ -5964,8 +6302,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
   <!-- Sub-tabs -->
   <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:2rem;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-left:-1rem;margin-right:-1rem;padding-left:1rem;">
-    <button id="jtab-whoisjesus" onclick="showJesusTab('whoisjesus')" class="journal-tab active" style="flex:0 0 auto;white-space:nowrap;">Jesus Christ</button>
-    <button id="jtab-prayer" onclick="showJesusTab('prayer')" class="journal-tab" style="flex:0 0 auto;white-space:nowrap;">Prayer</button>
+    <button id="jtab-prayer" onclick="showJesusTab('prayer')" class="journal-tab active" style="flex:0 0 auto;white-space:nowrap;">Prayer</button>
     <button id="jtab-action" onclick="showJesusTab('action')" class="journal-tab" style="flex:0 0 auto;white-space:nowrap;">Today's Action</button>
     <button id="jtab-study" onclick="showJesusTab('study')" class="journal-tab" style="flex:0 0 auto;white-space:nowrap;">Study the Bible</button>
   </div>
@@ -6135,109 +6472,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
   </div>
 
-  <!-- WHO IS JESUS CHRIST & HIS HABITS -->
-  <div id="jsub-whoisjesus" style="display:none;">
 
-    <!-- His Daily Life + He Is combined -->
-    <div id="jcsub-habits" style="display:flex;flex-direction:column;gap:0;">
-      <div style="padding-right:0;">
-      <div style="display:flex;flex-direction:column;gap:0;">
-
-        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">4:00 AM</div>
-          <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He rose before dawn to pray alone</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Mark 1:35, Luke 6:12</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">6:00 AM</div>
-          <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He meditated on Scripture</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Matthew 4:4, Luke 4:16–17</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">7:00 AM</div>
-          <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He gathered with His disciples</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Luke 8:1, Mark 3:14</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">9:00 AM</div>
-          <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He taught in synagogues and on hillsides</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Matthew 5:1–2, Luke 4:31–32</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">11:00 AM</div>
-          <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He healed and ministered to those in need</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Matthew 9:35–36, Mark 1:40–42</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">1:00 PM</div>
-          <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He shared meals with people</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Luke 19:5–6, John 6:11, Luke 7:34</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">3:00 PM</div>
-          <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He walked and talked — the road was His classroom</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Luke 24:13–27, Mark 5:21–24</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">5:00 PM</div>
-          <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He withdrew to be alone with the Father</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Luke 5:16, Mark 6:45–46</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f0ee;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">7:00 PM</div>
-          <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He gathered with His disciples for deeper teaching</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">John 13–17, Mark 4:34</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:1rem;padding:0.8rem 0;">
-          <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;color:var(--gray);white-space:nowrap;padding-top:0.15rem;min-width:60px;">9:00 PM</div>
-          <div>
-            <div style="font-family:'Lora',serif;font-style:italic;font-size:0.88rem;">He rested fully and without guilt</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:300;color:var(--gray);margin-top:0.15rem;">Mark 4:38, Matthew 8:24</div>
-          </div>
-        </div>
-
-      </div><!-- end daily life list -->
-      </div><!-- end left column -->
-
-      <!-- divider -->
-      <div style="background:#e8e8e5;height:1px;margin:1.2rem 0;"></div>
-      <!-- He Is -->
-      <div>
-        <div style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">He Is…</div>
-        <div style="font-family:'Lora',serif;font-style:italic;font-size:0.75rem;color:var(--gray);margin-bottom:0.8rem;">What have you discovered about Him?</div>
-        <div id="jesus-heis-list" style="margin-bottom:1rem;"></div>
-        <input id="jesus-heis-input" placeholder="He is..." onkeydown="if(event.key==='Enter')jesusSaveHeIs()" style="width:100%;border:none;border-bottom:1px solid #c8c8c5;background:transparent;font-family:'Lora',serif;font-style:italic;font-size:0.82rem;color:var(--black);outline:none;padding:0.3rem 0;box-sizing:border-box;">
-      </div>
-    </div><!-- end flex column -->
-
-  </div>
 
 
 </div><!-- end #jesus section -->
@@ -6276,7 +6511,7 @@ function jesusInit() {
   jesusLoad();
   jesusUpdateDayLabel();
   renderJesusCal();
-  showJesusTab('whoisjesus');
+  showJesusTab('prayer');
   // Pre-render prayer and action so data is ready when user switches tabs
   try { jesusRender('prayer'); } catch(e) {}
   try { showJesusActionTab('action', true); } catch(e) {}
@@ -6447,14 +6682,13 @@ function jesusCJump(date) {
 }
 
 function showJesusTab(tab) {
-  ['prayer','action','study','whoisjesus'].forEach(function(t) {
+  ['prayer','action','study'].forEach(function(t) {
     var sub = document.getElementById('jsub-'+t);
     if (sub) sub.style.display = t===tab?'block':'none';
     var btn = document.getElementById('jtab-'+t);
     if (btn) btn.classList.toggle('active', t===tab);
   });
   jesusRender(tab);
-  if (tab === 'whoisjesus') { jesusRenderHeIs(); showJesusChristTab('habits'); }
   if (tab === 'prayer') { showJesusPrayWordTab('things'); }
   if (tab === 'study') { showJesusStudyTab('howto'); }
 }
@@ -6857,21 +7091,26 @@ function showSchedMainTab(tab) {
   var mh = document.getElementById('schmain-habits');
   var mr = document.getElementById('schmain-routine');
   var mi = document.getElementById('schmain-infp');
+  var mry = document.getElementById('schmain-rhythm');
   var ts = document.getElementById('schtab-schedule');
   var th = document.getElementById('schtab-habits');
   var tr = document.getElementById('schtab-routine');
   var ti = document.getElementById('schtab-infp');
+  var try_ = document.getElementById('schtab-rhythm');
   if (ms) ms.style.display = tab === 'schedule' ? 'block' : 'none';
   if (mh) mh.style.display = tab === 'habits' ? 'block' : 'none';
   if (mr) mr.style.display = tab === 'routine' ? 'block' : 'none';
   if (mi) mi.style.display = tab === 'infp' ? 'block' : 'none';
+  if (mry) mry.style.display = tab === 'rhythm' ? 'block' : 'none';
   if (ts) { ts.style.color = tab === 'schedule' ? 'var(--black)' : 'var(--gray)'; ts.style.borderBottom = tab === 'schedule' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (th) { th.style.color = tab === 'habits' ? 'var(--black)' : 'var(--gray)'; th.style.borderBottom = tab === 'habits' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (tr) { tr.style.color = tab === 'routine' ? 'var(--black)' : 'var(--gray)'; tr.style.borderBottom = tab === 'routine' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (ti) { ti.style.color = tab === 'infp' ? 'var(--black)' : 'var(--gray)'; ti.style.borderBottom = tab === 'infp' ? '2px solid var(--black)' : '2px solid transparent'; }
+  if (try_) { try_.style.color = tab === 'rhythm' ? 'var(--black)' : 'var(--gray)'; try_.style.borderBottom = tab === 'rhythm' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (tab === 'habits') showSchedHabitsTab('calisthenics');
   if (tab === 'routine') routineInit();
   if (tab === 'infp') infpLoad();
+  if (tab === 'rhythm') rhythmLoad();
 }
 
 function showSchedHabitsTab(tab) {
@@ -8629,7 +8868,7 @@ function wiaRenderQ() {
   var ans = document.getElementById('wiaQAns'); if (ans) ans.value = WIA.j[wiaQi] || '';
   var prev = document.getElementById('wiaQPrev'); if (prev) prev.disabled = wiaQi === 0;
   var next = document.getElementById('wiaQNext'); if (next) next.disabled = wiaQi === wiaQs.length - 1;
-  document.getElementById('wiaQDots').innerHTML = wiaQs.map(function(_, i) {
+  var _wiaQDots = document.getElementById('wiaQDots'); if (_wiaQDots) _wiaQDots.innerHTML = wiaQs.map(function(_, i) {
     return '<div class="wia-dot' + (WIA.j[i] ? ' done' : '') + (i === wiaQi ? ' current' : '') + '" onclick="wiaJump(' + i + ')"></div>';
   }).join('');
 }
@@ -8675,7 +8914,7 @@ var wiaDailyItems = [
 function wiaRenderChecks() {
   var today = new Date().toDateString();
   var tc = WIA.c[today] || {};
-  document.getElementById('wiaChecklist').innerHTML = wiaDailyItems.map(function(t, i) {
+  var _wiaChecklist = document.getElementById('wiaChecklist'); if (_wiaChecklist) _wiaChecklist.innerHTML = wiaDailyItems.map(function(t, i) {
     return '<div class="wia-check-wrap">' +
       '<div class="wia-check' + (tc[i] ? ' done' : '') + '" onclick="wiaTog(' + i + ')">' +
         '<div class="wia-box">' + (tc[i] ? '✓' : '') + '</div>' +
@@ -8711,7 +8950,8 @@ function wiaBestStreak() {
   } return best;
 }
 function wiaRenderStreakRow() {
-  document.getElementById('wiaStreakRow').innerHTML =
+  var _wiaStreakRow = document.getElementById('wiaStreakRow'); if (!_wiaStreakRow) return;
+  _wiaStreakRow.innerHTML =
     '<div class="wia-streak-card"><div class="wia-streak-num">' + wiaStreak() + '</div><div class="wia-streak-label">Day Streak</div></div>' +
     '<div class="wia-streak-card"><div class="wia-streak-num">' + wiaTotalDays() + '</div><div class="wia-streak-label">Total Days</div></div>' +
     '<div class="wia-streak-card"><div class="wia-streak-num">' + wiaBestStreak() + '</div><div class="wia-streak-label">Best Streak</div></div>';
@@ -8803,7 +9043,7 @@ function wiaRenderPractice() {
     var tc = WIA.c[k] || {};
     wiaDailyItems.forEach(function(_, j){ if(tc[j]) counts[j]++; });
   }
-  document.getElementById('wiaPracticeBreakdown').innerHTML = wiaDailyItems.map(function(t, i) {
+  var _wiaPB = document.getElementById('wiaPracticeBreakdown'); if (_wiaPB) _wiaPB.innerHTML = wiaDailyItems.map(function(t, i) {
     var pct = Math.round((counts[i]/7)*100);
     return '<div class="wia-practice-row"><div class="wia-practice-name">'+t+'</div>' +
       '<div class="wia-bar-wrap"><div class="wia-bar" style="width:'+pct+'%"></div></div>' +
@@ -8823,7 +9063,7 @@ function wiaRenderWQ() {
   var ans = document.getElementById('wiaWQAns'); if (ans) ans.value = WIA.wj[wiaWqi] || '';
   var prev = document.getElementById('wiaWPrev'); if (prev) prev.disabled = wiaWqi === 0;
   var next = document.getElementById('wiaWNext'); if (next) next.disabled = wiaWqi === wiaWqs.length - 1;
-  document.getElementById('wiaWDots').innerHTML = wiaWqs.map(function(_, i) {
+  var _wiaWDots = document.getElementById('wiaWDots'); if (_wiaWDots) _wiaWDots.innerHTML = wiaWqs.map(function(_, i) {
     return '<div class="wia-dot' + (WIA.wj[i] ? ' done' : '') + (i === wiaWqi ? ' current' : '') + '" onclick="wiaJumpW(' + i + ')"></div>';
   }).join('');
 }
@@ -9155,7 +9395,7 @@ function rfmOpenDetail(i) {
     '</div>';
   }
 
-  document.getElementById('rfm-detail-content').innerHTML = html;
+  var _rfmDetail = document.getElementById('rfm-detail-content'); if (_rfmDetail) _rfmDetail.innerHTML = html;
   document.getElementById('rfm-panel-values').style.display = 'none';
   document.getElementById('rfm-panel-people').style.display = 'none';
   document.getElementById('rfm-panel-compare').style.display = 'none';
@@ -9608,7 +9848,7 @@ function assHabitDayView(ds) {
       + '<div style="font-family:Nunito,sans-serif;font-size:0.8rem;font-weight:300;color:'+(checked?'var(--black)':'var(--gray)')+';">'+q+'</div>'
       + '</div>';
   }).join('');
-  document.getElementById('ass-day-view-content').innerHTML = html;
+  var _assDay = document.getElementById('ass-day-view-content'); if (_assDay) _assDay.innerHTML = html;
   document.getElementById('ass-day-view-popup').style.display = 'block';
 }
 
@@ -11380,6 +11620,328 @@ function friendsPanelDeleteNote(idx) {
   friendsSave();
   var f = friendsList.find(function(x){ return x.id === _friendsPanelId; });
   if (f) friendsPanelRenderNotes(f.panelNotes || []);
+}
+
+// -- MY RHYTHM -----------------------------------------------
+var rhythmData = {};
+var rhythmMonthYear = new Date().getFullYear();
+var rhythmMonthIdx = new Date().getMonth();
+var rhythmYearNum = new Date().getFullYear();
+var rhythmCurrentSubTab = 'today';
+
+function rhythmLoad() {
+  try { rhythmData = JSON.parse(localStorage.getItem('rhythm_data') || '{}'); } catch(e) { rhythmData = {}; }
+  rhythmRenderToday();
+  rhythmRenderMonthLabel();
+  rhythmRenderMonth();
+  rhythmRenderYearLabel();
+  rhythmRenderYear();
+}
+
+function rhythmSave() {
+  localStorage.setItem('rhythm_data', JSON.stringify(rhythmData));
+}
+
+function showRhythmTab(tab) {
+  rhythmCurrentSubTab = tab;
+  ['today','month','year'].forEach(function(t) {
+    var btn = document.getElementById('rhythmtab-' + t);
+    var sub = document.getElementById('rhythmsub-' + t);
+    if (btn) { btn.style.color = t === tab ? 'var(--black)' : 'var(--gray)'; btn.style.borderBottom = t === tab ? '2px solid var(--black)' : '2px solid transparent'; }
+    if (sub) sub.style.display = t === tab ? 'block' : 'none';
+  });
+}
+
+// ---- TODAY ----
+function rhythmGetTodayKey() { return new Date().toISOString().split('T')[0]; }
+
+function rhythmRenderToday() {
+  var key = rhythmGetTodayKey();
+  var day = (rhythmData.days && rhythmData.days[key]) || {};
+
+  // Rhythm mode
+  rhythmApplyMode(day.mode || null);
+
+  // Must + Magic
+  rhythmRenderList('must', day.must || []);
+  rhythmRenderList('magic', day.magic || []);
+
+  // 3 things
+  var three = day.three || {};
+  ['imp','nec','me'].forEach(function(k) {
+    var inp = document.getElementById('rhythm-3-' + k);
+    var doneEl = document.getElementById('rhythm-3-' + k + '-done');
+    if (inp) inp.value = (three[k] && three[k].text) || '';
+    if (doneEl) rhythmApplyDoneStyle(doneEl, inp, three[k] && three[k].done);
+  });
+
+  // Solitude
+  rhythmApplySolitude(day.solitude || null);
+}
+
+function rhythmApplyMode(mode) {
+  var inhale = document.getElementById('rhythm-inhale-btn');
+  var exhale = document.getElementById('rhythm-exhale-btn');
+  var note = document.getElementById('rhythm-mode-note');
+  if (!inhale || !exhale || !note) return;
+  inhale.style.background = mode === 'inhale' ? 'var(--black)' : 'transparent';
+  inhale.style.color = mode === 'inhale' ? 'var(--white)' : 'var(--gray)';
+  exhale.style.background = mode === 'exhale' ? 'var(--black)' : 'transparent';
+  exhale.style.color = mode === 'exhale' ? 'var(--white)' : 'var(--gray)';
+  if (mode === 'inhale') note.textContent = 'Give yourself permission to rest today. One real thing, then freedom.';
+  else if (mode === 'exhale') note.textContent = 'Channel your energy. Structure serves you today — use it gently.';
+  else note.textContent = '';
+}
+
+function rhythmSetMode(mode) {
+  var key = rhythmGetTodayKey();
+  if (!rhythmData.days) rhythmData.days = {};
+  if (!rhythmData.days[key]) rhythmData.days[key] = {};
+  var cur = rhythmData.days[key].mode;
+  rhythmData.days[key].mode = cur === mode ? null : mode;
+  rhythmSave();
+  rhythmApplyMode(rhythmData.days[key].mode);
+}
+
+function rhythmRenderList(type, items) {
+  var el = document.getElementById('rhythm-' + type + '-list');
+  if (!el) return;
+  if (!items.length) { el.innerHTML = ''; return; }
+  el.innerHTML = items.map(function(item, idx) {
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.22rem 0;border-bottom:1px solid #f7f7f5;">'
+      + '<div onclick="rhythmToggleListItem(\'' + type + '\',' + idx + ')" style="cursor:pointer;flex:1;font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:' + (item.done ? '#bbb' : 'var(--black)') + ';text-decoration:' + (item.done ? 'line-through' : 'none') + ';">' + item.text + '</div>'
+      + '<button onclick="rhythmDeleteListItem(\'' + type + '\',' + idx + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:0.85rem;padding:0;line-height:1;flex-shrink:0;">×</button>'
+      + '</div>';
+  }).join('');
+}
+
+function rhythmAddItem(type) {
+  var inp = document.getElementById('rhythm-' + type + '-input');
+  var text = inp.value.trim();
+  if (!text) return;
+  var key = rhythmGetTodayKey();
+  if (!rhythmData.days) rhythmData.days = {};
+  if (!rhythmData.days[key]) rhythmData.days[key] = {};
+  if (!rhythmData.days[key][type]) rhythmData.days[key][type] = [];
+  rhythmData.days[key][type].push({ text: text, done: false });
+  rhythmSave();
+  inp.value = '';
+  rhythmRenderList(type, rhythmData.days[key][type]);
+}
+
+function rhythmToggleListItem(type, idx) {
+  var key = rhythmGetTodayKey();
+  var arr = (rhythmData.days && rhythmData.days[key] && rhythmData.days[key][type]) || [];
+  if (arr[idx]) arr[idx].done = !arr[idx].done;
+  rhythmSave();
+  rhythmRenderList(type, arr);
+}
+
+function rhythmDeleteListItem(type, idx) {
+  var key = rhythmGetTodayKey();
+  var arr = (rhythmData.days && rhythmData.days[key] && rhythmData.days[key][type]) || [];
+  arr.splice(idx, 1);
+  rhythmSave();
+  rhythmRenderList(type, arr);
+}
+
+function rhythmApplyDoneStyle(circleEl, inputEl, done) {
+  if (!circleEl) return;
+  circleEl.style.background = done ? 'var(--black)' : 'transparent';
+  circleEl.style.border = '1px solid ' + (done ? 'var(--black)' : '#c8c8c5');
+  circleEl.innerHTML = done ? '<svg width="9" height="9" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="white" stroke-width="1.8"/></svg>' : '';
+  if (inputEl) { inputEl.style.textDecoration = done ? 'line-through' : 'none'; inputEl.style.color = done ? '#bbb' : 'var(--black)'; }
+}
+
+function rhythmToggle3(k) {
+  var key = rhythmGetTodayKey();
+  if (!rhythmData.days) rhythmData.days = {};
+  if (!rhythmData.days[key]) rhythmData.days[key] = {};
+  if (!rhythmData.days[key].three) rhythmData.days[key].three = {};
+  var t = rhythmData.days[key].three;
+  if (!t[k]) t[k] = { text: '', done: false };
+  t[k].done = !t[k].done;
+  rhythmSave();
+  var inp = document.getElementById('rhythm-3-' + k);
+  var doneEl = document.getElementById('rhythm-3-' + k + '-done');
+  rhythmApplyDoneStyle(doneEl, inp, t[k].done);
+}
+
+function rhythmSave3() {
+  var key = rhythmGetTodayKey();
+  if (!rhythmData.days) rhythmData.days = {};
+  if (!rhythmData.days[key]) rhythmData.days[key] = {};
+  if (!rhythmData.days[key].three) rhythmData.days[key].three = {};
+  ['imp','nec','me'].forEach(function(k) {
+    var inp = document.getElementById('rhythm-3-' + k);
+    if (!rhythmData.days[key].three[k]) rhythmData.days[key].three[k] = { text: '', done: false };
+    rhythmData.days[key].three[k].text = inp ? inp.value : '';
+  });
+  rhythmSave();
+}
+
+function rhythmSetSolitude(val) {
+  var key = rhythmGetTodayKey();
+  if (!rhythmData.days) rhythmData.days = {};
+  if (!rhythmData.days[key]) rhythmData.days[key] = {};
+  var cur = rhythmData.days[key].solitude;
+  rhythmData.days[key].solitude = cur === val ? null : val;
+  rhythmSave();
+  rhythmApplySolitude(rhythmData.days[key].solitude);
+}
+
+function rhythmApplySolitude(val) {
+  var rBtn = document.getElementById('rhythm-sol-restore');
+  var aBtn = document.getElementById('rhythm-sol-avoid');
+  var note = document.getElementById('rhythm-sol-note');
+  if (!rBtn || !aBtn || !note) return;
+  rBtn.style.background = val === 'restore' ? 'var(--black)' : 'transparent';
+  rBtn.style.color = val === 'restore' ? 'var(--white)' : 'var(--gray)';
+  aBtn.style.background = val === 'avoid' ? 'var(--black)' : 'transparent';
+  aBtn.style.color = val === 'avoid' ? 'var(--white)' : 'var(--gray)';
+  if (val === 'restore') note.textContent = 'Good. You came out of it feeling recharged. That\'s healthy solitude. 🌿';
+  else if (val === 'avoid') note.textContent = 'Honest. Just notice what feels scary outside — you don\'t have to fix it today.';
+  else note.textContent = '';
+}
+
+// ---- MONTHLY ----
+function rhythmMonthShift(dir) {
+  rhythmMonthIdx += dir;
+  if (rhythmMonthIdx > 11) { rhythmMonthIdx = 0; rhythmMonthYear++; }
+  if (rhythmMonthIdx < 0) { rhythmMonthIdx = 11; rhythmMonthYear--; }
+  rhythmRenderMonthLabel();
+  rhythmRenderMonth();
+}
+
+function rhythmMonthKey() {
+  return rhythmMonthYear + '-' + String(rhythmMonthIdx + 1).padStart(2, '0');
+}
+
+function rhythmRenderMonthLabel() {
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var el = document.getElementById('rhythm-month-label');
+  if (el) el.textContent = months[rhythmMonthIdx] + ' ' + rhythmMonthYear;
+}
+
+function rhythmRenderMonth() {
+  var key = rhythmMonthKey();
+  var m = (rhythmData.months && rhythmData.months[key]) || {};
+  var intentionEl = document.getElementById('rhythm-month-intention');
+  var oneEl = document.getElementById('rhythm-month-one');
+  if (intentionEl) intentionEl.value = m.intention || '';
+  if (oneEl) oneEl.value = m.one || '';
+  rhythmRenderTagList('rhythm-month-more-list', m.more || [], 'month-more');
+  rhythmRenderTagList('rhythm-month-less-list', m.less || [], 'month-less');
+}
+
+function rhythmSaveMonth() {
+  var key = rhythmMonthKey();
+  if (!rhythmData.months) rhythmData.months = {};
+  if (!rhythmData.months[key]) rhythmData.months[key] = {};
+  var intentionEl = document.getElementById('rhythm-month-intention');
+  var oneEl = document.getElementById('rhythm-month-one');
+  rhythmData.months[key].intention = intentionEl ? intentionEl.value : '';
+  rhythmData.months[key].one = oneEl ? oneEl.value : '';
+  rhythmSave();
+}
+
+function rhythmAddMonthItem(type) {
+  var inp = document.getElementById('rhythm-month-' + type + '-input');
+  var text = inp.value.trim();
+  if (!text) return;
+  var key = rhythmMonthKey();
+  if (!rhythmData.months) rhythmData.months = {};
+  if (!rhythmData.months[key]) rhythmData.months[key] = {};
+  if (!rhythmData.months[key][type]) rhythmData.months[key][type] = [];
+  rhythmData.months[key][type].push(text);
+  rhythmSave();
+  inp.value = '';
+  rhythmRenderTagList('rhythm-month-' + type + '-list', rhythmData.months[key][type], 'month-' + type);
+}
+
+// ---- YEARLY ----
+function rhythmYearShift(dir) {
+  rhythmYearNum += dir;
+  rhythmRenderYearLabel();
+  rhythmRenderYear();
+}
+
+function rhythmRenderYearLabel() {
+  var el = document.getElementById('rhythm-year-label');
+  if (el) el.textContent = String(rhythmYearNum);
+}
+
+function rhythmRenderYear() {
+  var key = String(rhythmYearNum);
+  var y = (rhythmData.years && rhythmData.years[key]) || {};
+  var wordEl = document.getElementById('rhythm-year-word');
+  var visionEl = document.getElementById('rhythm-year-vision');
+  var releaseEl = document.getElementById('rhythm-year-release');
+  if (wordEl) wordEl.value = y.word || '';
+  if (visionEl) visionEl.value = y.vision || '';
+  if (releaseEl) releaseEl.value = y.release || '';
+  rhythmRenderTagList('rhythm-year-soul-list', y.soul || [], 'year-soul');
+  rhythmRenderTagList('rhythm-year-real-list', y.real || [], 'year-real');
+}
+
+function rhythmSaveYear() {
+  var key = String(rhythmYearNum);
+  if (!rhythmData.years) rhythmData.years = {};
+  if (!rhythmData.years[key]) rhythmData.years[key] = {};
+  var wordEl = document.getElementById('rhythm-year-word');
+  var visionEl = document.getElementById('rhythm-year-vision');
+  var releaseEl = document.getElementById('rhythm-year-release');
+  rhythmData.years[key].word = wordEl ? wordEl.value : '';
+  rhythmData.years[key].vision = visionEl ? visionEl.value : '';
+  rhythmData.years[key].release = releaseEl ? releaseEl.value : '';
+  rhythmSave();
+}
+
+function rhythmAddYearItem(type) {
+  var inp = document.getElementById('rhythm-year-' + type + '-input');
+  var text = inp.value.trim();
+  if (!text) return;
+  var key = String(rhythmYearNum);
+  if (!rhythmData.years) rhythmData.years = {};
+  if (!rhythmData.years[key]) rhythmData.years[key] = {};
+  if (!rhythmData.years[key][type]) rhythmData.years[key][type] = [];
+  rhythmData.years[key][type].push(text);
+  rhythmSave();
+  inp.value = '';
+  rhythmRenderTagList('rhythm-year-' + type + '-list', rhythmData.years[key][type], 'year-' + type);
+}
+
+function rhythmRenderTagList(elId, items, namespace) {
+  var el = document.getElementById(elId);
+  if (!el) return;
+  if (!items.length) { el.innerHTML = ''; return; }
+  el.innerHTML = items.map(function(item, idx) {
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.22rem 0;border-bottom:1px solid #f7f7f5;">'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-size:0.82rem;font-weight:300;color:var(--black);">' + item + '</div>'
+      + '<button onclick="rhythmDeleteTagItem(\'' + elId + '\',\'' + namespace + '\',' + idx + ')" style="border:none;background:none;color:#ccc;cursor:pointer;font-size:0.85rem;padding:0;line-height:1;flex-shrink:0;">×</button>'
+      + '</div>';
+  }).join('');
+}
+
+function rhythmDeleteTagItem(elId, namespace, idx) {
+  var parts = namespace.split('-');
+  if (parts[0] === 'month') {
+    var mKey = rhythmMonthKey();
+    var type = parts[1];
+    if (rhythmData.months && rhythmData.months[mKey] && rhythmData.months[mKey][type]) {
+      rhythmData.months[mKey][type].splice(idx, 1);
+      rhythmSave();
+      rhythmRenderTagList(elId, rhythmData.months[mKey][type], namespace);
+    }
+  } else if (parts[0] === 'year') {
+    var yKey = String(rhythmYearNum);
+    var yType = parts[1];
+    if (rhythmData.years && rhythmData.years[yKey] && rhythmData.years[yKey][yType]) {
+      rhythmData.years[yKey][yType].splice(idx, 1);
+      rhythmSave();
+      rhythmRenderTagList(elId, rhythmData.years[yKey][yType], namespace);
+    }
+  }
 }
 </script>
 
