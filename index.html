@@ -74,7 +74,7 @@
     'balance_data','that_girl_data','vision_items','ritual_state','user_rituals',
     'bc_habits_data','face_habits_data','daily_data','rfm_data','jesus_data',
     'my_routine_data','routine_todos','routine_notes','routine_photos'];
-  const SYNC_PREFIXES = ['ass_entries_','ass_notes_','jesus_','bc_','rfm_'];
+  const SYNC_PREFIXES = ['ass_entries_','ass_notes_','jesus_','bc_','rfm_','rhythm_day_','rhythm_month_','rhythm_year_'];
 
   function _shouldSync(key) {
     return SYNC_KEYS.includes(key) || SYNC_PREFIXES.some(function(p){ return key.startsWith(p); });
@@ -986,8 +986,7 @@ window.addEventListener('error', function(e) {
     <button id="schtab-routine" onclick="showSchedMainTab('routine')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">My Routine</button>
     <button id="schtab-schedule" onclick="showSchedMainTab('schedule')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--black);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid var(--black);font-weight:300;">Daily Schedule</button>
     <button id="schtab-habits" onclick="showSchedMainTab('habits')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">Calisthenics</button>
-    <button id="schtab-infp" onclick="showSchedMainTab('infp')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">INFP</button>
-    <button id="schtab-rhythm" onclick="showSchedMainTab('rhythm')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">My Rhythm</button>
+    <button id="schtab-rhythminfp" onclick="showSchedMainTab('rhythminfp')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.5rem 0.5rem 0.6rem;border-bottom:2px solid transparent;font-weight:300;">Rhythm & INFP</button>
 
   </div>
 
@@ -1276,6 +1275,13 @@ window.addEventListener('error', function(e) {
     <div id="schhabits-rest" style="display:none;"></div>
   </div>
 
+  <!-- RHYTHM & INFP COMBINED TAB -->
+  <div id="schmain-rhythminfp" style="display:none;">
+    <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.2rem;">
+      <button id="ritab-rhythm" onclick="showRhythmInfpTab('rhythm')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--black);border:none;background:none;padding:0.45rem 0.3rem 0.5rem;border-bottom:2px solid var(--black);font-weight:300;">My Rhythm</button>
+      <button id="ritab-infp" onclick="showRhythmInfpTab('infp')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gray);border:none;background:none;padding:0.45rem 0.3rem 0.5rem;border-bottom:2px solid transparent;font-weight:300;">INFP</button>
+    </div>
+
   <!-- INFP TAB -->
   <div id="schmain-infp" style="display:none;">
     <div class="subtitle" style="margin-bottom:0.5rem;">INFP</div>
@@ -1353,7 +1359,7 @@ window.addEventListener('error', function(e) {
   <!-- MY RHYTHM TAB -->
   <div id="schmain-rhythm" style="display:none;">
     <div class="subtitle" style="margin-bottom:0.5rem;">My Rhythm</div>
-    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">You don't run on schedules — you run on meaning. 🌊</div>
+    <div style="font-family:'Lora',serif;font-style:italic;font-size:0.95rem;color:var(--gray);margin-bottom:1.5rem;line-height:1.6;">You don't run on schedules. You run on meaning. 🌊</div>
 
     <!-- Inner sub-tabs -->
     <div style="display:flex;gap:0;border-bottom:1px solid #e8e8e5;margin-bottom:1.2rem;">
@@ -1365,13 +1371,15 @@ window.addEventListener('error', function(e) {
     <!-- TODAY sub-tab -->
     <div id="rhythmsub-today">
 
+      <div id="rhythm-saved-at" style="font-family:'Nunito',sans-serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);text-align:right;margin-bottom:0.5rem;min-height:1rem;"></div>
+
       <!-- Breathing check-in -->
       <div style="border:1px solid #c8c8c5;padding:0.8rem;margin-bottom:0.6rem;">
         <div class="planner-label" style="margin-bottom:0.6rem;">Today's Rhythm</div>
         <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:0.6rem;">Are you inhaling or exhaling today?</div>
         <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
-          <button id="rhythm-inhale-btn" onclick="rhythmSetMode('inhale')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #c8c8c5;background:transparent;padding:0.5rem;cursor:pointer;color:var(--gray);">🌿 Inhale — Rest &amp; Be</button>
-          <button id="rhythm-exhale-btn" onclick="rhythmSetMode('exhale')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #c8c8c5;background:transparent;padding:0.5rem;cursor:pointer;color:var(--gray);">🌬 Exhale — Do &amp; Output</button>
+          <button id="rhythm-inhale-btn" onclick="rhythmSetMode('inhale')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #c8c8c5;background:transparent;padding:0.5rem;cursor:pointer;color:var(--gray);">🌿 Inhale Rest &amp; Be</button>
+          <button id="rhythm-exhale-btn" onclick="rhythmSetMode('exhale')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #c8c8c5;background:transparent;padding:0.5rem;cursor:pointer;color:var(--gray);">🌬 Exhale Do &amp; Output</button>
         </div>
         <div id="rhythm-mode-note" style="font-family:'Lora',serif;font-style:italic;font-size:0.78rem;color:var(--gray);min-height:1.2rem;"></div>
       </div>
@@ -1426,7 +1434,7 @@ window.addEventListener('error', function(e) {
       <!-- Guilt check -->
       <div style="border:1px solid #c8c8c5;padding:0.8rem;">
         <div class="planner-label" style="margin-bottom:0.3rem;">Check In With Yourself</div>
-        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;font-weight:300;color:var(--gray);margin-bottom:0.7rem;">Your solitude today — which kind is it?</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:0.68rem;font-weight:300;color:var(--gray);margin-bottom:0.7rem;">Your solitude today. Which kind is it?</div>
         <div style="display:flex;gap:0.5rem;margin-bottom:0.6rem;">
           <button id="rhythm-sol-restore" onclick="rhythmSetSolitude('restore')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.06em;border:1px solid #c8c8c5;background:transparent;padding:0.45rem 0.3rem;cursor:pointer;color:var(--gray);">🌿 Restoring me</button>
           <button id="rhythm-sol-avoid" onclick="rhythmSetSolitude('avoid')" style="flex:1;font-family:'Nunito',sans-serif;font-size:0.62rem;letter-spacing:0.06em;border:1px solid #c8c8c5;background:transparent;padding:0.45rem 0.3rem;cursor:pointer;color:var(--gray);">🌀 Hiding from something</button>
@@ -1472,7 +1480,7 @@ window.addEventListener('error', function(e) {
 
     <!-- YEARLY sub-tab -->
     <div id="rhythmsub-year" style="display:none;">
-      <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:1rem;line-height:1.6;">The big picture. Not goals — just a direction. A feeling. A version of yourself.</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gray);margin-bottom:1rem;line-height:1.6;">The big picture. Not goals, just a direction. A feeling. A version of yourself.</div>
 
       <!-- Year selector -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
@@ -1513,6 +1521,8 @@ window.addEventListener('error', function(e) {
     </div>
 
   </div>
+
+  </div><!-- end schmain-rhythminfp -->
 
   <!-- Copy schedule picker -->
   <div id="copy-schedule-box" style="display:none;border:1px solid #c8c8c5;padding:1rem;margin-top:0.6rem;">
@@ -7090,27 +7100,35 @@ function showSchedMainTab(tab) {
   var ms = document.getElementById('schmain-schedule');
   var mh = document.getElementById('schmain-habits');
   var mr = document.getElementById('schmain-routine');
-  var mi = document.getElementById('schmain-infp');
-  var mry = document.getElementById('schmain-rhythm');
+  var mri = document.getElementById('schmain-rhythminfp');
   var ts = document.getElementById('schtab-schedule');
   var th = document.getElementById('schtab-habits');
   var tr = document.getElementById('schtab-routine');
-  var ti = document.getElementById('schtab-infp');
-  var try_ = document.getElementById('schtab-rhythm');
+  var tri = document.getElementById('schtab-rhythminfp');
   if (ms) ms.style.display = tab === 'schedule' ? 'block' : 'none';
   if (mh) mh.style.display = tab === 'habits' ? 'block' : 'none';
   if (mr) mr.style.display = tab === 'routine' ? 'block' : 'none';
-  if (mi) mi.style.display = tab === 'infp' ? 'block' : 'none';
-  if (mry) mry.style.display = tab === 'rhythm' ? 'block' : 'none';
+  if (mri) mri.style.display = tab === 'rhythminfp' ? 'block' : 'none';
   if (ts) { ts.style.color = tab === 'schedule' ? 'var(--black)' : 'var(--gray)'; ts.style.borderBottom = tab === 'schedule' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (th) { th.style.color = tab === 'habits' ? 'var(--black)' : 'var(--gray)'; th.style.borderBottom = tab === 'habits' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (tr) { tr.style.color = tab === 'routine' ? 'var(--black)' : 'var(--gray)'; tr.style.borderBottom = tab === 'routine' ? '2px solid var(--black)' : '2px solid transparent'; }
-  if (ti) { ti.style.color = tab === 'infp' ? 'var(--black)' : 'var(--gray)'; ti.style.borderBottom = tab === 'infp' ? '2px solid var(--black)' : '2px solid transparent'; }
-  if (try_) { try_.style.color = tab === 'rhythm' ? 'var(--black)' : 'var(--gray)'; try_.style.borderBottom = tab === 'rhythm' ? '2px solid var(--black)' : '2px solid transparent'; }
+  if (tri) { tri.style.color = tab === 'rhythminfp' ? 'var(--black)' : 'var(--gray)'; tri.style.borderBottom = tab === 'rhythminfp' ? '2px solid var(--black)' : '2px solid transparent'; }
   if (tab === 'habits') showSchedHabitsTab('calisthenics');
   if (tab === 'routine') routineInit();
-  if (tab === 'infp') infpLoad();
-  if (tab === 'rhythm') rhythmLoad();
+  if (tab === 'rhythminfp') { showRhythmInfpTab('rhythm'); }
+}
+
+function showRhythmInfpTab(sub) {
+  var rDiv = document.getElementById('schmain-rhythm');
+  var iDiv = document.getElementById('schmain-infp');
+  var rBtn = document.getElementById('ritab-rhythm');
+  var iBtn = document.getElementById('ritab-infp');
+  if (rDiv) rDiv.style.display = sub === 'rhythm' ? 'block' : 'none';
+  if (iDiv) iDiv.style.display = sub === 'infp' ? 'block' : 'none';
+  if (rBtn) { rBtn.style.color = sub === 'rhythm' ? 'var(--black)' : 'var(--gray)'; rBtn.style.borderBottom = sub === 'rhythm' ? '2px solid var(--black)' : '2px solid transparent'; }
+  if (iBtn) { iBtn.style.color = sub === 'infp' ? 'var(--black)' : 'var(--gray)'; iBtn.style.borderBottom = sub === 'infp' ? '2px solid var(--black)' : '2px solid transparent'; }
+  if (sub === 'rhythm') rhythmLoad();
+  if (sub === 'infp') infpLoad();
 }
 
 function showSchedHabitsTab(tab) {
@@ -11629,8 +11647,64 @@ var rhythmMonthIdx = new Date().getMonth();
 var rhythmYearNum = new Date().getFullYear();
 var rhythmCurrentSubTab = 'today';
 
+function rhythmTsNow() {
+  return new Date().toLocaleString('en-US', {
+    month: 'long', day: 'numeric', year: 'numeric',
+    hour: 'numeric', minute: '2-digit', hour12: true
+  });
+}
+
+function rhythmDayKey(dateKey) { return 'rhythm_day_' + dateKey; }
+function rhythmMonKey(yrmo)    { return 'rhythm_month_' + yrmo; }
+function rhythmYrKey(yr)       { return 'rhythm_year_'  + yr; }
+
+function rhythmLoadDay(dateKey) {
+  try { return JSON.parse(localStorage.getItem(rhythmDayKey(dateKey)) || '{}'); } catch(e) { return {}; }
+}
+function rhythmLoadMonth(yrmo) {
+  try { return JSON.parse(localStorage.getItem(rhythmMonKey(yrmo)) || '{}'); } catch(e) { return {}; }
+}
+function rhythmLoadYear(yr) {
+  try { return JSON.parse(localStorage.getItem(rhythmYrKey(yr)) || '{}'); } catch(e) { return {}; }
+}
+
 function rhythmLoad() {
-  try { rhythmData = JSON.parse(localStorage.getItem('rhythm_data') || '{}'); } catch(e) { rhythmData = {}; }
+  // Migrate old monolithic rhythm_data if it exists
+  try {
+    var old = JSON.parse(localStorage.getItem('rhythm_data') || 'null');
+    if (old) {
+      if (old.days) {
+        Object.keys(old.days).forEach(function(dk) {
+          var k = rhythmDayKey(dk);
+          if (!localStorage.getItem(k)) {
+            var d = old.days[dk]; d.savedAt = d.savedAt || old.savedAt || rhythmTsNow();
+            window._rawLS(k, JSON.stringify(d));
+          }
+        });
+      }
+      if (old.months) {
+        Object.keys(old.months).forEach(function(mk) {
+          var k = rhythmMonKey(mk);
+          if (!localStorage.getItem(k)) {
+            var m = old.months[mk]; m.savedAt = m.savedAt || old.savedAt || rhythmTsNow();
+            window._rawLS(k, JSON.stringify(m));
+          }
+        });
+      }
+      if (old.years) {
+        Object.keys(old.years).forEach(function(yk) {
+          var k = rhythmYrKey(yk);
+          if (!localStorage.getItem(k)) {
+            var y = old.years[yk]; y.savedAt = y.savedAt || old.savedAt || rhythmTsNow();
+            window._rawLS(k, JSON.stringify(y));
+          }
+        });
+      }
+      localStorage.removeItem('rhythm_data');
+    }
+  } catch(e) {}
+
+  rhythmData = {}; // kept as lightweight in-memory scratch; real data lives per-key
   rhythmRenderToday();
   rhythmRenderMonthLabel();
   rhythmRenderMonth();
@@ -11638,8 +11712,51 @@ function rhythmLoad() {
   rhythmRenderYear();
 }
 
+// Save today's day record
+function rhythmSaveDay() {
+  var dateKey = rhythmGetTodayKey();
+  var dayData = rhythmLoadDay(dateKey);
+  // merge in-memory day from rhythmData
+  if (rhythmData.days && rhythmData.days[dateKey]) {
+    dayData = Object.assign(dayData, rhythmData.days[dateKey]);
+  }
+  dayData.savedAt = rhythmTsNow();
+  localStorage.setItem(rhythmDayKey(dateKey), JSON.stringify(dayData));
+  var el = document.getElementById('rhythm-saved-at');
+  if (el) el.textContent = 'Saved ' + dayData.savedAt;
+}
+
+// Save current month record
+function rhythmSaveMonthData() {
+  var yrmo = rhythmMonthYear + '-' + String(rhythmMonthIdx + 1).padStart(2, '0');
+  var mData = rhythmLoadMonth(yrmo);
+  if (rhythmData.months && rhythmData.months[yrmo]) {
+    mData = Object.assign(mData, rhythmData.months[yrmo]);
+  }
+  mData.savedAt = rhythmTsNow();
+  localStorage.setItem(rhythmMonKey(yrmo), JSON.stringify(mData));
+  var el = document.getElementById('rhythm-saved-at');
+  if (el) el.textContent = 'Saved ' + mData.savedAt;
+}
+
+// Save current year record
+function rhythmSaveYearData() {
+  var yr = String(rhythmYearNum);
+  var yData = rhythmLoadYear(yr);
+  if (rhythmData.years && rhythmData.years[yr]) {
+    yData = Object.assign(yData, rhythmData.years[yr]);
+  }
+  yData.savedAt = rhythmTsNow();
+  localStorage.setItem(rhythmYrKey(yr), JSON.stringify(yData));
+  var el = document.getElementById('rhythm-saved-at');
+  if (el) el.textContent = 'Saved ' + yData.savedAt;
+}
+
+// Legacy alias — routes to the right saver based on active sub-tab
 function rhythmSave() {
-  localStorage.setItem('rhythm_data', JSON.stringify(rhythmData));
+  if (rhythmCurrentSubTab === 'month') { rhythmSaveMonthData(); }
+  else if (rhythmCurrentSubTab === 'year') { rhythmSaveYearData(); }
+  else { rhythmSaveDay(); }
 }
 
 function showRhythmTab(tab) {
@@ -11650,6 +11767,20 @@ function showRhythmTab(tab) {
     if (btn) { btn.style.color = t === tab ? 'var(--black)' : 'var(--gray)'; btn.style.borderBottom = t === tab ? '2px solid var(--black)' : '2px solid transparent'; }
     if (sub) sub.style.display = t === tab ? 'block' : 'none';
   });
+  // Update saved-at label for the newly active tab
+  var savedEl = document.getElementById('rhythm-saved-at');
+  if (savedEl) {
+    var ts = '';
+    if (tab === 'today') {
+      var d = rhythmLoadDay(rhythmGetTodayKey()); ts = d.savedAt || '';
+    } else if (tab === 'month') {
+      var yrmo = rhythmMonthYear + '-' + String(rhythmMonthIdx + 1).padStart(2, '0');
+      var m = rhythmLoadMonth(yrmo); ts = m.savedAt || '';
+    } else if (tab === 'year') {
+      var y = rhythmLoadYear(String(rhythmYearNum)); ts = y.savedAt || '';
+    }
+    savedEl.textContent = ts ? 'Saved ' + ts : '';
+  }
 }
 
 // ---- TODAY ----
@@ -11657,7 +11788,11 @@ function rhythmGetTodayKey() { return new Date().toISOString().split('T')[0]; }
 
 function rhythmRenderToday() {
   var key = rhythmGetTodayKey();
-  var day = (rhythmData.days && rhythmData.days[key]) || {};
+  var day = rhythmLoadDay(key);
+  if (!rhythmData.days) rhythmData.days = {};
+  rhythmData.days[key] = day; // keep in-memory in sync
+  var savedEl = document.getElementById('rhythm-saved-at');
+  if (savedEl) savedEl.textContent = day.savedAt ? 'Saved ' + day.savedAt : '';
 
   // Rhythm mode
   rhythmApplyMode(day.mode || null);
@@ -11689,7 +11824,7 @@ function rhythmApplyMode(mode) {
   exhale.style.background = mode === 'exhale' ? 'var(--black)' : 'transparent';
   exhale.style.color = mode === 'exhale' ? 'var(--white)' : 'var(--gray)';
   if (mode === 'inhale') note.textContent = 'Give yourself permission to rest today. One real thing, then freedom.';
-  else if (mode === 'exhale') note.textContent = 'Channel your energy. Structure serves you today — use it gently.';
+  else if (mode === 'exhale') note.textContent = 'Channel your energy. Structure serves you today, use it gently.';
   else note.textContent = '';
 }
 
@@ -11699,7 +11834,7 @@ function rhythmSetMode(mode) {
   if (!rhythmData.days[key]) rhythmData.days[key] = {};
   var cur = rhythmData.days[key].mode;
   rhythmData.days[key].mode = cur === mode ? null : mode;
-  rhythmSave();
+  rhythmSaveDay();
   rhythmApplyMode(rhythmData.days[key].mode);
 }
 
@@ -11724,7 +11859,7 @@ function rhythmAddItem(type) {
   if (!rhythmData.days[key]) rhythmData.days[key] = {};
   if (!rhythmData.days[key][type]) rhythmData.days[key][type] = [];
   rhythmData.days[key][type].push({ text: text, done: false });
-  rhythmSave();
+  rhythmSaveDay();
   inp.value = '';
   rhythmRenderList(type, rhythmData.days[key][type]);
 }
@@ -11733,7 +11868,7 @@ function rhythmToggleListItem(type, idx) {
   var key = rhythmGetTodayKey();
   var arr = (rhythmData.days && rhythmData.days[key] && rhythmData.days[key][type]) || [];
   if (arr[idx]) arr[idx].done = !arr[idx].done;
-  rhythmSave();
+  rhythmSaveDay();
   rhythmRenderList(type, arr);
 }
 
@@ -11741,7 +11876,7 @@ function rhythmDeleteListItem(type, idx) {
   var key = rhythmGetTodayKey();
   var arr = (rhythmData.days && rhythmData.days[key] && rhythmData.days[key][type]) || [];
   arr.splice(idx, 1);
-  rhythmSave();
+  rhythmSaveDay();
   rhythmRenderList(type, arr);
 }
 
@@ -11761,7 +11896,7 @@ function rhythmToggle3(k) {
   var t = rhythmData.days[key].three;
   if (!t[k]) t[k] = { text: '', done: false };
   t[k].done = !t[k].done;
-  rhythmSave();
+  rhythmSaveDay();
   var inp = document.getElementById('rhythm-3-' + k);
   var doneEl = document.getElementById('rhythm-3-' + k + '-done');
   rhythmApplyDoneStyle(doneEl, inp, t[k].done);
@@ -11777,7 +11912,7 @@ function rhythmSave3() {
     if (!rhythmData.days[key].three[k]) rhythmData.days[key].three[k] = { text: '', done: false };
     rhythmData.days[key].three[k].text = inp ? inp.value : '';
   });
-  rhythmSave();
+  rhythmSaveDay();
 }
 
 function rhythmSetSolitude(val) {
@@ -11786,7 +11921,7 @@ function rhythmSetSolitude(val) {
   if (!rhythmData.days[key]) rhythmData.days[key] = {};
   var cur = rhythmData.days[key].solitude;
   rhythmData.days[key].solitude = cur === val ? null : val;
-  rhythmSave();
+  rhythmSaveDay();
   rhythmApplySolitude(rhythmData.days[key].solitude);
 }
 
@@ -11800,7 +11935,7 @@ function rhythmApplySolitude(val) {
   aBtn.style.background = val === 'avoid' ? 'var(--black)' : 'transparent';
   aBtn.style.color = val === 'avoid' ? 'var(--white)' : 'var(--gray)';
   if (val === 'restore') note.textContent = 'Good. You came out of it feeling recharged. That\'s healthy solitude. 🌿';
-  else if (val === 'avoid') note.textContent = 'Honest. Just notice what feels scary outside — you don\'t have to fix it today.';
+  else if (val === 'avoid') note.textContent = 'Honest. Just notice what feels scary outside. You don\'t have to fix it today.';
   else note.textContent = '';
 }
 
@@ -11824,8 +11959,12 @@ function rhythmRenderMonthLabel() {
 }
 
 function rhythmRenderMonth() {
-  var key = rhythmMonthKey();
-  var m = (rhythmData.months && rhythmData.months[key]) || {};
+  var yrmo = rhythmMonthYear + '-' + String(rhythmMonthIdx + 1).padStart(2, '0');
+  var m = rhythmLoadMonth(yrmo);
+  if (!rhythmData.months) rhythmData.months = {};
+  rhythmData.months[yrmo] = m;
+  var savedEl = document.getElementById('rhythm-saved-at');
+  if (savedEl) savedEl.textContent = m.savedAt ? 'Saved ' + m.savedAt : '';
   var intentionEl = document.getElementById('rhythm-month-intention');
   var oneEl = document.getElementById('rhythm-month-one');
   if (intentionEl) intentionEl.value = m.intention || '';
@@ -11835,28 +11974,28 @@ function rhythmRenderMonth() {
 }
 
 function rhythmSaveMonth() {
-  var key = rhythmMonthKey();
+  var yrmo = rhythmMonthYear + '-' + String(rhythmMonthIdx + 1).padStart(2, '0');
   if (!rhythmData.months) rhythmData.months = {};
-  if (!rhythmData.months[key]) rhythmData.months[key] = {};
+  if (!rhythmData.months[yrmo]) rhythmData.months[yrmo] = {};
   var intentionEl = document.getElementById('rhythm-month-intention');
   var oneEl = document.getElementById('rhythm-month-one');
-  rhythmData.months[key].intention = intentionEl ? intentionEl.value : '';
-  rhythmData.months[key].one = oneEl ? oneEl.value : '';
-  rhythmSave();
+  rhythmData.months[yrmo].intention = intentionEl ? intentionEl.value : '';
+  rhythmData.months[yrmo].one = oneEl ? oneEl.value : '';
+  rhythmSaveMonthData();
 }
 
 function rhythmAddMonthItem(type) {
   var inp = document.getElementById('rhythm-month-' + type + '-input');
   var text = inp.value.trim();
   if (!text) return;
-  var key = rhythmMonthKey();
+  var yrmo = rhythmMonthYear + '-' + String(rhythmMonthIdx + 1).padStart(2, '0');
   if (!rhythmData.months) rhythmData.months = {};
-  if (!rhythmData.months[key]) rhythmData.months[key] = {};
-  if (!rhythmData.months[key][type]) rhythmData.months[key][type] = [];
-  rhythmData.months[key][type].push(text);
-  rhythmSave();
+  if (!rhythmData.months[yrmo]) rhythmData.months[yrmo] = {};
+  if (!rhythmData.months[yrmo][type]) rhythmData.months[yrmo][type] = [];
+  rhythmData.months[yrmo][type].push(text);
+  rhythmSaveMonthData();
   inp.value = '';
-  rhythmRenderTagList('rhythm-month-' + type + '-list', rhythmData.months[key][type], 'month-' + type);
+  rhythmRenderTagList('rhythm-month-' + type + '-list', rhythmData.months[yrmo][type], 'month-' + type);
 }
 
 // ---- YEARLY ----
@@ -11872,8 +12011,12 @@ function rhythmRenderYearLabel() {
 }
 
 function rhythmRenderYear() {
-  var key = String(rhythmYearNum);
-  var y = (rhythmData.years && rhythmData.years[key]) || {};
+  var yr = String(rhythmYearNum);
+  var y = rhythmLoadYear(yr);
+  if (!rhythmData.years) rhythmData.years = {};
+  rhythmData.years[yr] = y;
+  var savedEl = document.getElementById('rhythm-saved-at');
+  if (savedEl) savedEl.textContent = y.savedAt ? 'Saved ' + y.savedAt : '';
   var wordEl = document.getElementById('rhythm-year-word');
   var visionEl = document.getElementById('rhythm-year-vision');
   var releaseEl = document.getElementById('rhythm-year-release');
@@ -11885,30 +12028,30 @@ function rhythmRenderYear() {
 }
 
 function rhythmSaveYear() {
-  var key = String(rhythmYearNum);
+  var yr = String(rhythmYearNum);
   if (!rhythmData.years) rhythmData.years = {};
-  if (!rhythmData.years[key]) rhythmData.years[key] = {};
+  if (!rhythmData.years[yr]) rhythmData.years[yr] = {};
   var wordEl = document.getElementById('rhythm-year-word');
   var visionEl = document.getElementById('rhythm-year-vision');
   var releaseEl = document.getElementById('rhythm-year-release');
-  rhythmData.years[key].word = wordEl ? wordEl.value : '';
-  rhythmData.years[key].vision = visionEl ? visionEl.value : '';
-  rhythmData.years[key].release = releaseEl ? releaseEl.value : '';
-  rhythmSave();
+  rhythmData.years[yr].word = wordEl ? wordEl.value : '';
+  rhythmData.years[yr].vision = visionEl ? visionEl.value : '';
+  rhythmData.years[yr].release = releaseEl ? releaseEl.value : '';
+  rhythmSaveYearData();
 }
 
 function rhythmAddYearItem(type) {
   var inp = document.getElementById('rhythm-year-' + type + '-input');
   var text = inp.value.trim();
   if (!text) return;
-  var key = String(rhythmYearNum);
+  var yr = String(rhythmYearNum);
   if (!rhythmData.years) rhythmData.years = {};
-  if (!rhythmData.years[key]) rhythmData.years[key] = {};
-  if (!rhythmData.years[key][type]) rhythmData.years[key][type] = [];
-  rhythmData.years[key][type].push(text);
-  rhythmSave();
+  if (!rhythmData.years[yr]) rhythmData.years[yr] = {};
+  if (!rhythmData.years[yr][type]) rhythmData.years[yr][type] = [];
+  rhythmData.years[yr][type].push(text);
+  rhythmSaveYearData();
   inp.value = '';
-  rhythmRenderTagList('rhythm-year-' + type + '-list', rhythmData.years[key][type], 'year-' + type);
+  rhythmRenderTagList('rhythm-year-' + type + '-list', rhythmData.years[yr][type], 'year-' + type);
 }
 
 function rhythmRenderTagList(elId, items, namespace) {
@@ -11926,20 +12069,20 @@ function rhythmRenderTagList(elId, items, namespace) {
 function rhythmDeleteTagItem(elId, namespace, idx) {
   var parts = namespace.split('-');
   if (parts[0] === 'month') {
-    var mKey = rhythmMonthKey();
+    var yrmo = rhythmMonthYear + '-' + String(rhythmMonthIdx + 1).padStart(2, '0');
     var type = parts[1];
-    if (rhythmData.months && rhythmData.months[mKey] && rhythmData.months[mKey][type]) {
-      rhythmData.months[mKey][type].splice(idx, 1);
-      rhythmSave();
-      rhythmRenderTagList(elId, rhythmData.months[mKey][type], namespace);
+    if (rhythmData.months && rhythmData.months[yrmo] && rhythmData.months[yrmo][type]) {
+      rhythmData.months[yrmo][type].splice(idx, 1);
+      rhythmSaveMonthData();
+      rhythmRenderTagList(elId, rhythmData.months[yrmo][type], namespace);
     }
   } else if (parts[0] === 'year') {
-    var yKey = String(rhythmYearNum);
+    var yr = String(rhythmYearNum);
     var yType = parts[1];
-    if (rhythmData.years && rhythmData.years[yKey] && rhythmData.years[yKey][yType]) {
-      rhythmData.years[yKey][yType].splice(idx, 1);
-      rhythmSave();
-      rhythmRenderTagList(elId, rhythmData.years[yKey][yType], namespace);
+    if (rhythmData.years && rhythmData.years[yr] && rhythmData.years[yr][yType]) {
+      rhythmData.years[yr][yType].splice(idx, 1);
+      rhythmSaveYearData();
+      rhythmRenderTagList(elId, rhythmData.years[yr][yType], namespace);
     }
   }
 }
